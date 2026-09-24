@@ -1,0 +1,51 @@
+▲ Next.js 16.1.3 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://21.0.17.105:3000
+- Environments: .env
+
+✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+✓ Ready in 920ms
+○ Compiling / ...
+ GET / 200 in 4.6s (compile: 4.4s, render: 168ms)
+ GET / 200 in 418ms (compile: 348ms, render: 70ms)
+ GET /rekomenduyu 200 in 502ms (compile: 458ms, render: 44ms)
+ GET /gde-deshevle 200 in 438ms (compile: 378ms, render: 60ms)
+ GET /gde-kupit 200 in 426ms (compile: 383ms, render: 43ms)
+ GET /o-rabotodatelyah 200 in 371ms (compile: 320ms, render: 51ms)
+ GET /gkh 200 in 368ms (compile: 313ms, render: 55ms)
+ POST /api/discuss/recommend/test 401 in 1075ms (compile: 1055ms, render: 20ms)
+ POST /api/discuss/wheretobuy/test 401 in 32ms (compile: 19ms, render: 13ms)
+ POST /api/discuss/gdedeshevle/test 401 in 18ms (compile: 4ms, render: 14ms)
+ POST /api/discuss/employers/test 401 in 11ms (compile: 3ms, render: 8ms)
+ POST /api/discuss/gkh/test 401 in 38ms (compile: 3ms, render: 35ms)
+ POST /api/discuss/badkind/test 400 in 14ms (compile: 3ms, render: 11ms)
+prisma:query SELECT `main`.`GkhProblem`.`id`, `main`.`GkhProblem`.`title`, `main`.`GkhProblem`.`text`, `main`.`GkhProblem`.`actions`, `main`.`GkhProblem`.`place`, `main`.`GkhProblem`.`problemDate`, `main`.`GkhProblem`.`status`, `main`.`GkhProblem`.`statusAt`, `main`.`GkhProblem`.`authorId`, `main`.`GkhProblem`.`authorName`, `main`.`GkhProblem`.`organization`, `main`.`GkhProblem`.`orgResponseText`, `main`.`GkhProblem`.`orgResponseAt`, `main`.`GkhProblem`.`orgResponseById`, `main`.`GkhProblem`.`orgResponseByName`, `main`.`GkhProblem`.`topicId`, `main`.`GkhProblem`.`mergedIntoId`, `main`.`GkhProblem`.`aiStatus`, `main`.`GkhProblem`.`aiNote`, `main`.`GkhProblem`.`hiddenReason`, `main`.`GkhProblem`.`isHiddenByAi`, `main`.`GkhProblem`.`needHuman`, `main`.`GkhProblem`.`isDeleted`, `main`.`GkhProblem`.`deletedAt`, `main`.`GkhProblem`.`editedAt`, `main`.`GkhProblem`.`createdAt`, `main`.`GkhProblem`.`updatedAt` FROM `main`.`GkhProblem` WHERE (`main`.`GkhProblem`.`isDeleted` = ? AND `main`.`GkhProblem`.`isHiddenByAi` = ? AND `main`.`GkhProblem`.`mergedIntoId` IS NULL AND `main`.`GkhProblem`.`status` IN (?,?,?,?)) ORDER BY `main`.`GkhProblem`.`createdAt` DESC, `main`.`GkhProblem`.`id` DESC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`User`.`id`, `main`.`User`.`gender` FROM `main`.`User` WHERE `main`.`User`.`id` IN (?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`GkhUpdate`.`id`, `main`.`GkhUpdate`.`problemId`, `main`.`GkhUpdate`.`text` FROM `main`.`GkhUpdate` WHERE (`main`.`GkhUpdate`.`problemId` IN (?,?,?,?) AND `main`.`GkhUpdate`.`isDeleted` = ? AND `main`.`GkhUpdate`.`isHiddenByAi` = ?) ORDER BY `main`.`GkhUpdate`.`id` ASC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`GkhMedia`.`id`, `main`.`GkhMedia`.`problemId`, `main`.`GkhMedia`.`kind` FROM `main`.`GkhMedia` WHERE (`main`.`GkhMedia`.`problemId` IN (?) AND `main`.`GkhMedia`.`updateId` IS NULL) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`GkhUpdate`.`id`, `main`.`GkhUpdate`.`problemId` FROM `main`.`GkhUpdate` WHERE (`main`.`GkhUpdate`.`problemId` IN (?) AND `main`.`GkhUpdate`.`isDeleted` = ? AND `main`.`GkhUpdate`.`isHiddenByAi` = ?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`GkhUpdate`.`id`, `main`.`GkhUpdate`.`problemId`, `main`.`GkhUpdate`.`text` FROM `main`.`GkhUpdate` WHERE (`main`.`GkhUpdate`.`problemId` IN (?) AND `main`.`GkhUpdate`.`isDeleted` = ? AND `main`.`GkhUpdate`.`isHiddenByAi` = ?) ORDER BY `main`.`GkhUpdate`.`id` ASC LIMIT ? OFFSET ?
+ GET /api/gkh?page=1&pageSize=1 200 in 216ms (compile: 196ms, render: 20ms)
+prisma:query BEGIN IMMEDIATE
+prisma:query INSERT INTO `main`.`CurrencyRate` (`id`, `batch`, `bank`, `currency`, `buy`, `sell`, `refreshedAt`, `source`, `createdAt`) VALUES (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?)
+prisma:query COMMIT
+prisma:query DELETE FROM `main`.`CurrencyRate` WHERE `main`.`CurrencyRate`.`batch` < ?
+Failed to invoke remote function: Error: Function invoke failed with status 500: {"result":null,"error":"Page reader failed: request failed with status 422: {\"code\":422,\"data\":null,\"message\":\"JINA request returned 422 for https:/skk65.ru/wp-json/wp/v2/posts: {\\\"data\\\":null,\\\"cause\\\":{\\\"log\\\":[\\\"  - navigating to \\\\\\\"https://skk65.ru/wp-json/wp/v2/posts\\\\\\\", waiting until \\\\\\\"networkidle\\\\\\\"\\\"],\\\"name\\\":\\\"Error\\\"},\\\"code\\\":422,\\\"name\\\":\\\"AssertionFailureError\\\",\\\"status\\\":42206,\\\"message\\\":\\\"Failed to goto https://skk65.ru: Error: page.goto: net::ERR_CONNECTION_REFUSED at https://skk65.ru/wp-json/wp/v2/posts\\\\nCall log:\\\\n  - navigating to \\\\\\\"https://skk65.ru/wp-json/wp/v2/posts\\\\\\\", waiting until \\\\\\\"networkidle\\\\\\\"\\\\n\\\",\\\"readableMessage\\\":\\\"AssertionFailureError: Failed to goto https://skk65.ru: Error: page.goto: net::ERR_CONNECTION_REFUSED at https://skk65.ru/wp-json/wp/v2/posts\\\\nCall log:\\\\n  - navigating to \\\\\\\"https://skk65.ru/wp-json/wp/v2/posts\\\\\\\", waiting until \\\\\\\"networkidle\\\\\\\"\\\\n\\\"}\",\"name\":\"UpstreamError\"}\n"}
+    at async sdkPageReader (src/lib/outages-parser.ts:297:15)
+    at async fetchSourcePage (src/lib/outages-parser.ts:320:16)
+    at async collectSkk (src/lib/outages-parser.ts:659:17)
+    at async runOutagesParse (src/lib/outages-parser.ts:729:19)
+    at async tick (src/instrumentation-node.ts:35:7)
+    at async runOutages (src/instrumentation-node.ts:51:5)
+  295 |   const ZAI = (mod as { default?: unknown }).default ?? mod;
+  296 |   const zai = await (ZAI as { create: () => Promise<unknown> }).create();
+> 297 |   const res = await (
+      |               ^
+  298 |     zai as {
+  299 |       functions: {
+  300 |         invoke: (name: string, args: { url: string }) => Promise<unknown>;

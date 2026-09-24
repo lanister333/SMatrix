@@ -105,7 +105,17 @@ function buildTopicTitleBody(kind: string, post: Record<string, unknown>): { tit
     if (post.personMention) parts.push(`Отдельно хочу отметить человека:\n${post.personMention}`);
     return { title, body: parts.join("\n\n") };
   }
-  // recommend / wheretobuy / gdedeshevle / gkh — стандартные title + text.
+  if (kind === "gkh") {
+    // ЖКХ — заголовок = title (например, «Южно-Сахалинск, ул. Емельянова, д. 21»),
+    // тело = описание проблемы + предпринятые действия (actions — поле в GkhProblem,
+    // ТЗ №2 от 2026-09-23: «Подана коллективная заявка в УК №10 от 16.09…»).
+    const title = String(post.title || "").slice(0, 150);
+    const parts: string[] = [];
+    if (post.text) parts.push(`Проблема:\n${post.text}`);
+    if (post.actions) parts.push(`Действия:\n${post.actions}`);
+    return { title, body: parts.join("\n\n") };
+  }
+  // recommend / wheretobuy / gdedeshevle — стандартные title + text.
   // У RecPost есть ещё поле subject — используем его как fallback для заголовка.
   const title = String(post.title || post.subject || "").slice(0, 150);
   const body = String(post.text || "");
@@ -144,29 +154,35 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ kind: stri
       return NextResponse.json({ error: "Рубрика-назначение не найдена" }, { status: 500 });
     }
 
-    // Шаг 4: находим публикацию. Используем db.<model>.findUnique с select,
-    // чтобы взять только нужные поля (включая topicId, isDeleted, isHiddenByAi).
+    // Шаг 4: находим публикацию. Универсальные поля (id, topicId, isDeleted,
+    // isHiddenByAi) есть во всех 5 моделях. Специфичные поля (subject для RecPost,
+    // employer/city/workPeriod/experience/personMention для EmpPost, actions для
+    // GkhProblem) добавляем по kind — иначе Prisma упадёт с Unknown field.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const baseSelect: Record<string, true> = {
+      id: true,
+      topicId: true,
+      isDeleted: true,
+      isHiddenByAi: true,
+      title: true,
+      text: true,
+      place: true,
+    };
+    if (kind === "recommend") baseSelect.subject = true;
+    if (kind === "employers") {
+      baseSelect.employer = true;
+      baseSelect.city = true;
+      baseSelect.workPeriod = true;
+      baseSelect.experience = true;
+      baseSelect.personMention = true;
+    }
+    if (kind === "gkh") {
+      baseSelect.actions = true;
+    }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const post: Record<string, unknown> | null = await (db[cfg.prismaModel] as any).findUnique({
       where: { id },
-      select: {
-        id: true,
-        topicId: true,
-        isDeleted: true,
-        isHiddenByAi: true,
-        // Стандартные title/text/subject (для recommend):
-        title: true,
-        text: true,
-        subject: true,
-        // Поле place есть у всех, кроме EmpPost (там city):
-        place: true,
-        // Только для EmpPost:
-        employer: true,
-        city: true,
-        workPeriod: true,
-        experience: true,
-        personMention: true,
-      },
+      select: baseSelect,
     });
     if (!post || post.isDeleted) {
       return NextResponse.json({ error: "Публикация не найдена" }, { status: 404 });
