@@ -1,0 +1,916 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  nickname      String    @unique
+  gender        String    @default("unspecified")
+  role          String    @default("user")
+  secretQuestion String   @default("")
+  secretAnswer  String    @default("")
+  emailVerified Boolean   @default(false)
+  restrictedUntil DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  tokens        AuthToken[]
+  messages      Message[]
+  topics        Topic[]
+  sanctions     Sanction[]
+  /// ШАГ 19. Подтверждённый представитель организации (устанавливает только
+  /// администратор; обычный пользователь не может присвоить статус сам — ТЗ п.11).
+  orgRep        Boolean   @default(false)
+  /// ШАГ 19. Название организации представителя (показывается при официальном ответе).
+  orgName       String    @default("")
+  gkhProblems   GkhProblem[]
+  gkhUpdates    GkhUpdate[]
+  datingPosts   DatingPost[]
+  cheapPosts    CheapPost[]
+  recPosts      RecPost[]
+  empPosts      EmpPost[]
+  adListings    AdListing[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model AuthToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  purpose   String // "verify" | "reset"
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model Captcha {
+  id        String   @id @default(cuid())
+  answer    String
+  expiresAt DateTime
+}
+
+model Rubric {
+  id        Int       @id @default(autoincrement())
+  name      String
+  slug      String    @unique
+  isService Boolean   @default(false)
+  parentId  Int?
+  parent    Rubric?   @relation("RubricTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Rubric[]  @relation("RubricTree")
+  topics    Topic[]
+}
+
+model Topic {
+  id             Int       @id @default(autoincrement())
+  number         Int       @unique
+  title          String
+  source         String?
+  authorName     String
+  authorId       String?
+  author         User?     @relation(fields: [authorId], references: [id])
+  rubricId       Int?
+  rubric         Rubric?   @relation(fields: [rubricId], references: [id])
+  views          Int       @default(0)
+  isPinned       Boolean   @default(false)
+  isClosed       Boolean   @default(false)
+  isArchived     Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  lastActivityAt DateTime  @default(now())
+  lastAuthorName String    @default("")
+  deletedAt      DateTime?
+  messages       Message[]
+  /// ШАГ 17. Публикация «Подслушано», к которой привязана тема (0..1, у публикации уникально).
+  overheardPost  OverheardPost?
+  /// ШАГ 18. Вопрос «Где купить», к которому привязана тема (0..1, у вопроса уникально).
+  whereToBuyPost WhereToBuyPost?
+  /// ШАГ 19. Проблема «ЖКХ и городские проблемы», к которой привязана тема
+  /// (0..1, у проблемы уникально — максимум одна тема на проблему, ТЗ п.13–15).
+  gkhProblem     GkhProblem?
+  /// ШАГ 23. Вопрос «Где дешевле», к которому привязана тема.
+  cheapPost      CheapPost?
+  /// ШАГ 20. Публикация «Рекомендую / Не рекомендую», к которой привязана тема.
+  recPost        RecPost?
+  /// ШАГ 25. Отзыв «О работодателях», к которому привязана тема.
+  empPost        EmpPost?
+}
+
+model Message {
+  id           String    @id @default(cuid())
+  topicId      Int
+  topic        Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  parentId     String?
+  parent       Message?  @relation("MsgTree", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children     Message[] @relation("MsgTree")
+  depth        Int       @default(0)
+  num          Int
+  authorName   String
+  authorId     String?
+  author       User?     @relation(fields: [authorId], references: [id])
+  body         String
+  kind         String    @default("advice")
+  aiStatus     String    @default("ok")
+  aiNote       String    @default("")
+  needHuman    Boolean   @default(false)
+  floodCount   Int       @default(0)
+  isCollapsed  Boolean   @default(false)
+  isHiddenByAi Boolean   @default(false)
+  hiddenReason String    @default("")
+  isDeleted    Boolean   @default(false)
+  deletedBy    String    @default("")
+  editedAt     DateTime?
+  createdAt    DateTime  @default(now())
+  complaints   Complaint[]
+}
+
+model Complaint {
+  id           String    @id @default(cuid())
+  messageId    String
+  message      Message   @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  category     String
+  comment      String    @default("")
+  reporterName String    @default("")
+  aiVerdict    String    @default("")
+  aiNote       String    @default("")
+  resolved     Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+}
+
+model Appeal {
+  id        String   @id @default(cuid())
+  text      String
+  contact   String   @default("")
+  resolved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+/// ШАГ 11. Санкции — мягкая лестница ограничений.
+/// kind: warning | limit_1h | limit_24h | limit_3d | ban
+/// source: ai (автоматически, осторожно) | human (человек-модератор)
+model Sanction {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind          String
+  reason        String
+  source        String    @default("ai")
+  messageId     String?
+  topicId       Int?
+  expiresAt     DateTime?
+  revoked       Boolean   @default(false)
+  revokedBy     String    @default("")
+  revokedReason String    @default("")
+  revokedAt     DateTime?
+  createdAt     DateTime  @default(now())
+  appeals       DecisionAppeal[]
+}
+
+/// ШАГ 11. Апелляция на решение модерации (скрытие сообщения или санкция).
+/// Рассматривает ТОЛЬКО человек-модератор — ИИ не пересматривает свои решения.
+model DecisionAppeal {
+  id         String    @id @default(cuid())
+  userId     String?
+  userNick   String    @default("")
+  sanctionId String?
+  sanction   Sanction? @relation(fields: [sanctionId], references: [id], onDelete: Cascade)
+  messageId  String?
+  text       String
+  status     String    @default("open") // open | accepted | rejected
+  resolvedBy String    @default("")
+  note       String    @default("")
+  createdAt  DateTime  @default(now())
+  resolvedAt DateTime?
+}
+
+/// ШАГ 12. Журнал действий модерации и администрирования (внутренний).
+/// Хранится внутри панели: кто, что и когда сделал, с каким объектом.
+model AdminLog {
+  id          String   @id @default(cuid())
+  actor       String   // ник исполнителя
+  actorRole   String   @default("owner") // owner | admin | moderator
+  action      String   // например message.publish, sanction.apply, topic.move
+  targetType  String   @default("") // message | topic | user | complaint | appeal | setting | section_item
+  targetLabel String   @default("") // человекочитаемое описание объекта
+  details     String   @default("") // дополнительные сведения
+  createdAt   DateTime @default(now())
+}
+
+/// ШАГ 12. Настройки сайта (ключ-значение), меняются владельцем.
+model SiteSetting {
+  key       String   @id
+  value     String   @default("")
+  updatedAt DateTime @updatedAt
+}
+
+/// ШАГ 12. Содержимое разделов «Объявления», «Практическая информация», «Справочник».
+model ContentItem {
+  id        String   @id @default(cuid())
+  section   String   // ads | info | directory
+  title     String
+  body      String   @default("")
+  contact   String   @default("")
+  status    String   @default("published") // published | hidden
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// ШАГ 16. «Нужна помощь» — самостоятельная доска бесплатной взаимопомощи.
+/// Никаких обсуждений и социальных функций: текст + контакты + статус.
+/// ШАГ 16 (ТЗ п.10): самостоятельная сущность публикаций помощи.
+/// Не ForumTopic и не ForumPost — отдельная таблица, никакой связи с форумом.
+/// Статусы: active | resolved | irrelevant (в UI видны только два последних).
+model HelpPublication {
+  id           String          @id @default(cuid())
+  title        String
+  text         String
+  contactData  String          @default("")
+  status       String          @default("active")
+  authorId     String
+  authorName   String
+  aiStatus     String          @default("ok") // ok | hidden | human
+  aiNote       String          @default("")
+  hiddenReason String          @default("")
+  isHiddenByAi Boolean         @default(false)
+  needHuman    Boolean         @default(false)
+  isDeleted    Boolean         @default(false)
+  deletedAt    DateTime?
+  editedAt     DateTime?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  complaints   HelpComplaint[]
+}
+
+/// ШАГ 16. Жалоба на объявление раздела «Нужна помощь».
+/// Не голосование: количество жалоб не показывается и не создаёт рейтинг.
+model HelpComplaint {
+  id            String          @id @default(cuid())
+  publicationId String
+  publication   HelpPublication @relation(fields: [publicationId], references: [id], onDelete: Cascade)
+  category     String
+  comment      String      @default("")
+  reporterName String      @default("")
+  aiVerdict    String      @default("")
+  aiNote       String      @default("")
+  resolved     Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+}
+
+/// ШАГ 17. «Подслушано Сахалин» — самостоятельная городская лента слухов,
+/// наблюдений и сообщений жителей (отдельная страница /podslyshano).
+/// НЕ форум и не «Нужна помощь». С форумом связана ровно одной ОПЦИОНАЛЬНОЙ
+/// ссылкой: у публикации может быть МАКСИМУМ ОДНА тема форума (п.3 ТЗ).
+/// Уникальность topicId гарантирует: ни повторные нажатия, ни обновление
+/// страницы, ни одновременные нажатия нескольких пользователей не создадут
+/// вторую тему.
+model OverheardPost {
+  id           String   @id @default(cuid())
+  title        String
+  text         String
+  place        String   @default("") // необязательно: Южно-Сахалинск, Корсаков, Холмск, район
+  authorId     String
+  authorName   String
+  topicId      Int?     @unique
+  topic        Topic?   @relation(fields: [topicId], references: [id])
+  aiStatus     String   @default("ok") // ok | hidden | human
+  aiNote       String   @default("")
+  hiddenReason String   @default("")
+  isHiddenByAi Boolean  @default(false)
+  needHuman    Boolean  @default(false)
+  isDeleted    Boolean  @default(false)
+  deletedAt    DateTime?
+  editedAt     DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  complaints   OverheardComplaint[]
+}
+
+/// ШАГ 17. Жалоба на сообщение «Подслушано». Не голосование: количество
+/// жалоб не показывается и не создаёт никаких оценок.
+model OverheardComplaint {
+  id           String        @id @default(cuid())
+  postId       String
+  post         OverheardPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  category     String
+  comment      String        @default("")
+  reporterName String        @default("")
+  aiVerdict    String        @default("")
+  aiNote       String        @default("")
+  resolved     Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+}
+
+/// ШАГ 18. «Где купить» — самостоятельный раздел вопросов о КОНКРЕТНЫХ товарах
+/// (отдельная страница /gde-kupit). НЕ форум, НЕ «Подслушано», НЕ «Нужна помощь»
+/// и не рекламная площадка. Главный принцип: одна публикация — один конкретный
+/// товар/модель. Статусы: seeking (Ищу) → found (Нашёл) / irrelevant (Неактуально);
+/// найденные и неактуальные вопросы НЕ удаляются — накапливаются как база поиска.
+/// С форумом связан ровно одной ОПЦИОНАЛЬНОЙ ссылкой: у вопроса может быть
+/// МАКСИМУМ ОДНА тема форума (уникальность topicId защищает от двойных нажатий,
+/// обновления страницы и параллельных запросов нескольких пользователей).
+model WhereToBuyPost {
+  id           String   @id @default(cuid())
+  title        String
+  text         String
+  place        String   @default("") // необязательно: Южно-Сахалинск, Холмск, Корсаков, Долинск
+  status       String   @default("seeking") // seeking (Ищу) | found (Найдено) | irrelevant (Неактуально)
+  statusAt     DateTime @default(now()) // время последней смены статуса (стабильная сортировка)
+  /// ТЗ 2026-09-23 «Ответить на запрос»: сухой факт ответчика (точный адрес,
+  /// ТЦ) под кнопкой «📍 Ответить на запрос». Ответ может оставить ЛЮБОЙ
+  /// зарегистрированный житель — не только автор вопроса.
+  answerText       String    @default("")
+  answerAuthorName String    @default("")
+  answeredAt       DateTime?
+  authorId     String
+  authorName   String
+  topicId      Int?     @unique
+  topic        Topic?   @relation(fields: [topicId], references: [id])
+  aiStatus     String   @default("ok") // ok | hidden | human
+  aiNote       String   @default("")
+  hiddenReason String   @default("")
+  isHiddenByAi Boolean  @default(false)
+  needHuman    Boolean  @default(false)
+  isDeleted    Boolean  @default(false)
+  deletedAt    DateTime?
+  editedAt     DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  complaints   WhereToBuyComplaint[]
+  /// ТЗ 2026-09-23 «Ответить»: ответы на запрос — ПЛОСКИЙ СПИСОК внутри
+  /// карточки; ответов может быть СКОЛЬКО УГОДНО; ответов на ответ и
+  /// вложенности НЕТ (споры — только на форуме).
+  answers      WhereToBuyAnswer[]
+}
+
+/// ТЗ 2026-09-23 «Ответить»: один ответ на запрос «Где купить». Ответ
+/// оставляет ЛЮБОЙ зарегистрированный житель; список плоский, хронологический.
+model WhereToBuyAnswer {
+  id         String         @id @default(cuid())
+  postId     String
+  post       WhereToBuyPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorName String
+  text       String
+  createdAt  DateTime       @default(now())
+
+  @@index([postId])
+}
+
+/// ШАГ 18. Жалоба на вопрос «Где купить» (реклама; спам; мошенничество;
+/// личные данные; другое). Не голосование: количество жалоб не показывается,
+/// публикацию жалобой сама по себе не удаляет — это сигнал для модерации.
+model WhereToBuyComplaint {
+  id           String         @id @default(cuid())
+  postId       String
+  post         WhereToBuyPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  category     String
+  comment      String         @default("")
+  reporterName String         @default("")
+  aiVerdict    String         @default("")
+  aiNote       String         @default("")
+  resolved     Boolean        @default(false)
+  createdAt    DateTime       @default(now())
+}
+
+/// ТЗ 2026-09-22. Быстрая подсказка «Где купить» с ГЛАВНОЙ страницы —
+/// витрина СУХИХ географических фактов (ориентиры, адреса, названия ТЦ,
+/// павильонов, официальных открытых организаций). Перед записью текст
+/// проходит первую линию пре-модерации (wheretobuy-hint-premoderation.ts):
+/// Кейс А (телефоны физлиц) и Кейс Б (эмоциональные ярлыки) на главную
+/// не попадают — автору предлагается бесшовный перенос в форумную тему
+/// «Товары и услуги ▸ Где купить». Подсказка неизменяема (без updatedAt),
+/// удаление — только средствами модерации.
+model WheretobuyHint {
+  id         String   @id @default(cuid())
+  text       String
+  authorId   String
+  authorName String
+  createdAt  DateTime @default(now())
+}
+
+/// ТЗ 2026-09-22. Быстрая подсказка «Где дешевле» с ГЛАВНОЙ страницы
+/// (блок цен) — витрина СУХИХ фактов стоимости, дат и адресов. Перед
+/// записью текст проходит первую линию пре-модерации
+/// (gdedeshevle-hint-premoderation.ts): Кейс А (телефоны физлиц) и
+/// Кейс Б (эмоциональная критика ценообразования — «барыги», «оборзели»,
+/// «крутят», «с ума сошли», «обдираловка», «грабеж») на главную не
+/// попадают — автору предлагается бесшовный перенос в форумную тему
+/// «Товары и услуги ▸ Цены». Подсказка неизменяема (без updatedAt),
+/// удаление — только средствами модерации.
+model CheapHint {
+  id         String   @id @default(cuid())
+  text       String
+  authorId   String
+  authorName String
+  createdAt  DateTime @default(now())
+}
+
+/// ШАГ 19. «ЖКХ и городские проблемы» — самостоятельная страница /gkh:
+/// жители обозначают КОНКРЕТНЫЕ проблемы города, ЖКХ и инфраструктуры,
+/// описывают собственный опыт и добавляют фактические обновления.
+/// НЕ форум и не социальная сеть. Главный принцип (ТЗ п.26):
+/// «Не обвинить — обозначить. Не осудить — рассказать о своём опыте.
+/// Не обобщить — отметить конкретное. Не спорить — дать возможность
+/// высказаться обеим сторонам. Не вынести приговор — дать людям информацию.»
+/// Статусы (ТЗ п.3 — только три): active «Проблема актуальна»,
+/// in_progress «Решается», solved «Решено». Решённые исчезают из основного
+/// списка и обычного поиска, но история сохраняется и при повторном
+/// возникновении проблема ВОЗВРАЩАЕТСЯ той же публикацией (ТЗ п.4/5).
+/// С форумом связана ровно одной ОПЦИОНАЛЬНОЙ ссылкой: у проблемы максимум
+/// ОДНА тема (уникальность topicId защищает от двойных нажатий, обновления
+/// страницы и гонок, ТЗ п.13). При удалении автором тема НЕ удаляется (п.16).
+model GkhProblem {
+  id                String   @id @default(cuid())
+  title             String
+  text              String
+  /// ТЗ №2 от 2026-09-23 (Flat 2.0, 3-шаговая форма): «Предпринятые
+  /// действия» — куда звонили/писали, номер заявки, статус. ОБЯЗАТЕЛЬНОЕ
+  /// поле — без него публикация не проходит (старые записи — пусто).
+  actions           String   @default("")
+  place             String   @default("") // улица/дом/двор/район/объект/ориентир — необязательно (ТЗ п.1)
+  problemDate       String   @default("") // дата обнаружения/возникновения (YYYY-MM-DD или пусто) — необязательно
+  status            String   @default("active") // active | in_progress | solved | rejected (ТЗ №2 2026-09-23: «В поиске решения» / «Передано в УК» / «Решено» / «Отклонено»)
+  statusAt          DateTime @default(now())
+  authorId          String
+  /// Связь с пользователем — для цвета ника по полу (ТЗ п.20);
+  /// account может быть удалён — публикация остаётся.
+  author            User?    @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  authorName        String
+  /// Ответственная организация — необязательна (ТЗ п.10); может быть
+  /// добавлена позже администратором/модератором.
+  organization      String   @default("")
+  /// Официальный ответ представителя организации — МАКСИМУМ ОДИН (ТЗ п.12).
+  /// Ответ сам по себе НЕ устанавливает статус «Решено» (ТЗ п.3).
+  orgResponseText   String   @default("")
+  orgResponseAt     DateTime?
+  orgResponseById   String?
+  orgResponseByName String   @default("")
+  topicId           Int?     @unique
+  topic             Topic?   @relation(fields: [topicId], references: [id])
+  /// ШАГ 19 (ТЗ п.9). Объединение дубликатов: mergedIntoId указывает на
+  /// каноническую проблему; объединённые копии не показываются в лентах.
+  mergedIntoId      String?
+  mergedInto        GkhProblem?  @relation("GkhMerge", fields: [mergedIntoId], references: [id], onDelete: SetNull)
+  mergedDups        GkhProblem[] @relation("GkhMerge")
+  aiStatus          String   @default("ok") // ok | hidden | human
+  aiNote            String   @default("")
+  hiddenReason      String   @default("")
+  isHiddenByAi      Boolean  @default(false)
+  needHuman         Boolean  @default(false)
+  /// Мягкое удаление (ТЗ п.16): автор удалил публикацию, но связанная тема
+  /// форума сохраняется — в теме показывается «Исходная публикация была
+  /// удалена автором.»
+  isDeleted         Boolean  @default(false)
+  deletedAt         DateTime?
+  /// Техническая отметка правки — сохраняется для модерации, пользователю
+  /// надпись «Изменено» НЕ показывается (ТЗ п.6).
+  editedAt          DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  updates           GkhUpdate[]
+  statusLog         GkhStatusLog[]
+  complaints        GkhComplaint[]
+  media             GkhMedia[]
+}
+
+/// ШАГ 19 (ТЗ п.7/8). Обновление к проблеме — от автора и от других жителей.
+/// Каждый пользователь редактирует и удаляет ТОЛЬКО свои обновления;
+/// удалённое обновление полностью исчезает из интерфейса (без надписи
+/// «Обновление удалено»), техническая история сохраняется для модерации.
+model GkhUpdate {
+  id           String     @id @default(cuid())
+  problemId    String
+  problem      GkhProblem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  authorId     String
+  author       User?      @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  authorName   String
+  text         String
+  aiStatus     String     @default("ok")
+  aiNote       String     @default("")
+  hiddenReason String     @default("")
+  isHiddenByAi Boolean    @default(false)
+  needHuman    Boolean    @default(false)
+  isDeleted    Boolean    @default(false)
+  deletedAt    DateTime?
+  editedAt     DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  complaints   GkhComplaint[]
+  media        GkhMedia[]
+}
+
+/// ШАГ 19 (ТЗ п.6). Журнал смен статусов проблемы — часть хронологии,
+/// отображается в истории проблемы с датой каждого события.
+model GkhStatusLog {
+  id         String     @id @default(cuid())
+  problemId  String
+  problem    GkhProblem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  fromStatus String
+  toStatus   String
+  byName     String     @default("")
+  byRole     String     @default("author") // author | moderator
+  createdAt  DateTime   @default(now())
+}
+
+/// ШАГ 19 (ТЗ п.27). Медиа проблемы/обновления: до 5 фото и до 1 видео
+/// (≤1 минута) к публикации и к каждому обновлению. Файлы хранятся в
+/// public/media/gkh/, метаданные — здесь.
+model GkhMedia {
+  id        String      @id @default(cuid())
+  kind      String // photo | video
+  url       String
+  mime      String      @default("")
+  size      Int         @default(0)
+  problemId String?
+  problem   GkhProblem? @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  updateId  String?
+  update    GkhUpdate?  @relation(fields: [updateId], references: [id], onDelete: Cascade)
+  createdAt DateTime    @default(now())
+}
+
+/// ШАГ 19 (ТЗ п.17). Жалоба на публикацию или обновление. Причины (ТЗ):
+/// персональные данные; оскорбления; угрозы; спам; реклама; мошенничество;
+/// не по теме; другое. Кнопок «Ложь»/«Фейк»/«Не согласен» НЕТ; количество
+/// жалоб не показывается и не является голосованием — сигнал для модерации.
+model GkhComplaint {
+  id           String      @id @default(cuid())
+  problemId    String?
+  problem      GkhProblem? @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  updateId     String?
+  update       GkhUpdate?  @relation(fields: [updateId], references: [id], onDelete: Cascade)
+  category     String
+  comment      String      @default("")
+  reporterName String      @default("")
+  aiVerdict    String      @default("")
+  aiNote       String      @default("")
+  resolved     Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+}
+
+/// ШАГ 26. «Знакомства» (/znakomstva) — самостоятельный раздел, единственный
+/// публично анонимный раздел SakhMatrix. РОВНО ДВЕ категории (другие запрещены):
+/// m4w «Мужчина ищет женщину», w4m «Женщина ищет мужчину».
+/// Публичная анонимность (ТЗ): посетителю не показываются ник, имя, аватар,
+/// пол автора и ссылка на профиль; при этом автор известен системе и модерации
+/// (authorId + authorName хранятся, модерация видит автора в очереди).
+/// Статусы: actual «Актуально» | stale «Неактуально» — неактуальные не удаляются:
+/// остаются в разделе, показываются ниже актуальных серым.
+/// Свои контакты автора в тексте разрешены; чужие — запрещены.
+/// НЕТ комментариев/лайков/оценок/подписок/уведомлений/форумных тем.
+model DatingPost {
+  id           String        @id @default(cuid())
+  category     String // m4w | w4m | friendship | person — вкладки Flat 2.0
+  title        String
+  body         String
+  place        String        @default("") // город на Сахалине (Flat 2.0)
+  status       String        @default("actual") // actual «Актуально» | stale «Неактуально»
+  statusAt     DateTime      @default(now()) // время последней смены статуса (стабильная сортировка)
+  authorId     String
+  /// Автор известен системе, ИИ-модерации и администратору (ТЗ);
+  /// публично ник/имя/пол/аватар/профиль не показываются НИКОГДА.
+  authorName   String
+  aiStatus     String        @default("ok") // ok | hidden | human
+  aiNote       String        @default("")
+  hiddenReason String        @default("")
+  isHiddenByAi Boolean       @default(false)
+  needHuman    Boolean       @default(false)
+  isDeleted    Boolean       @default(false)
+  deletedAt    DateTime?
+  editedAt     DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  author       User?         @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  photos       DatingPhoto[]
+  complaints   DatingComplaint[]
+}
+
+/// ШАГ 26. Фото объявления «Знакомства» — по желанию автора, до 5 штук.
+model DatingPhoto {
+  id        String      @id @default(cuid())
+  url       String
+  mime      String      @default("")
+  size      Int         @default(0)
+  postId    String?
+  post      DatingPost? @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime    @default(now())
+}
+
+/// ШАГ 23 (восстановление). «Где дешевле» — самостоятельная страница
+/// /gde-deshevle: жители сравнивают цены на КОНКРЕТНЫЙ товар. НЕ форум,
+/// не рекламная площадка, не каталог магазинов. Главное правило (ТЗ п.2):
+/// «Здесь сравнивают цену конкретного товара, а не спрашивают, где вообще
+/// дешевле покупать». Одна публикация — один конкретный товар/модель (п.4).
+/// Статусы (п.12): comparing «Сравниваю» | cheaper «Нашёл дешевле» |
+/// irrelevant «Неактуально». Завершённые публикации сохраняются для поиска (п.28).
+/// С форумом — максимум одна ОПЦИОНАЛЬНАЯ тема (п.15/16, уникальный topicId).
+model CheapPost {
+  id           String   @id @default(cuid())
+  title        String
+  text         String
+  place        String   @default("") // необязательно: Южно-Сахалинск, Холмск, Корсаков, Долинск
+  status       String   @default("comparing")
+  statusAt     DateTime @default(now())
+  /// ТЗ 2026-09-23 «Ответить на запрос»: сухой факт ответчика (цена, адрес,
+  /// магазин). Статус карточки переходит в «fixed» — «Цена зафиксирована».
+  answerText       String    @default("")
+  answerAuthorName String    @default("")
+  answeredAt       DateTime?
+  authorId     String
+  /// Аккаунт может быть удалён — публикация остаётся.
+  author       User?    @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  authorName   String
+  topicId      Int?     @unique
+  topic        Topic?   @relation(fields: [topicId], references: [id])
+  aiStatus     String   @default("ok") // ok | hidden | human
+  aiNote       String   @default("")
+  hiddenReason String   @default("")
+  isHiddenByAi Boolean  @default(false)
+  needHuman    Boolean  @default(false)
+  isDeleted    Boolean  @default(false)
+  deletedAt    DateTime?
+  editedAt     DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  complaints   CheapComplaint[]
+  /// ТЗ 2026-09-23 «Ответить»: ответы на запрос — ПЛОСКИЙ СПИСОК внутри
+  /// карточки; ответов может быть СКОЛЬКО УГОДНО; ответов на ответ и
+  /// вложенности НЕТ (споры — только на форуме).
+  answers      CheapAnswer[]
+}
+
+/// ТЗ 2026-09-23 «Ответить»: один ответ на запрос «Где дешевле» (цена,
+/// магазин, адрес). Список плоский, хронологический.
+model CheapAnswer {
+  id         String    @id @default(cuid())
+  postId     String
+  post       CheapPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorName String
+  text       String
+  createdAt  DateTime  @default(now())
+
+  @@index([postId])
+}
+
+/// ШАГ 23. Жалоба на вопрос «Где дешевле» (ТЗ п.21 — ровно пять причин:
+/// реклама; спам; мошенничество; личные данные; другое). Не голосование:
+/// количество жалоб не показывается, публикацию сама по себе не удаляет.
+model CheapComplaint {
+  id           String      @id @default(cuid())
+  postId       String
+  post         CheapPost   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  category     String
+  comment      String      @default("")
+  reporterName String      @default("")
+  aiVerdict    String      @default("")
+  aiNote       String      @default("")
+  resolved     Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+}
+
+/// ШАГ 20 (восстановление). «Рекомендую / Не рекомендую» — самостоятельная
+/// страница /rekomenduyu: жители делятся ЛИЧНЫМ опытом об организациях,
+/// компаниях, сервисах и местах Сахалина. Одна публикация — один субъект
+/// (subject) и одна чёткая позиция: recommend «Рекомендую» |
+/// notrecommend «Не рекомендую». Критика и негативный опыт — НЕ нарушение
+/// (это суть раздела); реклама, скрытая реклама, заказные рекомендации,
+/// спам и мошенничество — нарушение. Максимум одна форумная тема (topicId).
+model RecPost {
+  id           String   @id @default(cuid())
+  subject      String // кого/что: организация, компания, сервис или место
+  stance       String   @default("recommend") // recommend | notrecommend
+  stanceAt     DateTime @default(now())
+  title        String
+  text         String
+  place        String   @default("")
+  /// ТЗ 2026-09-21 (Пункт 6 Манифеста): выделение конкретного человека в отзыве
+  /// («Отдельно отмечу человека:…») — необязательно; выводится в карточке отдельным блоком.
+  humanHighlight String @default("")
+  /// ТЗ 2026-09-21 (Пункт 13 Манифеста): единственный официальный ответ
+  /// организации (паттерн ЖКХ: только подтверждённый представитель, РОВНО ОДИН ответ).
+  orgResponseText   String   @default("")
+  orgResponseAt     DateTime?
+  orgResponseById   String?
+  orgResponseByName String   @default("")
+  authorId     String
+  /// Аккаунт может быть удалён — публикация остаётся.
+  author       User?    @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  authorName   String
+  topicId      Int?     @unique
+  topic        Topic?   @relation(fields: [topicId], references: [id])
+  aiStatus     String   @default("ok")
+  aiNote       String   @default("")
+  hiddenReason String   @default("")
+  isHiddenByAi Boolean  @default(false)
+  needHuman    Boolean  @default(false)
+  isDeleted    Boolean  @default(false)
+  deletedAt    DateTime?
+  editedAt     DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  complaints   RecComplaint[]
+  usefulVotes  RecUsefulVote[]
+}
+
+/// ТЗ 2026-09-21: отметка «Полезный отзыв» — по одной на пользователя на публикацию
+/// (@@unique — защита от накрутки); счётчик вычисляется через _count.
+/// ТЗ 2026-09-24 (пользователь): кнопки «Рекомендую»/«Не рекомендую» рядом с
+/// «Обсудить на форуме» — kind хранит голос читателя: "recommend" |
+/// "notrecommend"; legacy-строки ("useful") считаются нейтральными и в
+/// кнопки не попадают. Повторный клик по той же кнопке снимает голос,
+/// клик по соседней — переключает.
+model RecUsefulVote {
+  id        String   @id @default(cuid())
+  postId    String
+  post      RecPost  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String
+  kind      String   @default("useful")
+  createdAt DateTime @default(now())
+
+  @@unique([postId, userId])
+}
+
+/// ШАГ 20. Жалоба на публикацию «Рекомендую / Не рекомендую» — ровно пять
+/// причин (реклама; спам; мошенничество; личные данные; другое).
+model RecComplaint {
+  id           String      @id @default(cuid())
+  postId       String
+  post         RecPost     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  category     String
+  comment      String      @default("")
+  reporterName String      @default("")
+  aiVerdict    String      @default("")
+  aiNote       String      @default("")
+  resolved     Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+}
+
+/// ТЗ 2026-09-23 «О работодателях» (Flat 2.0, Пункты 5/6/8/20 ТЗ №2).
+/// Самостоятельная страница /o-rabotodatelyah — фиксация СУХОГО, изолированного
+/// трудового опыта жителя (НЕ «чёрные списки», не коллективный вердикт).
+/// Карточка ТЗ: 📍 Компания (Город) · 📅 Период работы · Личный опыт ·
+/// Особое упоминание человека (принцип «Человек ≠ Организация») · дисклеймер ·
+/// кнопка «Обсудить на форуме» → рубрика «Карьера, бизнес ▸ Работодатели» (78).
+/// Позиции «Советую/Не советую» больше нет — только факт личного опыта.
+/// Максимум одна форумная тема (topicId).
+model EmpPost {
+  id            String   @id @default(cuid())
+  employer      String // официальное название ООО / ИП
+  /// Legacy-поля прежнего формата («Советую/Не советую») — оставлены для
+  /// совместимости БД, новый UI и API их не используют.
+  position      String   @default("")
+  stance        String   @default("")
+  stanceAt      DateTime?
+  title         String   @default("")
+  text          String   @default("")
+  place         String   @default("")
+  // --- Поля ТЗ 2026-09-23 (Flat 2.0) ---
+  city          String   @default("") // город: Южно-Сахалинск, Холмск, Корсаков…
+  workPeriod    String   @default("") // период работы: «май – август 2026 г.»
+  experience    String   @default("") // личный опыт — сухой факт
+  personMention String   @default("") // особое упоминание человека (необязательно)
+  authorId      String
+  /// Аккаунт может быть удалён — публикация остаётся.
+  author        User?    @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  authorName    String
+  topicId       Int?     @unique
+  topic         Topic?   @relation(fields: [topicId], references: [id])
+  aiStatus      String   @default("ok")
+  aiNote        String   @default("")
+  hiddenReason  String   @default("")
+  isHiddenByAi  Boolean  @default(false)
+  needHuman     Boolean  @default(false)
+  isDeleted     Boolean  @default(false)
+  deletedAt     DateTime?
+  editedAt      DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  complaints    EmpComplaint[]
+}
+
+/// ШАГ 25. Жалоба на отзыв «О работодателях» — ровно пять причин
+/// (реклама; спам; мошенничество; личные данные; другое).
+model EmpComplaint {
+  id           String      @id @default(cuid())
+  postId       String
+  post         EmpPost     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  category     String
+  comment      String      @default("")
+  reporterName String      @default("")
+  aiVerdict    String      @default("")
+  aiNote       String      @default("")
+  resolved     Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+}
+
+/// ШАГ 26. Жалоба на объявление «Знакомства». Не голосование и не автоматическое
+/// нарушение: сигнал для модерации; ИИ перепроверяет объявление по жалобе.
+model DatingComplaint {
+  id           String      @id @default(cuid())
+  postId       String
+  post         DatingPost  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  category     String
+  comment      String      @default("")
+  reporterName String      @default("")
+  aiVerdict    String      @default("")
+  aiNote       String      @default("")
+  resolved     Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+}
+
+/// ШАГ 22 (восстановление). «Объявления» /obyavleniya — доска объявлений
+/// жителей Сахалина. Восемь рубрик (другие запрещены): sell «Продам»,
+/// buy «Куплю», give «Отдам даром», services «Услуги», jobs «Работа»,
+/// realty «Недвижимость», transport «Транспорт», other «Разное».
+/// Одно объявление — один товар/услуга. Цена и контакты — необязательные
+/// поля (можно и в тексте). Суть раздела — объявления: продажа своих вещей
+/// и предложение своих услуг РАЗРЕШЕНЫ; мошенничество (предоплата переводом
+/// вперёд, фейковые товары), запрещённые к продаже товары, спам и чужие
+/// персональные данные — нарушение.
+/// Статусы: active «Актуально» | closed «Снято с публикации» (автор).
+/// НЕТ форумных тем/комментариев/лайков — связь покупателя и продавца
+/// напрямую по контактам из объявления.
+model AdListing {
+  id           String   @id @default(cuid())
+  rubric       String // sell | buy | give | services | jobs | realty | transport | other — ровно восемь
+  title        String
+  text         String
+  price        String   @default("") // необязательно: «5000 руб», «бесплатно», «от 1500 за час»
+  contact      String   @default("") // необязательно: телефон/email/способ связи — или прямо в тексте
+  place        String   @default("") // необязательно: Южно-Сахалинск, Холмск, Корсаков, Долинск
+  status       String   @default("active") // active «Актуально» | closed «Снято с публикации»
+  statusAt     DateTime @default(now())
+  authorId     String
+  /// Аккаунт может быть удалён — объявление остаётся.
+  author       User?    @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  authorName   String
+  aiStatus     String   @default("ok") // ok | hidden | human
+  aiNote       String   @default("")
+  hiddenReason String   @default("")
+  isHiddenByAi Boolean  @default(false)
+  needHuman    Boolean  @default(false)
+  isDeleted    Boolean  @default(false)
+  deletedAt    DateTime?
+  editedAt     DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  media        AdMedia[]
+  complaints   AdComplaint[]
+}
+
+/// ШАГ 22. Фото объявления — по желанию автора, до 5 штук.
+/// Файлы в public/media/ads/, метаданные здесь (postId=null до прикрепления).
+model AdMedia {
+  id        String     @id @default(cuid())
+  url       String
+  mime      String     @default("")
+  size      Int        @default(0)
+  postId    String?
+  post      AdListing? @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime   @default(now())
+}
+
+/// ШАГ 22. Жалоба на объявление. Причины (ровно пять): спам; мошенничество;
+/// запрещённый товар; личные данные; другое. Реклама НЕ причина — объявления
+/// сами по себе являются рекламой своих товаров/услуг. Не голосование:
+/// количество жалоб не показывается, объявление само по себе не удаляет.
+model AdComplaint {
+  id           String      @id @default(cuid())
+  postId       String
+  post         AdListing   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  category     String
+  comment      String      @default("")
+  reporterName String      @default("")
+  aiVerdict    String      @default("")
+  aiNote       String      @default("")
+  resolved     Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+}
+
+/// СТАДИЯ 2 (Шаг 6): реальные курсы покупки/продажи НАЛИЧНОЙ валюты
+/// в кассах банков Южно-Сахалинска. Одна строка = банк × валюта в
+/// очередном парсинге (каждая серия строк несёт один batch — время
+/// запуска парсера; панель показывает свежайшую серию целиком).
+model CurrencyRate {
+  id          String    @id @default(cuid())
+  batch       DateTime
+  bank        String
+  currency    String
+  buy         Float?
+  sell        Float?
+  refreshedAt DateTime?
+  source      String    @default("banki.ru")
+  createdAt   DateTime  @default(now())
+
+  @@index([batch])
+}

@@ -1,0 +1,17 @@
+import { chromium } from "playwright";
+const BASE = "http://localhost:3000";
+const browser = await chromium.launch();
+const ctx = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+const page = await ctx.newPage();
+await page.goto(`${BASE}/gde-kupit`, { waitUntil: "networkidle" });
+await page.waitForSelector("[data-wb-id]", { timeout: 30000 });
+await page.screenshot({ path: "scripts/shot-five-gde-kupit.png" });
+await page.goto(`${BASE}/gde-deshevle`, { waitUntil: "networkidle" });
+await page.waitForSelector("[data-cd-id]", { timeout: 30000 });
+await page.screenshot({ path: "scripts/shot-five-gde-deshevle.png" });
+await page.setViewportSize({ width: 375, height: 800 });
+await page.goto(`${BASE}/gde-kupit`, { waitUntil: "networkidle" });
+await page.waitForSelector("[data-wb-id]", { timeout: 30000 });
+await page.screenshot({ path: "scripts/shot-five-gde-kupit-m375.png" });
+await browser.close();
+console.log("shots done");

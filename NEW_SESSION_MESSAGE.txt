@@ -1,0 +1,92 @@
+ВСТУПИТЕЛЬНОЕ СООБЩЕНИЕ ДЛЯ НОВОЙ СЕССИИ
+(скопируй текст ниже в начало новой сессии после распаковки архива)
+
+=============================================================
+
+ПРОЕКТ: SakhMatrix — информационный портал Сахалина.
+Роль: фронтенд-разработчик. Язык общения — русский.
+Превью: https://preview-chat-27cf817b-c1ae-4967-9e43-a2f7d979adca.space-z.ai/
+Стек: Next.js 16 + Bun + Prisma + SQLite (db/custom.db).
+
+КАК РАЗВЕРНУТЬ АРХИВ:
+1) Распаковать в /home/z/my-project
+2) bun install
+3) npx prisma generate (ОБЯЗАТЕЛЬНО до проверки API — иначе tsc/API сыпят ошибками;
+   после бэкапа 2026-09-24 (вечер) — prisma db push уже применён: у RecUsefulVote
+   есть колонка kind, так что достаточно generate)
+4) Холодный рестарт:
+   pkill -9 -f bun; pkill -9 -f next; sleep 2
+   (nohup bun run dev > dev-server.log 2>&1 & disown)
+   ждать ответа 200 от localhost:3000
+
+СОСТОЯНИЕ НА МОМЕНТ АРХИВА (коммиты 2026-09-24: dd02330 → ef1e503 → e4fda5d):
+Страница «Рекомендую / Не рекомендую» (/rekomenduyu) приведена 1-в-1 к эталону
+«Где купить» и доработана по ТЗ пользователя в 3 раунда:
+
+1) dd02330 «RC → ЭТАЛОН WB»: левая колонка как на «Где купить» — тёмная шапка-часы
+   .rc-sidehead «👍 Рекомендую / Не рекомендую» (#1E3A5F/белый), «Раздел» убран,
+   «＋ Поделиться опытом» синяя справа (.rc-addrow/.rc-addbtn 34px), блок «Место»
+   с синей «Показать»; центр — заголовок+подзаголовок+синий поиск; карточки
+   .matrix-review-card r0/p10-12, шапка «📍 ник · дата · город» (ник по полу,
+   без аватара), «Отзыв: субъект», официал. ответ плоской строкой «📍 Ответ от …»,
+   ряды .rc-secrow/.rc-actrow: «Пожаловаться» #8B0000 слева на одной линии с
+   бирюзовым форумом; мобайл-сплит как wb.
+
+2) ef1e503 «fullwidth-clock»: ВСЕ сообщения центральной колонки на всю ширину
+   (max-w убраны), окантовка как у блока «SakhMatrix - Время» (1px solid #4A688C,
+   радиус 0, без теней); маркеры .rc-democard (демо-карточки заказчика
+   SakhMatrixReviewCard) и .rc-simcard (симулятор SakhMatrixResolutionSimulator) —
+   стабильные селекторы проб; кнопка «💬 Обсудить на форуме» ВНУТРИ каждого
+   сообщения (демо-карточка рендерит её сама, .rc-demo-forumrow.rc-in).
+
+3) e4fda5d «compact-votes»: рамка поиска белая (.rc-search input border #fff);
+   карточки сжаты по вертикали (p-3/my-3, секции mt-2/pt-2); в КАЖДОМ сообщении
+   рядом с бирюзовым форумом — голосовые кнопки «👍 Рекомендую (N)» / «👎 Не
+   рекомендую (N)» (.rc-votebtn 26px, подсветка is-on зелёная/красная);
+   «Полезный отзыв» удалён из UI. БЭКЕНД: prisma RecUsefulVote + kind
+   (recommend|notrecommend, legacy "useful"), POST /api/recommend/[id]/support —
+   один голос/пользователь, повторный клик снимает, соседняя кнопка переключает,
+   ответ {kind, myVote, recommendCount, notrecommendCount}; GET /api/recommend —
+   счётчики по видам + myVote по токену. У автора своего отзыва голосовых нет.
+
+Ранее (в силе, не ломать): 5 правок wb/cd (db39ad6), окантовка 6 разделов (2f65074),
+кнопка «✅ Вопрос решён» (5359caf), окантовка лент wb/cd (9073f50), restore (7e74003),
+бэкап+страница /backup (f65ec88/03c720f).
+
+ЭТАЛОНЫ СТИЛЯ (Flat 2.0): белый фон, радиус 0, без аватаров/теней; рамка блоков
+и карточек 1px solid #4A688C (rgb(74,104,140)) — как у блока «SakhMatrix - Время»
+(.sakh-clock в globals.css ~3392-3465); шапки блоков #1E3A5F/белый с иконкой;
+синие кнопки #0a5caa, бирюзовые #0d9488 («Обсудить на форуме»), «Пожаловаться»
+#8B0000. Пример: src/components/site/wheretobuy-publications.tsx.
+
+ПРИЁМОЧНЫЕ ПРОБЫ (scripts/probe-*.mjs, node scripts/probe-ИМЯ):
+- probe-review-card.mjs — карточки rc: 88 OK / 8 FAIL (все 8 — прежний
+  документированный устаревший блок 15 ИИ-модерации, вне скоупа; НЕ чинить без ТЗ)
+- probe-rc-five-fixes-2026-09-24.mjs — 18/0
+- probe-forum-buttons-final-2026-09-23.mjs — 27/0
+- npx tsc --noEmit — 14 legacy / 0 новых (базовый уровень; НЕ «чинить» legacy)
+
+ЛОВУШКИ:
+- Rate-limit: POST /api/wheretobuy|gdedeshevle|recommend — in-memory лимит
+  6 вопросов/час (src/lib/api.ts). Перед серией проб: холодный рестарт сервера.
+- After prisma db push/generate — холодный рестарт сервера (старый клиент в памяти).
+- .git раздут до ~300M старыми zip-блобами — НОВЫЕ БИНАРНИКИ В GIT НЕ КОММИТИТЬ.
+- Платформенные ссылки на скачивание у пользователя не работают (Failed to fetch);
+  рабочий путь доставки файлов — litterbox.catbox.moe (retention 72ч):
+  curl -s -A "Mozilla/5.0" -F "reqtype=fileupload" -F "time=72h" \
+    -F "fileToUpload=@<файл>" https://litterbox.catbox.moe/resources/internals/api.php
+  (x0.at — 403 бан IP песочницы; catbox.moe — «Invalid uploader»)
+- При затрагивании проб синхронизировать CLOCK_BORDER = "rgb(74, 104, 140)".
+
+СТРУКТУРА /rekomenduyu (что где лежит):
+- src/components/site/recommend-publications.tsx — экран + RecRow (реальные
+  карточки), RecFormModal, RecComplaintModal, RecOrgResponseForm
+- src/components/site/sakh-matrix-review-card.tsx — демо-карточки заказчика
+  (sakh-001…003 из review-demo-data.ts), маркер .rc-democard
+- src/components/site/sakh-matrix-resolution-simulator.tsx — симулятор примирения
+  (прислан заказчиком), маркер .rc-simcard
+- src/app/globals.css — блок «RC → ЭТАЛОН WB» в конце файла + .rc-votebtn
+
+ЖУРНАЛ РАБОТ: worklog.md (записи Task ID: rc-to-wb-etalon / rc-fullwidth-clock /
+rc-compact-votes 2026-09-24 — там детальные описания всех правок и приёмки).
+История коммитов: GIT_HISTORY.txt.

@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>panel-repro-sandbox</title></head>
+<body style="margin:0">
+<div id="status" style="padding:8px;font-family:monospace;background:#ff0">waiting...</div>
+<iframe id="f" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" src="https://preview-chat-4bb38ded-30a1-4868-be17-29c72578b3a8.space-z.ai/" style="width:100%;height:700px;border:1px solid #000"></iframe>
+<script>
+  const f = document.getElementById('f'); const t0 = Date.now(); const st = document.getElementById('status');
+  f.addEventListener('load', () => { st.textContent = 'SANDBOX-IFRAME LOAD FIRED at ' + (Date.now()-t0) + 'ms; iframe.readyState-check via poll'; });
+  setTimeout(() => { if (st.textContent.startsWith('waiting')) st.textContent = 'SANDBOX-IFRAME LOAD NOT FIRED after 20s'; }, 20000);
+</script>
+</body>
+</html>

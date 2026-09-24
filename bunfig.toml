@@ -1,0 +1,5 @@
+# Bun: конфигурация только для `bun test` (на `bun run dev` не влияет).
+# Подгружает happy-dom ДО тестов: React и @testing-library/react требуют
+# DOM-глобалы (document, window, HTMLElement...) в момент рендера.
+[test]
+preload = ["./tests/setup-dom.ts"]
