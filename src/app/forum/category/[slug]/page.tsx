@@ -20,6 +20,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import TopicList from "@/components/forum/topic-list";
 import { AuthModal, NewTopicModal } from "@/components/forum/modals";
 import { DEFAULT_SETTINGS, isStaffRole, MainNav, Masthead, SiteFooter, useAuth, type SiteSettings } from "@/components/site/chrome";
@@ -67,6 +68,81 @@ export default function ForumCategoryPage(props: { params: Promise<{ slug: strin
   const [scope, setScope] = useState("new");
   const [toast, setToast] = useState("");
   const favorites = useFavorites();
+
+  /**
+   * ТЗ 2026-09-24 «Обсудить на форуме из отзыва»: предзаполнение формы
+   * новой темы. URL вида /forum/category/<slug>?new=1&postId=<id>&source=<url>
+   * означает «пришёл пользователь с кнопки «Обсудить на форуме» под
+   * отзывом; открой форму создания темы и подставь заголовок/текст».
+   *
+   * Логика:
+   *  1. useSearchParams() читает query (Next 16 client-component API).
+   *  2. Если new=1 && postId — делаем fetch /api/recommend/[id] (GET)
+   *     и заполняем prefillTitle / prefillMessage.
+   *  3. К сообщению добавляем ссылку-источник из ?source=... —
+   *    «— из отзыва: <origin><source>» — чтобы на форуме была обратная
+   *    навигация к исходной публикации.
+   *  4. После загрузки — автоматически открываем NewTopicModal (если
+   *    гость — сначала AuthModal; после входа откроется NewTopicModal).
+   */
+  const searchParams = useSearchParams();
+  const prefillNew = searchParams.get("new") === "1";
+  const prefillPostId = searchParams.get("postId");
+  const prefillSource = searchParams.get("source");
+
+  const [prefillTitle, setPrefillTitle] = useState("");
+  const [prefillMessage, setPrefillMessage] = useState("");
+  const [prefillLoaded, setPrefillLoaded] = useState(false);
+  const [prefillError, setPrefillError] = useState("");
+
+  // Шаг 1: подгрузка отзыва по postId, формирование prefill-строк.
+  useEffect(() => {
+    if (!prefillNew || !prefillPostId) {
+      setPrefillLoaded(true);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const r = await fetch(`/api/recommend/${encodeURIComponent(prefillPostId)}`);
+        if (!r.ok) {
+          setPrefillError(r.status === 404 ? "Отзыв не найден" : "Не удалось загрузить отзыв");
+          return;
+        }
+        const d = await r.json();
+        if (cancelled) return;
+        // Заголовок темы — из заголовка отзыва (maxLength 150 в форме).
+        const t = (d.title || d.subject || "").slice(0, 150);
+        setPrefillTitle(t);
+        // Текст сообщения — текст отзыва + ссылка на источник.
+        const origin = typeof window !== "undefined" ? window.location.origin : "";
+        const srcLine = prefillSource
+          ? `\n\n— из отзыва: ${origin}${prefillSource}`
+          : "";
+        setPrefillMessage(`${d.text || ""}${srcLine}`.slice(0, 20000));
+      } catch {
+        if (!cancelled) setPrefillError("Сеть недоступна — откройте форму вручную");
+      } finally {
+        if (!cancelled) setPrefillLoaded(true);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [prefillNew, prefillPostId, prefillSource]);
+
+  // Шаг 2: после загрузки prefill и найденной рубрики — авто-открытие формы.
+  useEffect(() => {
+    if (!prefillLoaded || !prefillTitle || !found) return;
+    // Если уже открыто (повторный заход) — пропускаем.
+    if (newTopic || authOpen) return;
+    // Гостю — сначала AuthModal; после входа user/token станут не-null и
+    // этот эффект перезапустится и откроет NewTopicModal.
+    if (!user || !token) {
+      setAuthOpen(true);
+      return;
+    }
+    setNewTopic(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefillLoaded, prefillTitle, found, user, token]);
 
   // Слаг маршрута (Next 15/16: params — промис).
   useEffect(() => {
@@ -199,6 +275,8 @@ export default function ForumCategoryPage(props: { params: Promise<{ slug: strin
         <NewTopicModal
           token={token}
           initialRubric={{ slug: found.slug, name: found.name }}
+          initialTitle={prefillTitle}
+          initialMessage={prefillMessage}
           onClose={() => setNewTopic(false)}
           onCreated={(id) => {
             setNewTopic(false);

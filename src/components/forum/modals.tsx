@@ -527,13 +527,28 @@ export function ResetModal(props: { token: string; onClose: () => void; onLogin:
 export function NewTopicModal(props: {
   token: string;
   initialRubric: { slug: string; name: string } | null;
+  /**
+   * ТЗ 2026-09-24 «Обсудить на форуме из отзыва»: опциональные поля
+   * предзаполнения формы новой темы. Передаются со страницы рубрики
+   * после подтягивания отзыва из БД (GET /api/recommend/[id]).
+   *
+   *   initialTitle   — подставляется в поле «Заголовок» ( maxLength 150 ).
+   *   initialMessage — подставляется в textarea «Сообщение»
+   *                    (maxLength 20000, уже содержит ссылку на источник).
+   *
+   * Состояние инициализируется лениво: useState с дефолтом из props.*
+   * только при первом монтировании, чтобы пользователь мог свободно
+   * редактировать поля после открытия формы.
+   */
+  initialTitle?: string;
+  initialMessage?: string;
   onClose: () => void;
   onCreated: (id: number) => void;
 }) {
   const [rubrics, setRubrics] = useState<Rubric[]>([]);
   const [rubricId, setRubricId] = useState<number | null>(null);
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
+  const [title, setTitle] = useState(props.initialTitle ?? "");
+  const [body, setBody] = useState(props.initialMessage ?? "");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 

@@ -105,3 +105,47 @@ export function sectionDiscussHref(section: string, topicId: number | null | und
   const t = SECTION_FORUM[section];
   return t ? forumCategoryHref(t.rubricSlug) : "/forum";
 }
+
+/**
+ * Ссылка-назначение для карточки блока с ПРЕДЗАПОЛНЕНИЕМ полей формы
+ * создания НОВОЙ темы (ТЗ 2026-09-24 «Обсудить на форуме из отзыва»).
+ *
+ * Логика:
+ *  1. Если у публикации уже есть связанная тема (topicId !== null) — ведём
+ *     в неё как раньше, prefill не нужен (там продолжается обсуждение).
+ *  2. Если темы нет — ведём в рубрику раздела с query-параметрами:
+ *       /forum/category/<slug>?new=1&postId=<id>&source=<откуда-пришли>
+ *     Короткая ссылка (только postId — не весь текст) — данные подтягиваются
+ *     на стороне форума через GET /api/recommend/[id], что снимает лимит URL
+ *     на длину текста отзыва (может быть до 8000 символов).
+ *
+ * @param section  Ключ блока (см. SECTION_FORUM): "recommend" для отзывов.
+ * @param topicId  ID связанной темы (если уже создана) или null.
+ * @param postId   ID публикации-источника (строка cuid). Обязателен для prefill.
+ * @param source   Относительный URL страницы-источника (например, "/rekomenduyu#rec-<id>").
+ *                 Добавляется в конец текста темы как «— из отзыва: <url>».
+ */
+export function sectionDiscussHrefWithPrefill(
+  section: string,
+  topicId: number | null | undefined,
+  postId: string,
+  source?: string,
+): string {
+  // Тема уже создана — ведём в неё без prefill (текст ответа — другой кейс).
+  if (topicId) return forumTopicHref(topicId);
+
+  const t = SECTION_FORUM[section];
+  if (!t) return "/forum";
+
+  // Базовый URL рубрики-назначения.
+  const base = forumCategoryHref(t.rubricSlug);
+
+  // Query-параметры для авто-открытия формы новой темы с предзаполнением.
+  // new=1 — флаг «автоматически открыть NewTopicModal» на странице рубрики.
+  const params = new URLSearchParams();
+  params.set("new", "1");
+  params.set("postId", postId);
+  if (source) params.set("source", source);
+
+  return `${base}?${params.toString()}`;
+}

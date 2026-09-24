@@ -27,7 +27,7 @@ import SakhDatetimeBlock from "@/components/site/sakh-datetime-block";
 import { SakhMatrixReviewCard } from "@/components/site/sakh-matrix-review-card";
 import { SakhMatrixResolutionSimulator } from "@/components/site/sakh-matrix-resolution-simulator";
 import type { ForumUser } from "@/lib/ui";
-import { sectionDiscussHref } from "@/lib/forum-links";
+import { sectionDiscussHrefWithPrefill } from "@/lib/forum-links";
 import { DEMO_REVIEW_ENTRIES } from "@/components/site/review-demo-data";
 import { nickGenderClass } from "@/lib/nick-gender";
 
@@ -490,7 +490,12 @@ function RecRow(props: {
         <div className="rc-demo-forumrow">
           <a
             className="rc-btn-forum is-none"
-            href={sectionDiscussHref("recommend", item.topicId)}
+            href={sectionDiscussHrefWithPrefill(
+              "recommend",
+              item.topicId,
+              item.id,
+              `/rekomenduyu#rec-${item.id}`,
+            )}
             title="Открыть тему обсуждения на форуме"
           >
             💬 Обсудить на форуме
@@ -1060,13 +1065,23 @@ export function RecommendPage(props: {
   };
 
   /**
-   * Кнопка состояния форума — ЕДИНАЯ ЛОГИКА ТЗ 2026-09-23: переход по
-   * относительной ссылке, работает и у гостя: тема связана →
-   * /forum/topic/<id>, темы нет → /forum/category/<slug> — рубрика
-   * «Товары и услуги ▸ Отзывы и рекомендации» (п.3/4/5 ТЗ).
+   * Кнопка состояния форума — ЕДИНАЯ ЛОГИКА ТЗ 2026-09-23 + расширение
+   * 2026-09-24 «Обсудить на форуме из отзыва»: переход по относительной
+   * ссылке работает и у гостя.
+   *
+   *   • Если у отзыва уже есть связанная тема → /forum/topic/<id>
+   *     (продолжаем обсуждение, prefill не нужен).
+   *   • Если темы нет → /forum/category/<slug>?new=1&postId=<id>&source=...
+   *     Страница рубрики автоматически откроет форму новой темы с
+   *     предзаполненными заголовком/текстом и ссылкой на исходный отзыв.
    */
   const discuss = (item: RecItem) => {
-    window.location.href = sectionDiscussHref("recommend", item.topicId);
+    window.location.href = sectionDiscussHrefWithPrefill(
+      "recommend",
+      item.topicId,
+      item.id,
+      `/rekomenduyu#rec-${item.id}`,
+    );
   };
 
   const openEdit = (item: RecItem) => {

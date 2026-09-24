@@ -24,6 +24,51 @@ export const maxDuration = 60;
 const ACTIONS = new Set(["edit", "delete", "stance"]);
 const STANCES = new Set(["recommend", "notrecommend"]);
 
+/**
+ * ТЗ 2026-09-24 «Обсудить на форуме из отзыва»: публичный GET одной
+ * публикации по её cuid. Используется страницей рубрики форума
+ * (/forum/category/<slug>?new=1&postId=...) для предзаполнения формы
+ * создания новой темы: подтягивает заголовок и текст отзыва, чтобы
+ * пользователь не вставлял их вручную.
+ *
+ * Возвращает поля, нужные форме: subject, title, text, place, authorName,
+ * createdAt, stance, topicId (если уже есть связанная тема). Удалённые
+ * отзывы отдаются как 404 — не показываем даже автору.
+ *
+ * Авторизация НЕ требуется — это публичные данные ленты (как в GET /api/recommend).
+ */
+export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await ctx.params;
+    const post = await db.recPost.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        subject: true,
+        title: true,
+        text: true,
+        place: true,
+        authorName: true,
+        createdAt: true,
+        stance: true,
+        topicId: true,
+        isDeleted: true,
+        isHiddenByAi: true,
+      },
+    });
+    if (!post || post.isDeleted) {
+      return NextResponse.json({ error: "Публикация не найдена" }, { status: 404 });
+    }
+    // Если ИИ скрыл отзыв — не отдаём его для предзаполнения (как в ленте).
+    if (post.isHiddenByAi) {
+      return NextResponse.json({ error: "Публикация недоступна" }, { status: 410 });
+    }
+    return NextResponse.json(post);
+  } catch (e) {
+    return handleApiError(e);
+  }
+}
+
 export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await ctx.params;
