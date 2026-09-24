@@ -33,6 +33,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Nick, type TopicRow } from "@/lib/ui";
+import { forumCategoryHref, forumTopicHref } from "@/lib/forum-links";
 // Указ заказчика 2026-09-23 (скриншот «это удали», ТРЕТЬЕ снятие): панели
 // «Быстрые подсказки «Где купить»/«Где дешевле»» снова сняты с Главной —
 // импорты и монтирование удалены (низ центральной колонки). Подсистема
@@ -67,6 +68,14 @@ interface OverheardLite {
   title: string;
   authorName: string;
   createdAt: string;
+  /**
+   * ID связанной темы форума, если публикация уже привязана к теме
+   * в рубрике «Обсуждение сообщений из «Подслушано»» (podslyshano-discuss).
+   * Если есть — клик ведёт прямо в тему (/forum/topic/<id>);
+   * если нет — в список тем рубрики (/forum/category/podslyshano-discuss),
+   * где пользователь может сам создать тему обсуждения.
+   */
+  topicId?: number | null;
 }
 
 /** Пункт нижней сетки: заголовок-ссылка и короткий список пунктов. */
@@ -395,6 +404,20 @@ export default function HomeCenter(props: {
   const [posts, setPosts] = useState<OverheardLite[] | null>(null);
   const [topics, setTopics] = useState<TopicRow[] | null>(null);
 
+  /**
+   * ТЗ 2026-09-24 «Подслушано Сахалин» — автопрокрутка ленты на главной.
+   * Контейнер с фиксированной высотой (CSS-класс .mp-overheard-scroll),
+   * внутри которого публикации прокручиваются вертикально и плавно через
+   * requestAnimationFrame. При наведении мыши прокрутка приостанавливается,
+   * чтобы пользователь мог спокойно прочитать заголовок и кликнуть.
+   *
+   * Запускается только когда есть что крутить (posts.length > 0 и контент
+   * длиннее высоты контейнера). Если публикаций нет — рендерится статичное
+   * сообщение «Пока нет публикаций — ваша может стать первой…».
+   */
+  const overheardRef = useRef<HTMLDivElement>(null);
+  const overheardPausedRef = useRef(false);
+
   // ТЗ 2026-09-21: баннер «Поддержка молодого бизнеса» (слайды 1 и 3
   // ротатора) открывает страницу «Новый бизнес Сахалина» (/startup.php).
   const openStartup = () => {
@@ -403,10 +426,12 @@ export default function HomeCenter(props: {
 
   useEffect(() => {
     let alive = false;
-    fetch("/api/overheard?page=1&pageSize=4")
+    // Берём 12 свежих публикаций (с запасом — для заметной автопрокрутки;
+    // 4 было слишком мало для полноценной ленты новостей).
+    fetch("/api/overheard?page=1&pageSize=12")
       .then(async (r) => (r.ok ? r.json() : { posts: [] }))
       .then((d) => {
-        if (!alive) setPosts((d.posts || []).slice(0, 4));
+        if (!alive) setPosts((d.posts || []).slice(0, 12));
       })
       .catch(() => {
         if (!alive) setPosts([]);
@@ -424,30 +449,90 @@ export default function HomeCenter(props: {
     };
   }, []);
 
+  /**
+   * ТЗ 2026-09-24: автопрокрутка ленты «Подслушано Сахалин».
+   * Алгоритм: каждый кадр requestAnimationFrame сдвигаем scrollTop на 0.4px
+   * (~24px/сек при 60fps — плавно и без рывков), при достижении конца
+   * плавно возвращаемся в начало. Пауза по hover (для чтения и клика).
+   */
+  useEffect(() => {
+    const el = overheardRef.current;
+    if (!el) return;
+    // Не запускаем, если публикаций нет — крутить нечего.
+    if (!posts || posts.length === 0) return;
+
+    let rafId = 0;
+    const onEnter = () => { overheardPausedRef.current = true; };
+    const onLeave = () => { overheardPausedRef.current = false; };
+    el.addEventListener("mouseenter", onEnter);
+    el.addEventListener("mouseleave", onLeave);
+
+    const step = () => {
+      if (!overheardPausedRef.current) {
+        // Крутим только если контент реально длиннее контейнера.
+        if (el.scrollHeight > el.clientHeight + 1) {
+          el.scrollTop += 0.4;
+          // Достигли низа (с допуском в 1px) — мягко возвращаемся в начало.
+          if (el.scrollTop + el.clientHeight >= el.scrollHeight - 1) {
+            el.scrollTop = 0;
+          }
+        }
+      }
+      rafId = requestAnimationFrame(step);
+    };
+    rafId = requestAnimationFrame(step);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      el.removeEventListener("mouseenter", onEnter);
+      el.removeEventListener("mouseleave", onLeave);
+    };
+  }, [posts]);
+
   return (
     <div className="mp-center">
-      {/* 7.1 «Подслушано Сахалин» — компактный список, высота ~половина следующего блока */}
+      {/*
+        7.1 «Подслушано Сахалин» — лента с автопрокруткой.
+        ТЗ 2026-09-24: блок имеет фиксированную высоту (380px, CSS-класс
+        .mp-overheard-scroll) и плавно прокручивается по вертикали через
+        requestAnimationFrame (см. useEffect выше). При наведении мыши —
+        пауза. Клик по публикации ведёт в связанную тему форума, если у
+        публикации есть topicId, иначе — в рубрику «Обсуждение сообщений
+        из «Подслушано»» (/forum/category/podslyshano-discuss). Если
+        публикаций нет — статичное сообщение «Пока нет публикаций…».
+      */}
       <section className="mp-panel" aria-label="Подслушано Сахалин">
         <div className="mp-paneltitle">
           <span className="tri">▼</span>Подслушано Сахалин
         </div>
-        <div className="mp-rows mp-overheard">
+        <div
+          className="mp-rows mp-overheard mp-overheard-scroll"
+          ref={overheardRef}
+        >
           {posts === null ? (
             <div className="mp-loading">Загрузка…</div>
           ) : posts.length === 0 ? (
             <div className="mp-loading">Пока нет публикаций — ваша может стать первой на странице «Подслушано Сахалин».</div>
           ) : (
-            posts.map((p) => (
-              <div key={p.id} className="mp-trow">
-                <a className="mp-ttext" href="/podslyshano" title={p.title}>
-                  {p.title}
-                </a>
-                <span className="mp-tauthor">
-                  <Nick name={p.authorName} />
-                </span>
-                <span className="mp-tdate">{fmtDay(p.createdAt)}</span>
-              </div>
-            ))
+            posts.map((p) => {
+              // Если у публикации есть связанная тема форума — ведём в неё;
+              // иначе — в рубрику «Обсуждение сообщений из «Подслушано»»,
+              // где пользователь может сам создать тему обсуждения.
+              const href = p.topicId
+                ? forumTopicHref(p.topicId)
+                : forumCategoryHref("podslyshano-discuss");
+              return (
+                <div key={p.id} className="mp-trow">
+                  <a className="mp-ttext" href={href} title={p.title}>
+                    {p.title}
+                  </a>
+                  <span className="mp-tauthor">
+                    <Nick name={p.authorName} />
+                  </span>
+                  <span className="mp-tdate">{fmtDay(p.createdAt)}</span>
+                </div>
+              );
+            })
           )}
         </div>
       </section>

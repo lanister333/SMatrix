@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-24T20:31:43.191Z",
+  "updated": "2026-09-24T20:38:47.242Z",
   "items": [
     {
       "source": "Сахалинэнерго",
@@ -14,7 +14,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-24T02:14:00.000Z",
-      "fetchedAt": "2026-09-24T20:31:43.191Z"
+      "fetchedAt": "2026-09-24T20:38:47.242Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -29,7 +29,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-24T02:01:00.000Z",
-      "fetchedAt": "2026-09-24T20:31:43.191Z"
+      "fetchedAt": "2026-09-24T20:38:47.242Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -48,7 +48,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-24T01:48:00.000Z",
-      "fetchedAt": "2026-09-24T20:31:43.191Z"
+      "fetchedAt": "2026-09-24T20:38:47.242Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -64,7 +64,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-23T23:55:00.000Z",
-      "fetchedAt": "2026-09-24T20:31:43.191Z"
+      "fetchedAt": "2026-09-24T20:38:47.242Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -90,7 +90,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-23T23:41:00.000Z",
-      "fetchedAt": "2026-09-24T20:31:43.191Z"
+      "fetchedAt": "2026-09-24T20:38:47.242Z"
     },
     {
       "source": "СКК",
@@ -104,7 +104,7 @@
       "kind": "hot",
       "type": "planned",
       "publishedAt": "2026-09-23T22:32:49Z",
-      "fetchedAt": "2026-09-24T20:31:43.191Z"
+      "fetchedAt": "2026-09-24T20:38:47.242Z"
     },
     {
       "source": "СКК",
@@ -118,7 +118,7 @@
       "kind": "hot",
       "type": "planned",
       "publishedAt": "2026-09-23T04:54:17Z",
-      "fetchedAt": "2026-09-24T20:31:43.191Z"
+      "fetchedAt": "2026-09-24T20:38:47.242Z"
     },
     {
       "source": "СКК",
@@ -132,7 +132,7 @@
       "kind": "hot",
       "type": "planned",
       "publishedAt": "2026-09-23T04:44:44Z",
-      "fetchedAt": "2026-09-24T20:31:43.191Z"
+      "fetchedAt": "2026-09-24T20:38:47.242Z"
     },
     {
       "source": "СКК",
@@ -146,7 +146,7 @@
       "kind": "hot",
       "type": "planned",
       "publishedAt": "2026-09-22T23:59:02Z",
-      "fetchedAt": "2026-09-24T20:31:43.191Z"
+      "fetchedAt": "2026-09-24T20:38:47.242Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -165,7 +165,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-22T23:31:00.000Z",
-      "fetchedAt": "2026-09-24T20:31:43.191Z"
+      "fetchedAt": "2026-09-24T20:38:47.242Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -182,7 +182,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-22T23:21:00.000Z",
-      "fetchedAt": "2026-09-24T20:31:43.191Z"
+      "fetchedAt": "2026-09-24T20:38:47.242Z"
     },
     {
       "source": "СКК",
@@ -196,7 +196,7 @@
       "kind": "hot",
       "type": "planned",
       "publishedAt": "2026-09-22T21:40:08Z",
-      "fetchedAt": "2026-09-24T20:31:43.191Z"
+      "fetchedAt": "2026-09-24T20:38:47.242Z"
     },
     {
       "source": "СКК",
@@ -208,7 +208,7 @@
       "kind": "hot",
       "type": "planned",
       "publishedAt": "2026-09-22T06:22:06Z",
-      "fetchedAt": "2026-09-24T20:31:43.191Z"
+      "fetchedAt": "2026-09-24T20:38:47.242Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -241,7 +241,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-22T00:06:00.000Z",
-      "fetchedAt": "2026-09-24T20:31:43.191Z"
+      "fetchedAt": "2026-09-24T20:38:47.242Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -255,7 +255,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-21T23:21:00.000Z",
-      "fetchedAt": "2026-09-24T20:31:43.191Z"
+      "fetchedAt": "2026-09-24T20:38:47.242Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -281,7 +281,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-21T02:41:00.000Z",
-      "fetchedAt": "2026-09-24T20:31:43.191Z"
+      "fetchedAt": "2026-09-24T20:38:47.242Z"
     }
   ],
   "errors": []
