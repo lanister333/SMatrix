@@ -451,9 +451,10 @@ export default function HomeCenter(props: {
 
   /**
    * ТЗ 2026-09-24: автопрокрутка ленты «Подслушано Сахалин».
-   * Алгоритм: каждый кадр requestAnimationFrame сдвигаем scrollTop на 0.4px
-   * (~24px/сек при 60fps — плавно и без рывков), при достижении конца
-   * плавно возвращаемся в начало. Пауза по hover (для чтения и клика).
+   * Алгоритм: каждый кадр requestAnimationFrame сдвигаем scrollTop на 0.2px
+   * (~12px/сек при 60fps — плавно и без рывков; в 2 раза медленнее, чем
+   * прошлая версия 0.4px/кадр — ТЗ 2026-09-25 «Замедлить ровно в 2 раза»),
+   * при достижении конца плавно возвращаемся в начало. Пауза по hover.
    */
   useEffect(() => {
     const el = overheardRef.current;
@@ -471,7 +472,8 @@ export default function HomeCenter(props: {
       if (!overheardPausedRef.current) {
         // Крутим только если контент реально длиннее контейнера.
         if (el.scrollHeight > el.clientHeight + 1) {
-          el.scrollTop += 0.4;
+          // 0.2px/кадр (ровно в 2 раза медленнее прежних 0.4px/кадр).
+          el.scrollTop += 0.2;
           // Достигли низа (с допуском в 1px) — мягко возвращаемся в начало.
           if (el.scrollTop + el.clientHeight >= el.scrollHeight - 1) {
             el.scrollTop = 0;
@@ -486,6 +488,62 @@ export default function HomeCenter(props: {
       cancelAnimationFrame(rafId);
       el.removeEventListener("mouseenter", onEnter);
       el.removeEventListener("mouseleave", onLeave);
+    };
+  }, [posts]);
+
+  /**
+   * ТЗ 2026-09-25 «Высота блока ровно под 5 сообщений»: после рендера
+   * публикаций измеряем высоту первой строки .mp-trow (через offsetHeight,
+   * включая padding и border) и устанавливаем высоту контейнера = 5 × rowH.
+   * Динамический расчёт надёжнее статичного CSS, т.к. высота строк может
+   * отличаться (длинный ник, длина даты, варианты шрифтов на разных ОС).
+   *
+   * Если публикаций меньше 5 — оставляем CSS-дефолт (380px) или сжимаем
+   * под фактическое число строк (минимум не нужен — flexbox сам справится).
+   *
+   * Срабатывает на каждый рендер posts (появились новые публикации —
+   * высота контейнера пересчитывается). Также подписываемся на resize
+   * окна (через ResizeObserver) — на случай, когда пользователь меняет
+   * масштаб браузера или поворачивает телефон.
+   */
+  useEffect(() => {
+    const el = overheardRef.current;
+    if (!el) return;
+    if (!posts || posts.length === 0) return;
+
+    /** Видимое число строк в окне блока. */
+    const VISIBLE_ROWS = 5;
+
+    /** Пересчёт высоты контейнера по факту высоты первой строки. */
+    const adjustHeight = () => {
+      const firstRow = el.querySelector<HTMLElement>(".mp-trow");
+      if (!firstRow) return;
+      const rowH = firstRow.offsetHeight;
+      if (rowH <= 0) return;
+      // Устанавливаем ровно под VISIBLE_ROWS строк. Если публикаций меньше
+      // — всё равно фиксируем высоту под 5 (т.к. пользователь видит «окно»
+      // стабильного размера; пустое место остаётся снизу — это нормально
+      // и не ломает автопрокрутку, потому что scrollHeight <= clientHeight
+      // и rAF-цикл просто не запускается).
+      el.style.height = `${rowH * VISIBLE_ROWS}px`;
+    };
+
+    // Первый пересчёт — после монтирования (DOM уже есть, но layout ещё
+    // мог не зафиксироваться; вызываем через requestAnimationFrame, чтобы
+    // браузер успел отрисовать .mp-trow и offsetHeight был корректным).
+    const raf = requestAnimationFrame(adjustHeight);
+
+    // Подписка на изменения размера (масштаб браузера, поворот телефона,
+    // изменение шрифта системы) — пересчёт высоты.
+    const ro = new ResizeObserver(() => adjustHeight());
+    ro.observe(el);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+      // Сбрасываем инлайн-стиль, чтобы CSS-класс снова взял верх при
+      // следующем рендере (например, когда posts стал пустым).
+      el.style.height = "";
     };
   }, [posts]);
 
