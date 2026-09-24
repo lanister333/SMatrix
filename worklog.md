@@ -5496,3 +5496,23 @@ Work Log:
 Stage Summary:
 - Страница /rekomenduyu: поиск без тёмной рамки (белая), карточки сжаты по вертикали (~в 1.5 раза ниже), в КАЖДОМ сообщении рядом с бирюзовым «💬 Обсудить на форуме» — пара «👍 Рекомендую (N)» / «👎 Не рекомендую (N)» (у реальных карточек с записью в БД и подсветкой своего голоса, у демо — локальная подсветка), «Полезный отзыв» удалён из UI
 - Голос читателя: один на публикацию, повторный клик снимает, соседняя кнопка переключает; гостям — предложение войти
+
+---
+Task ID: discuss-auto-create-2026-09-24
+Agent: Super Z (main, opus)
+Task: Развёртывание архива + доработка SakhMatrix в 5 раундов (кнопка «Обсудить на форуме» — эталон + prefill + автопрокрутка + авто-создание темы)
+
+Work Log:
+- Развёртывание: распаковал w07q7k.zip (4.1 MB, 855 файлов) → bun install (842 пакета) → npx prisma generate → холодный рестарт через setsid+nohup (платформа убивала обычный &). Сервер v16.1.3 стабильно держит 200 на /, /rekomenduyu, /api/recommend и т.д.
+- Раунд 1 (prefill для /rekomenduyu): расширена sectionDiscussHrefWithPrefill() в forum-links.ts (новый параметр kind по умолчанию = section); recommend-publications.tsx — заменена кнопка на prefill-ссылку; modals.tsx — NewTopicModal принимает initialTitle/initialMessage; forum/category/[slug]/page.tsx — useSearchParams + fetch /api/recommend/[id]; api/recommend/[id]/route.ts — добавлен GET handler.
+- Раунд 2 (универсализация prefill для 3 страниц): та же логика применена к /gde-deshevle, /gde-kupit, /o-rabotodatelyah. Заменены 3 discuss()-функции (wheretobuy, gdedeshevle, employers). Добавлены 3 новых GET handler в /api/{wheretobuy,gdedeshevle,employers}/[id]/route.ts. Для employers специфичный формат: заголовок = «<employer> (<city>)», текст = workPeriod + experience + personMention.
+- Раунд 3 (виджет «Подслушано» на главной): home-center.tsx — добавлен useRef + автопрокрутка через requestAnimationFrame (0.4px/кадр, пауза по hover, возврат в начало при достижении низа); pageSize поднят с 4 до 12; href заменён на forumTopicHref(topicId) или forumCategoryHref("podslyshano-discuss"); OverheardLite расширен полем topicId. CSS .mp-overheard-scroll в globals.css: fixed 380px, overflow-y:hidden, скрытый скроллбар.
+- Раунд 4 (АВТО-СОЗДАНИЕ ТЕМЫ вместо prefill — смена логики): пользователь уточнил, что тема должна СОЗДАВАТЬСЯ автоматически, без формы. Создан универсальный API POST /api/discuss/[kind]/[id]/route.ts: для всех 5 разделов (recommend/wheretobuy/gdedeshevle/employers/gkh). Создан клиентский хелпер src/lib/discuss.ts с discussOnForum(). Заменены кнопки в 5 карточках на <button onClick={() => discussOnForum(...)}>. Автор темы — текущий залогиненный пользователь (не системный бот — безопаснее, пользователь видит тему у себя). Гостю — AuthModal. Если у публикации уже есть topicId — сразу редирект без дубликата.
+- Раунд 5 (архивация для новой сессии): см. NEW_SESSION_MESSAGE.txt — инструкция по развёртыванию, список всех правок, живые проверки.
+
+Stage Summary:
+- Логика «Обсудить на форуме»: было (prefill-форма) → стало (авто-создание темы через POST /api/discuss/[kind]/[id] + редирект в готовую тему). Старая prefill-логика в forum/category/[slug]/page.tsx оставлена как fallback — из карточек больше не вызывается.
+- 5 страниц полностью покрыты: /rekomenduyu, /gde-deshevle, /gde-kupit, /o-rabotodatelyah, /gkh. ЖКХ (gkh) добавлен в 5-й раунд; рубрика «Недвижимость ▸ ЖКХ и управляющие компании» (slug nedvizhimost--zhkh-i-upravlyayuschie-kompanii).
+- 8 новых файлов + правки: src/app/api/discuss/[kind]/[id]/route.ts (новый); src/lib/discuss.ts (новый); 3 новых GET handler (wheretobuy, gdedeshevle, employers); расширение forum-links.ts (kind параметр); расширение forum/category/[slug]/page.tsx (useSearchParams + по kind); расширение modals.tsx (initialTitle/initialMessage); расширение home-center.tsx (автопрокрутка + topicId); CSS .mp-overheard-scroll в globals.css; замены кнопок в 5 карточках.
+- Живые проверки: 5 страниц → 200; POST /api/discuss/recommend/<cuid> без token → 401 + needAuth=True; невалидный kind → 400; TypeScript → 0 ошибок в изменённых файлах.
+- Полный поток: гость → AuthModal → залогинен → POST → тема создана/найдена → редирект в /forum/topic/<id>. При повторном клике — тот же topicId, без дубликата.

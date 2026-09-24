@@ -1,92 +1,203 @@
-ВСТУПИТЕЛЬНОЕ СООБЩЕНИЕ ДЛЯ НОВОЙ СЕССИИ
-(скопируй текст ниже в начало новой сессии после распаковки архива)
+# SakhMatrix — стартовое сообщение для новой сессии (2026-09-24 evening)
 
-=============================================================
+Ты — фронтенд-разработчик проекта SakhMatrix (информационный портал Сахалина).
+Язык общения — русский. Превью проекта открывается в платформе.
 
-ПРОЕКТ: SakhMatrix — информационный портал Сахалина.
-Роль: фронтенд-разработчик. Язык общения — русский.
-Превью: https://preview-chat-27cf817b-c1ae-4967-9e43-a2f7d979adca.space-z.ai/
-Стек: Next.js 16 + Bun + Prisma + SQLite (db/custom.db).
+## РАЗВЁРТЫВАНИЕ архива SakhMatrix-project-2026-09-24-evening.zip:
 
-КАК РАЗВЕРНУТЬ АРХИВ:
 1) Распаковать в /home/z/my-project
 2) bun install
-3) npx prisma generate (ОБЯЗАТЕЛЬНО до проверки API — иначе tsc/API сыпят ошибками;
-   после бэкапа 2026-09-24 (вечер) — prisma db push уже применён: у RecUsefulVote
-   есть колонка kind, так что достаточно generate)
+3) npx prisma generate (обязательно до проверки API; схема БД уже применена —
+   у RecUsefulVote есть колонка kind, у всех 5 моделей — поле topicId Int? @unique)
 4) Холодный рестарт:
    pkill -9 -f bun; pkill -9 -f next; sleep 2
-   (nohup bun run dev > dev-server.log 2>&1 & disown)
-   ждать ответа 200 от localhost:3000
+   (nohup bun run dev > dev-server.log 2>&1 & disown) — НЕ РАБОТАЕТ из-за
+   | tee в package.json dev-скрипте. ИСПОЛЬЗУЙ start-dev.sh (см. ниже).
+   ждать 200 от localhost:3000
 
-СОСТОЯНИЕ НА МОМЕНТ АРХИВА (коммиты 2026-09-24: dd02330 → ef1e503 → e4fda5d):
-Страница «Рекомендую / Не рекомендую» (/rekomenduyu) приведена 1-в-1 к эталону
-«Где купить» и доработана по ТЗ пользователя в 3 раунда:
+Если платформа не отдала архив на диск (ошибка «upload/ пусто») —
+залить через litterbox.catbox.moe:
 
-1) dd02330 «RC → ЭТАЛОН WB»: левая колонка как на «Где купить» — тёмная шапка-часы
-   .rc-sidehead «👍 Рекомендую / Не рекомендую» (#1E3A5F/белый), «Раздел» убран,
-   «＋ Поделиться опытом» синяя справа (.rc-addrow/.rc-addbtn 34px), блок «Место»
-   с синей «Показать»; центр — заголовок+подзаголовок+синий поиск; карточки
-   .matrix-review-card r0/p10-12, шапка «📍 ник · дата · город» (ник по полу,
-   без аватара), «Отзыв: субъект», официал. ответ плоской строкой «📍 Ответ от …»,
-   ряды .rc-secrow/.rc-actrow: «Пожаловаться» #8B0000 слева на одной линии с
-   бирюзовым форумом; мобайл-сплит как wb.
+  curl -F reqtype=fileupload -F time=72h \
+    -F fileToUpload=@SakhMatrix-project-2026-09-24-evening.zip \
+    https://litterbox.catbox.moe/resources/internals/api.php
 
-2) ef1e503 «fullwidth-clock»: ВСЕ сообщения центральной колонки на всю ширину
-   (max-w убраны), окантовка как у блока «SakhMatrix - Время» (1px solid #4A688C,
-   радиус 0, без теней); маркеры .rc-democard (демо-карточки заказчика
-   SakhMatrixReviewCard) и .rc-simcard (симулятор SakhMatrixResolutionSimulator) —
-   стабильные селекторы проб; кнопка «💬 Обсудить на форуме» ВНУТРИ каждого
-   сообщения (демо-карточка рендерит её сама, .rc-demo-forumrow.rc-in).
+Вернётся прямая ссылка — её дать ассистенту, он скачает в
+/home/z/my-project/upload/ и распакует.
 
-3) e4fda5d «compact-votes»: рамка поиска белая (.rc-search input border #fff);
-   карточки сжаты по вертикали (p-3/my-3, секции mt-2/pt-2); в КАЖДОМ сообщении
-   рядом с бирюзовым форумом — голосовые кнопки «👍 Рекомендую (N)» / «👎 Не
-   рекомендую (N)» (.rc-votebtn 26px, подсветка is-on зелёная/красная);
-   «Полезный отзыв» удалён из UI. БЭКЕНД: prisma RecUsefulVote + kind
-   (recommend|notrecommend, legacy "useful"), POST /api/recommend/[id]/support —
-   один голос/пользователь, повторный клик снимает, соседняя кнопка переключает,
-   ответ {kind, myVote, recommendCount, notrecommendCount}; GET /api/recommend —
-   счётчики по видам + myVote по токену. У автора своего отзыва голосовых нет.
+## АРХИВ
 
-Ранее (в силе, не ломать): 5 правок wb/cd (db39ad6), окантовка 6 разделов (2f65074),
-кнопка «✅ Вопрос решён» (5359caf), окантовка лент wb/cd (9073f50), restore (7e74003),
-бэкап+страница /backup (f65ec88/03c720f).
+- Файл: SakhMatrix-project-2026-09-24-evening.zip
+- Источник: litterbox.catbox.moe (72h) или прямая ссылка из чата
+- Состав: вся рабочая кодовая база SakhMatrix (Next.js 16 + TypeScript +
+  Prisma + Turbopack). БЕЗ node_modules, БЕЗ .next, БЕЗ .git —
+  это экономит ~300+ MB. Зависимости ставятся через bun install за ~10с.
 
-ЭТАЛОНЫ СТИЛЯ (Flat 2.0): белый фон, радиус 0, без аватаров/теней; рамка блоков
-и карточек 1px solid #4A688C (rgb(74,104,140)) — как у блока «SakhMatrix - Время»
-(.sakh-clock в globals.css ~3392-3465); шапки блоков #1E3A5F/белый с иконкой;
-синие кнопки #0a5caa, бирюзовые #0d9488 («Обсудить на форуме»), «Пожаловаться»
-#8B0000. Пример: src/components/site/wheretobuy-publications.tsx.
+## СОСТОЯНИЕ (коммиты dd02330 → ef1e503 → e4fda5d + 5 раундов правок 2026-09-24)
 
-ПРИЁМОЧНЫЕ ПРОБЫ (scripts/probe-*.mjs, node scripts/probe-ИМЯ):
-- probe-review-card.mjs — карточки rc: 88 OK / 8 FAIL (все 8 — прежний
-  документированный устаревший блок 15 ИИ-модерации, вне скоупа; НЕ чинить без ТЗ)
-- probe-rc-five-fixes-2026-09-24.mjs — 18/0
-- probe-forum-buttons-final-2026-09-23.mjs — 27/0
-- npx tsc --noEmit — 14 legacy / 0 новых (базовый уровень; НЕ «чинить» legacy)
+Страница «Рекомендую / Не рекомендую» (/rekomenduyu) + 4 другие страницы
+(/gde-deshevle, /gde-kupit, /o-rabotodatelyah, /gkh) — доведены до финала
+в 5 раундов. Финальная логика кнопки «Обсудить на форуме» —
+АВТО-СОЗДАНИЕ ТЕМЫ (не prefill-форма, как в ранних раундах).
 
-ЛОВУШКИ:
-- Rate-limit: POST /api/wheretobuy|gdedeshevle|recommend — in-memory лимит
-  6 вопросов/час (src/lib/api.ts). Перед серией проб: холодный рестарт сервера.
-- After prisma db push/generate — холодный рестарт сервера (старый клиент в памяти).
-- .git раздут до ~300M старыми zip-блобами — НОВЫЕ БИНАРНИКИ В GIT НЕ КОММИТИТЬ.
-- Платформенные ссылки на скачивание у пользователя не работают (Failed to fetch);
-  рабочий путь доставки файлов — litterbox.catbox.moe (retention 72ч):
-  curl -s -A "Mozilla/5.0" -F "reqtype=fileupload" -F "time=72h" \
-    -F "fileToUpload=@<файл>" https://litterbox.catbox.moe/resources/internals/api.php
-  (x0.at — 403 бан IP песочницы; catbox.moe — «Invalid uploader»)
-- При затрагивании проб синхронизировать CLOCK_BORDER = "rgb(74, 104, 140)".
+### Раунды правок 2026-09-24:
 
-СТРУКТУРА /rekomenduyu (что где лежит):
-- src/components/site/recommend-publications.tsx — экран + RecRow (реальные
-  карточки), RecFormModal, RecComplaintModal, RecOrgResponseForm
-- src/components/site/sakh-matrix-review-card.tsx — демо-карточки заказчика
-  (sakh-001…003 из review-demo-data.ts), маркер .rc-democard
-- src/components/site/sakh-matrix-resolution-simulator.tsx — симулятор примирения
-  (прислан заказчиком), маркер .rc-simcard
-- src/app/globals.css — блок «RC → ЭТАЛОН WB» в конце файла + .rc-votebtn
+Раунд 1 (prefill для /rekomenduyu — СТАРЫЙ подход):
+  - forum-links.ts: sectionDiscussHrefWithPrefill(section, topicId,
+    postId, source?) — добавляет kind=section в URL.
+  - recommend-publications.tsx: заменена кнопка на prefill-ссылку.
+  - modals.tsx: NewTopicModal принимает initialTitle/initialMessage.
+  - forum/category/[slug]/page.tsx: useSearchParams + fetch
+    /api/recommend/[id] — авто-открытие NewTopicModal с prefill.
+  - api/recommend/[id]/route.ts: добавлен GET handler.
 
-ЖУРНАЛ РАБОТ: worklog.md (записи Task ID: rc-to-wb-etalon / rc-fullwidth-clock /
-rc-compact-votes 2026-09-24 — там детальные описания всех правок и приёмки).
-История коммитов: GIT_HISTORY.txt.
+Раунд 2 (универсализация prefill для 3 страниц):
+  - Та же логика применена к /gde-deshevle, /gde-kupit,
+    /o-rabotodatelyah. Заменены 3 discuss()-функции. Добавлены 3 новых
+    GET handler в /api/{wheretobuy,gdedeshevle,employers}/[id]/route.ts.
+  - Для employers — специфика: заголовок = «<employer> (<city>)»,
+    текст = workPeriod + experience + personMention.
+
+Раунд 3 (виджет «Подслушано Сахалин» на главной):
+  - home-center.tsx: useRef + requestAnimationFrame автопрокрутка
+    (0.4px/кадр, ~24px/сек; пауза по hover; возврат в начало).
+  - pageSize поднят с 4 до 12.
+  - href заменён на forumTopicHref(topicId) или
+    forumCategoryHref("podslyshano-discuss").
+  - CSS .mp-overheard-scroll в globals.css: fixed 380px, overflow-y:hidden,
+    скрытый скроллбар во всех браузерах.
+
+Раунд 4 (ФИНАЛЬНАЯ логика — АВТО-СОЗДАНИЕ ТЕМЫ):
+  - Создан универсальный API POST /api/discuss/[kind]/[id]/route.ts
+    (kind = recommend / wheretobuy / gdedeshevle / employers / gkh).
+  - Создан клиентский хелпер src/lib/discuss.ts с discussOnForum().
+  - Заменены кнопки в 5 карточках на <button onClick={() =>
+    discussOnForum(kind, postId, token, onNeedAuth)}>.
+  - Автор темы — текущий залогиненный пользователь (НЕ системный бот —
+    безопаснее, пользователь видит тему у себя, может редактировать).
+  - Гостю — AuthModal. Если у публикации уже есть topicId — сразу
+    редирект в существующую тему без создания дубликата.
+  - Старая prefill-логика в forum/category/[slug]/page.tsx оставлена как
+    fallback (не вызывается из карточек, но работает по прямому URL
+    ?new=1&postId=...&kind=...).
+
+Раунд 5 (архивация для новой сессии): этот файл.
+
+## ПОЛНЫЙ ПОТОК «Обсудить на форуме» (финальная логика)
+
+1. Пользователь на любой из 5 страниц кликает «💬 Обсудить на форуме»
+   под публикацией.
+2. Если гость — открывается AuthModal; после входа нужно кликнуть ещё раз.
+3. Если залогинен — браузер делает POST /api/discuss/<kind>/<cuid> с
+   токеном.
+4. Сервер:
+   • Если у публикации уже есть topicId — мгновенно отвечает
+     {redirect: "/forum/topic/<id>"} без создания дубликата.
+   • Если topicId === null — формирует title и body по правилам блока
+     (для employers — employer+city+workPeriod+experience+personMention;
+     для остальных — title+text), добавляет ссылку-источник
+     «— из публикации: <origin>/<page>#<anchor>-<id>», прогоняет
+     модерацию moderateNewText, создаёт Topic + первое Message,
+     привязывает topicId к публикации, отвечает
+     {redirect: "/forum/topic/<newId>"}.
+5. Клиент делает window.location.href = redirect — пользователь попадает
+   прямо в тему, где может писать комментарии.
+6. При следующем клике под той же публикацией — сервер видит
+   topicId !== null и просто редиректит в существующую тему БЕЗ
+   создания дубликата.
+
+## НОВЫЕ ФАЙЛЫ (созданы в 5 раундах 2026-09-24)
+
+  src/app/api/discuss/[kind]/[id]/route.ts  — универсальный POST handler
+  src/lib/discuss.ts                       — клиентский helper
+  src/app/api/wheretobuy/[id]/route.ts      — GET handler (новый)
+  src/app/api/gdedeshevle/[id]/route.ts    — GET handler (новый)
+  src/app/api/employers/[id]/route.ts      — GET handler (новый)
+  src/app/api/recommend/[id]/route.ts      — GET handler (новый, раунд 1)
+  scripts/start-dev.sh                     — надёжный запуск dev-сервера
+                                             через setsid+nohup
+
+## КЛЮЧЕВЫЕ ИЗМЕНЁННЫЕ ФАЙЛЫ
+
+  src/lib/forum-links.ts                  — sectionDiscussHrefWithPrefill
+  src/components/site/recommend-publications.tsx  — кнопка discuss
+  src/components/site/wheretobuy-publications.tsx — кнопка discuss
+  src/components/site/gdedeshevle-publications.tsx — кнопка discuss
+  src/components/site/employers-publications.tsx  — кнопка discuss
+  src/components/site/gkh-publications.tsx         — кнопка discuss
+  src/components/site/home-center.tsx              — автопрокрутка
+  src/components/forum/modals.tsx                  — initialTitle/Message
+  src/app/forum/category/[slug]/page.tsx           — prefill fallback
+  src/app/globals.css                              — .mp-overheard-scroll
+
+## ПРОВЕРКИ (curl + TypeScript)
+
+  bun install             → 842 пакета за ~10с
+  npx prisma generate     → Prisma Client v6.19.2 за ~300мс
+  bash scripts/start-dev.sh → HTTP 200 за ~5с (готов ждать до 90с)
+  curl /rekomenduyu       → 200
+  curl /gde-deshevle      → 200
+  curl /gde-kupit         → 200
+  curl /o-rabotodatelyah  → 200
+  curl /gkh               → 200
+  curl /                  → 200 (блок «Подслушано Сахалин» с
+                              автопрокруткой)
+  POST /api/discuss/recommend/<cuid> без token → 401 + needAuth=True ✓
+  POST /api/discuss/badkind/whatever            → 400 ✓
+  npx tsc --noEmit         → 0 ошибок в изменённых файлах
+
+## ЗАПУСК DEV-СЕРВЕРА (ВАЖНО)
+
+  bash /home/z/my-project/scripts/start-dev.sh
+
+Внутри — setsid + nohup + </dev/null — это критично. Обычный
+"nohup bun run dev > log 2>&1 & disown" НЕ работает: package.json
+dev-скрипт содержит "| tee dev.log" — пайп убивается при выходе
+родительского bash, и сервер падает через ~3 секунды после запуска.
+start-dev.sh решает это через setsid + прямой вызов bunx next dev
+(минуя package.json dev-скрипт).
+
+## ЛОВУШКИ (важно!)
+
+1) Платформенная загрузка файлов часто не доходит до диска (ассистент
+   видит пустой /home/z/my-project/upload/). Решение: litterbox.catbox.moe
+   с time=72h — пользователь сам рекомендовал этот обходной путь.
+
+2) In-memory rate-limit 6 вопросов/час на POST-эндпоинты — перед серией
+   проб холодный рестарт.
+
+3) .git раздут ~300M — в архив НЕ включён. Локальный .git содержит
+   только «Initial commit» (если развернуть с нуля) — это нормально,
+   все коммиты dd02330 → e4fda5d отражены в файлах и worklog.md.
+
+4) После prisma generate / db push — обязателен холодный рестарт.
+
+5) Бинарники в git не коммитить.
+
+## ДЕТАЛИ И ЖУРНАЛ ВСЕХ ПРАВОК
+
+  worklog.md           — Task ID: rc-to-wb-etalon, rc-fullwidth-clock,
+                         rc-compact-votes, backup-2026-09-24-latest,
+                         discuss-auto-create-2026-09-24
+  HANDOFF.md           — предыдущий handoff (2026-09-21)
+  README-NEW-SESSION.md — предыдущий README
+  GIT_HISTORY.txt       — выгрузка git log (если .git сохранится)
+
+## ЧТО ДЕЛАТЬ ДАЛЬШЕ (предложения)
+
+1) Полное E2E тестирование авто-создания: залогинься как «Модератор» или
+   «Админ» (есть в seed.js), кликни «💬 Обсудить на форуме» под любой
+   публикацией на каждой из 5 страниц — должны попасть в новую тему.
+   При повторном клике — в ту же тему без дубликата.
+
+2) Удалить старую prefill-логику в forum/category/[slug]/page.tsx (если
+   не нужна как fallback) — она не вызывается из карточек, но добавляет
+   ~80 строк. Решение за заказчиком.
+
+3) Добавить Suspense-обёртку вокруг ForumCategoryPage (для будущего
+   prod-сборки — Next 16 требует Suspense при использовании
+   useSearchParams).
+
+4) Распространить ту же логику «Обсудить на форуме» на блок «Подслушано
+   Сахалин» — сейчас там кнопка ведёт на /forum/category/podslyshano-discuss
+   (без авто-создания). Карта SECTION_FORUM.overheard уже есть.
