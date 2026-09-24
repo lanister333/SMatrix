@@ -114,6 +114,12 @@ const GKF_REWRITE_MESSAGE =
  *  src/lib/forum-links.ts (SECTION_FORUM.gkh). */
 const GKF_FORUM_URL = "/forum/category/nedvizhimost--zhkh-i-upravlyayuschie-kompanii";
 
+// ТЗ 2026-09-24 «Обсудить на форуме — авто-создание темы»: клиентский
+// helper для всех 5 разделов (recommend / wheretobuy / gdedeshevle /
+// employers / gkh). Создаёт тему через POST /api/discuss/<kind>/<id> и
+// редиректит пользователя на готовую тему.
+import { discussOnForum } from "@/lib/discuss";
+
 /** Класс чипа статуса карточки (плоские заливки, ТЗ №2). */
 const GKF_STATUS_CLASS: Record<string, string> = {
   active: "gkf-status is-search",
@@ -549,15 +555,28 @@ export function GkhPage(props: {
                   {/* Кнопка ТЗ №2: рубрика «Недвижимость ▸ ЖКХ и управляющие
                       компании» (статическая ссылка, относительный путь).
                       Справа, бирюзовая — указ заказчика 2026-09-23. */}
+                  {/*
+                    ТЗ 2026-09-24 «Обсудить на форуме — авто-создание темы»:
+                    button вместо <a> — действие создаёт тему, а не навигация.
+                    POST /api/discuss/gkh/<postId>:
+                      • если есть topicId — редирект в существующую тему;
+                      • если нет — создаёт тему в рубрике «ЖКХ и управляющие
+                        компании» от имени текущего пользователя, привязывает
+                        к проблеме, редиректит в новую тему.
+                    Заголовок и текст темы берутся из полей title и text
+                    модели GkhProblem (дополнительно — действия/статус через
+                    отдельный JS-логику не формируем, оставляем как в публикации).
+                  */}
                   <div className="gkf-card-foot">
-                    <a
+                    <button
+                      type="button"
                       className="gkf-btn-forum"
                       data-gkf-card-forum={it.id}
-                      href={GKF_FORUM_URL}
-                      title="Обсудить в рубрике «Недвижимость ▸ ЖКХ и управляющие компании»"
+                      onClick={() => discussOnForum("gkh", it.id, props.token, props.onNeedAuth)}
+                      title="Создать тему обсуждения в рубрике «ЖКХ и управляющие компании»"
                     >
                       💬 Обсудить на форуме ЖКХ
-                    </a>
+                    </button>
                   </div>
                 </article>
               );

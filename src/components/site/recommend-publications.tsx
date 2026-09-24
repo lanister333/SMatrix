@@ -27,7 +27,7 @@ import SakhDatetimeBlock from "@/components/site/sakh-datetime-block";
 import { SakhMatrixReviewCard } from "@/components/site/sakh-matrix-review-card";
 import { SakhMatrixResolutionSimulator } from "@/components/site/sakh-matrix-resolution-simulator";
 import type { ForumUser } from "@/lib/ui";
-import { sectionDiscussHrefWithPrefill } from "@/lib/forum-links";
+import { discussOnForum } from "@/lib/discuss";
 import { DEMO_REVIEW_ENTRIES } from "@/components/site/review-demo-data";
 import { nickGenderClass } from "@/lib/nick-gender";
 
@@ -488,18 +488,21 @@ function RecRow(props: {
           подвалом, бирюзовая ссылка в рубрику раздела. */}
       {isFooterFixed && (
         <div className="rc-demo-forumrow">
-          <a
+          {/*
+            ТЗ 2026-09-24 «Обсудить — авто-создание»: button вместо <a>,
+            т.к. действие создаёт тему (не навигация по статической ссылке).
+            Используем тот же onDiscuss, что и основная карточка — он
+            вызывает обновлённую функцию discuss() в родителе, которая
+            редиректит через helper discussOnForum после ответа сервера.
+          */}
+          <button
+            type="button"
             className="rc-btn-forum is-none"
-            href={sectionDiscussHrefWithPrefill(
-              "recommend",
-              item.topicId,
-              item.id,
-              `/rekomenduyu#rec-${item.id}`,
-            )}
-            title="Открыть тему обсуждения на форуме"
+            onClick={() => props.onDiscuss(item)}
+            title="Создать тему обсуждения на форуме"
           >
             💬 Обсудить на форуме
-          </a>
+          </button>
         </div>
       )}
 
@@ -1065,23 +1068,16 @@ export function RecommendPage(props: {
   };
 
   /**
-   * Кнопка состояния форума — ЕДИНАЯ ЛОГИКА ТЗ 2026-09-23 + расширение
-   * 2026-09-24 «Обсудить на форуме из отзыва»: переход по относительной
-   * ссылке работает и у гостя.
-   *
-   *   • Если у отзыва уже есть связанная тема → /forum/topic/<id>
-   *     (продолжаем обсуждение, prefill не нужен).
-   *   • Если темы нет → /forum/category/<slug>?new=1&postId=<id>&source=...
-   *     Страница рубрики автоматически откроет форму новой темы с
-   *     предзаполненными заголовком/текстом и ссылкой на исходный отзыв.
+   * Кнопка состояния форума — ТЗ 2026-09-24 «Обсудить на форуме —
+   * авто-создание темы»: при клике вызываем универсальный API
+   * POST /api/discuss/recommend/<postId>, который:
+   *   • если у отзыва уже есть topicId — редирект в существующую тему;
+   *   • если нет — создаёт тему в рубрике «Отзывы и рекомендации»
+   *     от имени текущего пользователя, привязывает к отзыву, редиректит.
+   * Гостю открываем AuthModal (тема создаётся от имени залогиненного).
    */
   const discuss = (item: RecItem) => {
-    window.location.href = sectionDiscussHrefWithPrefill(
-      "recommend",
-      item.topicId,
-      item.id,
-      `/rekomenduyu#rec-${item.id}`,
-    );
+    discussOnForum("recommend", item.id, props.token, props.onNeedAuth);
   };
 
   const openEdit = (item: RecItem) => {

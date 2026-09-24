@@ -32,7 +32,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import SakhDatetimeBlock from "@/components/site/sakh-datetime-block";
 import type { ForumUser } from "@/lib/ui";
-import { sectionDiscussHrefWithPrefill } from "@/lib/forum-links";
+import { discussOnForum } from "@/lib/discuss";
 import { SAKHALIN_CITIES } from "@/components/site/flat-board";
 
 interface EmpItem {
@@ -523,29 +523,27 @@ export function EmployersPage(props: {
                   <div className="ep-card-disclaimer" data-ep-card-disclaimer={it.id}>
                     {EP_DISCLAIMER}
                   </div>
-                  {/* Кнопка ТЗ: рубрика «Карьера, бизнес ▸ Работодатели» (78) —
-                      единая логика ТЗ 2026-09-23 + расширение 2026-09-24
-                      «Обсудить на форуме из трудового опыта»: относительная
-                      ссылка, работает и у гостя; связанная тема → /forum/topic/<id>,
-                      темы нет → /forum/category/<slug>?new=1&postId=<id>&kind=employers
-                      &source=/o-rabotodatelyah#emp-<id> — авто-открытие формы
-                      новой темы с предзаполненными заголовком (название организации)
-                      и текстом (период + опыт + упоминание человека). Данные
-                      подтягиваются через GET /api/employers/<id>. */}
+                  {/*
+                    ТЗ 2026-09-24 «Обсудить на форуме — авто-создание темы»:
+                    button вместо <a> — действие создаёт тему, а не навигация.
+                    POST /api/discuss/employers/<postId>:
+                      • если есть topicId — редирект в существующую тему;
+                      • если нет — создаёт тему в рубрике «Работодатели» от
+                        имени текущего пользователя, привязывает к карточке,
+                        редиректит в новую тему.
+                    Тема формируется из employer + city + workPeriod + experience
+                    + personMention (новые поля Flat 2.0, не legacy title/text).
+                  */}
                   <div className="ep-card-foot">
-                    <a
+                    <button
+                      type="button"
                       className={`ep-btn-forum is-${state}`}
                       data-ep-card-forum={it.id}
-                      href={sectionDiscussHrefWithPrefill(
-                        "employers",
-                        it.topicId,
-                        it.id,
-                        `/o-rabotodatelyah#emp-${it.id}`,
-                      )}
-                      title="Обсудить в рубрике «Карьера, бизнес ▸ Работодатели»"
+                      onClick={() => discussOnForum("employers", it.id, props.token, props.onNeedAuth)}
+                      title="Создать тему обсуждения в рубрике «Карьера, бизнес ▸ Работодатели»"
                     >
                       {forumButtonLabel(it.topicId ? it.topicState : "none")}
-                    </a>
+                    </button>
                   </div>
                 </article>
               );
