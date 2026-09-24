@@ -2230,28 +2230,25 @@ a.pl-entry-detail:hover{color:#0a5caa}
 .mp-tdate{color:#56657a;white-space:nowrap;flex:0 0 110px;text-align:right;font-size:12px}
 
 /* ---- ТЗ 2026-09-24 «Подслушано Сахалин» — лента с автопрокруткой на главной.
-   Фиксированная высота (380px — половина высоты соседнего блока «Последние
-   темы форума»), вертикальный overflow скрыт (прокрутку управляет JS через
-   requestAnimationFrame, см. home-center.tsx). Скроллбар скрыт во всех
-   браузерах: WebKit/Firefox/IE — чтобы визуально оставалась «лента» без
-   системной полосы. При :hover — лёгкая подсветка рамки (визуальная подсказка,
-   что блок кликабелен); сама прокрутка приостанавливается JS-логикой. */
+   Фиксированная высота (380px — fallback по умолчанию; переопределяется JS
+   в home-center.tsx под ровно 5 строк: el.style.height = rowH × 5 + 'px' —
+   ТЗ 2026-09-25 «Высота ровно под 5 сообщений»). Вертикальный overflow
+   скрыт (прокрутку управляет JS через requestAnimationFrame в home-center.tsx).
+   Скроллбар скрыт во всех браузерах: WebKit/Firefox/IE — чтобы визуально
+   оставалась «лента» без системной полосы. При :hover — лёгкая подсветка
+   рамки (визуальная подсказка, что блок кликабелен); сама прокрутка
+   приостанавливается JS-логикой. */
 .mp-overheard-scroll{
-  height:380px;
+  height:380px; /* fallback: JS динамически переопределит под 5 строк */
   overflow-y:hidden;
   position:relative;
-  /* Альтернативно для авто-плавности — отключаем системный scroll-behavior,
-     плавность задаётся через requestAnimationFrame в home-center.tsx */
   scroll-behavior:auto;
 }
 .mp-overheard-scroll:hover{
   border-color:#1E3A5F;
   box-shadow:inset 0 0 0 1px #1E3A5F;
 }
-/* WebKit (Chrome/Safari/Edge): полностью прячем системный скроллбар,
-   но оставляем возможность прокрутки программно через scrollTop */
 .mp-overheard-scroll::-webkit-scrollbar{width:0;height:0;display:none}
-/* Firefox: прячем через scrollbar-width: none */
 .mp-overheard-scroll{scrollbar-width:none;-ms-overflow-style:none}
 
 /* ---- Нижняя сетка разделов: попарно две колонки, ровно по макету ---- */

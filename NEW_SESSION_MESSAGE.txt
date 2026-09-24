@@ -1,112 +1,109 @@
-# SakhMatrix — стартовое сообщение для новой сессии (2026-09-24 evening)
+# SakhMatrix — стартовое сообщение для новой сессии (2026-09-25)
 
 Ты — фронтенд-разработчик проекта SakhMatrix (информационный портал Сахалина).
 Язык общения — русский. Превью проекта открывается в платформе.
 
-## РАЗВЁРТЫВАНИЕ архива SakhMatrix-project-2026-09-24-evening.zip:
+## РАЗВЁРТЫВАНИЕ архива SakhMatrix-project-2026-09-25.zip:
 
-1) Распаковать в /home/z/my-project
-2) bun install
-3) npx prisma generate (обязательно до проверки API; схема БД уже применена —
-   у RecUsefulVote есть колонка kind, у всех 5 моделей — поле topicId Int? @unique)
-4) Холодный рестарт:
+1) Скачать архив curl-ом в /home/z/my-project/upload/:
+   mkdir -p /home/z/my-project/upload
+   curl -L -o /home/z/my-project/upload/sakhmatrix.zip "<прямая ссылка из чата>"
+2) Распаковать в /home/z/my-project:
+   unzip -o /home/z/my-project/upload/sakhmatrix.zip -d /home/z/my-project
+3) cd /home/z/my-project && bun install
+4) npx prisma generate
+5) Холодный рестарт:
    pkill -9 -f bun; pkill -9 -f next; sleep 2
-   (nohup bun run dev > dev-server.log 2>&1 & disown) — НЕ РАБОТАЕТ из-за
-   | tee в package.json dev-скрипте. ИСПОЛЬЗУЙ start-dev.sh (см. ниже).
-   ждать 200 от localhost:3000
+   bash /home/z/my-project/scripts/start-dev.sh
+   (НЕ ИСПОЛЬЗУЙ "nohup bun run dev" напрямую — package.json dev-скрипт
+   содержит "| tee dev.log" который убивается при выходе bash, и сервер
+   падает через ~3 секунды. start-dev.sh решает через setsid+nohup.)
+6) Ждать HTTP 200 от localhost:3000 (~5с).
 
 Если платформа не отдала архив на диск (ошибка «upload/ пусто») —
-залить через litterbox.catbox.moe:
+залить через gofile.io (litterbox/catbox/transfer.sh/0x0.st/file.io/
+tmpfiles в прошлых сессиях все упали — 403 Cloudflare или таймауты;
+gofile.io — единственный рабочий):
 
-  curl -F reqtype=fileupload -F time=72h \
-    -F fileToUpload=@SakhMatrix-project-2026-09-24-evening.zip \
-    https://litterbox.catbox.moe/resources/internals/api.php
+  curl -F "file=@SakhMatrix-project-2026-09-25.zip" \
+    https://store1.gofile.io/uploadFile
 
-Вернётся прямая ссылка — её дать ассистенту, он скачает в
-/home/z/my-project/upload/ и распакует.
+Вернётся JSON с полем data.downloadPage — пользователь кидает эту
+ссылку ассистенту, тот скачивает в /home/z/my-project/upload/.
 
-## АРХИВ
+## СОСТОЯНИЕ (коммиты dd02330 → ef1e503 → e4fda5d + 6 раундов правок 2026-09-24/25)
 
-- Файл: SakhMatrix-project-2026-09-24-evening.zip
-- Источник: litterbox.catbox.moe (72h) или прямая ссылка из чата
-- Состав: вся рабочая кодовая база SakhMatrix (Next.js 16 + TypeScript +
-  Prisma + Turbopack). БЕЗ node_modules, БЕЗ .next, БЕЗ .git —
-  это экономит ~300+ MB. Зависимости ставятся через bun install за ~10с.
+6 раундов правок кумулятивно:
 
-## СОСТОЯНИЕ (коммиты dd02330 → ef1e503 → e4fda5d + 5 раундов правок 2026-09-24)
+### Раунд 1 (prefill для /rekomenduyu — СТАРЫЙ подход, оставлен как fallback):
+  - forum-links.ts: sectionDiscussHrefWithPrefill(section, topicId, postId, source, kind?)
+  - recommend-publications.tsx: заменена кнопка на prefill-ссылку (демо-карточка)
+  - modals.tsx: NewTopicModal принимает initialTitle/initialMessage
+  - forum/category/[slug]/page.tsx: useSearchParams + fetch /api/<kind>/<id>
+  - api/recommend/[id]/route.ts: добавлен GET handler
 
-Страница «Рекомендую / Не рекомендую» (/rekomenduyu) + 4 другие страницы
-(/gde-deshevle, /gde-kupit, /o-rabotodatelyah, /gkh) — доведены до финала
-в 5 раундов. Финальная логика кнопки «Обсудить на форуме» —
-АВТО-СОЗДАНИЕ ТЕМЫ (не prefill-форма, как в ранних раундах).
+### Раунд 2 (универсализация prefill для 3 страниц):
+  - Та же логика применена к /gde-deshevle, /gde-kupit, /o-rabotodatelyah
+  - Добавлены 3 новых GET handler: /api/{wheretobuy,gdedeshevle,employers}/[id]/route.ts
+  - Для employers — специфика: заголовок = «<employer> (<city>)», текст = workPeriod + experience + personMention
 
-### Раунды правок 2026-09-24:
-
-Раунд 1 (prefill для /rekomenduyu — СТАРЫЙ подход):
-  - forum-links.ts: sectionDiscussHrefWithPrefill(section, topicId,
-    postId, source?) — добавляет kind=section в URL.
-  - recommend-publications.tsx: заменена кнопка на prefill-ссылку.
-  - modals.tsx: NewTopicModal принимает initialTitle/initialMessage.
-  - forum/category/[slug]/page.tsx: useSearchParams + fetch
-    /api/recommend/[id] — авто-открытие NewTopicModal с prefill.
-  - api/recommend/[id]/route.ts: добавлен GET handler.
-
-Раунд 2 (универсализация prefill для 3 страниц):
-  - Та же логика применена к /gde-deshevle, /gde-kupit,
-    /o-rabotodatelyah. Заменены 3 discuss()-функции. Добавлены 3 новых
-    GET handler в /api/{wheretobuy,gdedeshevle,employers}/[id]/route.ts.
-  - Для employers — специфика: заголовок = «<employer> (<city>)»,
-    текст = workPeriod + experience + personMention.
-
-Раунд 3 (виджет «Подслушано Сахалин» на главной):
+### Раунд 3 (виджет «Подслушано Сахалин» на главной — автопрокрутка):
   - home-center.tsx: useRef + requestAnimationFrame автопрокрутка
-    (0.4px/кадр, ~24px/сек; пауза по hover; возврат в начало).
-  - pageSize поднят с 4 до 12.
-  - href заменён на forumTopicHref(topicId) или
-    forumCategoryHref("podslyshano-discuss").
-  - CSS .mp-overheard-scroll в globals.css: fixed 380px, overflow-y:hidden,
-    скрытый скроллбар во всех браузерах.
+  - pageSize поднят с 4 до 12
+  - href заменён на forumTopicHref(topicId) или forumCategoryHref("podslyshano-discuss")
+  - CSS .mp-overheard-scroll в globals.css: fixed, overflow-y:hidden, скрытый скроллбар
 
-Раунд 4 (ФИНАЛЬНАЯ логика — АВТО-СОЗДАНИЕ ТЕМЫ):
+### Раунд 4 (ФИНАЛЬНАЯ логика — АВТО-СОЗДАНИЕ ТЕМЫ вместо prefill):
   - Создан универсальный API POST /api/discuss/[kind]/[id]/route.ts
-    (kind = recommend / wheretobuy / gdedeshevle / employers / gkh).
-  - Создан клиентский хелпер src/lib/discuss.ts с discussOnForum().
-  - Заменены кнопки в 5 карточках на <button onClick={() =>
-    discussOnForum(kind, postId, token, onNeedAuth)}>.
-  - Автор темы — текущий залогиненный пользователь (НЕ системный бот —
-    безопаснее, пользователь видит тему у себя, может редактировать).
-  - Гостю — AuthModal. Если у публикации уже есть topicId — сразу
-    редирект в существующую тему без создания дубликата.
-  - Старая prefill-логика в forum/category/[slug]/page.tsx оставлена как
-    fallback (не вызывается из карточек, но работает по прямому URL
-    ?new=1&postId=...&kind=...).
+    (kind = recommend / wheretobuy / gdedeshevle / employers / gkh)
+  - Создан клиентский хелпер src/lib/discuss.ts с discussOnForum()
+  - Заменены кнопки в 5 карточках на <button onClick={() => discussOnForum(...)}>
+  - Автор темы — текущий залогиненный пользователь (НЕ системный бот)
+  - Гостю — AuthModal; дубликаты не создаются (по topicId)
+  - Старая prefill-логика оставлена как fallback (не вызывается из карточек)
 
-Раунд 5 (архивация для новой сессии): этот файл.
+### Раунд 5 (архивация для переноса сессии): prev. NEW_SESSION_MESSAGE.txt
 
-## ПОЛНЫЙ ПОТОК «Обсудить на форуме» (финальная логика)
+### Раунд 6-A «Кликабельные счётчики админки»:
+  - src/components/forum/admin.tsx, строки 258-308
+  - Массив tiles расширен до 4-элементного [label, value, alert, section]
+  - Каждый счётчик обёрнут в <a href="#" onClick preventDefault → onSection(section)>
+  - Tailwind hover-классы: hover:bg-[#E6EEF7] (обычные), hover:border-[#8a1a28] hover:bg-[#F6E0E3] (красные)
+  - title + no-underline
+  - Соответствие: Участников→users, Тем→topics, Сообщений→topics, Спорных у ИИ→ai,
+    Нерешённых жалоб→complaints, Открытых апелляций→ai, Скрыто ИИ→ai, Активных санкций→log
+  - Замечание: SPA, URL не меняется — нет закладок на раздел (рефакторинг под app-router = 4-6ч, отдельно)
 
-1. Пользователь на любой из 5 страниц кликает «💬 Обсудить на форуме»
-   под публикацией.
-2. Если гость — открывается AuthModal; после входа нужно кликнуть ещё раз.
-3. Если залогинен — браузер делает POST /api/discuss/<kind>/<cuid> с
-   токеном.
-4. Сервер:
-   • Если у публикации уже есть topicId — мгновенно отвечает
-     {redirect: "/forum/topic/<id>"} без создания дубликата.
-   • Если topicId === null — формирует title и body по правилам блока
-     (для employers — employer+city+workPeriod+experience+personMention;
-     для остальных — title+text), добавляет ссылку-источник
-     «— из публикации: <origin>/<page>#<anchor>-<id>», прогоняет
-     модерацию moderateNewText, создаёт Topic + первое Message,
-     привязывает topicId к публикации, отвечает
-     {redirect: "/forum/topic/<newId>"}.
-5. Клиент делает window.location.href = redirect — пользователь попадает
-   прямо в тему, где может писать комментарии.
-6. При следующем клике под той же публикацией — сервер видит
-   topicId !== null и просто редиректит в существующую тему БЕЗ
-   создания дубликата.
+### Раунд 6-B «Высота блока Подслушано ровно под 5 строк + скорость в 2 раза медленнее»:
+  - src/components/site/home-center.tsx: добавлен второй useEffect
+    (после автопрокрутки), который через requestAnimationFrame измеряет
+    offsetHeight первой строки .mp-trow, умножает на 5, устанавливает
+    el.style.height. ResizeObserver — пересчёт при масштабе/повороте.
+    Cleanup: сбрасывает el.style.height = "" (CSS fallback снова работает).
+  - Скорость автопрокрутки: 0.4px/кадр → 0.2px/кадр (ровно в 2 раза медленнее,
+    ~12px/сек при 60fps)
+  - src/app/globals.css: обновлён комментарий к .mp-overheard-scroll —
+    height:380px теперь явно fallback (JS динамически переопределит под 5 строк)
 
-## НОВЫЕ ФАЙЛЫ (созданы в 5 раундах 2026-09-24)
+## ПОЛНЫЙ ПОТОК «Обсудить на форуме» (финальная логика — АВТО-СОЗДАНИЕ)
+
+1) Клик по «💬 Обсудить на форуме» под публикацией
+2) Гость → AuthModal; залогинен → POST /api/discuss/<kind>/<cuid> с token
+3) Сервер:
+   • Если topicId !== null → {redirect: "/forum/topic/<id>"} (без дубликата)
+   • Если topicId === null → формирует title/body по правилам блока:
+     - recommend → title+text (+ subject как fallback)
+     - wheretobuy/gdedeshevle → title+text
+     - employers → employer+city + workPeriod+experience+personMention
+     - gkh → title + «Проблема: <text>» + «Действия: <actions>»
+   • Добавляет ссылку-источник «— из публикации: <origin>/<page>#<anchor>-<id>»
+   • Прогоняет moderateNewText
+   • Создаёт Topic + первое Message (от имени текущего пользователя)
+   • Привязывает topicId к публикации
+   • Возвращает {redirect: "/forum/topic/<newId>"}
+4) Клиент делает window.location.href = redirect → пользователь в теме
+
+## НОВЫЕ ФАЙЛЫ (созданы за 6 раундов)
 
   src/app/api/discuss/[kind]/[id]/route.ts  — универсальный POST handler
   src/lib/discuss.ts                       — клиентский helper
@@ -115,89 +112,81 @@
   src/app/api/employers/[id]/route.ts      — GET handler (новый)
   src/app/api/recommend/[id]/route.ts      — GET handler (новый, раунд 1)
   scripts/start-dev.sh                     — надёжный запуск dev-сервера
-                                             через setsid+nohup
 
 ## КЛЮЧЕВЫЕ ИЗМЕНЁННЫЕ ФАЙЛЫ
 
-  src/lib/forum-links.ts                  — sectionDiscussHrefWithPrefill
+  src/lib/forum-links.ts                   — sectionDiscussHrefWithPrefill
   src/components/site/recommend-publications.tsx  — кнопка discuss
   src/components/site/wheretobuy-publications.tsx — кнопка discuss
   src/components/site/gdedeshevle-publications.tsx — кнопка discuss
   src/components/site/employers-publications.tsx  — кнопка discuss
   src/components/site/gkh-publications.tsx         — кнопка discuss
-  src/components/site/home-center.tsx              — автопрокрутка
+  src/components/site/home-center.tsx              — автопрокрутка (0.2px/кадр)
+                                                    + высота ровно под 5 строк
   src/components/forum/modals.tsx                  — initialTitle/Message
+  src/components/forum/admin.tsx                   — кликабельные счётчики (8 шт)
   src/app/forum/category/[slug]/page.tsx           — prefill fallback
   src/app/globals.css                              — .mp-overheard-scroll
 
 ## ПРОВЕРКИ (curl + TypeScript)
 
-  bun install             → 842 пакета за ~10с
-  npx prisma generate     → Prisma Client v6.19.2 за ~300мс
-  bash scripts/start-dev.sh → HTTP 200 за ~5с (готов ждать до 90с)
+  bash scripts/start-dev.sh → HTTP 200 за ~5с
+  curl /                  → 200 (виджет «Подслушано» с автопрокруткой,
+                              высота динамически под 5 строк, скорость 0.2px/кадр)
   curl /rekomenduyu       → 200
   curl /gde-deshevle      → 200
   curl /gde-kupit         → 200
   curl /o-rabotodatelyah  → 200
   curl /gkh               → 200
-  curl /                  → 200 (блок «Подслушано Сахалин» с
-                              автопрокруткой)
   POST /api/discuss/recommend/<cuid> без token → 401 + needAuth=True ✓
-  POST /api/discuss/badkind/whatever            → 400 ✓
-  npx tsc --noEmit         → 0 ошибок в изменённых файлах
+  POST /api/discuss/badkind/whatever           → 400 ✓
+  npx tsc --noEmit         → 0 ошибок
 
 ## ЗАПУСК DEV-СЕРВЕРА (ВАЖНО)
 
   bash /home/z/my-project/scripts/start-dev.sh
 
-Внутри — setsid + nohup + </dev/null — это критично. Обычный
+Внутри — setsid + nohup + </dev/null — критично. Обычный
 "nohup bun run dev > log 2>&1 & disown" НЕ работает: package.json
 dev-скрипт содержит "| tee dev.log" — пайп убивается при выходе
-родительского bash, и сервер падает через ~3 секунды после запуска.
-start-dev.sh решает это через setsid + прямой вызов bunx next dev
-(минуя package.json dev-скрипт).
+родительского bash, и сервер падает через ~3 секунды.
 
-## ЛОВУШКИ (важно!)
+## ЛОВУШКИ
 
-1) Платформенная загрузка файлов часто не доходит до диска (ассистент
-   видит пустой /home/z/my-project/upload/). Решение: litterbox.catbox.moe
-   с time=72h — пользователь сам рекомендовал этот обходной путь.
-
+1) Платформенная загрузка файлов часто не доходит до диска — используй
+   gofile.io (litterbox/catbox/transfer.sh/0x0.st/file.io/tmpfiles
+   обычно НЕ работают — 403 Cloudflare или таймауты).
 2) In-memory rate-limit 6 вопросов/час на POST-эндпоинты — перед серией
    проб холодный рестарт.
-
-3) .git раздут ~300M — в архив НЕ включён. Локальный .git содержит
-   только «Initial commit» (если развернуть с нуля) — это нормально,
-   все коммиты dd02330 → e4fda5d отражены в файлах и worklog.md.
-
+3) .git раздут ~300M — в архив НЕ включён. Локальный .git содержит только
+   «Initial commit» — это нормально, все коммиты dd02330 → e4fda5d
+   отражены в файлах и worklog.md.
 4) После prisma generate / db push — обязателен холодный рестарт.
-
-5) Бинарники в git не коммитить.
 
 ## ДЕТАЛИ И ЖУРНАЛ ВСЕХ ПРАВОК
 
-  worklog.md           — Task ID: rc-to-wb-etalon, rc-fullwidth-clock,
-                         rc-compact-votes, backup-2026-09-24-latest,
-                         discuss-auto-create-2026-09-24
+  worklog.md — Task ID: rc-to-wb-etalon, rc-fullwidth-clock,
+    rc-compact-votes, backup-2026-09-24-latest, discuss-auto-create-2026-09-24,
+    overheard-height-speed-2026-09-25, admin-counters-clickable
   HANDOFF.md           — предыдущий handoff (2026-09-21)
   README-NEW-SESSION.md — предыдущий README
-  GIT_HISTORY.txt       — выгрузка git log (если .git сохранится)
+  GIT_HISTORY.txt       — выгрузка git log
 
 ## ЧТО ДЕЛАТЬ ДАЛЬШЕ (предложения)
 
-1) Полное E2E тестирование авто-создания: залогинься как «Модератор» или
-   «Админ» (есть в seed.js), кликни «💬 Обсудить на форуме» под любой
-   публикацией на каждой из 5 страниц — должны попасть в новую тему.
-   При повторном клике — в ту же тему без дубликата.
-
-2) Удалить старую prefill-логику в forum/category/[slug]/page.tsx (если
-   не нужна как fallback) — она не вызывается из карточек, но добавляет
-   ~80 строк. Решение за заказчиком.
-
-3) Добавить Suspense-обёртку вокруг ForumCategoryPage (для будущего
-   prod-сборки — Next 16 требует Suspense при использовании
-   useSearchParams).
-
-4) Распространить ту же логику «Обсудить на форуме» на блок «Подслушано
-   Сахалин» — сейчас там кнопка ведёт на /forum/category/podslyshano-discuss
-   (без авто-создания). Карта SECTION_FORUM.overheard уже есть.
+1) Полное E2E: залогинься как «Модератор» или «Админ» (есть в seed.js),
+   кликни «💬 Обсудить на форуме» под публикацией на каждой из 5 страниц —
+   должны попасть в новую тему. При повторном клике — в ту же тему без дубликата.
+2) Проверь блок «Подслушано» на главной — теперь там ровно 5 строк в окне,
+   скорость автопрокрутки в 2 раза медленнее. При наведении мыши — пауза.
+3) Проверь кликабельные счётчики в админ-панели (раздел «Главная · состояние
+   и дела») — все 8 блоков реагируют на hover и переключают раздел при клике.
+4) Удалить старую prefill-логику в forum/category/[slug]/page.tsx (если
+   не нужна как fallback).
+5) Добавить Suspense-обёртку вокруг ForumCategoryPage для prod-сборки
+   (Next 16 требует Suspense при использовании useSearchParams).
+6) Рефакторинг admin.tsx под app-router с прямыми URL /admin/users,
+   /admin/topics и т.д. — для закладок (4-6 часов, отдельно).
+7) Распространить логику «Обсудить на форуме» с авто-созданием на блок
+   «Подслушано Сахалин» (overheard-publications.tsx) — карта
+   SECTION_FORUM.overheard уже есть.

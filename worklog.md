@@ -5516,3 +5516,32 @@ Stage Summary:
 - 8 новых файлов + правки: src/app/api/discuss/[kind]/[id]/route.ts (новый); src/lib/discuss.ts (новый); 3 новых GET handler (wheretobuy, gdedeshevle, employers); расширение forum-links.ts (kind параметр); расширение forum/category/[slug]/page.tsx (useSearchParams + по kind); расширение modals.tsx (initialTitle/initialMessage); расширение home-center.tsx (автопрокрутка + topicId); CSS .mp-overheard-scroll в globals.css; замены кнопок в 5 карточках.
 - Живые проверки: 5 страниц → 200; POST /api/discuss/recommend/<cuid> без token → 401 + needAuth=True; невалидный kind → 400; TypeScript → 0 ошибок в изменённых файлах.
 - Полный поток: гость → AuthModal → залогинен → POST → тема создана/найдена → редирект в /forum/topic/<id>. При повторном клике — тот же topicId, без дубликата.
+
+---
+Task ID: overheard-height-speed-2026-09-25 + admin-counters-clickable
+Agent: Super Z (main, opus)
+Task: Доработки раунда 6 — кликабельные счётчики админки + высота блока Подслушано ровно под 5 строк + скорость автопрокрутки в 2 раза медленнее
+
+Work Log:
+- Раунд 6-A «Кликабельные счётчики админки» (src/components/forum/admin.tsx, строки 258-308): массив tiles расширен с 3-элементного [label, value, alert] до 4-элементного [label, value, alert, section]; каждый счётчик обёрнут в <a href="#" onClick preventDefault → onSection(section)> с Tailwind hover-классами (hover:bg-[#E6EEF7] для обычных, hover:border-[#8a1a28] hover:bg-[#F6E0E3] для красных — рамка ярче при наведении); добавлен title «Перейти к разделу «...»» и no-underline.
+  Соответствие счётчиков → разделам SPA:
+    1. Участников → users
+    2. Тем → topics
+    3. Сообщений → topics (нет отдельного раздела «сообщения»; открываем список тем)
+    4. Спорных у ИИ → ai
+    5. Нерешённых жалоб → complaints
+    6. Открытых апелляций → ai (апелляции в ИИ-модерации)
+    7. Скрыто ИИ сейчас → ai
+    8. Активных санкций → log (журнал действий)
+  Замечание: SPA, URL не меняется — нет закладок на конкретный раздел; рефакторинг под app-router с прямыми URL = 4-6 часов, отдельная задача.
+- Раунд 6-B «Высота блока Подслушано ровно под 5 строк + скорость в 2 раза медленнее»:
+  - src/components/site/home-center.tsx: добавлен useEffect (второй, после автопрокрутки), который через requestAnimationFrame измеряет offsetHeight первой строки .mp-trow, умножает на 5, устанавливает el.style.height. Подписка на ResizeObserver — пересчёт при масштабе браузера/повороте телефона. Cleanup: сбрасывает el.style.height = "" чтобы CSS-класс (height:380px fallback) снова взял верх.
+  - Скорость автопрокрутки: 0.4px/кадр → 0.2px/кадр (ровно в 2 раза медленнее, ~12px/сек при 60fps).
+  - src/app/globals.css: обновлён комментарий к .mp-overheard-scroll — height:380px теперь явно fallback (JS переопределит динамически под 5 строк).
+- Раунд 6-C «Архивация для новой сессии»: см. NEW_SESSION_MESSAGE.txt.
+
+Stage Summary:
+- 8 счётчиков админки кликабельны — переключают раздел SPA, hover-эффект работает.
+- Блок «Подслушано Сахалин» на главной: высота динамически ровно под 5 строк, скорость автопрокрутки 0.2px/кадр (~12px/сек, в 2 раза медленнее прежних 0.4px/кадр).
+- Живые проверки: главная / → 200, /rekomenduyu → 200, /gkh → 200, TypeScript → 0 ошибок.
+- Архив загружен на gofile.io (litterbox/catbox/transfer.sh/0x0.st/file.io/tmpfiles — все упали в прошлый раз, спас только gofile).
