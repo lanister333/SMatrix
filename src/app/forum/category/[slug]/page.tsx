@@ -70,24 +70,32 @@ export default function ForumCategoryPage(props: { params: Promise<{ slug: strin
   const favorites = useFavorites();
 
   /**
-   * ТЗ 2026-09-24 «Обсудить на форуме из отзыва»: предзаполнение формы
-   * новой темы. URL вида /forum/category/<slug>?new=1&postId=<id>&source=<url>
+   * ТЗ 2026-09-24 «Обсудить на форуме из отзыва/вопроса/трудового опыта»:
+   * предзаполнение формы новой темы. URL вида
+   *   /forum/category/<slug>?new=1&postId=<id>&kind=<section>&source=<url>
    * означает «пришёл пользователь с кнопки «Обсудить на форуме» под
-   * отзывом; открой форму создания темы и подставь заголовок/текст».
+   * публикацией; открой форму создания темы и подставь заголовок/текст».
    *
    * Логика:
    *  1. useSearchParams() читает query (Next 16 client-component API).
-   *  2. Если new=1 && postId — делаем fetch /api/recommend/[id] (GET)
-   *     и заполняем prefillTitle / prefillMessage.
-   *  3. К сообщению добавляем ссылку-источник из ?source=... —
-   *    «— из отзыва: <origin><source>» — чтобы на форуме была обратная
-   *    навигация к исходной публикации.
-   *  4. После загрузки — автоматически открываем NewTopicModal (если
-   *    гость — сначала AuthModal; после входа откроется NewTopicModal).
+   *  2. Если new=1 && postId — делаем fetch к /api/<kind>/<postId>.
+   *     kind определяет тип публикации:
+   *       recommend   → /api/recommend/<id>      (отзывы)
+   *       wheretobuy  → /api/wheretobuy/<id>     (вопросы «Где купить»)
+   *       gdedeshevle → /api/gdedeshevle/<id>    (вопросы «Где дешевле»)
+   *       employers   → /api/employers/<id>      (карточки «О работодателях»)
+   *  3. Формирование prefillTitle / prefillMessage зависит от типа:
+   *       • recommend/wheretobuy/gdedeshevle — title из d.title, message из d.text
+   *       • employers — title = «<employer> (<city>)», message = опыт + упоминание
+   *  4. К сообщению всегда добавляется ссылка-источник из ?source=...:
+   *       «— из публикации: <origin><source>» — обратная навигация к исходной карточке.
+   *  5. После загрузки — автоматически открываем NewTopicModal (если гость —
+   *     сначала AuthModal; после входа откроется NewTopicModal).
    */
   const searchParams = useSearchParams();
   const prefillNew = searchParams.get("new") === "1";
   const prefillPostId = searchParams.get("postId");
+  const prefillKind = searchParams.get("kind") || "recommend"; // default для обратной совместимости
   const prefillSource = searchParams.get("source");
 
   const [prefillTitle, setPrefillTitle] = useState("");
@@ -95,7 +103,7 @@ export default function ForumCategoryPage(props: { params: Promise<{ slug: strin
   const [prefillLoaded, setPrefillLoaded] = useState(false);
   const [prefillError, setPrefillError] = useState("");
 
-  // Шаг 1: подгрузка отзыва по postId, формирование prefill-строк.
+  // Шаг 1: подгрузка публикации по postId, формирование prefill-строк.
   useEffect(() => {
     if (!prefillNew || !prefillPostId) {
       setPrefillLoaded(true);
@@ -104,22 +112,39 @@ export default function ForumCategoryPage(props: { params: Promise<{ slug: strin
     let cancelled = false;
     (async () => {
       try {
-        const r = await fetch(`/api/recommend/${encodeURIComponent(prefillPostId)}`);
+        const r = await fetch(`/api/${prefillKind}/${encodeURIComponent(prefillPostId)}`);
         if (!r.ok) {
-          setPrefillError(r.status === 404 ? "Отзыв не найден" : "Не удалось загрузить отзыв");
+          setPrefillError(r.status === 404 ? "Публикация не найдена" : "Не удалось загрузить публикацию");
           return;
         }
         const d = await r.json();
         if (cancelled) return;
-        // Заголовок темы — из заголовка отзыва (maxLength 150 в форме).
-        const t = (d.title || d.subject || "").slice(0, 150);
-        setPrefillTitle(t);
-        // Текст сообщения — текст отзыва + ссылка на источник.
+
+        // Универсальный формат: заголовок + текст + ссылка-источник.
+        // Специфика employers — собирается из нескольких полей.
+        let title = "";
+        let message = "";
+        if (prefillKind === "employers") {
+          // Заголовок темы = «<employer> (<city>)» — как в карточке.
+          const city = d.city ? ` (${d.city})` : "";
+          title = `${d.employer || ""}${city}`.slice(0, 150).trim();
+          // Текст сообщения = период + опыт + упоминание человека.
+          const parts: string[] = [];
+          if (d.workPeriod) parts.push(`Период работы: ${d.workPeriod}`);
+          if (d.experience) parts.push(`\nЛичный опыт:\n${d.experience}`);
+          if (d.personMention) parts.push(`\n\nОтдельно хочу отметить человека:\n${d.personMention}`);
+          message = parts.join("\n\n");
+        } else {
+          // recommend / wheretobuy / gdedeshevle — стандартные title + text.
+          title = (d.title || d.subject || "").slice(0, 150);
+          message = d.text || "";
+        }
+
+        // Ссылка-источник в конец сообщения — обратная навигация.
         const origin = typeof window !== "undefined" ? window.location.origin : "";
-        const srcLine = prefillSource
-          ? `\n\n— из отзыва: ${origin}${prefillSource}`
-          : "";
-        setPrefillMessage(`${d.text || ""}${srcLine}`.slice(0, 20000));
+        const srcLine = prefillSource ? `\n\n— из публикации: ${origin}${prefillSource}` : "";
+        setPrefillTitle(title);
+        setPrefillMessage(`${message}${srcLine}`.slice(0, 20000));
       } catch {
         if (!cancelled) setPrefillError("Сеть недоступна — откройте форму вручную");
       } finally {
@@ -127,7 +152,7 @@ export default function ForumCategoryPage(props: { params: Promise<{ slug: strin
       }
     })();
     return () => { cancelled = true; };
-  }, [prefillNew, prefillPostId, prefillSource]);
+  }, [prefillNew, prefillPostId, prefillKind, prefillSource]);
 
   // Шаг 2: после загрузки prefill и найденной рубрики — авто-открытие формы.
   useEffect(() => {

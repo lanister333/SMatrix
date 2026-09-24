@@ -23,7 +23,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import SakhDatetimeBlock from "@/components/site/sakh-datetime-block";
 import E2eTransferTestPanel from "@/components/site/e2e-transfer-test-panel";
 import type { ForumUser } from "@/lib/ui";
-import { sectionDiscussHref } from "@/lib/forum-links";
+import { sectionDiscussHrefWithPrefill } from "@/lib/forum-links";
 import { findPhoneNumbers } from "@/lib/moderation/premoderation";
 import { findEmotionalLabels, WTB_HINT_FORUM_BUTTON_LABEL } from "@/lib/moderation/wheretobuy-hint-premoderation";
 import { nickGenderClass } from "@/lib/nick-gender";
@@ -848,8 +848,19 @@ export function WhereToBuyPage(props: {
    * Прежний POST /discuss с созданием служебной темы заменён переходом
    * в публичную рубрику блока; API-эндпоинт сохранён для совместимости.
    */
+  /**
+   * Кнопка состояния форума — расширение 2026-09-24 «Обсудить на форуме
+   * из вопроса»: при отсутствии связанной темы ведём в рубрику «Где купить»
+   * с автоматическим открытием формы и предзаполненными заголовком/текстом
+   * из вопроса (подтягиваются через GET /api/wheretobuy/<id>).
+   */
   const discuss = (item: WhereToBuyItem) => {
-    window.location.href = sectionDiscussHref("wheretobuy", item.topicId);
+    window.location.href = sectionDiscussHrefWithPrefill(
+      "wheretobuy",
+      item.topicId,
+      item.id,
+      `/gde-kupit#wb-${item.id}`,
+    );
   };
 
   const openEdit = (item: WhereToBuyItem) => {

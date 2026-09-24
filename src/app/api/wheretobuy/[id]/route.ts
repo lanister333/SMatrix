@@ -31,6 +31,47 @@ export const maxDuration = 60;
 const ACTIONS = new Set(["edit", "delete", "status", "answer"]);
 const STATUSES = new Set(["seeking", "found", "irrelevant"]);
 
+/**
+ * ТЗ 2026-09-24 «Обсудить на форуме из вопроса»: публичный GET одного
+ * вопроса «Где купить» по cuid. Используется страницей рубрики форума
+ * (/forum/category/<slug>?new=1&postId=...&kind=wheretobuy) для
+ * предзаполнения формы новой темы: подтягивает заголовок и текст вопроса.
+ *
+ * Возвращает поля, нужные форме: title, text, place, authorName, createdAt,
+ * status, topicId (если уже есть связанная тема), isDeleted, isHiddenByAi.
+ * Удалённые вопросы → 404, скрытые ИИ → 410. Авторизация НЕ требуется —
+ * это публичные данные ленты (как в GET /api/wheretobuy).
+ */
+export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await ctx.params;
+    const post = await db.whereToBuyPost.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        title: true,
+        text: true,
+        place: true,
+        authorName: true,
+        createdAt: true,
+        status: true,
+        topicId: true,
+        isDeleted: true,
+        isHiddenByAi: true,
+      },
+    });
+    if (!post || post.isDeleted) {
+      return NextResponse.json({ error: "Вопрос не найден" }, { status: 404 });
+    }
+    if (post.isHiddenByAi) {
+      return NextResponse.json({ error: "Публикация недоступна" }, { status: 410 });
+    }
+    return NextResponse.json(post);
+  } catch (e) {
+    return handleApiError(e);
+  }
+}
+
 /** ТЗ 2026-09-23 «ИИ-ФИЛЬТР (обязательно)»: серая плашка — ДОСЛОВНЫЙ текст
  *  заказчика; сервер возвращает её текст прямым вызовам API (клиент не
  *  отправляет отфильтрованный текст — линия прочности для прямых запросов). */

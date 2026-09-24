@@ -114,22 +114,32 @@ export function sectionDiscussHref(section: string, topicId: number | null | und
  *  1. Если у публикации уже есть связанная тема (topicId !== null) — ведём
  *     в неё как раньше, prefill не нужен (там продолжается обсуждение).
  *  2. Если темы нет — ведём в рубрику раздела с query-параметрами:
- *       /forum/category/<slug>?new=1&postId=<id>&source=<откуда-пришли>
+ *       /forum/category/<slug>?new=1&postId=<id>&kind=<section>&source=<url>
  *     Короткая ссылка (только postId — не весь текст) — данные подтягиваются
- *     на стороне форума через GET /api/recommend/[id], что снимает лимит URL
- *     на длину текста отзыва (может быть до 8000 символов).
+ *     на стороне форума через GET /api/<kind>/[id], что снимает лимит URL
+ *     на длину текста публикации (до 8000 символов в отзывах / 20000 в темах).
  *
- * @param section  Ключ блока (см. SECTION_FORUM): "recommend" для отзывов.
+ * Параметр kind (тип публикации) нужен странице рубрики, чтобы выбрать
+ * правильный API endpoint: для отзывов — /api/recommend/<id>, для «Где
+ * купить» — /api/wheretobuy/<id>, для «Где дешевле» — /api/gdedeshevle/<id>,
+ * для «О работодателях» — /api/employers/<id>. По умолчанию kind = section
+ * (можно переопределить, если slug рубрики не совпадает с типом источника).
+ *
+ * @param section  Ключ блока (см. SECTION_FORUM): "recommend" / "wheretobuy" /
+ *                "gdedeshevle" / "employers" / "gkh" / "help" / "overheard".
  * @param topicId  ID связанной темы (если уже создана) или null.
  * @param postId   ID публикации-источника (строка cuid). Обязателен для prefill.
- * @param source   Относительный URL страницы-источника (например, "/rekomenduyu#rec-<id>").
- *                 Добавляется в конец текста темы как «— из отзыва: <url>».
+ * @param source   Относительный URL страницы-источника (например,
+ *                 "/rekomenduyu#rec-<id>"). Добавляется в конец текста темы
+ *                 как «— из публикации: <origin><source>».
+ * @param kind     Тип публикации для выбора API endpoint (по умолчанию = section).
  */
 export function sectionDiscussHrefWithPrefill(
   section: string,
   topicId: number | null | undefined,
   postId: string,
   source?: string,
+  kind?: string,
 ): string {
   // Тема уже создана — ведём в неё без prefill (текст ответа — другой кейс).
   if (topicId) return forumTopicHref(topicId);
@@ -142,9 +152,11 @@ export function sectionDiscussHrefWithPrefill(
 
   // Query-параметры для авто-открытия формы новой темы с предзаполнением.
   // new=1 — флаг «автоматически открыть NewTopicModal» на странице рубрики.
+  // kind — тип публикации (для выбора API endpoint подтягивания данных).
   const params = new URLSearchParams();
   params.set("new", "1");
   params.set("postId", postId);
+  params.set("kind", kind ?? section);
   if (source) params.set("source", source);
 
   return `${base}?${params.toString()}`;

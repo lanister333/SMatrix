@@ -32,7 +32,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import SakhDatetimeBlock from "@/components/site/sakh-datetime-block";
 import type { ForumUser } from "@/lib/ui";
-import { sectionDiscussHref } from "@/lib/forum-links";
+import { sectionDiscussHrefWithPrefill } from "@/lib/forum-links";
 import { SAKHALIN_CITIES } from "@/components/site/flat-board";
 
 interface EmpItem {
@@ -524,13 +524,24 @@ export function EmployersPage(props: {
                     {EP_DISCLAIMER}
                   </div>
                   {/* Кнопка ТЗ: рубрика «Карьера, бизнес ▸ Работодатели» (78) —
-                      единая логика ТЗ 2026-09-23: относительная ссылка,
-                      работает и у гостя; связанная тема → /forum/topic/<id>. */}
+                      единая логика ТЗ 2026-09-23 + расширение 2026-09-24
+                      «Обсудить на форуме из трудового опыта»: относительная
+                      ссылка, работает и у гостя; связанная тема → /forum/topic/<id>,
+                      темы нет → /forum/category/<slug>?new=1&postId=<id>&kind=employers
+                      &source=/o-rabotodatelyah#emp-<id> — авто-открытие формы
+                      новой темы с предзаполненными заголовком (название организации)
+                      и текстом (период + опыт + упоминание человека). Данные
+                      подтягиваются через GET /api/employers/<id>. */}
                   <div className="ep-card-foot">
                     <a
                       className={`ep-btn-forum is-${state}`}
                       data-ep-card-forum={it.id}
-                      href={sectionDiscussHref("employers", it.topicId)}
+                      href={sectionDiscussHrefWithPrefill(
+                        "employers",
+                        it.topicId,
+                        it.id,
+                        `/o-rabotodatelyah#emp-${it.id}`,
+                      )}
                       title="Обсудить в рубрике «Карьера, бизнес ▸ Работодатели»"
                     >
                       {forumButtonLabel(it.topicId ? it.topicState : "none")}
