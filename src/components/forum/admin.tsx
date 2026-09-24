@@ -256,26 +256,54 @@ function AdminHome(props: { token: string | null; notify: (m: string) => void; o
   if (!data) return <p className="p-4 text-[14px] text-[#56657a]">Загрузка…</p>;
 
   const s = data.site;
-  const tiles: [string, string | number, boolean][] = [
-    ["Участников", fmtNum(s.users), false],
-    ["Тем", fmtNum(s.topics), false],
-    ["Сообщений", fmtNum(s.messages), false],
-    ["Спорных у ИИ (нужен человек)", s.needHuman, s.needHuman > 0],
-    ["Нерешённых жалоб", s.openComplaints, s.openComplaints > 0],
-    ["Открытых апелляций", s.openAppeals, s.openAppeals > 0],
-    ["Скрыто ИИ сейчас", s.hiddenByAi, s.hiddenByAi > 0],
-    ["Активных санкций", s.activeSanctions, s.activeSanctions > 0],
+  /**
+   * ТЗ 2026-09-24 «Кликабельные счётчики админки»: каждый из 8 блоков
+   * становится ссылкой, переключающей активный раздел админ-панели.
+   * 4-й элемент массива — целевой AdminSection, куда вести при клике:
+   *   • Участников        → users (список пользователей)
+   *   • Тем               → topics (список тем форума)
+   *   • Сообщений         → topics (нет отдельного раздела «сообщения»;
+   *                          сообщения видны внутри каждой темы — открываем
+   *                          список тем, админ выбирает нужную тему)
+   *   • Спорных у ИИ      → ai (ИИ-модерация, очередь «нужен человек»)
+   *   • Нерешённых жалоб  → complaints (жалобы)
+   *   • Открытых апелляций → ai (апелляции рассматриваются в ИИ-модерации)
+   *   • Скрыто ИИ сейчас   → ai (скрытые сообщения в ИИ-модерации)
+   *   • Активных санкций   → log (журнал действий — там видны применённые
+   *                          санкции; прямого раздела «санкции» нет)
+   */
+  const tiles: [string, string | number, boolean, AdminSection][] = [
+    ["Участников", fmtNum(s.users), false, "users"],
+    ["Тем", fmtNum(s.topics), false, "topics"],
+    ["Сообщений", fmtNum(s.messages), false, "topics"],
+    ["Спорных у ИИ (нужен человек)", s.needHuman, s.needHuman > 0, "ai"],
+    ["Нерешённых жалоб", s.openComplaints, s.openComplaints > 0, "complaints"],
+    ["Открытых апелляций", s.openAppeals, s.openAppeals > 0, "ai"],
+    ["Скрыто ИИ сейчас", s.hiddenByAi, s.hiddenByAi > 0, "ai"],
+    ["Активных санкций", s.activeSanctions, s.activeSanctions > 0, "log"],
   ];
 
   return (
     <div className="p-3">
-      {/* Базовое состояние сайта — только счётчики, без раздутой аналитики */}
+      {/* Базовое состояние сайта — только счётчики, без раздутой аналитики.
+          ТЗ 2026-09-24: каждый блок обёрнут в <a> с onClick, переключающим
+          раздел админки. href="#" + preventDefault — семантически ссылка
+          (cursor:pointer, hover-эффект), но реальной навигации нет (SPA). */}
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {tiles.map(([label, value, alert]) => (
-          <div key={label} className={`border p-2.5 ${alert ? "border-[#B22335] bg-[#FBF2F3]" : "border-[#C9D4E2] bg-[#F7FAFD]"}`}>
+        {tiles.map(([label, value, alert, section]) => (
+          <a
+            key={label}
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              props.onSection(section);
+            }}
+            title={`Перейти к разделу «${SECTION_TITLES[section]}»`}
+            className={`block border p-2.5 no-underline transition-colors duration-150 hover:bg-[#E6EEF7] ${alert ? "border-[#B22335] bg-[#FBF2F3] hover:border-[#8a1a28] hover:bg-[#F6E0E3]" : "border-[#C9D4E2] bg-[#F7FAFD] hover:border-[#1E3A5F]"}`}
+          >
             <div className={`text-[20px] font-bold leading-tight ${alert ? "text-[#B22335]" : "text-[#1E3A5F]"}`}>{value}</div>
             <div className="text-[12px] leading-snug text-[#4a5b6d]">{label}</div>
-          </div>
+          </a>
         ))}
       </div>
       <p className="mt-1.5 text-[12px] text-[#56657a]">За сутки: новых тем — {s.topicsToday}, сообщений — {s.messagesToday}. Ограничений действует: {s.restrictedUsers}, из них автоматических санкций ИИ — {s.aiSanctions}.</p>
