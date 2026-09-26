@@ -34,6 +34,7 @@ import {
 } from "lucide-react";
 import { Nick, type TopicRow } from "@/lib/ui";
 import { forumCategoryHref, forumTopicHref } from "@/lib/forum-links";
+import TransportScheduleBlock from "@/components/site/transport-schedule-block";
 // Указ заказчика 2026-09-23 (скриншот «это удали», ТРЕТЬЕ снятие): панели
 // «Быстрые подсказки «Где купить»/«Где дешевле»» снова сняты с Главной —
 // импорты и монтирование удалены (низ центральной колонки). Подсистема
@@ -661,6 +662,14 @@ export default function HomeCenter(props: {
           примеров) сохранены на диске и просто не рендерятся — см.
           комментарий в шапке файла. Возврат: два импорта в шапке +
           <WhereToBuyQuickHints /> и <GdedeshevleQuickHints /> здесь. */}
+
+      {/* ТЗ 2026-09-26: блок «Расписание транспорта» — в самом низу
+          центральной колонки Главной, на всю ширину. Дизайн повторяет
+          блок «Время» (.sakh-clock): синяя шапка #1E3A5F, белое тело.
+          Компактный, с вкладками (✈️ Авиа / 🚢 Вода / 🚂 ЖД).
+          Источник: env YANDEX_RASP_KEY → реальные данные Яндекс.Расписаний;
+          иначе — демонстрационная заглушка с пометкой. */}
+      <TransportScheduleBlock />
     </div>
   );
 }
