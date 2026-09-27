@@ -2230,9 +2230,9 @@ a.pl-entry-detail:hover{color:#0a5caa}
 .mp-tdate{color:#56657a;white-space:nowrap;flex:0 0 110px;text-align:right;font-size:12px}
 
 /* ---- ТЗ 2026-09-24 «Подслушано Сахалин» — лента с автопрокруткой на главной.
-   Фиксированная высота (228px — fallback по умолчанию; переопределяется JS
-   в home-center.tsx под ровно 3 строки: el.style.height = rowH × 3 + 'px' —
-   ТЗ 2026-09-27 «Высота вдвое меньше — под 3 сообщения», было 5/380px).
+   Фиксированная высота (150px — fallback по умолчанию; переопределяется JS
+   в home-center.tsx под ровно 2 строки: el.style.height = rowH × 2 + 'px' —
+   ТЗ 2026-09-27 «Высота ещё вдвое меньше — под 2 сообщения», было 5/380px → 3/228px → 2/150px).
    Вертикальный overflow
    скрыт (прокрутку управляет JS через requestAnimationFrame в home-center.tsx).
    Скроллбар скрыт во всех браузерах: WebKit/Firefox/IE — чтобы визуально
@@ -2240,7 +2240,7 @@ a.pl-entry-detail:hover{color:#0a5caa}
    рамки (визуальная подсказка, что блок кликабелен); сама прокрутка
    приостанавливается JS-логикой. */
 .mp-overheard-scroll{
-  height:228px; /* fallback: JS динамически переопределит под 3 строки */
+  height:150px; /* fallback: JS динамически переопределит под 2 строки */
   overflow-y:hidden;
   position:relative;
   scroll-behavior:auto;
