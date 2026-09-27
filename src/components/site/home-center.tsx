@@ -452,9 +452,11 @@ export default function HomeCenter(props: {
 
   /**
    * ТЗ 2026-09-24: автопрокрутка ленты «Подслушано Сахалин».
-   * Алгоритм: каждый кадр requestAnimationFrame сдвигаем scrollTop на 0.2px
-   * (~12px/сек при 60fps — плавно и без рывков; в 2 раза медленнее, чем
-   * прошлая версия 0.4px/кадр — ТЗ 2026-09-25 «Замедлить ровно в 2 раза»),
+   * Алгоритм: каждый кадр requestAnimationFrame сдвигаем scrollTop на 0.1px
+   * (~6px/сек при 60fps — плавно и без рывков; история:
+   *   - 0.4px/кадр — изначальная версия
+   *   - 0.2px/кадр — ТЗ 2026-09-25 «в 2 раза медленнее»
+   *   - 0.1px/кадр — ТЗ 2026-09-27 «ещё в 2 раза медленнее»),
    * при достижении конца плавно возвращаемся в начало. Пауза по hover.
    */
   useEffect(() => {
@@ -464,6 +466,10 @@ export default function HomeCenter(props: {
     if (!posts || posts.length === 0) return;
 
     let rafId = 0;
+    // Накопитель дробных пикселей: 0.1px/кадр браузер округлит до 0,
+    // поэтому копим доли пикселя в переменной и применяем целую часть.
+    let fractionalPx = 0;
+    const SCROLL_PER_FRAME = 0.1; // 0.1px/кадр → ~6px/сек при 60fps
     const onEnter = () => { overheardPausedRef.current = true; };
     const onLeave = () => { overheardPausedRef.current = false; };
     el.addEventListener("mouseenter", onEnter);
@@ -473,11 +479,19 @@ export default function HomeCenter(props: {
       if (!overheardPausedRef.current) {
         // Крутим только если контент реально длиннее контейнера.
         if (el.scrollHeight > el.clientHeight + 1) {
-          // 0.2px/кадр (ровно в 2 раза медленнее прежних 0.4px/кадр).
-          el.scrollTop += 0.2;
+          // 0.1px/кадр (~6px/сек при 60fps — в 2 раза медленнее прежних 0.2px/кадр).
+          // Накапливаем дробную часть: browsers округляют scrollTop до int,
+          // поэтому 0.1 + 0.1 + 0.1 + ... + 0.1 (10 раз) = 1px — применяем раз в 10 кадров.
+          fractionalPx += SCROLL_PER_FRAME;
+          if (fractionalPx >= 1) {
+            const toAdd = Math.floor(fractionalPx);
+            el.scrollTop += toAdd;
+            fractionalPx -= toAdd;
+          }
           // Достигли низа (с допуском в 1px) — мягко возвращаемся в начало.
           if (el.scrollTop + el.clientHeight >= el.scrollHeight - 1) {
             el.scrollTop = 0;
+            fractionalPx = 0;
           }
         }
       }
