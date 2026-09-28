@@ -267,6 +267,46 @@ li.sk-rubric-row{display:block}
   margin-top:1px;
 }
 .sk-topicbox .t-title .sk-btn-answer-in-title:hover{background:#084c8b !important}
+
+/* 28.09.2026 (правка п.б.4, п.г): «☆ Добавить в избранное» в шапке темы
+   рядом с «Ответить» — БЕЗ рамки (п.г), цвет — бирюзово-синий, как у
+   других вторичных действий шапки; в выбранном виде — золотой. */
+.sk-topicbox .t-title .sk-fav-btn-in-title{
+  flex:0 0 auto;
+  background:0 0 !important;
+  border:0 !important;
+  padding:5px 8px !important;
+  margin:1px 6px 0 0;
+  font-size:12.5px !important;
+  font-weight:600 !important;
+  color:#0a5caa !important;
+  text-decoration:none !important;
+  cursor:pointer !important;
+  white-space:nowrap !important;
+  align-self:flex-start;
+}
+.sk-topicbox .t-title .sk-fav-btn-in-title:hover{color:#084c8b !important;text-decoration:underline !important}
+.sk-topicbox .t-title .sk-fav-btn-in-title.done{color:#b8860b !important}
+
+/* 28.09.2026 (правка п.ж): синяя кнопка «Ответить» в каждой рамке
+   сообщения. Та же палитра, что у «Ответить» в шапке темы — #0a5caa.
+   Безусловный шаблон: рисуется во всех сообщениях форума, текущих
+   и будущих, единым CSS-правилом. */
+.sk-msg .sk-btn-answer-in-msg{
+  flex:0 0 auto;
+  color:#fff !important;
+  background:#0a5caa !important;
+  border:1px solid #084c8b !important;
+  border-radius:2px !important;
+  padding:3px 12px !important;
+  font-size:12.5px !important;
+  font-weight:700 !important;
+  text-decoration:none !important;
+  cursor:pointer !important;
+  white-space:nowrap !important;
+  margin-left:6px;
+}
+.sk-msg .sk-btn-answer-in-msg:hover{background:#084c8b !important}
 .sk-topicbox .t-meta{color:#4a5b6d;font-size:12.5px;line-height:1.5}
 .sk-topicbox .t-meta b{color:#2f3b49;font-weight:700}
 
@@ -431,7 +471,9 @@ li.sk-rubric-row{display:block}
 .sk-msg-collapsed{color:#55606b;cursor:pointer;background:#efefef;border:1px solid #b9c2cc;margin-bottom:7px;padding:5px 10px;font-size:12.5px}
 .sk-msg-aihidden{color:#5d4a75;cursor:pointer;background:#f7f3fb;border:1px dashed #b9a7c9;border-radius:3px;margin-bottom:7px;padding:7px 11px;font-size:12.5px}
 /* Хлебные крошки */
-.sk-crumbs{color:#3d4a5c;background:#f4f7fb;border:1px solid var(--sm-navy);margin:0 0 8px;padding:5px 9px;font-size:13px;line-height:1.5}
+/* 28.09.2026 (правка п.в): рамка с хлебных крошек темы снята —
+   «Форум → Закон и право → Общие вопросы права» теперь без рамки. */
+.sk-crumbs{color:#3d4a5c;background:0 0;border:0;margin:0 0 8px;padding:0;font-size:13px;line-height:1.5}
 .sk-crumbs a{color:#0a5caa;cursor:pointer;font-weight:600}
 .sk-crumbs a:hover{color:#c40000}
 .sk-crumbs .sep{color:#8296ab;margin:0 5px}
@@ -1055,10 +1097,10 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .sk-nick{cursor:pointer}
 .sk-nick:hover{text-decoration:underline}
 .sk-nick.g-male{color:#1050b8}
-.sk-nick.g-female{color:#c2185b}
+.sk-nick.g-female{color:#c62828}
 .sk-nick.g-neutral{color:#4c5563}
 .sk-msg.sk-msg .sk-msg-head .sk-nick.g-male{color:#1050b8}
-.sk-msg.sk-msg .sk-msg-head .sk-nick.g-female{color:#c2185b}
+.sk-msg.sk-msg .sk-msg-head .sk-nick.g-female{color:#c62828}
 .sk-msg.sk-msg .sk-msg-head .sk-nick.g-neutral{color:#4c5563}
 
 /* Вход/регистрация */
@@ -1252,8 +1294,8 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .gkh-rulesnote{color:#56657a;margin-top:7px;font-size:12px;line-height:1.5}
 /* Ники по полу (ТЗ п.20): мужской — бордовый, женский — синий, нейтральный — серый */
 .gkh-nick{font-weight:700}
-.gkh-nick.g-male{color:#7a1f2b}
-.gkh-nick.g-female{color:#1050b8}
+.gkh-nick.g-male{color:#1050b8}
+.gkh-nick.g-female{color:#c62828}
 .gkh-nick.g-neutral{color:#4c5563}
 /* Медиа (ТЗ п.27): фото до 5, видео до 1 минуты */
 .gkh-media{margin-top:6px}
@@ -4498,7 +4540,7 @@ div[style*="background-color: rgb(0, 74, 143)"] {
    «Где купить»/«Где дешевле» и e2e-панели. */
 .sm-nick-gender{font-weight:600}
 .sm-nick-gender.g-male{color:#1050b8}
-.sm-nick-gender.g-female{color:#c2185b}
+.sm-nick-gender.g-female{color:#c62828}
 .sm-nick-gender.g-neutral{color:#4c5563}
 @media (max-width:900px){
   /* Мобильная карточка с ответами: воздух сохраняем; пара кнопок —

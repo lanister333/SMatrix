@@ -127,7 +127,17 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
       orderBy: { num: "asc" },
       skip: (page - 1) * PER_PAGE,
       take: PER_PAGE,
-      include: { parent: { include: { author: { select: { gender: true } } } } },
+      // ШАГ 28.09.2026 (правка п.е): подгружаем gender автора СООБЩЕНИЯ
+      // (раньше включался только parent.author.gender — из-за этого
+      // m.author?.gender всегда был undefined, в API уходил "unspecified",
+      // и Nick компонент рисовал нейтрально-серый ник даже для тех
+      // пользователей, у которых gender=male/female). Теперь авторы
+      // ответов красятся по гендеру на всём форуме — и в существующих,
+      // и в будущих темах, потому что правка в едином API-эндпоинте.
+      include: {
+        author: { select: { gender: true } },
+        parent: { include: { author: { select: { gender: true } } } },
+      },
     });
 
     return NextResponse.json({
