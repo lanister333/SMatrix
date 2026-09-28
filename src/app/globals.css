@@ -952,18 +952,25 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
      в одной строке по центру) + лента вопросов
    — ПРАВАЯ колонка: Время + «Правила «Где купить»» (в дизайне .sakh-clock) */
 
-/* Header bar: заголовок «Где купить» + inline-навигация + «Задать вопрос»
-   в одной строке, по центру. */
+/* Header bar: заголовок «Где купить» слева + правая группа
+   (nav + «Задать вопрос») справа. Аналог .cd-head-bar для /gde-deshevle. */
 .wb-head-bar{
   display:flex;
   align-items:center;
-  justify-content:center;
+  justify-content:space-between;
   flex-wrap:wrap;
   gap:10px 14px;
   margin-bottom:6px;
 }
 .wb-head-bar .wb-title{margin:0}
-.wb-head-bar .wb-addbtn{margin-left:8px;flex-shrink:0}
+/* Правая группа: nav-inline + кнопка «Задать вопрос» вместе, прижаты вправо */
+.wb-head-right{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px 14px;
+}
+.wb-head-right .wb-addbtn{margin-left:0;flex-shrink:0}
 
 /* Inline-навигация — кнопки в ряд, тот же стиль что .wb-navlist, но горизонтально */
 .wb-nav-inline{

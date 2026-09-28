@@ -961,20 +961,26 @@ export function WhereToBuyPage(props: {
                 — Окно поиска города + «Показать» УБРАНЫ
                 В header-bar остались только nav-кнопки и кнопка «Задать вопрос». */}
             <div className="wb-head-bar">
-              <div className="wb-nav-inline">
-                <button className={activeNav === "home" ? "active" : ""} onClick={() => mineTab("all", "home")}>
-                  Где купить
-                </button>
-                <button className={activeNav === "latest" ? "active" : ""} onClick={() => mineTab("all", "latest")}>
-                  Последние вопросы
-                </button>
-                <button className={activeNav === "mine" ? "active" : ""} onClick={() => mineTab("mine", "mine")}>
-                  Мои публикации
+              {/* 28.09.2026 (аналог /gde-deshevle):
+                  — Восстановлен H1 «Где купить» (.wb-title, синий #0a5caa) — слева
+                  — Удалена первая nav-кнопка «Где купить» (active имела цвет
+                    #1a1a1a — почти чёрный, была «чёрной надписью»)
+                  — Nav-inline + кнопка «Задать вопрос» обёрнуты в .wb-head-right
+                    и прижаты к правому краю через justify-content: space-between */}
+              <div className="wb-title">Где купить</div>
+              <div className="wb-head-right">
+                <div className="wb-nav-inline">
+                  <button className={activeNav === "latest" ? "active" : ""} onClick={() => mineTab("all", "latest")}>
+                    Последние вопросы
+                  </button>
+                  <button className={activeNav === "mine" ? "active" : ""} onClick={() => mineTab("mine", "mine")}>
+                    Мои публикации
+                  </button>
+                </div>
+                <button className="wb-addbtn" onClick={openNewForm}>
+                  ＋ Задать вопрос
                 </button>
               </div>
-              <button className="wb-addbtn" onClick={openNewForm}>
-                ＋ Задать вопрос
-              </button>
             </div>
             {!props.user && (
               <p className="wb-rulesnote">Задавать вопросы могут только зарегистрированные пользователи — войдите или зарегистрируйтесь. Гости могут читать.</p>
