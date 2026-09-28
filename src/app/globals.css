@@ -1621,6 +1621,65 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
    что у «Где купить»: светлый фон, тонкие серые границы, компактный список,
    без тёмно-синих форумных рамок/теней/градиентов (ТЗ п.25). */
 .cd-layout{align-items:start;grid-template-columns:300px minmax(0,1fr) 320px;gap:14px;display:grid}
+
+/* ТЗ 2026-09-28 (правки 1–4 страницы /gde-deshevle): 3-колоночный layout
+   СОХРАНЯЕТСЯ. Блоки перераспределены:
+   — ЛЕВАЯ колонка: «О разделе» (в дизайне .sakh-clock)
+   — ЦЕНТР. колонка: header-bar (заголовок + навигация + «Задать вопрос»,
+     в одной строке по центру) + лента вопросов
+   — ПРАВАЯ колонка: Время + «Правила «Где дешевле»» (в дизайне .sakh-clock) */
+
+/* Header bar: заголовок «Где дешевле» + inline-навигация + «Задать вопрос»
+   в одной строке, по центру. */
+.cd-head-bar{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:10px 14px;
+  margin-bottom:6px;
+}
+.cd-head-bar .cd-title{margin:0}
+.cd-head-bar .cd-addbtn{margin-left:8px;flex-shrink:0}
+
+/* Inline-навигация — кнопки в ряд, тот же стиль что .cd-navlist, но горизонтально */
+.cd-nav-inline{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:6px 10px;
+}
+.cd-nav-inline button{
+  color:#0a5caa;
+  cursor:pointer;
+  background:0 0;
+  border:0;
+  padding:4px 0;
+  font-family:inherit;
+  font-size:13.5px;
+  text-decoration:underline;
+  display:inline-block;
+}
+.cd-nav-inline button:hover{color:#c40000}
+.cd-nav-inline button.active{color:#1a1a1a;font-weight:700;text-decoration:none}
+
+/* Правка 4: блоки «О разделе» и «Правила «Где дешевле»» оформлены как блок
+   «Время» (.sakh-clock). Чтобы контент (многострочный текст, список правил)
+   не ужимался в 50px тело часов — переопределяем sakh-clock-body для этих
+   конкретных блоков: высота auto, не центрируем, выравнивание по левому краю. */
+.cd-clock-block .sakh-clock-body-content{
+  height:auto !important;
+  align-items:stretch !important;
+  justify-content:flex-start !important;
+  padding:9px 10px !important;
+  text-align:left !important;
+}
+.cd-clock-block .cd-info,
+.cd-clock-block .cd-keyrule,
+.cd-clock-block .cd-ruleslist,
+.cd-clock-block .cd-rulesnote{
+  text-align:left;
+}
 /* П.8 (2026-09-24): рамка блоков колонок — border-zinc-200 #e4e4e7 (было #d9dee5). */
 .cd-sideblock{background:#fff;border:1px solid #e4e4e7;margin-bottom:12px;padding:9px 10px}
 .cd-blocktitle{color:#3d4a5c;border-bottom:1px solid #e4e8ee;margin-bottom:7px;padding-bottom:5px;font-size:13px;font-weight:700}
