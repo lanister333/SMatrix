@@ -315,55 +315,26 @@ export function GkhPage(props: {
 
   return (
     <div className="gkh-layout main-grid-container" data-gkf-layout="1">
-      {/* ================= ЛЕВАЯ КОЛОНКА (Фильтр и Управление) ================= */}
+      {/* ============ ЛЕВАЯ КОЛОНКА — «О разделе» (правка 1+2+3, 28.09.2026) ============
+          Прежние блоки (Доступ + Локация) УБРАНЫ.
+          «О разделе» перемещён сюда из правой колонки и оформлен в дизайне
+          блока «Время» (.sakh-clock: тёмно-синяя шапка #1E3A5F, белое тело). */}
       <aside className="left-column">
-        {/* Блок 1 «Кнопка действия»: кнопка + текст снизу (ТЗ дословно). */}
-        <div className="gkh-sideblock" data-gkf-access="1">
-          <button className="gkf-addbtn" data-gkf-add-left="1" onClick={openForm}>
-            + Зафиксировать проблему
-          </button>
-          <p className="gkf-note" data-gkf-accessnote="1">
-            {GKF_ACCESS_NOTE}
-          </p>
-        </div>
-        {/* Блок 2 «Локация»: поле ввода «Район / Улица / Дом» + «Показать». */}
-        <div className="gkh-sideblock" data-gkf-placeblock="1">
-          <div className="gkh-blocktitle">Локация</div>
-          <div className="gkf-placefilter">
-            <input
-              aria-label="Фильтр по локации"
-              data-gkf-place-input="1"
-              value={place}
-              maxLength={80}
-              list="gkf-place-locations"
-              onChange={(e) => setPlace(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") applySearch();
-              }}
-              placeholder="Район / Улица / Дом"
-            />
-            <button data-gkf-place-apply="1" onClick={applySearch}>
-              Показать
-            </button>
+        <div className="sakh-clock gkh-clock-block gkh-clock-about" data-gkf-about="1">
+          <div className="sakh-clock-head">ℹ️ О разделе</div>
+          <div className="sakh-clock-body sakh-clock-body-content">
+            <div className="gkf-info" data-gkf-about-text="1">
+              <p>
+                «ЖКХ и городские проблемы» — это инструмент прямой фиксации коммунальных, дорожных и инфраструктурных проблем на
+                Сахалине и Курилах.
+              </p>
+              <p>
+                Раздел создан не для пустых споров, а для решения конкретных задач. Каждая карточка — это сухой сигнал для города,
+                управляющих компаний и других жителей, позволяющий видеть реальную картину состояния ЖКХ в вашем районе в режиме
+                реального времени.
+              </p>
+            </div>
           </div>
-          <datalist id="gkf-place-locations">
-            {GKF_LOCATIONS.map((c) => (
-              <option key={c} value={c} />
-            ))}
-          </datalist>
-          {appliedPlace && (
-            <button
-              className="gkf-search-reset"
-              data-gkf-place-reset="1"
-              onClick={() => {
-                setPlace("");
-                setAppliedPlace("");
-              }}
-              style={{ marginTop: 7 }}
-            >
-              Сбросить локацию
-            </button>
-          )}
         </div>
       </aside>
 
@@ -612,34 +583,21 @@ export function GkhPage(props: {
       </div>
 
       {/* ============== ПРАВАЯ КОЛОНКА (Правила и философия) ============== */}
+      {/* ==== ПРАВАЯ КОЛОНКА — Время + Правила (правки 28.09.2026) ====
+          «О разделе» убран (теперь он в левой колонке).
+          «Правила публикации» оформлены в дизайне блока «Время» (.sakh-clock). */}
       <aside className="right-column">
-        {/* Часы на всех страницах: первым блоком правой колонки (сквозная
-            директива сайта), затем два блока ТЗ. */}
         <SakhDatetimeBlock />
-        {/* Блок 1 «О разделе» — 2 абзаца ТЗ №2 дословно. */}
-        <div className="gkh-sideblock" data-gkf-about="1">
-          <div className="gkh-blocktitle">О разделе</div>
-          <div className="gkf-info" data-gkf-about-text="1">
-            <p>
-              «ЖКХ и городские проблемы» — это инструмент прямой фиксации коммунальных, дорожных и инфраструктурных проблем на
-              Сахалине и Курилах.
-            </p>
-            <p>
-              Раздел создан не для пустых споров, а для решения конкретных задач. Каждая карточка — это сухой сигнал для города,
-              управляющих компаний и других жителей, позволяющий видеть реальную картину состояния ЖКХ в вашем районе в режиме
-              реального времени.
-            </p>
+        <div className="sakh-clock gkh-clock-block gkh-clock-rules" data-gkf-rules="1">
+          <div className="sakh-clock-head">📋 Правила публикации</div>
+          <div className="sakh-clock-body sakh-clock-body-content">
+            <div className="gkf-keyrule">{GKF_RULES_INTRO}</div>
+            <ul className="gkf-rules" data-gkf-rules-list="1">
+              {GKF_RULES.map((r, i) => (
+                <li key={i}>{r}</li>
+              ))}
+            </ul>
           </div>
-        </div>
-        {/* Блок 2 «Правила публикации» — в рамке, текст ТЗ №2 дословно. */}
-        <div className="gkh-sideblock" data-gkf-rules="1">
-          <div className="gkh-blocktitle">Правила публикации</div>
-          <div className="gkf-keyrule">{GKF_RULES_INTRO}</div>
-          <ul className="gkf-rules" data-gkf-rules-list="1">
-            {GKF_RULES.map((r, i) => (
-              <li key={i}>{r}</li>
-            ))}
-          </ul>
         </div>
       </aside>
     </div>

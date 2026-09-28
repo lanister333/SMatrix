@@ -1295,6 +1295,30 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
    и градиентов (ТЗ п.22). */
 
 .gkh-layout{align-items:start;grid-template-columns:300px minmax(0,1fr) 320px;gap:14px;display:grid}
+
+/* ТЗ 2026-09-28 (правки страницы /gkh — аналог /gde-deshevle и /o-rabotodatelyah):
+   3-колоночный layout СОХРАНЯЕТСЯ. Блоки перераспределены:
+   — ЛЕВАЯ колонка: «О разделе» (в дизайне .sakh-clock) — прежние блоки
+     (Доступ + Локация) убраны.
+   — ЦЕНТР. колонка: без изменений (H1 + описание + кнопка + лента).
+   — ПРАВАЯ колонка: Время + «Правила публикации» (в дизайне .sakh-clock).
+   «О разделе» убран из правой колонки (теперь он в левой). */
+
+/* Override .sakh-clock-body для многострочного контента.
+   Те же правила что у .cd-clock-block / .wb-clock-block / .ep-clock-block. */
+.gkh-clock-block .sakh-clock-body-content{
+  height:auto !important;
+  align-items:stretch !important;
+  justify-content:flex-start !important;
+  padding:9px 10px !important;
+  text-align:left !important;
+}
+.gkh-clock-block .gkf-info,
+.gkh-clock-block .gkf-keyrule,
+.gkh-clock-block .gkf-rules,
+.gkh-clock-block .gkf-rulesnote{
+  text-align:left;
+}
 .gkh-sideblock{background:#fff;border:1px solid #d9dee5;margin-bottom:12px;padding:9px 10px}
 .gkh-blocktitle{color:#3d4a5c;border-bottom:1px solid #e4e8ee;margin-bottom:7px;padding-bottom:5px;font-size:13px;font-weight:700}
 .gkh-navlist{margin:0;padding:0;list-style:none}
@@ -2039,6 +2063,31 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
    тонкой светло-серой рамке — сухой трудовой опыт без «чёрных списков».
    Тот же стиль, что у ЖКХ (gkf-*): светлый фон, тонкие серые границы. */
 .ep-layout{align-items:start;grid-template-columns:300px minmax(0,1fr) 320px;gap:14px;display:grid}
+
+/* ТЗ 2026-09-28 (правки страницы /o-rabotodatelyah — аналог /gde-deshevle):
+   3-колоночный layout СОХРАНЯЕТСЯ. Блоки перераспределены:
+   — ЛЕВАЯ колонка: «О разделе» (в дизайне .sakh-clock) — прежние блоки
+     (Доступ + Поиск по организации) убраны.
+   — ЦЕНТР. колонка: без изменений (H1 + описание + кнопка + лента).
+   — ПРАВАЯ колонка: Время + «Правила публикации» (в дизайне .sakh-clock).
+   «О разделе» убран из правой колонки (теперь он в левой). */
+
+/* Override .sakh-clock-body для многострочного контента (правка 3).
+   Те же правила что у .cd-clock-block и .wb-clock-block. */
+.ep-clock-block .sakh-clock-body-content{
+  height:auto !important;
+  align-items:stretch !important;
+  justify-content:flex-start !important;
+  padding:9px 10px !important;
+  text-align:left !important;
+}
+.ep-clock-block .ep-info,
+.ep-clock-block .ep-keyrule,
+.ep-clock-block .ep-ruleslist,
+.ep-clock-block .ep-rulesnote,
+.ep-clock-block .ep-rulesframe{
+  text-align:left;
+}
 .ep-sideblock{background:#fff;border:1px solid #d9dee5;margin-bottom:12px;padding:9px 10px}
 .ep-blocktitle{color:#3d4a5c;border-bottom:1px solid #e4e8ee;margin-bottom:7px;padding-bottom:5px;font-size:13px;font-weight:700}
 /* Левая колонка, блок 1: кнопка действия + текст снизу (ТЗ дословно) */
