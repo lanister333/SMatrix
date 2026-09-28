@@ -944,6 +944,65 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
    без тёмно-синих форумных рамок/теней/градиентов (ТЗ п.22). */
 
 .wb-layout{align-items:start;grid-template-columns:300px minmax(0,1fr) 320px;gap:14px;display:grid}
+
+/* ТЗ 2026-09-28 (правки 1–4 страницы /gde-kupit — аналог /gde-deshevle):
+   3-колоночный layout СОХРАНЯЕТСЯ. Блоки перераспределены:
+   — ЛЕВАЯ колонка: «О разделе» (в дизайне .sakh-clock)
+   — ЦЕНТР. колонка: header-bar (заголовок + навигация + «Задать вопрос»,
+     в одной строке по центру) + лента вопросов
+   — ПРАВАЯ колонка: Время + «Правила «Где купить»» (в дизайне .sakh-clock) */
+
+/* Header bar: заголовок «Где купить» + inline-навигация + «Задать вопрос»
+   в одной строке, по центру. */
+.wb-head-bar{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:10px 14px;
+  margin-bottom:6px;
+}
+.wb-head-bar .wb-title{margin:0}
+.wb-head-bar .wb-addbtn{margin-left:8px;flex-shrink:0}
+
+/* Inline-навигация — кнопки в ряд, тот же стиль что .wb-navlist, но горизонтально */
+.wb-nav-inline{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:6px 10px;
+}
+.wb-nav-inline button{
+  color:#0a5caa;
+  cursor:pointer;
+  background:0 0;
+  border:0;
+  padding:4px 0;
+  font-family:inherit;
+  font-size:13.5px;
+  text-decoration:underline;
+  display:inline-block;
+}
+.wb-nav-inline button:hover{color:#c40000}
+.wb-nav-inline button.active{color:#1a1a1a;font-weight:700;text-decoration:none}
+
+/* Правка 4: блоки «О разделе» и «Правила «Где купить»» оформлены как блок
+   «Время» (.sakh-clock). Override sakh-clock-body для многострочного контента
+   (правило общее с .cd-clock-block — работает и для .wb-clock-block через
+   общий селектор .cd-clock-block, .wb-clock-block). */
+.wb-clock-block .sakh-clock-body-content{
+  height:auto !important;
+  align-items:stretch !important;
+  justify-content:flex-start !important;
+  padding:9px 10px !important;
+  text-align:left !important;
+}
+.wb-clock-block .wb-info,
+.wb-clock-block .wb-keyrule,
+.wb-clock-block .wb-ruleslist,
+.wb-clock-block .wb-rulesnote{
+  text-align:left;
+}
 /* П.8 (2026-09-24): блоки левой/правой колонок — рамка border-zinc-200
    (#e4e4e7), белый фон, компактные отступы (было #d9dee5). */
 .wb-sideblock{background:#fff;border:1px solid #e4e4e7;margin-bottom:12px;padding:9px 10px}
