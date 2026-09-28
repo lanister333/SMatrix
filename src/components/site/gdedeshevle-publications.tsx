@@ -982,41 +982,9 @@ export function GdedeshevlePage(props: {
             )}
             <div className="cd-desc">Сравнивайте цены на конкретный товар и находите, где его можно купить дешевле.</div>
 
-            {/* Простой поиск (ТЗ п.27): заголовок, текст, модель и артикул,
-                частичное совпадение; без сложных фильтров */}
-            <div className="cd-search">
-              <input
-                aria-label="Поиск по вопросам"
-                value={q}
-                maxLength={120}
-                onChange={(e) => setQ(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") applySearch();
-                }}
-                placeholder="Поиск по вопросу, модели или артикулу…"
-              />
-              <button onClick={applySearch}>Найти</button>
-              {searching && (
-                <button className="cd-search-reset" onClick={resetSearch}>
-                  Сбросить
-                </button>
-              )}
-            </div>
-
-            {/* Место покупки — перенесён из левой колонки (теперь там «О разделе») */}
-            <div className="cd-placefilter">
-              <input
-                aria-label="Фильтр по месту"
-                value={place}
-                maxLength={80}
-                onChange={(e) => setPlace(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") applySearch();
-                }}
-                placeholder="Южно-Сахалинск, Холмск…"
-              />
-              <button onClick={applySearch}>Показать</button>
-            </div>
+            {/* 28.09.2026 (по запросу пользователя): блоки .cd-search
+                (поле поиска + кнопка «Найти» + «Сбросить») и .cd-placefilter
+                (поле места + кнопка «Показать») УБРАНЫ из центральной колонки. */}
           </div>
 
           <div ref={listTopRef} />

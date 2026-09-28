@@ -277,62 +277,25 @@ export function EmployersPage(props: {
 
   return (
     <div className="ep-layout main-grid-container" data-ep-layout="1">
-      {/* ============ ЛЕВАЯ КОЛОНКА (Доступ и Поиск компании) ============ */}
+      {/* ============ ЛЕВАЯ КОЛОНКА — «О разделе» (правка 1+2+3, 28.09.2026) ============
+          Прежние блоки (Доступ + Поиск по организации) УБРАНЫ.
+          «О разделе» перемещён сюда из правой колонки и оформлен в дизайне
+          блока «Время» (.sakh-clock: тёмно-синяя шапка #1E3A5F, белое тело). */}
       <aside className="left-column">
-        {/* Блок 1 «Кнопка действия»: кнопка + текст снизу (ТЗ дословно). */}
-        <div className="ep-sideblock" data-ep-access="1">
-          <button className="ep-addbtn" data-ep-add-left="1" onClick={openForm}>
-            + Описать трудовой опыт
-          </button>
-          <p className="ep-note" data-ep-accessnote="1">
-            {EP_ACCESS_NOTE}
-          </p>
-        </div>
-        {/* Блок 2 «Поиск по организации»: «Название компании или ИП» → «Найти»
-            + фильтр по городам (Южно-Сахалинск, Холмск, Корсаков…). */}
-        <div className="ep-sideblock" data-ep-searchblock="1">
-          <div className="ep-blocktitle">Поиск по организации</div>
-          <div className="ep-orgfilter">
-            <input
-              aria-label="Название компании или ИП"
-              data-ep-search-input="1"
-              value={q}
-              maxLength={120}
-              onChange={(e) => setQ(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") applySearch();
-              }}
-              placeholder="Название компании или ИП"
-            />
-            <button data-ep-search-apply="1" onClick={applySearch}>
-              Найти
-            </button>
+        <div className="sakh-clock ep-clock-block ep-clock-about" data-ep-about="1">
+          <div className="sakh-clock-head">ℹ️ О разделе</div>
+          <div className="sakh-clock-body sakh-clock-body-content">
+            <div className="ep-info" data-ep-about-text="1">
+              <p>
+                «О работодателях» — это инструмент фиксации реального трудового опыта жителей Сахалина и Курил.
+              </p>
+              <p>
+                Раздел создан не для травли или вынесения публичных приговоров организациям, а для обмена честными фактами. Мы
+                не ведем «черных списков» компаний и не выносим коллективный вердикт. SakhMatrix предоставляет площадку для
+                высказывания, но не является автором пользовательских утверждений.
+              </p>
+            </div>
           </div>
-          <label className="ep-citylabel" htmlFor="ep-city-filter">
-            Фильтр по городам
-          </label>
-          <select
-            id="ep-city-filter"
-            className="ep-cityfilter"
-            data-ep-city-select="1"
-            value={city}
-            onChange={(e) => {
-              setCity(e.target.value);
-              setAppliedCity(e.target.value); // фильтр применяется сразу
-            }}
-          >
-            <option value="">Все города</option>
-            {SAKHALIN_CITIES.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-          {searching && (
-            <button className="ep-search-reset" data-ep-search-reset="1" onClick={resetSearch}>
-              Сбросить
-            </button>
-          )}
         </div>
       </aside>
 
@@ -578,36 +541,22 @@ export function EmployersPage(props: {
         )}
       </div>
 
-      {/* ==== ПРАВАЯ КОЛОНКА (Описание раздела и Защита Персональных Данных) ==== */}
+      {/* ==== ПРАВАЯ КОЛОНКА — Время + Правила (правки 28.09.2026) ====
+          «О разделе» убран (теперь он в левой колонке).
+          «Правила публикации» оформлены в дизайне блока «Время» (.sakh-clock). */}
       <aside className="right-column">
-        {/* Часы на всех страницах: первым блоком правой колонки (сквозная
-            директива сайта), затем два блока ТЗ. */}
         <SakhDatetimeBlock />
-        {/* Блок 1 «О разделе» — текст ТЗ дословно. */}
-        <div className="ep-sideblock" data-ep-about="1">
-          <div className="ep-blocktitle">О разделе</div>
-          <div className="ep-info" data-ep-about-text="1">
-            <p>
-              «О работодателях» — это инструмент фиксации реального трудового опыта жителей Сахалина и Курил.
-            </p>
-            <p>
-              Раздел создан не для травли или вынесения публичных приговоров организациям, а для обмена честными фактами. Мы
-              не ведем «черных списков» компаний и не выносим коллективный вердикт. SakhMatrix предоставляет площадку для
-              высказывания, но не является автором пользовательских утверждений.
-            </p>
-          </div>
-        </div>
-        {/* Блок 2 «Правила публикации» — В РАМКЕ, строго по Пункту 8 и 20
-            ТЗ №2, четыре пункта дословно. */}
-        <div className="ep-sideblock" data-ep-rules="1">
-          <div className="ep-blocktitle">Правила публикации</div>
-          <div className="ep-rulesframe" data-ep-rules-frame="1">
-            <div className="ep-keyrule">{EP_RULES_INTRO}</div>
-            <ul className="ep-ruleslist" data-ep-rules-list="1">
-              {EP_RULES.map((r, i) => (
-                <li key={i}>{r}</li>
-              ))}
-            </ul>
+        <div className="sakh-clock ep-clock-block ep-clock-rules" data-ep-rules="1">
+          <div className="sakh-clock-head">📋 Правила публикации</div>
+          <div className="sakh-clock-body sakh-clock-body-content">
+            <div className="ep-rulesframe" data-ep-rules-frame="1">
+              <div className="ep-keyrule">{EP_RULES_INTRO}</div>
+              <ul className="ep-ruleslist" data-ep-rules-list="1">
+                {EP_RULES.map((r, i) => (
+                  <li key={i}>{r}</li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </aside>
