@@ -1485,6 +1485,24 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
    и ссылки на профиль (анонимность ТЗ); система цветов ника не используется. */
 
 .dk-layout{align-items:start;grid-template-columns:300px minmax(0,1fr) 320px;gap:14px;display:grid}
+
+/* ТЗ 2026-09-28 (правки /znakomstva — аналог /gde-deshevle и др.):
+   3-колоночный layout СОХРАНЯЕТСЯ. Блоки перераспределены:
+   — ЛЕВАЯ колонка: «О разделе» (.sakh-clock) — прежние блоки убраны.
+   — ЦЕНТР. колонка: без изменений.
+   — ПРАВАЯ колонка: Время + «Правила раздела» (.sakh-clock). */
+.dk-clock-block .sakh-clock-body-content{
+  height:auto !important;
+  align-items:stretch !important;
+  justify-content:flex-start !important;
+  padding:9px 10px !important;
+  text-align:left !important;
+}
+.dk-clock-block .dk-info,
+.dk-clock-block .dk-rules,
+.dk-clock-block .dk-rulesnote{
+  text-align:left;
+}
 .dk-sideblock{background:#fff;border:1px solid #d9dee5;margin-bottom:12px;padding:9px 10px}
 .dk-blocktitle{color:#3d4a5c;border-bottom:1px solid #e4e8ee;margin-bottom:7px;padding-bottom:5px;font-size:13px;font-weight:700}
 .dk-navlist{margin:0;padding:0;list-style:none}
@@ -2190,6 +2208,25 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
    «Где дешевле» и «Рекомендую»: светлый фон, тонкие серые границы,
    компактный список, без тёмно-синих форумных рамок/теней/градиентов. */
 .ad-grid{align-items:start;grid-template-columns:300px minmax(0,1fr) 320px;gap:14px;display:grid}
+
+/* ТЗ 2026-09-28 (правки /obyavlenya — аналог /gde-deshevle и др.):
+   3-колоночный layout СОХРАНЯЕТСЯ. Блоки перераспределены:
+   — ЛЕВАЯ колонка: «О разделе» (.sakh-clock) — прежние блоки
+     (Раздел / Рубрики / Мои публикации / Главное правило) убраны.
+   — ЦЕНТР. колонка: без изменений.
+   — ПРАВАЯ колонка: Время + «Правила раздела» (.sakh-clock). */
+.ad-clock-block .sakh-clock-body-content{
+  height:auto !important;
+  align-items:stretch !important;
+  justify-content:flex-start !important;
+  padding:9px 10px !important;
+  text-align:left !important;
+}
+.ad-clock-block .ad-about-text,
+.ad-clock-block .ad-rules,
+.ad-clock-block .ad-keyrule{
+  text-align:left;
+}
 .ad-col-right{min-width:0}
 .ad-sidebox{background:#fff;border:1px solid #d9dee5;margin-bottom:12px;padding:9px 10px}
 .ad-side-title{color:#3d4a5c;border-bottom:1px solid #e4e8ee;margin:0 0 7px;padding-bottom:5px;font-size:13px;font-weight:700}

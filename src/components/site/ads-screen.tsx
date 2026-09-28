@@ -151,46 +151,16 @@ export default function AdsScreen() {
               «О разделе» и «Правила раздела» дословно по ТЗ. КНОПОК
               «Обсудить на форуме» НА СТРАНИЦЕ НЕТ (жёсткое правило ТЗ). */}
           <div className="main-grid-container" data-ads-layout="1">
-            {/* ============ ЛЕВАЯ КОЛОНКА (Доступ и фильтр города) ============ */}
+            {/* ============ ЛЕВАЯ КОЛОНКА — «О разделе» (правки 28.09.2026) ============
+                Прежние блоки (Доступ + Фильтр городов) УБРАНЫ.
+                «О разделе» перемещён сюда из правой колонки и оформлен в дизайне
+                блока «Время» (.sakh-clock: тёмно-синяя шапка #1E3A5F, белое тело). */}
             <aside className="left-column" data-ads-left="1">
-              <div className="dk-sideblock" data-ads-access="1">
-                <button className="dk-addbtn" data-ads-add-left="1" onClick={openFormLeft}>
-                  + Разместить объявление
-                </button>
-                <p className="dk-rulesnote" data-ads-accessnote="1">
-                  {ADS_ACCESS_NOTE}
-                </p>
-                {guestHint && (
-                  <p className="dk-guesthint" data-ads-guesthint="1" role="alert">
-                    Добавлять объявления могут только зарегистрированные пользователи. Войдите или зарегистрируйтесь.
-                  </p>
-                )}
-              </div>
-              <div className="dk-sideblock" data-ads-cityblock="1">
-                <div className="dk-blocktitle">Фильтр городов Сахалина</div>
-                <div className="dk-placefilter">
-                  <select
-                    aria-label="Фильтр городов Сахалина"
-                    data-ads-city-input="1"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                  >
-                    <option value="">Все города</option>
-                    {SAKHALIN_CITIES.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))}
-                  </select>
-                  <button data-ads-city-apply="1" onClick={applyCity}>
-                    Показать
-                  </button>
+              <div className="sakh-clock ad-clock-block ad-clock-about" data-ads-about="1">
+                <div className="sakh-clock-head">ℹ️ О разделе</div>
+                <div className="sakh-clock-body sakh-clock-body-content">
+                  <p className="ad-about-text" data-ads-about-text="1">{ADS_ABOUT_TEXT}</p>
                 </div>
-                {appliedCity && (
-                  <button className="dk-search-reset" data-ads-city-reset="1" onClick={() => { setCity(""); setAppliedCity(""); }}>
-                    Сбросить город
-                  </button>
-                )}
               </div>
             </aside>
 
@@ -206,22 +176,20 @@ export default function AdsScreen() {
               />
             </div>
 
-            {/* ============ ПРАВАЯ КОЛОНКА (Правила и Описание) ============ */}
+            {/* ============ ПРАВАЯ КОЛОНКА — Время + Правила (правки 28.09.2026) ============
+                «О разделе» убран (теперь он в левой колонке).
+                «Правила раздела» оформлены в дизайне блока «Время» (.sakh-clock). */}
             <aside className="right-column" data-ads-right="1">
-              {/* Часы на всех страницах: первым блоком правой колонки
-                  (сквозная директива сайта). */}
               <SakhDatetimeBlock />
-              <div className="ad-sidebox" data-ads-about="1">
-                <h3 className="ad-side-title">О разделе</h3>
-                <p className="ad-about-text" data-ads-about-text="1">{ADS_ABOUT_TEXT}</p>
-              </div>
-              <div className="ad-sidebox" data-ads-rules="1">
-                <h3 className="ad-side-title">Правила раздела</h3>
-                <ul className="ad-rules" data-ads-rules-list="1">
-                  {ADS_RULES.map((r, i) => (
-                    <li key={i}>{r}</li>
-                  ))}
-                </ul>
+              <div className="sakh-clock ad-clock-block ad-clock-rules" data-ads-rules="1">
+                <div className="sakh-clock-head">📋 Правила раздела</div>
+                <div className="sakh-clock-body sakh-clock-body-content">
+                  <ul className="ad-rules" data-ads-rules-list="1">
+                    {ADS_RULES.map((r, i) => (
+                      <li key={i}>{r}</li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             </aside>
           </div>

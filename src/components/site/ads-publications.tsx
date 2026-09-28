@@ -105,23 +105,26 @@ const ADS_RULES = [
   "Жалоба — сигнал для модерации, а не голосование.",
 ];
 
-/** Заметка «О разделе» — правая колонка. */
+/** Заметка «О разделе» — оформлена в дизайне блока «Время» (.sakh-clock).
+ *  28.09.2026: блок перемещён из правой колонки в левую. */
 function AboutBlock() {
   return (
-    <div className="ad-about">
-      <h3 className="ad-side-title">О разделе</h3>
-      <p className="ad-about-text">
-        «Объявления» — доска объявлений жителей Сахалина. Здесь продают и покупают вещи, предлагают
-        и ищут услуги, отдают даром, находят работу и жильё.
-      </p>
-      <p className="ad-about-text">
-        Раздел — не форум: связи между покупателем и продавцом возникают напрямую, по контактам из
-        объявления. Комментариев и лайков здесь нет.
-      </p>
-      <p className="ad-about-text">
-        ИИ-модерация следит за мошенничеством: просьбы перевести деньги вперёд незнакомому человеку
-        скрываются. Будьте внимательны и не переводите предоплату незнакомцам.
-      </p>
+    <div className="sakh-clock ad-clock-block ad-clock-about ad-about">
+      <div className="sakh-clock-head">ℹ️ О разделе</div>
+      <div className="sakh-clock-body sakh-clock-body-content">
+        <p className="ad-about-text">
+          «Объявления» — доска объявлений жителей Сахалина. Здесь продают и покупают вещи, предлагают
+          и ищут услуги, отдают даром, находят работу и жильё.
+        </p>
+        <p className="ad-about-text">
+          Раздел — не форум: связи между покупателем и продавцом возникают напрямую, по контактам из
+          объявления. Комментариев и лайков здесь нет.
+        </p>
+        <p className="ad-about-text">
+          ИИ-модерация следит за мошенничеством: просьбы перевести деньги вперёд незнакомому человеку
+          скрываются. Будьте внимательны и не переводите предоплату незнакомцам.
+        </p>
+      </div>
     </div>
   );
 }
@@ -713,74 +716,12 @@ export function AdsPage(props: {
 
   return (
     <div className="ad-grid main-grid-container">
-      {/* ЛЕВАЯ КОЛОНКА: рубрики и фильтры */}
+      {/* ЛЕВАЯ КОЛОНКА — «О разделе» (правки 28.09.2026):
+          Прежние блоки (Раздел / Рубрики / Мои публикации / Главное правило)
+          УБРАНЫ. «О разделе» перемещён сюда из правой колонки и оформлен
+          в дизайне блока «Время» (.sakh-clock). */}
       <aside className="ad-col ad-col-left left-column">
-        <div className="ad-sidebox">
-          <h3 className="ad-side-title">Раздел: Объявления</h3>
-          <p className="ad-side-note">Доска объявлений жителей Сахалина. Связь покупателя и продавца — напрямую по контактам из объявления.</p>
-        </div>
-        <div className="ad-sidebox">
-          <h3 className="ad-side-title">Рубрики</h3>
-          <div className="ad-rubric-list">
-            <button
-              className={`ad-rubric-link${rubric === "" && !mine ? " is-active" : ""}`}
-              onClick={() => {
-                setRubric("");
-                setMine(false);
-                setPage(1);
-              }}
-            >
-              Все рубрики
-            </button>
-            {AD_RUBRICS.map((r) => (
-              <button
-                key={r.key}
-                className={`ad-rubric-link${rubric === r.key && !mine ? " is-active" : ""}`}
-                onClick={() => {
-                  setRubric(r.key);
-                  setMine(false);
-                  setPage(1);
-                }}
-              >
-                {r.label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="ad-sidebox">
-          <h3 className="ad-side-title">Мои публикации</h3>
-          <button
-            className={`ad-rubric-link${mine ? " is-active" : ""}`}
-            onClick={() => {
-              if (!token) {
-                props.onNeedAuth();
-                return;
-              }
-              setMine(true);
-              setPage(1);
-            }}
-          >
-            Мои объявления
-          </button>
-          {mine && (
-            <button
-              className="ad-rubric-link"
-              onClick={() => {
-                setMine(false);
-                setPage(1);
-              }}
-            >
-              ← Вернуться ко всем
-            </button>
-          )}
-          <button className="ad-create" onClick={openCreate}>
-            ＋ Создать объявление
-          </button>
-        </div>
-        <div className="ad-sidebox">
-          <h3 className="ad-side-title">Главное правило</h3>
-          <p className="ad-keyrule">Одно объявление — один товар или одна услуга. Мошенничество запрещено.</p>
-        </div>
+        <AboutBlock />
       </aside>
 
       {/* ЦЕНТРАЛЬНАЯ КОЛОНКА: лента объявлений */}
@@ -870,19 +811,21 @@ export function AdsPage(props: {
         )}
       </section>
 
-      {/* ПРАВАЯ КОЛОНКА: правила и о разделе */}
+      {/* ПРАВАЯ КОЛОНКА — Время + Правила (правки 28.09.2026):
+          AboutBlock убран (теперь он в левой колонке).
+          «Правила раздела» оформлены в дизайне блока «Время» (.sakh-clock). */}
       <aside className="ad-col ad-col-right right-column">
-        {/* Часы на всех страницах: первым блоком правой колонки, как на Главной */}
         <SakhDatetimeBlock />
-        <div className="ad-sidebox">
-          <h3 className="ad-side-title">Правила раздела</h3>
-          <ol className="ad-rules">
-            {ADS_RULES.map((rule, i) => (
-              <li key={i}>{rule}</li>
-            ))}
-          </ol>
+        <div className="sakh-clock ad-clock-block ad-clock-rules">
+          <div className="sakh-clock-head">📋 Правила раздела</div>
+          <div className="sakh-clock-body sakh-clock-body-content">
+            <ol className="ad-rules">
+              {ADS_RULES.map((rule, i) => (
+                <li key={i}>{rule}</li>
+              ))}
+            </ol>
+          </div>
         </div>
-        <AboutBlock />
       </aside>
 
       {formOpen && (

@@ -247,43 +247,22 @@ export default function LoveSakhPage(props: {
 
   return (
     <div className="dk-layout main-grid-container" data-ls-layout="1">
-      {/* ================= ЛЕВАЯ КОЛОНКА (Навигация и фильтр) ================= */}
+      {/* ============ ЛЕВАЯ КОЛОНКА — «О разделе» (правка 1+2+3, 28.09.2026) ============
+          Прежние блоки (Доступ + Город) УБРАНЫ.
+          «О разделе» перемещён сюда из правой колонки и оформлен в дизайне
+          блока «Время» (.sakh-clock: тёмно-синяя шапка #1E3A5F, белое тело). */}
       <aside className="left-column">
-        {/* Блок 1 «Доступ»: кнопка + текст снизу (ТЗ дословно). */}
-        <div className="dk-sideblock" data-ls-access="1">
-          <button className="dk-addbtn" data-ls-add-left="1" onClick={openForm}>
-            + Разместить анкету
-          </button>
-          <p className="dk-rulesnote" data-ls-accessnote="1">
-            {LS_ACCESS_NOTE}
-          </p>
-        </div>
-        {/* Блок 2 «Город»: поле ВЫБОРА города + «Показать» (ТЗ 2026-09-23). */}
-        <div className="dk-sideblock" data-ls-placeblock="1">
-          <div className="dk-blocktitle">Город</div>
-          <div className="dk-placefilter">
-            <select
-              aria-label="Выбор города"
-              data-ls-place-input="1"
-              value={place}
-              onChange={(e) => setPlace(e.target.value)}
-            >
-              <option value="">Все города</option>
-              {SAKHALIN_CITIES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-            <button data-ls-place-apply="1" onClick={applySearch}>
-              Показать
-            </button>
+        <div className="sakh-clock dk-clock-block dk-clock-about" data-ls-about="1">
+          <div className="sakh-clock-head">ℹ️ О разделе</div>
+          <div className="sakh-clock-body sakh-clock-body-content">
+            <div className="dk-info" data-ls-about-text="1">
+              <p>
+                «Знакомства (Love Sakh)» — бесплатная народная доска для поиска людей, создания семей и дружбы на Сахалине.
+                Здесь нет фото и обязательного возраста ради приватности жителей. Вкладка «Благодарность» создана для
+                поиска случайных героев на дорогах острова.
+              </p>
+            </div>
           </div>
-          {appliedPlace && (
-            <button className="dk-search-reset" data-ls-place-reset="1" onClick={() => { setPlace(""); setAppliedPlace(""); }}>
-              Сбросить место
-            </button>
-          )}
         </div>
       </aside>
 
@@ -490,29 +469,20 @@ export default function LoveSakhPage(props: {
       </div>
 
       {/* ============== ПРАВАЯ КОЛОНКА (Правила и Описание раздела) ============== */}
+      {/* ==== ПРАВАЯ КОЛОНКА — Время + Правила (правки 28.09.2026) ====
+          «О разделе» убран (теперь он в левой колонке).
+          «Правила раздела» оформлены в дизайне блока «Время» (.sakh-clock). */}
       <aside className="right-column">
-        {/* Часы на всех страницах: первым блоком правой колонки, как на Главной
-            (сквозная директива сайта), затем два блока ТЗ. */}
         <SakhDatetimeBlock />
-        {/* Блок 1 «О разделе» — текст ТЗ 2026-09-23 дословно. */}
-        <div className="dk-sideblock" data-ls-about="1">
-          <div className="dk-blocktitle">О разделе</div>
-          <div className="dk-info" data-ls-about-text="1">
-            <p>
-              «Знакомства (Love Sakh)» — бесплатная народная доска для поиска людей, создания семей и дружбы на Сахалине.
-              Здесь нет фото и обязательного возраста ради приватности жителей. Вкладка «Благодарность» создана для
-              поиска случайных героев на дорогах острова.
-            </p>
+        <div className="sakh-clock dk-clock-block dk-clock-rules" data-ls-rules="1">
+          <div className="sakh-clock-head">📋 Правила раздела</div>
+          <div className="sakh-clock-body sakh-clock-body-content">
+            <ul className="dk-rules" data-ls-rules-list="1">
+              {LS_RULES.map((r, i) => (
+                <li key={i}>{r}</li>
+              ))}
+            </ul>
           </div>
-        </div>
-        {/* Блок 2 «Правила раздела» — 3 пункта ТЗ 2026-09-23 дословно. */}
-        <div className="dk-sideblock" data-ls-rules="1">
-          <div className="dk-blocktitle">Правила раздела</div>
-          <ul className="dk-rules" data-ls-rules-list="1">
-            {LS_RULES.map((r, i) => (
-              <li key={i}>{r}</li>
-            ))}
-          </ul>
         </div>
       </aside>
     </div>
