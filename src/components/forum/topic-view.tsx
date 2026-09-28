@@ -204,21 +204,12 @@ function MessageRow(props: {
           </span>
         )}
         <span className="sk-msg-spacer" />
-        {props.canReply && (
-          <button className="sk-btn-reply" onClick={props.onReply} title={`Ответить на сообщение №${m.num}`}>
-            Ответить
-          </button>
-        )}
+        {/* ТЗ 2026-09-28: надпись «Ответить» в каждом сообщении убрана.
+            Главная синяя кнопка «Ответить» теперь в шапке темы — рядом с
+            заголовком. «☆ В избранное» и «Поиск по теме» тоже убраны. */}
         {/* ШАГ 10: жалоба на сообщение — модальное окно с 7 причинами */}
         <button className="sk-flood-btn" onClick={props.onComplain} title="Жалоба уходит ИИ-модератору; спорные случаи рассмотрит человек">
           Пожаловаться
-        </button>
-        <button
-          className={`sk-flood-btn sk-fav-btn ${props.favDone ? "done" : ""}`}
-          onClick={props.onFav}
-          title="Сохранить тему в избранном (не подписка)"
-        >
-          {props.favDone ? "★ В избранном" : "☆ В избранное"}
         </button>
         {own && (
           <button className="sk-flood-btn" onClick={props.onEdit}>
@@ -853,14 +844,35 @@ export default function TopicView(props: {
       </div>
 
       <div className="sk-topicbox">
+        {/* ТЗ 2026-09-28: .t-title теперь flex-строка — слева заголовок
+            темы (с бирками «Закреплена»/«В архиве»/«Тема закрыта»),
+            справа — синяя кнопка «Ответить» (sk-btn-answer). */}
         <div className="t-title">
-          {topic.title as string}
-          {topic.isPinned && <span className="sk-tstatus pinned">Закреплена</span>}
-          {topic.isArchived ? (
-            <span className="sk-tstatus archived">В архиве</span>
-          ) : (
-            topic.isClosed && <span className="sk-tstatus closed">Тема закрыта</span>
-          )}
+          <span className="t-title-text">
+            {topic.title as string}
+            {topic.isPinned && <span className="sk-tstatus pinned">Закреплена</span>}
+            {topic.isArchived ? (
+              <span className="sk-tstatus archived">В архиве</span>
+            ) : (
+              topic.isClosed && <span className="sk-tstatus closed">Тема закрыта</span>
+            )}
+          </span>
+          <button
+            className="sk-btn-answer sk-btn-answer-in-title"
+            onClick={() => {
+              if (topic.isArchived) {
+                props.notify("Тема в архиве — обсуждение закрыто. Создайте новую тему, если вопрос снова актуален");
+              } else if (topic.isClosed) {
+                props.notify("Тема закрыта для новых сообщений");
+              } else if (props.user) {
+                document.getElementById("reply-form")?.scrollIntoView({ behavior: "smooth" });
+              } else {
+                props.onNeedAuth();
+              }
+            }}
+          >
+            Ответить
+          </button>
         </div>
         <div className="t-meta">
           Автор: <Nick name={topic.author as string} gender={topic.authorGender as string} onOpen={props.onOpenProfile} /> · создана{" "}
