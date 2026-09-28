@@ -959,7 +959,8 @@ export function GdedeshevlePage(props: {
             {/* Правка 1: заголовок «Где дешевле» + навигация (Последние вопросы /
                 Мои публикации) + кнопка «Задать вопрос» — в одной строке, по центру. */}
             <div className="cd-head-bar">
-              <div className="cd-title">Где дешевле</div>
+              {/* 28.09.2026: H1 «Где дешевле» (.cd-title) убран из header-bar
+                  по запросу пользователя — остался только nav + кнопка «Задать вопрос». */}
               <div className="cd-nav-inline">
                 <button className={activeNav === "home" ? "active" : ""} onClick={() => mineTab("all", "home")}>
                   Где дешевле
