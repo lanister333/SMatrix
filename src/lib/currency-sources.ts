@@ -300,6 +300,137 @@ export interface AggregateOutcome {
   perSource: Record<SourceId, { ok: boolean; empty: boolean; error?: string }>;
 }
 
+/* ------------------------------------------------------------------ */
+/* 4) DIRECT — прямые парсеры сайтов банков (АТБ, Приморье, Долинск)    */
+/* ------------------------------------------------------------------ */
+
+/** Реставрация 28.09.2026: прямые парсеры сайтов банков — единственный
+ *  надёжный источник для этих 3 банков (bankdep/mainfin для ЮС их курсы
+ *  не отдают). 3 формата по README:
+ *    Формат 3 (primbank.ru):  regex exchange-rates__currency + 2 значения
+ *    Формат 1 (atb.su):      code + "</div>" → следующие 2 десятичных числа
+ *    Формат 2 (dolinskbank): code + "</b>" + unit_symbol + 2 числа
+ *  JPY НЕ умножаем на 10 — оставляем per-100¥ под лейблом «за 1000».
+ *  dolinskbank.ru требует Referer: https://biz65.ru/ (антибот). */
+
+const DIRECT_SITES: { bank: string; url: string; format: 1 | 2 | 3; referer?: string }[] = [
+  { bank: "АТБ", url: "https://atb.su/currency/", format: 1 },
+  { bank: "Приморье", url: "https://primbank.ru/currency/", format: 3 },
+  { bank: "Долинск", url: "https://dolinskbank.ru/?utm_medium=cpc&utm_campaign=bank_dolinsk&utm_source=Biz65Ru", format: 2, referer: "https://biz65.ru/" },
+];
+
+/** Найти 2 следующих десятичных числа после позиции в HTML. */
+function findNextTwoNums(html: string, fromIdx: number): { buy: number | null; sell: number | null; nextIdx: number } {
+  const re = /(\d{1,3}(?:[.,]\d{1,4})?)/g;
+  re.lastIndex = fromIdx;
+  const m1 = re.exec(html);
+  if (!m1) return { buy: null, sell: null, nextIdx: fromIdx };
+  const m2 = re.exec(html);
+  const buy = num(m1[1]);
+  const sell = m2 ? num(m2[1]) : null;
+  return { buy: validRate(buy) ? buy : null, sell: sell !== null && validRate(sell) ? sell : null, nextIdx: re.lastIndex };
+}
+
+/** Парсинг страницы банка по формату. Возвращает курсы по валютам. */
+function parseDirectPage(bank: string, html: string, format: 1 | 2 | 3): SourceRate[] {
+  const rows: SourceRate[] = [];
+  const codes: CurrencyCode[] = ["USD", "EUR", "CNY", "JPY", "KRW", "THB"];
+  for (const code of codes) {
+    // Поиск позиции code в HTML (USD, EUR, CNY, JPY/KRW/THB)
+    // Внимание: THB может быть и в bat, ищем по «THB»
+    let searchStr = code;
+    // dolinskbank.ru помечает курс кодом + </b>, например «<b>USD</b>»
+    // atb.su — код внутри div, например «<div>USD</div>»
+    // primbank — внутри div с классом exchange-rates__currency
+    let idx = -1;
+    let buy: number | null = null;
+    let sell: number | null = null;
+
+    if (format === 3) {
+      // primbank.ru — блок <div class="exchange-rates__currency">USD</div>,
+      // далее unit div, далее 2 div со значениями
+      const reBlock = new RegExp(`exchange-rates__currency"[^>]*>\\s*${code}\\s*</div>([\\s\\S]*?)(?=exchange-rates__currency"|$)`, "i");
+      const m = reBlock.exec(html);
+      if (!m) continue;
+      // Внутри блока найти 2 числа (после кода)
+      const r = findNextTwoNums(m[1], 0);
+      buy = r.buy;
+      sell = r.sell;
+    } else if (format === 1) {
+      // atb.su — code + "</div>", дальше 2 десятичных числа
+      idx = html.indexOf(`${code}</div>`);
+      if (idx === -1) {
+        // Попробовать вариант без </div> — код как текст
+        const re = new RegExp(`\\b${code}\\b`);
+        const m = re.exec(html);
+        if (!m) continue;
+        idx = m.index;
+      }
+      const r = findNextTwoNums(html, idx + 4);
+      buy = r.buy;
+      sell = r.sell;
+    } else if (format === 2) {
+      // dolinskbank.ru — code + "</b>", затем unit_symbol (не число), затем 2 числа
+      // Ищем «<b>USD</b>» или просто «USD</b>»
+      const re = new RegExp(`${code}</b>`, "i");
+      const m = re.exec(html);
+      if (!m) continue;
+      // После </b> может быть единица измерения (¥, ₩, 100), затем 2 числа
+      const r = findNextTwoNums(html, m.index + m[0].length);
+      buy = r.buy;
+      sell = r.sell;
+    }
+
+    if (buy !== null) {
+      // Проверка: sell не должен быть > buy × 1.5 (иначе это placeholder)
+      if (sell !== null && sell > buy * 1.5) {
+        // Приморье ставит 100.00 для JPY/KRW когда «не продаём наличными»
+        // — сохраняем только buy (см. README)
+        sell = null;
+      }
+      rows.push({
+        bank,
+        currency: code,
+        buy,
+        sell,
+        sourceStamp: null,
+      });
+    }
+  }
+  return rows;
+}
+
+export async function fetchDirect(): Promise<SourceOutcome> {
+  const rows: SourceRate[] = [];
+  let pages = 0;
+  for (const site of DIRECT_SITES) {
+    try {
+      const headers = { ...BROWSER_HEADERS };
+      if (site.referer) (headers as Record<string, string>)["Referer"] = site.referer;
+      const r = await fetch(site.url, {
+        headers,
+        signal: AbortSignal.timeout(20000),
+        cache: "no-store",
+      });
+      if (!r.ok) {
+        // 403 Cloudflare и т.д. — просто пропускаем, не роняем источник
+        continue;
+      }
+      const html = await r.text();
+      pages++;
+      const bankRows = parseDirectPage(site.bank, html, site.format);
+      rows.push(...bankRows);
+    } catch {
+      // таймаут/сетевая ошибка — пропускаем банк, но не роняем источник
+      continue;
+    }
+  }
+  if (pages === 0) {
+    return { ok: false, empty: true, rows: [], error: "direct: ни один сайт банка не ответил" };
+  }
+  return { ok: true, empty: rows.length === 0, rows };
+}
+
 /** Один цикл агрегации: три источника параллельно → merge с
  *  приоритетом ТЗ → свежая серия в БД (source = выигравший источник).
  *  Серии старше 7 дней подчищаются. Полный сбой источников ошибкой НЕ

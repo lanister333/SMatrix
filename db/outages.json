@@ -1,6 +1,20 @@
 {
-  "updated": "2026-09-28T14:17:54.821Z",
+  "updated": "2026-09-28T20:31:34.920Z",
   "items": [
+    {
+      "source": "СКК",
+      "title": "Отключение горячей воды 29.09.2026г. с 04:40 до 16:40,",
+      "url": "https://skk65.ru/otkljuchenie-goryachej-vody-29-09-2026g-s-04-40-do-16-40/",
+      "addresses": [
+        "Отключенные дома: ул. Комсомольская,239,241,241А,243,237, 237А,235,231,233,233А."
+      ],
+      "short": "Отключенные дома: ул. Комсомольская,239,241,241А,243,237, 2…",
+      "when": "с 04:40 до 16:40",
+      "kind": "hot",
+      "type": "planned",
+      "publishedAt": "2026-09-28T18:04:01Z",
+      "fetchedAt": "2026-09-28T20:31:34.920Z"
+    },
     {
       "source": "СКК",
       "title": "Отключение горячей воды 29.09.2026 с 09:00 до 13:00",
@@ -11,7 +25,7 @@
       "kind": "hot",
       "type": "planned",
       "publishedAt": "2026-09-28T03:57:54Z",
-      "fetchedAt": "2026-09-28T14:17:54.821Z"
+      "fetchedAt": "2026-09-28T20:31:34.920Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -31,7 +45,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-28T01:58:00.000Z",
-      "fetchedAt": "2026-09-28T14:17:54.821Z"
+      "fetchedAt": "2026-09-28T20:31:34.920Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -47,7 +61,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-28T01:50:00.000Z",
-      "fetchedAt": "2026-09-28T14:17:54.821Z"
+      "fetchedAt": "2026-09-28T20:31:34.920Z"
     },
     {
       "source": "СКК",
@@ -61,7 +75,7 @@
       "kind": "hot",
       "type": "planned",
       "publishedAt": "2026-09-27T23:24:21Z",
-      "fetchedAt": "2026-09-28T14:17:54.821Z"
+      "fetchedAt": "2026-09-28T20:31:34.920Z"
     },
     {
       "source": "СКК",
@@ -75,7 +89,7 @@
       "kind": "hot",
       "type": "planned",
       "publishedAt": "2026-09-27T22:38:55Z",
-      "fetchedAt": "2026-09-28T14:17:54.821Z"
+      "fetchedAt": "2026-09-28T20:31:34.920Z"
     },
     {
       "source": "СКК",
@@ -89,7 +103,7 @@
       "kind": "hot",
       "type": "planned",
       "publishedAt": "2026-09-27T22:30:10Z",
-      "fetchedAt": "2026-09-28T14:17:54.821Z"
+      "fetchedAt": "2026-09-28T20:31:34.920Z"
     },
     {
       "source": "СКК",
@@ -103,7 +117,7 @@
       "kind": "hot",
       "type": "planned",
       "publishedAt": "2026-09-25T04:51:16Z",
-      "fetchedAt": "2026-09-28T14:17:54.821Z"
+      "fetchedAt": "2026-09-28T20:31:34.920Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -123,7 +137,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-25T00:50:00.000Z",
-      "fetchedAt": "2026-09-28T14:17:54.821Z"
+      "fetchedAt": "2026-09-28T20:31:34.920Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -140,7 +154,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-25T00:11:00.000Z",
-      "fetchedAt": "2026-09-28T14:17:54.821Z"
+      "fetchedAt": "2026-09-28T20:31:34.920Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -155,7 +169,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-24T02:14:00.000Z",
-      "fetchedAt": "2026-09-28T14:17:54.821Z"
+      "fetchedAt": "2026-09-28T20:31:34.920Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -170,7 +184,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-24T02:01:00.000Z",
-      "fetchedAt": "2026-09-28T14:17:54.821Z"
+      "fetchedAt": "2026-09-28T20:31:34.920Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -189,7 +203,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-24T01:48:00.000Z",
-      "fetchedAt": "2026-09-28T14:17:54.821Z"
+      "fetchedAt": "2026-09-28T20:31:34.920Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -205,7 +219,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-23T23:55:00.000Z",
-      "fetchedAt": "2026-09-28T14:17:54.821Z"
+      "fetchedAt": "2026-09-28T20:31:34.920Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -231,7 +245,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-23T23:41:00.000Z",
-      "fetchedAt": "2026-09-28T14:17:54.821Z"
+      "fetchedAt": "2026-09-28T20:31:34.920Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -257,7 +271,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-21T02:41:00.000Z",
-      "fetchedAt": "2026-09-28T14:17:54.821Z"
+      "fetchedAt": "2026-09-28T20:31:34.920Z"
     }
   ],
   "errors": []
