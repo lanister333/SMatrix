@@ -969,108 +969,62 @@ export default function TopicView(props: {
         </div>
       )}
 
-      <div className="sk-topicactions">
-        <button
-          className="sk-btn-answer"
-          onClick={() => {
-            if (topic.isArchived) {
-              props.notify("Тема в архиве — обсуждение закрыто. Создайте новую тему, если вопрос снова актуален");
-            } else if (topic.isClosed) {
-              props.notify("Тема закрыта для новых сообщений");
-            } else if (props.user) {
-              document.getElementById("reply-form")?.scrollIntoView({ behavior: "smooth" });
-            } else {
-              props.onNeedAuth();
-            }
-          }}
-        >
-          Ответить
-        </button>
-        {newCount > 0 && (
-          <button
-            onClick={() => {
-              if (newCount <= 0) return;
-              gotoMessage(answers - newCount + 1);
-              try {
-                localStorage.setItem(`sk_seen_${topicId}`, String(answers));
-              } catch {}
-              setNewCount(0);
-            }}
-            title={`К первому непрочитанному — сообщение №${answers - newCount + 1}`}
-          >
-            → Новые сообщения ({newCount})
-          </button>
-        )}
-        <button
-          className={favorites.has(topicId) ? "done" : ""}
-          onClick={() => {
-            favorites.toggle(topicId);
-            props.notify(favorites.has(topicId) ? "Удалено из избранного" : "Добавлено в избранное");
-          }}
-        >
-          {favorites.has(topicId) ? "★ В избранном" : "☆ Добавить в избранное"}
-        </button>
-        <button onClick={() => setInTopicSearch((v) => !v)}>Поиск по теме</button>
-        {isAdmin && !topic.isArchived && (topic.isClosed ? (
-          <button
-            onClick={() => {
-              if (window.confirm("Открыть тему снова? Пользователи смогут писать новые сообщения."))
-                topicAction("open", "Тема снова открыта — можно писать сообщения");
-            }}
-            title="Открыть тему снова — разрешить новые сообщения"
-          >
-            Открыть тему
-          </button>
-        ) : (
-          <button
-            onClick={() => {
-              if (window.confirm("Закрыть тему? Читать её сможет каждый, но новые сообщения будут запрещены. Открыть снова сможет модератор."))
-                topicAction("close", "Тема закрыта — новые сообщения запрещены");
-            }}
-            title="Закрыть тему: читать можно, новые сообщения запрещены"
-          >
-            Закрыть тему
-          </button>
-        ))}
-        {(isAdmin || isOwner) && (
-          <button
-            className="sk-topicdel"
-            onClick={() => {
-              if (window.confirm("Удалить тему? Она исчезнет из списков и поиска, а ссылки на неё будут открывать страницу «Эта тема больше недоступна».")) {
-                topicAction("delete", "Тема удалена", () => props.onBack());
-              }
-            }}
-            title="Удалить тему: ссылки на неё откроют страницу «Эта тема больше недоступна»"
-          >
-            Удалить тему
-          </button>
-        )}
-      </div>
-
-      {inTopicSearch && (
-        <div className="sk-note">
-          Поиск внутри темы:{" "}
-          <input
-            value={topicQ}
-            onChange={(e) => setTopicQ(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key !== "Enter") return;
-              const q = topicQ.trim().toLowerCase();
-              if (!q) return;
-              const found = messages.find((m) => !m.isDeleted && !m.isHiddenByAi && m.body.toLowerCase().includes(q));
-              if (found) gotoMessage(found.num);
-            }}
-            placeholder="Что ищем… Enter — к первому найденному"
-            style={{ width: "60%" }}
-          />{" "}
-          <a
-            onClick={() => {
-              setInTopicSearch(false);
-              setTopicQ("");
-            }}
-          >
-            закрыть
-          </a>
+      {/* ТЗ 2026-09-28: из .sk-topicactions убраны: «Ответить» (перенесена
+          в шапку .t-title), «☆ Добавить в избранное», «Поиск по теме».
+          Остались только: «→ Новые сообщения» (если есть) и админ-кнопки
+          «Открыть/Закрыть тему» / «Удалить тему». Если их нет — весь блок
+          не рендерится (над шапкой сообщений ничего лишнего). */}
+      {(newCount > 0 || (isAdmin && !topic.isArchived) || (isAdmin || isOwner)) && (
+        <div className="sk-topicactions">
+          {newCount > 0 && (
+            <button
+              onClick={() => {
+                if (newCount <= 0) return;
+                gotoMessage(answers - newCount + 1);
+                try {
+                  localStorage.setItem(`sk_seen_${topicId}`, String(answers));
+                } catch {}
+                setNewCount(0);
+              }}
+              title={`К первому непрочитанному — сообщение №${answers - newCount + 1}`}
+            >
+              → Новые сообщения ({newCount})
+            </button>
+          )}
+          {isAdmin && !topic.isArchived && (topic.isClosed ? (
+            <button
+              onClick={() => {
+                if (window.confirm("Открыть тему снова? Пользователи смогут писать новые сообщения."))
+                  topicAction("open", "Тема снова открыта — можно писать сообщения");
+              }}
+              title="Открыть тему снова — разрешить новые сообщения"
+            >
+              Открыть тему
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                if (window.confirm("Закрыть тему? Читать её сможет каждый, но новые сообщения будут запрещены. Открыть снова сможет модератор."))
+                  topicAction("close", "Тема закрыта — новые сообщения запрещены");
+              }}
+              title="Закрыть тему: читать можно, новые сообщения запрещены"
+            >
+              Закрыть тему
+            </button>
+          ))}
+          {(isAdmin || isOwner) && (
+            <button
+              className="sk-topicdel"
+              onClick={() => {
+                if (window.confirm("Удалить тему? Она исчезнет из списков и поиска, а ссылки на неё будут открывать страницу «Эта тема больше недоступна».")) {
+                  topicAction("delete", "Тема удалена", () => props.onBack());
+                }
+              }}
+              title="Удалить тему: ссылки на неё откроют страницу «Эта тема больше недоступна»"
+            >
+              Удалить тему
+            </button>
+          )}
         </div>
       )}
 

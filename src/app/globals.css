@@ -246,7 +246,27 @@ li.sk-rubric-row{display:block}
 
 /* Тема-карточка (мобильный стиль списка) */
 .sk-topicbox{background:#fff;border:1px solid var(--sm-navy);box-shadow:0 1px 3px rgba(0,0,0,0.05),0 1px 2px rgba(0,0,0,0.03);margin-bottom:7px;padding:7px 10px}
-.sk-topicbox .t-title{color:#0a5caa;word-break:break-word;overflow-wrap:anywhere;margin-bottom:4px;font-size:15px;font-weight:700;line-height:1.35;text-decoration:underline}
+.sk-topicbox .t-title{color:#0a5caa;word-break:break-word;overflow-wrap:anywhere;margin-bottom:4px;font-size:15px;font-weight:700;line-height:1.35;text-decoration:underline;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+/* ТЗ 2026-09-28: .t-title теперь flex-строка — слева текст заголовка,
+   справа синяя кнопка «Ответить». Текст не подчёркивается внутри
+   обёртки .t-title-text (чтобы клик шёл по кнопке, а не по ссылке). */
+.sk-topicbox .t-title .t-title-text{text-decoration:underline;flex:1 1 auto;min-width:0}
+.sk-topicbox .t-title .sk-btn-answer-in-title{
+  flex:0 0 auto;
+  color:#fff !important;
+  background:#0a5caa !important;
+  border:1px solid #084c8b !important;
+  border-radius:2px !important;
+  padding:5px 16px !important;
+  font-size:13px !important;
+  font-weight:700 !important;
+  text-decoration:none !important;
+  cursor:pointer !important;
+  white-space:nowrap !important;
+  align-self:flex-start;
+  margin-top:1px;
+}
+.sk-topicbox .t-title .sk-btn-answer-in-title:hover{background:#084c8b !important}
 .sk-topicbox .t-meta{color:#4a5b6d;font-size:12.5px;line-height:1.5}
 .sk-topicbox .t-meta b{color:#2f3b49;font-weight:700}
 
