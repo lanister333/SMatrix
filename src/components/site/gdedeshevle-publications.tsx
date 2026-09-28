@@ -959,24 +959,23 @@ export function GdedeshevlePage(props: {
             {/* Правка 1: заголовок «Где дешевле» + навигация (Последние вопросы /
                 Мои публикации) + кнопка «Задать вопрос» — в одной строке, по центру. */}
             <div className="cd-head-bar">
-              {/* 28.09.2026: восстановил H1 «Где дешевле» (.cd-title).
-                  Удалена первая nav-кнопка «Где дешевле» — у активной
-                  кнопки цвет #1a1a1a (почти чёрный), это и была «чёрная
-                  надпись» про которую просил пользователь. H1 теперь
-                  единственный «заголовок» названия раздела в header-bar,
-                  а nav-inline начинается сразу с «Последние вопросы». */}
+              {/* 28.09.2026: H1 «Где дешевле» прижат к левому краю,
+                  nav + кнопка «Задать вопрос» — к правому. Группировка
+                  через .cd-head-right + justify-content: space-between. */}
               <div className="cd-title">Где дешевле</div>
-              <div className="cd-nav-inline">
-                <button className={activeNav === "latest" ? "active" : ""} onClick={() => mineTab("all", "latest")}>
-                  Последние вопросы
-                </button>
-                <button className={activeNav === "mine" ? "active" : ""} onClick={() => mineTab("mine", "mine")}>
-                  Мои публикации
+              <div className="cd-head-right">
+                <div className="cd-nav-inline">
+                  <button className={activeNav === "latest" ? "active" : ""} onClick={() => mineTab("all", "latest")}>
+                    Последние вопросы
+                  </button>
+                  <button className={activeNav === "mine" ? "active" : ""} onClick={() => mineTab("mine", "mine")}>
+                    Мои публикации
+                  </button>
+                </div>
+                <button className="cd-addbtn" onClick={openNewForm}>
+                  ＋ Задать вопрос
                 </button>
               </div>
-              <button className="cd-addbtn" onClick={openNewForm}>
-                ＋ Задать вопрос
-              </button>
             </div>
             {!props.user && (
               <p className="cd-rulesnote">Задавать вопросы могут только зарегистрированные пользователи — войдите или зарегистрируйтесь. Гости могут читать.</p>

@@ -1688,18 +1688,25 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
      в одной строке по центру) + лента вопросов
    — ПРАВАЯ колонка: Время + «Правила «Где дешевле»» (в дизайне .sakh-clock) */
 
-/* Header bar: заголовок «Где дешевле» + inline-навигация + «Задать вопрос»
-   в одной строке, по центру. */
+/* Header bar: заголовок «Где дешевле» слева + правая группа
+   (nav + «Задать вопрос») справа. justify-content: space-between. */
 .cd-head-bar{
   display:flex;
   align-items:center;
-  justify-content:center;
+  justify-content:space-between;
   flex-wrap:wrap;
   gap:10px 14px;
   margin-bottom:6px;
 }
 .cd-head-bar .cd-title{margin:0}
-.cd-head-bar .cd-addbtn{margin-left:8px;flex-shrink:0}
+/* Правая группа: nav-inline + кнопка «Задать вопрос» вместе, прижаты вправо */
+.cd-head-right{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px 14px;
+}
+.cd-head-right .cd-addbtn{margin-left:0;flex-shrink:0}
 
 /* Inline-навигация — кнопки в ряд, тот же стиль что .cd-navlist, но горизонтально */
 .cd-nav-inline{
