@@ -955,10 +955,12 @@ export function WhereToBuyPage(props: {
         {/* Центральная колонка — лента вопросов + header bar (правка 1) */}
         <div className="wb-col-main center-column">
           <div className="wb-head">
-            {/* Правка 1: заголовок «Где купить» + навигация (Последние вопросы /
-                Мои публикации) + кнопка «Задать вопрос» — в одной строке, по центру. */}
+            {/* 28.09.2026 (правки от пользователя):
+                — H1 «Где купить» УБРАН (чёрный дубликат названия раздела)
+                — Поисковое окно + «Найти» УБРАНЫ
+                — Окно поиска города + «Показать» УБРАНЫ
+                В header-bar остались только nav-кнопки и кнопка «Задать вопрос». */}
             <div className="wb-head-bar">
-              <div className="wb-title">Где купить</div>
               <div className="wb-nav-inline">
                 <button className={activeNav === "home" ? "active" : ""} onClick={() => mineTab("all", "home")}>
                   Где купить
@@ -978,42 +980,6 @@ export function WhereToBuyPage(props: {
               <p className="wb-rulesnote">Задавать вопросы могут только зарегистрированные пользователи — войдите или зарегистрируйтесь. Гости могут читать.</p>
             )}
             <div className="wb-desc">Задайте вопрос о том, где на Сахалине купить конкретный товар.</div>
-
-            {/* Простой поиск (ТЗ п.24): заголовок и текст, частичное совпадение,
-                поиск по модели и артикулу; без сложных фильтров */}
-            <div className="wb-search">
-              <input
-                aria-label="Поиск по вопросам"
-                value={q}
-                maxLength={120}
-                onChange={(e) => setQ(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") applySearch();
-                }}
-                placeholder="Поиск по вопросу, модели или артикулу…"
-              />
-              <button onClick={applySearch}>Найти</button>
-              {searching && (
-                <button className="wb-search-reset" onClick={resetSearch}>
-                  Сбросить
-                </button>
-              )}
-            </div>
-
-            {/* Место покупки — перенесён из левой колонки (теперь там «О разделе») */}
-            <div className="wb-placefilter">
-              <input
-                aria-label="Фильтр по месту"
-                value={place}
-                maxLength={80}
-                onChange={(e) => setPlace(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") applySearch();
-                }}
-                placeholder="Южно-Сахалинск, Холмск…"
-              />
-              <button onClick={applySearch}>Показать</button>
-            </div>
           </div>
 
           <div ref={listTopRef} />
