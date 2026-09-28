@@ -959,12 +959,14 @@ export function GdedeshevlePage(props: {
             {/* Правка 1: заголовок «Где дешевле» + навигация (Последние вопросы /
                 Мои публикации) + кнопка «Задать вопрос» — в одной строке, по центру. */}
             <div className="cd-head-bar">
-              {/* 28.09.2026: H1 «Где дешевле» (.cd-title) убран из header-bar
-                  по запросу пользователя — остался только nav + кнопка «Задать вопрос». */}
+              {/* 28.09.2026: восстановил H1 «Где дешевле» (.cd-title).
+                  Удалена первая nav-кнопка «Где дешевле» — у активной
+                  кнопки цвет #1a1a1a (почти чёрный), это и была «чёрная
+                  надпись» про которую просил пользователь. H1 теперь
+                  единственный «заголовок» названия раздела в header-bar,
+                  а nav-inline начинается сразу с «Последние вопросы». */}
+              <div className="cd-title">Где дешевле</div>
               <div className="cd-nav-inline">
-                <button className={activeNav === "home" ? "active" : ""} onClick={() => mineTab("all", "home")}>
-                  Где дешевле
-                </button>
                 <button className={activeNav === "latest" ? "active" : ""} onClick={() => mineTab("all", "latest")}>
                   Последние вопросы
                 </button>
