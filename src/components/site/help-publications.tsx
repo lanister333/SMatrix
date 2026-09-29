@@ -699,6 +699,35 @@ export function HelpPage(props: {
               </div>
             </div>
           </div>
+
+          {/* 29.09.2026: блок «🎨 Цвета карточек» — пояснение для посетителей
+              сайта, что означают цвета рамок карточек в ленте. В едином стиле
+              с блоком «Время» (.sakh-clock), как «О разделе» и «Правила
+              публикации». Аналог блока на /rekomenduyu. */}
+          <div className="sakh-clock hp-clock-block hp-clock-legend">
+            <div className="sakh-clock-head">🎨 Цвета карточек</div>
+            <div className="sakh-clock-body sakh-clock-body-content">
+              <div className="hp-legend">
+                <div className="hp-legend-row">
+                  <span className="hp-legend-swatch swatch-active" />
+                  <div>
+                    <b>Бирюзовая рамка</b> — публикация <b>активна</b> (статус «Актуально»). Автор ждёт помощи.
+                  </div>
+                </div>
+                <div className="hp-legend-row">
+                  <span className="hp-legend-swatch swatch-resolved" />
+                  <div>
+                    <b>Серая рамка + полупрозрачность</b> — публикация завершена (статус «Решено») или потеряла
+                    актуальность («Неактуально»). Размещается ниже активных в ленте.
+                  </div>
+                </div>
+                <p className="hp-legend-note">
+                  Статус публикации меняет её автор: отметил помощь полученной → «Решено», или потеряло актуальность →
+                  «Неактуально». Завершённые/неактуальные не удаляются — остаются в ленте серыми для истории.
+                </p>
+              </div>
+            </div>
+          </div>
         </aside>
 
         {/* Центральная колонка — объявления + header bar */}

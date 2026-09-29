@@ -687,6 +687,42 @@ li.sk-rubric-row{display:block}
 .hp-clock-block .hp-rulesnote{
   text-align:left;
 }
+
+/* 29.09.2026: блок-легенда «Цвета карточек» в левой колонке /help.
+   Аналог .rc-legend на /rekomenduyu — свотчи (квадратики 24×24px)
+   показывают образец рамки для каждого статуса. */
+.hp-legend{font-size:13px;line-height:1.5;color:#3d4a5c}
+.hp-legend-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:9px}
+.hp-legend-row:last-of-type{margin-bottom:6px}
+.hp-legend-swatch{
+  flex:0 0 24px;
+  width:24px;
+  height:24px;
+  border-radius:3px;
+  border:1px solid #b6c2d1;
+  margin-top:1px;
+  display:inline-block;
+}
+.hp-legend-swatch.swatch-active{
+  background:#ccfbf1;
+  border-left:4px solid #0f766e;
+  border-color:#0f766e;
+}
+.hp-legend-swatch.swatch-resolved{
+  background:#f8fafc;
+  border-left:4px solid #94a3b8;
+  border-color:#94a3b8;
+  opacity:0.8;
+}
+.hp-legend-note{
+  margin:8px 0 0;
+  padding-top:7px;
+  border-top:1px solid #e2e8f0;
+  color:#56657a;
+  font-size:12px;
+  line-height:1.5;
+}
+.hp-legend b{color:#1e293b}
 .hp-sideblock{background:#fff;border:1px solid #d9dee5;margin-bottom:12px;padding:9px 10px}
 .hp-blocktitle{color:#3d4a5c;border-bottom:1px solid #e4e8ee;margin-bottom:7px;padding-bottom:5px;font-size:13px;font-weight:700}
 .hp-navlist{margin:0;padding:0;list-style:none}
@@ -729,16 +765,20 @@ li.sk-rubric-row{display:block}
    6) .help-direct-contact (подпись «Связь напрямую:») и
       .resolved-text приведены к палитре ТЗ (#475569/#0f766e).
    ============================================================ */
-.help-publications-list{display:flex;flex-direction:column;gap:16px;margin-top:20px}
-.help-item-card{background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;padding:20px;transition:border-color 0.2s ease}
+.help-publications-list{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+/* 29.09.2026: карточки УПЛОТНЕНЫ по вертикали — меньше "воздуха":
+   padding 20px → 10px 12px (как .wb-item, .cd-item, .gkf-card, .ep-card,
+   .dk-card). Применимо ко всем карточкам на всех страницах сайта. */
+.help-item-card{background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;transition:border-color 0.2s ease}
 .help-item-card.status-active{border-left:4px solid #0f766e} /* Наша бирюза */
 .help-item-card.status-resolved{border-left:4px solid #94a3b8;background:#f8fafc;opacity:0.8} /* Неактуальная/решенная карточка (Пункт 13 правил) */
-.help-item-header{display:flex;flex-wrap:wrap;gap:16px;font-size:12px;color:#64748b;margin-bottom:12px;align-items:center}
+/* 29.09.2026: уплотнены header/body/footer — меньше gap/margins. */
+.help-item-header{display:flex;flex-wrap:wrap;gap:8px;font-size:12px;color:#64748b;margin-bottom:6px;align-items:center}
 .help-status-badge{background:#ccfbf1;color:#0f766e;font-weight:700;padding:2px 8px;border-radius:4px}
 .help-status-badge.gray{background:#e2e8f0;color:#475569}
-.help-item-body h4{font-size:18px;color:#1e293b;margin:0 0 8px 0;font-weight:700;word-break:break-word;overflow-wrap:anywhere}
-.help-item-body p{font-size:14px;line-height:1.6;color:#334155;margin:0;white-space:pre-wrap;word-break:break-word}
-.help-item-footer{margin-top:16px;padding-top:12px;border-top:1px solid #f1f5f9;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center}
+.help-item-body h4{font-size:16px;color:#1e293b;margin:0 0 4px 0;font-weight:700;word-break:break-word;overflow-wrap:anywhere}
+.help-item-body p{font-size:13.5px;line-height:1.45;color:#334155;margin:0;white-space:pre-wrap;word-break:break-word}
+.help-item-footer{margin-top:8px;padding-top:6px;border-top:1px solid #f1f5f9;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center}
 .help-direct-contact{color:#475569;font-size:13px}
 .help-direct-contact strong{font-weight:700}
 .wa-action-link{color:#22c55e;font-weight:700;text-decoration:none}
@@ -2246,11 +2286,14 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
  *     margin-top:16px); transition убран (в ТЗ отсутствует).
  * ============================================================ */
 /* Базовая карточка отзыва */
-.matrix-review-card{background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;padding:24px;margin-bottom:20px}
+/* 29.09.2026: карточки отзыва /rekomenduyu УПЛОТНЕНЫ — padding 24px → 10px 12px
+   (как .wb-item, .cd-item), margin-bottom 20px → 10px. Меньше "воздуха". */
+.matrix-review-card{background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;margin-bottom:10px}
 /* Мягкие цветовые акценты по бокам в зависимости от рекомендации */
 .matrix-review-card.type-positive{border-left:4px solid #10b981}
 .matrix-review-card.type-negative{border-left:4px solid #ef4444}
-.review-card-header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 16px;margin-bottom:16px}
+/* 29.09.2026: уплотнено — gap 8px 16px → 4px 8px, margin-bottom 16px → 6px. */
+.review-card-header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:4px 8px;margin-bottom:6px}
 .review-user-meta{display:flex;gap:10px;align-items:center;min-width:0}
 .review-user-meta>div{display:flex;flex-direction:column;gap:2px;min-width:0}
 .user-avatar-placeholder{align-items:center;background:#f1f5f9;border-radius:50%;display:flex;flex-shrink:0;font-size:16px;height:36px;justify-content:center;width:36px}
@@ -2267,10 +2310,12 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .rc-act.rc-resolve-btn:hover{background:#bae6fd}
 .rc-act.rc-resolve-btn.is-resolved{background:#0284c7;color:#fff}
 .rc-act.rc-resolve-btn.is-resolved:hover{background:#0369a1}
-.review-target-object{font-size:18px;font-weight:700;color:#1e293b;margin:0 0 10px 0;line-height:1.35;word-break:break-word;overflow-wrap:anywhere}
-.review-experience-text{font-size:14px;line-height:1.6;color:#334155;margin:0 0 16px 0;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere}
+/* 29.09.2026: уплотнено — margin 0 0 10px → 0 0 4px, font-size 18px → 16px. */
+.review-target-object{font-size:16px;font-weight:700;color:#1e293b;margin:0 0 4px 0;line-height:1.35;word-break:break-word;overflow-wrap:anywhere}
+.review-experience-text{font-size:13.5px;line-height:1.45;color:#334155;margin:0 0 8px 0;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere}
 /* Блок похвалы конкретного человека */
-.review-human-highlight{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:12px 16px;display:flex;gap:12px;align-items:flex-start}
+/* 29.09.2026: уплотнено — padding 12px 16px → 6px 8px, gap 12px → 6px. */
+.review-human-highlight{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;display:flex;gap:6px;align-items:flex-start}
 .human-highlight-icon{flex-shrink:0;font-size:16px;line-height:1.4}
 .human-highlight-text{margin:0;font-size:13px;color:#475569;line-height:1.5;word-break:break-word;overflow-wrap:anywhere}
 .human-highlight-text strong{font-weight:700}
