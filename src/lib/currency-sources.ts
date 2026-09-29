@@ -118,7 +118,7 @@ const BANKDEP_STAMP_RE = /(\d{2}\.\d{2}\.\d{4} \d{2}:\d{2})/;
 export async function fetchBankdep(): Promise<SourceOutcome> {
   const rows: SourceRate[] = [];
   let pages = 0;
-  for (const code of ["USD", "EUR", "CNY", "THB"] as const) {
+  for (const code of ["USD", "EUR", "CNY", "KRW", "THB"] as const) {
     const url = `https://bankdep.ru/currency/${CITY_SLUG}/${code.toLowerCase()}`;
     let html: string;
     try {
@@ -180,6 +180,7 @@ export async function fetchMainfin(): Promise<SourceOutcome> {
     getPage(`https://mainfin.ru/currency/${CITY_SLUG}`),
     getPage(`https://mainfin.ru/currency/jpy/${CITY_SLUG}`),
     getPage(`https://mainfin.ru/currency/thb/${CITY_SLUG}`),
+    getPage(`https://mainfin.ru/currency/krw/${CITY_SLUG}`),
   ]);
   const htmls: string[] = [];
   for (const p of pages) {
