@@ -1166,44 +1166,11 @@ export function RecommendPage(props: {
   return (
     <>
       <div className="rc-layout main-grid-container">
-        {/* Левая колонка — навигация раздела */}
+        {/* Левая колонка — органайзер раздела (орг. кабинет + фильтр по месту)
+            29.09.2026: навигация (Последние/Мои публикации) + кнопка
+            «＋ Поделиться опытом» ПЕРЕНЕСЕНЫ в header-bar центральной колонки,
+            в одну строку с H1 «Рекомендую / Не рекомендую». */}
         <aside className="rc-col-left left-column">
-          <div className="rc-sideblock">
-            {/* ТЗ 2026-09-24 «RC → ЭТАЛОН WB»: слово «Раздел» убрано;
-                шапка блока — как у блока «SakhMatrix • Время» и как на
-                «Где купить» (.wb-sidehead): тёмный фон #1E3A5F, белый
-                текст, иконка, текст — название раздела. */}
-            <div className="rc-sidehead">👍 Рекомендую / Не рекомендую</div>
-            <ul className="rc-navlist">
-              <li>
-                <button className={activeNav === "home" ? "active" : ""} onClick={() => mineTab("all", "home")}>
-                  Рекомендую / Не рекомендую
-                </button>
-              </li>
-              <li>
-                <button className={activeNav === "latest" ? "active" : ""} onClick={() => mineTab("all", "latest")}>
-                  Последние публикации
-                </button>
-              </li>
-              <li>
-                <button className={activeNav === "mine" ? "active" : ""} onClick={() => mineTab("mine", "mine")}>
-                  Мои публикации
-                </button>
-              </li>
-            </ul>
-          </div>
-          <div className="rc-sideblock">
-            {/* ТЗ: кнопка прижата к ПРАВОМУ краю блока — обёртка .rc-addrow
-                (как .wb-addrow у «＋ Задать вопрос» на «Где купить»). */}
-            <div className="rc-addrow">
-              <button className="rc-addbtn" onClick={openNewForm}>
-                ＋ Поделиться опытом
-              </button>
-            </div>
-            {!props.user && (
-              <p className="rc-rulesnote">Публиковать могут только зарегистрированные пользователи — войдите или зарегистрируйтесь. Гости могут читать.</p>
-            )}
-          </div>
           {/* ТЗ 2026-09-22: точка входа в «Кабинет представителя организации» (/kabinet,
               разметка .matrix-business-cabinet) — только для подтверждённых orgRep.
               Точка входа — задокументированная импровизация (в макете заказчика не указана). */}
@@ -1236,10 +1203,27 @@ export function RecommendPage(props: {
         {/* Центральная колонка — лента */}
         <div className="rc-col-main center-column">
           <div className="rc-head">
-            <div className="rc-title">Рекомендую / Не рекомендую</div>
+            {/* 29.09.2026: header-bar — H1 «Рекомендую / Не рекомендую» слева,
+                nav + кнопка «Поделиться опытом» справа (как на /gde-deshevle,
+                /gde-kupit). Активная nav-кнопка «Рекомендую / Не рекомендую»
+                удалена (была чёрной #1a1a1a — дубликат названия раздела). */}
+            <div className="rc-head-bar">
+              <div className="rc-title">Рекомендую / Не рекомендую</div>
+              <div className="rc-head-right">
+                <div className="rc-nav-inline">
+                  <button className={activeNav === "latest" ? "active" : ""} onClick={() => mineTab("all", "latest")}>
+                    Последние публикации
+                  </button>
+                  <button className={activeNav === "mine" ? "active" : ""} onClick={() => mineTab("mine", "mine")}>
+                    Мои публикации
+                  </button>
+                </div>
+                <button className="rc-addbtn" onClick={openNewForm}>
+                  ＋ Поделиться опытом
+                </button>
+              </div>
+            </div>
             <div className="rc-desc">Личный опыт жителей Сахалина об организациях, компаниях, сервисах и местах.</div>
-            {/* П.1 (2026-09-24): кнопка «＋ Поделиться опытом» — ТОЛЬКО в левой
-                колонке; из центральной убрана (была .rc-newbtn — дубль). */}
             {/* Простой поиск: субъект, заголовок и текст, частичное совпадение */}
             <div className="rc-search">
               <input
