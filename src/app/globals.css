@@ -1983,6 +1983,50 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .rc-search input{
   background:#ffffff !important;
 }
+
+/* 29.09.2026: блок-легенда «Цвета карточек» в левой колонке.
+   Стили для свотчей (цветных квадратиков) и пояснений. */
+.rc-legend{font-size:13px;line-height:1.5;color:#3d4a5c}
+.rc-legend-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:9px}
+.rc-legend-row:last-of-type{margin-bottom:6px}
+.rc-legend-swatch{
+  flex:0 0 24px;
+  width:24px;
+  height:24px;
+  border-radius:3px;
+  border:1px solid #b6c2d1;
+  margin-top:1px;
+  display:inline-block;
+}
+.rc-legend-swatch.swatch-positive{
+  background:#ecfdf5;
+  border-left:4px solid #10b981;
+  border-color:#10b981;
+}
+.rc-legend-swatch.swatch-negative{
+  background:#fef2f2;
+  border-left:4px solid #ef4444;
+  border-color:#ef4444;
+}
+.rc-legend-swatch.swatch-resolved{
+  background:#e0f2fe;
+  border:1px solid #0284c7;
+  color:#075985;
+  font-weight:700;
+  font-size:13px;
+  text-align:center;
+  line-height:22px;
+}
+.rc-legend-swatch.swatch-resolved::before{content:"✓"}
+.rc-legend-note{
+  margin:8px 0 0;
+  padding-top:7px;
+  border-top:1px solid #e2e8f0;
+  color:#56657a;
+  font-size:12px;
+  line-height:1.5;
+}
+.rc-legend b{color:#1e293b}
 .rc-sideblock{background:#fff;border:1px solid #d9dee5;margin-bottom:12px;padding:9px 10px}
 .rc-blocktitle{color:#3d4a5c;border-bottom:1px solid #e4e8ee;margin-bottom:7px;padding-bottom:5px;font-size:13px;font-weight:700}
 .rc-navlist{margin:0;padding:0;list-style:none}

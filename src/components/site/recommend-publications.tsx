@@ -24,11 +24,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import SakhDatetimeBlock from "@/components/site/sakh-datetime-block";
-import { SakhMatrixReviewCard } from "@/components/site/sakh-matrix-review-card";
-import { SakhMatrixResolutionSimulator } from "@/components/site/sakh-matrix-resolution-simulator";
 import type { ForumUser } from "@/lib/ui";
 import { discussOnForum } from "@/lib/discuss";
-import { DEMO_REVIEW_ENTRIES } from "@/components/site/review-demo-data";
 import { nickGenderClass } from "@/lib/nick-gender";
 
 interface RecItem {
@@ -1255,6 +1252,41 @@ export function RecommendPage(props: {
               </div>
             </div>
           </div>
+
+          {/* 29.09.2026: блок «Цвета карточек» — пояснение для посетителей
+              сайта, что означают зелёная/красная рамка и голубой бейдж.
+              В едином стиле с блоком «Время» (.sakh-clock), как «О разделе»
+              и «Правила раздела». */}
+          <div className="sakh-clock rc-clock-block rc-clock-legend">
+            <div className="sakh-clock-head">🎨 Цвета карточек</div>
+            <div className="sakh-clock-body sakh-clock-body-content">
+              <div className="rc-legend">
+                <div className="rc-legend-row">
+                  <span className="rc-legend-swatch swatch-positive" />
+                  <div>
+                    <b>Зелёная рамка</b> — автор <b>рекомендует</b> организацию (положительный отзыв: «👍 Рекомендую»).
+                  </div>
+                </div>
+                <div className="rc-legend-row">
+                  <span className="rc-legend-swatch swatch-negative" />
+                  <div>
+                    <b>Красная рамка</b> — автор <b>не рекомендует</b> (отрицательный отзыв: «👎 Не рекомендую»). Критика разрешена — это суть раздела.
+                  </div>
+                </div>
+                <div className="rc-legend-row">
+                  <span className="rc-legend-swatch swatch-resolved" />
+                  <div>
+                    <b>Голубой бейдж «✓ Решено»</b> — автор отметил, что проблема решена. Может стоять как на зелёной, так и на красной карточке.
+                  </div>
+                </div>
+                <p className="rc-legend-note">
+                  Позиция отзыва («Рекомендую» или «Не рекомендую») выбирается автором при создании и не меняется.
+                  Отметить «Вопрос решён» может только сам автор своего отзыва.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* ТЗ 2026-09-22: точка входа в «Кабинет представителя организации» (/kabinet,
               разметка .matrix-business-cabinet) — только для подтверждённых orgRep.
               Точка входа — задокументированная импровизация (в макете заказчика не указана). */}
@@ -1334,34 +1366,12 @@ export function RecommendPage(props: {
           {items === null && !error && <div className="rc-empty">Загрузка…</div>}
           {error && <div className="sk-error">{error}</div>}
 
-          {/* ТЗ 2026-09-22 (раунд 2): демо-записи заказчика (sakh-001…003) —
-              присланный компонент SakhMatrixReviewCard 1-в-1, статичные карточки
-              в начале ленты; только в основном виде (вне «Мои публикации» и
-              поиска). ТЗ 2026-09-24 (пользователь): «Обсудить на форуме»
-              перенесена ВНУТРЬ карточки (SakhMatrixReviewCard рендерит её сама,
-              .rc-demo-forumrow.rc-in) — внешний ряд-дубль под карточкой убран. */}
-          {items !== null && !error && tab !== "mine" && !searching &&
-            DEMO_REVIEW_ENTRIES.map((entry) => (
-              <SakhMatrixReviewCard key={entry.id} review={entry} />
-            ))}
-
-          {/* ТЗ 2026-09-22: симулятор логики примирения SakhMatrixResolutionSimulator
-              (sakh-matrix-resolution-simulator.tsx, прислан 1-в-1, Tailwind) —
-              демонстрация сценария sakh-001: статус warning → перевод в «Вопрос
-              закрыт» (ТЗ №2, Пункт 4) и системный дисклеймер (Пункт 7).
-              Точка монтирования — задокументированная импровизация: в присланном
-              коде место размещения не указано; симулятор самодостаточен (данные
-              и состояние внутри компонента, без пропсов и записи в БД), поэтому
-              показан в демо-зоне ленты сразу после демо-записей, в том же режиме
-              видимости (вне «Мои публикации» и поиска). Интерактивные кнопки —
-              часть присланного кода: «Обсудить проблему на форуме» имитирует
-              создание ветки (локальное состояние, без записи в БД — «В реальном
-              движке здесь будет редирект или создание wp_post» — комментарий
-              заказчика), «Ошибка исправлена / Претензий нет» переводит карточку
-              в resolved локально. Сброс состояния — перезагрузкой страницы. */}
-          {items !== null && !error && tab !== "mine" && !searching && (
-            <SakhMatrixResolutionSimulator />
-          )}
+          {/* 29.09.2026: 4 демо-карточки (DEMO_REVIEW_ENTRIES → SakhMatrixReviewCard)
+              и симулятор примирения (SakhMatrixResolutionSimulator) УБРАНЫ со
+              страницы по запросу пользователя — они не имели цветной рамки и
+              путали визуал (выглядело как «неподсвеченные сообщения»).
+              Теперь лента начинается сразу с реальных публикаций из БД
+              (RecRow — с зелёной/красной рамкой по позиции автора). */}
 
           {items !== null && !error && list.length === 0 && (
             <div className="rc-empty">
