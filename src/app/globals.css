@@ -1958,6 +1958,31 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 }
 .rc-nav-inline button:hover{color:#c40000}
 .rc-nav-inline button.active{color:#1a1a1a;font-weight:700;text-decoration:none}
+
+/* 29.09.2026 (правки страницы /rekomenduyu):
+   1. Блоки «О разделе» (в левой колонке) и «Правила раздела» (в правой)
+      оформлены в дизайне блока «Время» (.sakh-clock). Override body
+      для многострочного контента — аналог .cd-clock-block / .wb-clock-block.
+   2. Поле поиска .rc-search input — белый фон (#ffffff), чтобы было
+      видно и не сливалось с фоном страницы. */
+.rc-clock-block .sakh-clock-body-content{
+  height:auto !important;
+  align-items:stretch !important;
+  justify-content:flex-start !important;
+  padding:9px 10px !important;
+  text-align:left !important;
+}
+.rc-clock-block .rc-info,
+.rc-clock-block .rc-keyrule,
+.rc-clock-block .rc-ruleslist,
+.rc-clock-block .rc-rulesnote{
+  text-align:left;
+}
+
+/* Белый фон поискового поля — по запросу пользователя (29.09.2026). */
+.rc-search input{
+  background:#ffffff !important;
+}
 .rc-sideblock{background:#fff;border:1px solid #d9dee5;margin-bottom:12px;padding:9px 10px}
 .rc-blocktitle{color:#3d4a5c;border-bottom:1px solid #e4e8ee;margin-bottom:7px;padding-bottom:5px;font-size:13px;font-weight:700}
 .rc-navlist{margin:0;padding:0;list-style:none}

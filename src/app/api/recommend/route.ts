@@ -43,7 +43,9 @@ const PAGE_SIZE_MAX = 50;
 /** Разумное ограничение частоты публикации — не мешает обычному пользователю. */
 const CREATE_LIMIT_PER_HOUR = 6;
 
-/** Публичный вид публикации (ТЗ 2026-09-21: + выделение человека, официальный ответ, полезность). */
+/** Публичный вид публикации (ТЗ 2026-09-21: + выделение человека, официальный ответ, полезность).
+ *  29.09.2026: добавлен authorGender — для покраски ника по полу автора
+ *  (как в форуме, через nickGenderClass(name, profileGender)). */
 function publicShape(p: {
   id: string;
   subject: string;
@@ -61,6 +63,7 @@ function publicShape(p: {
   createdAt: Date;
   topicId: number | null;
   _count?: { usefulVotes: number };
+  author?: { gender: string | null } | null;
 }) {
   return {
     id: p.id,
@@ -75,6 +78,7 @@ function publicShape(p: {
     orgResponseByName: p.orgResponseByName,
     authorId: p.authorId,
     authorName: p.authorName,
+    authorGender: p.author?.gender ?? "unspecified",
     editedAt: p.editedAt,
     createdAt: p.createdAt,
     topicId: p.topicId,
@@ -161,7 +165,7 @@ export async function GET(req: NextRequest) {
         where: { authorId: user.id, isDeleted: false },
         orderBy: [{ createdAt: "desc" }, { id: "desc" }],
         take: 300,
-        include: { _count: { select: { usefulVotes: true } } },
+        include: { _count: { select: { usefulVotes: true } }, author: { select: { gender: true } } },
       });
       rows.sort(feedOrder);
       const topicIds = [...new Set(rows.map((r) => r.topicId).filter((v): v is number => v != null))];
@@ -186,11 +190,12 @@ export async function GET(req: NextRequest) {
     }
 
     // Публичная лента. Поиск поддерживает частичное совпадение и русский регистр.
+    // 29.09.2026: добавлен author.gender — для покраски ника по полу автора.
     const rows = await db.recPost.findMany({
       where: { isDeleted: false, isHiddenByAi: false },
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       take: 1000,
-      include: { _count: { select: { usefulVotes: true } } },
+      include: { _count: { select: { usefulVotes: true } }, author: { select: { gender: true } } },
     });
     const filtered = rows.filter((r) => matchesQuery(r, q) && matchesPlace(r, place));
     filtered.sort(feedOrder);
