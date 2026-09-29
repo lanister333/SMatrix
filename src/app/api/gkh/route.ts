@@ -75,6 +75,9 @@ function publicShape(p: {
   updateCount: number;
   isMerged?: boolean;
   mergedIntoId?: string | null;
+  orgResponseText?: string;
+  orgResponseAt?: Date | null;
+  orgResponseByName?: string;
 }) {
   return {
     id: p.id,
@@ -97,6 +100,9 @@ function publicShape(p: {
     updateCount: p.updateCount,
     isMerged: p.isMerged ?? false,
     mergedIntoId: p.mergedIntoId ?? null,
+    orgResponseText: p.orgResponseText ?? "",
+    orgResponseAt: p.orgResponseAt ?? null,
+    orgResponseByName: p.orgResponseByName ?? "",
   };
 }
 

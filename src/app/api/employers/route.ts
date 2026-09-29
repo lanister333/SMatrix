@@ -56,6 +56,9 @@ function publicShape(p: {
   editedAt: Date | null;
   createdAt: Date;
   topicId: number | null;
+  orgResponseText?: string;
+  orgResponseAt?: Date | null;
+  orgResponseByName?: string;
 }) {
   return {
     id: p.id,
@@ -69,6 +72,9 @@ function publicShape(p: {
     editedAt: p.editedAt,
     createdAt: p.createdAt,
     topicId: p.topicId,
+    orgResponseText: p.orgResponseText ?? "",
+    orgResponseAt: p.orgResponseAt ?? null,
+    orgResponseByName: p.orgResponseByName ?? "",
   };
 }
 

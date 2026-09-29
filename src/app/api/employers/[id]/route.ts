@@ -21,7 +21,7 @@ import { EP_EMPLOYER_HINT } from "@/lib/employers";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-const ACTIONS = new Set(["edit", "delete"]);
+const ACTIONS = new Set(["edit", "delete", "orgResponse"]);
 
 /**
  * ТЗ 2026-09-24 «Обсудить на форуме из трудового опыта»: публичный GET
@@ -88,6 +88,32 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     const post = await db.empPost.findUnique({ where: { id } });
     if (!post || post.isDeleted) {
       return NextResponse.json({ error: "Карточка опыта не найдена" }, { status: 404 });
+    }
+
+    // 29.09.2026: «🏢 Ответ организации» — ПРОВЕРЯЕМ ДО авторской проверки,
+    // т.к. ответ даёт org rep (НЕ автор). Если поставить после проверки
+    // авторства — org rep получит 403 и не сможет ответить.
+    if (action === "orgResponse") {
+      if (!user.orgRep) {
+        return NextResponse.json({ error: "Ответ организации может дать только подтверждённый представитель" }, { status: 403 });
+      }
+      if (post.authorId === user.id) {
+        return NextResponse.json({ error: "Нельзя отвечать на свою же публикацию" }, { status: 403 });
+      }
+      const text = String(body.text ?? "").trim();
+      if (text.length < 10) {
+        return NextResponse.json({ error: "Текст ответа: от 10 символов" }, { status: 400 });
+      }
+      await db.empPost.update({
+        where: { id },
+        data: {
+          orgResponseText: text.slice(0, 4000),
+          orgResponseAt: new Date(),
+          orgResponseById: user.id,
+          orgResponseByName: user.orgName || user.nickname,
+        },
+      });
+      return NextResponse.json({ ok: true, note: "Официальный ответ опубликован" });
     }
 
     // Редактировать и удалять может только автор.

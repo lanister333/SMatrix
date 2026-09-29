@@ -498,15 +498,51 @@ export function EmployersPage(props: {
                     + personMention (новые поля Flat 2.0, не legacy title/text).
                   */}
                   <div className="ep-card-foot">
-                    <button
-                      type="button"
-                      className={`ep-btn-forum is-${state}`}
-                      data-ep-card-forum={it.id}
-                      onClick={() => discussOnForum("employers", it.id, props.token, props.onNeedAuth)}
-                      title="Создать тему обсуждения в рубрике «Карьера, бизнес ▸ Работодатели»"
-                    >
-                      {forumButtonLabel(it.topicId ? it.topicState : "none")}
-                    </button>
+                    {/* 29.09.2026: орг. ответ (если уже есть) — показываем текстом */}
+                    {it.orgResponseText ? (
+                      <div style={{ padding: "6px 8px", background: "#e0f2fe", border: "1px solid #0284c7", borderRadius: "2px", marginBottom: "6px", fontSize: "13px" }}>
+                        <b style={{ color: "#075985" }}>🏢 Официальный ответ организации</b>
+                        {it.orgResponseByName ? <span style={{ color: "#56657a" }}> · {it.orgResponseByName}</span> : null}
+                        <p style={{ margin: "4px 0 0", color: "#1a2433" }}>{it.orgResponseText}</p>
+                      </div>
+                    ) : null}
+                    <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
+                      <button
+                        type="button"
+                        className={`ep-btn-forum is-${state}`}
+                        data-ep-card-forum={it.id}
+                        onClick={() => discussOnForum("employers", it.id, props.token, props.onNeedAuth)}
+                        title="Создать тему обсуждения в рубрике «Карьера, бизнес ▸ Работодатели»"
+                      >
+                        {forumButtonLabel(it.topicId ? it.topicState : "none")}
+                      </button>
+                      {/* 29.09.2026: кнопка «🏢 Ответ организации» — для org rep,
+                          не автора, если ответа ещё нет. Рядом с форумом. */}
+                      {props.user?.orgRep && props.user.id !== it.authorId && !it.orgResponseText && props.token ? (
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            const text = window.prompt("Введите официальный ответ организации:");
+                            if (!text || text.trim().length < 10) { props.notify("Текст ответа: от 10 символов"); return; }
+                            try {
+                              const r = await fetch(`/api/employers/${it.id}`, {
+                                method: "PATCH",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ token: props.token, action: "orgResponse", text: text.trim() }),
+                              });
+                              const d = await r.json();
+                              if (!r.ok) { props.notify(d.error || "Ошибка"); return; }
+                              props.notify(d.note || "Ответ опубликован");
+                              load();
+                            } catch { props.notify("Сеть недоступна"); }
+                          }}
+                          title="Официальный ответ организации — виден только представителю, ровно один ответ"
+                          style={{ cursor: "pointer", background: "#e0f2fe", border: "1px solid #0284c7", color: "#075985", padding: "5px 12px", fontFamily: "inherit", fontSize: "12.5px", fontWeight: 700, whiteSpace: "nowrap", borderRadius: "2px" }}
+                        >
+                          🏢 Ответ организации
+                        </button>
+                      ) : null}
+                    </div>
                   </div>
                 </article>
               );
