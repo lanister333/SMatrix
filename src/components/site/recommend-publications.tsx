@@ -379,6 +379,15 @@ function RecRow(props: {
   // Форма официального ответа: только подтверждённый представитель организации,
   // не автор отзыва, пока ответа нет (Пункт 13 — ответ ровно один).
   const canRespond = !!(user?.orgRep && !own && !hasResponse);
+
+  // 29.09.2026 (правка 3): «Ответ организации» — КНОПКА в actrow рядом с
+  // «Обсудить на форуме». Видна только если тема НЕ закрыта. По клику
+  // открывается форма RecOrgResponseForm (toggle).
+  const [orgFormOpen, setOrgFormOpen] = useState(false);
+  // Тема закрыта / в архиве — кнопка «Ответ организации» пропадает.
+  const topicClosed = item.topicState === "closed" || item.topicState === "archived";
+  const canRespondAndOpenTopic = canRespond && !topicClosed;
+
   return (
     <article
       className={`matrix-review-card ${notrecommend ? "type-negative" : "type-positive"}${props.highlight ? " rc-highlight" : ""}`}
@@ -448,13 +457,20 @@ function RecRow(props: {
           </div>
         </div>
       )}
-      {canRespond && props.token && (
+      {/* 29.09.2026 (правка 3): форма ответа организации — открывается
+          по кнопке «Ответ организации» (рядом с «Обсудить на форуме»),
+          а не показывается всегда. Кнопка видна только если тема НЕ
+          закрыта (topicState !== closed/archived). */}
+      {canRespondAndOpenTopic && orgFormOpen && props.token && (
         <RecOrgResponseForm
           item={item}
           token={props.token}
           orgName={user?.orgName ?? ""}
           busy={props.busy}
-          onDone={props.onOrgDone}
+          onDone={(msg) => {
+            setOrgFormOpen(false);
+            props.onOrgDone(msg);
+          }}
         />
       )}
 
@@ -510,40 +526,21 @@ function RecRow(props: {
         </div>
       )}
 
-      {/* ТЗ 2026-09-24 (пользователь): основной ряд — «Пожаловаться»
-          (бордовый, НЕ автору) СЛЕВА, рядом с бирюзовой «💬 Обсудить на
-          форуме» — две голосовые кнопки «Рекомендую»/«Не рекомендую»
-          (заменили «Полезный отзыв», который удалён); у автора своего
-          отзыва голосовых кнопок нет (позиция — плашка статуса). */}
+      {/* 29.09.2026 (правка 1): кнопки голосования «👍 Рекомендую» /
+          «👎 Не рекомендую» УБРАНЫ — оценку (позицицию «Рекомендую» /
+          «Не рекомендую») может делать только владелец сообщения через
+          кнопки в rc-secrow выше («Сменить на Рекомендую»/«Сменить на
+          Не рекомендую»). Читатели голосовать не могут.
+
+          Правка 3: основной ряд actrow теперь содержит только
+          «Пожаловаться» (слева, не автору) + «💬 Обсудить на форуме»
+          + «Ответ организации» (только для org rep, только если тема
+          НЕ закрыта). */}
       <div className="rc-actrow" data-rc-actrow={item.id}>
         {!own && (
           <button className="rc-report" data-rc-report={item.id} onClick={() => props.onComplain(item)}>
             Пожаловаться
           </button>
-        )}
-        {/* Голоса читателей: один голос на пользователя; повторный клик
-            снимает, соседняя кнопка переключает (API support, kind). */}
-        {!own && (
-          <>
-            <button
-              className={`rc-votebtn rc-vote-yes${item.myVote === "recommend" ? " is-on" : ""}`}
-              data-rc-vote-yes={item.id}
-              disabled={props.busy}
-              title="Согласен с отзывом — рекомендую"
-              onClick={() => props.onVote(item, "recommend")}
-            >
-              👍 Рекомендую ({item.recommendCount ?? 0})
-            </button>
-            <button
-              className={`rc-votebtn rc-vote-no${item.myVote === "notrecommend" ? " is-on" : ""}`}
-              data-rc-vote-no={item.id}
-              disabled={props.busy}
-              title="Не согласен — не рекомендую"
-              onClick={() => props.onVote(item, "notrecommend")}
-            >
-              👎 Не рекомендую ({item.notrecommendCount ?? 0})
-            </button>
-          </>
         )}
         {/* Кнопка состояния форума — ШАГ 20 (максимум одна тема на публикацию);
             на демо-карточке с фиксированным подвалом — ссылка в rc-demo-forumrow. */}
@@ -555,6 +552,23 @@ function RecRow(props: {
             title="Открыть тему обсуждения на форуме"
           >
             {forumButtonLabel(item.topicId ? item.topicState : "none")}
+          </button>
+        )}
+        {/* 29.09.2026 (правка 3): кнопка «Ответ организации» — рядом с
+            «Обсудить на форуме». Видна только для подтверждённого
+            представителя организации (user.orgRep), не автору отзыва,
+            пока ответа нет, И только если тема НЕ закрыта
+            (topicState !== closed/archived). По клику открывает форму
+            ответа организации (RecOrgResponseForm) выше в карточке. */}
+        {canRespondAndOpenTopic && (
+          <button
+            type="button"
+            className="rc-act rc-org-resp-btn"
+            disabled={props.busy}
+            onClick={() => setOrgFormOpen((v) => !v)}
+            title={orgFormOpen ? "Свернуть форму ответа организации" : "Официальный ответ организации — виден только представителю организации, ровно один ответ"}
+          >
+            {orgFormOpen ? "▲ Скрыть форму ответа" : "🏢 Ответ организации"}
           </button>
         )}
       </div>
