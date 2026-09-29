@@ -404,15 +404,20 @@ function RecRow(props: {
         <span className="rc-date">{fmtPubDateTime(item.createdAt)}</span>
         {item.place ? ` · ${item.place}` : ""}
         {item.editedAt && " · изменено автором"}
-        <span className={`matrix-recommend-badge ${notrecommend ? "status-no" : "status-yes"}`}>
-          {notrecommend ? "👎 Не рекомендую" : "👍 Рекомендую"}
-        </span>
-        {/* 29.09.2026: бейдж «✓ Решено» — если автор отметил проблему решённой. */}
-        {item.resolved && (
-          <span className="matrix-recommend-badge status-resolved" title={item.resolvedAt ? `Решено: ${fmtResponseDate(item.resolvedAt)}` : "Отмечено как решённая"}>
-            ✓ Решено
+        {/* 29.09.2026: порядок плашек ИЗМЕНЁН — сначала «✓ Решено»
+            (если есть), потом «👍 Рекомендую» / «👎 Не рекомендую».
+            Обе плашки прижаты к правому краю шапки через
+            .rc-headrow .matrix-recommend-badge { margin-left:auto }. */}
+        <span className="rc-headrow-badges">
+          {item.resolved && (
+            <span className="matrix-recommend-badge status-resolved" title={item.resolvedAt ? `Решено: ${fmtResponseDate(item.resolvedAt)}` : "Отмечено как решённая"}>
+              ✓ Решено
+            </span>
+          )}
+          <span className={`matrix-recommend-badge ${notrecommend ? "status-no" : "status-yes"}`}>
+            {notrecommend ? "👎 Не рекомендую" : "👍 Рекомендую"}
           </span>
-        )}
+        </span>
       </div>
 
       {/* ТЗ: поле суть — «Отзыв: [субъект]», ниже текст личного опыта

@@ -2073,10 +2073,11 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 /* П.1 (2026-09-24): .rc-newbtn снят — кнопка «＋ Поделиться опытом»
    осталась ТОЛЬКО в левой колонке (.rc-addbtn). */
 /* П.3 (2026-09-24): «Найти» — СИНЯЯ как на wb/cd (#0a5caa, белый текст). */
-/* 29.09.2026: поиск поднят выше (margin-bottom 18px — чтобы не соприкасался
-   с первой карточкой), выделен в рамку navy (1px solid #1E3A5F) и
-   подсвечен белым фоном — видно и не сливается с фоном страницы. */
-.rc-search{display:flex;gap:6px;margin-top:9px;margin-bottom:18px;padding:6px;background:#f4f7fb;border:1px solid #1E3A5F;border-radius:3px}
+/* 29.09.2026: внешняя рамка вокруг поиска УБРАНА по запросу
+   пользователя. Поиск теперь без обёртки — просто input + кнопка
+   «Найти» в ряд, без внешней рамки. margin-bottom сохранён, чтобы
+   не соприкасалось с первой карточкой. */
+.rc-search{display:flex;gap:6px;margin-top:9px;margin-bottom:18px}
 .rc-search input{
   background:#ffffff !important;
   border:1px solid #1E3A5F !important;
@@ -5165,6 +5166,11 @@ div[style*="background-color: rgb(0, 74, 143)"] {
 .rc-headrow{color:#52525b;font-size:12.5px;line-height:1.5;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 6px;margin-bottom:6px}
 .rc-headrow b{font-weight:600}
 .rc-headrow .matrix-recommend-badge{margin-left:auto}
+/* 29.09.2026: группа плашек (✓ Решено + 👍 Рекомендую) — обёрнута в
+   .rc-headrow-badges и прижата к правому краю шапки. Плашки идут
+   в порядке: resolved (если есть) → stance. */
+.rc-headrow-badges{margin-left:auto;display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap}
+.rc-headrow-badges .matrix-recommend-badge{margin-left:0}
 .rc-date{white-space:nowrap}
 .rc-q{color:#1a2433;font-size:13.5px;line-height:1.45;margin-top:2px}
 .rc-qlabel{color:#3f3f46;font-weight:600}
