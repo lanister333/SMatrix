@@ -15,20 +15,26 @@
    FLAT_ADS_BOARD в flat-board.tsx); продажа вещей/авто/недвижимости
    исключена (старые коммерческие рубрики сняты). */
 export const AD_RUBRICS: { key: string; label: string }[] = [
+  { key: "give", label: "Отдам даром" },
+  { key: "need", label: "Приму в дар" },
+  { key: "lostfound", label: "Бюро находок" },
+  { key: "barter", label: "Бартер / Обмен" },
+  { key: "pets", label: "В добрые руки" },
+  { key: "ride", label: "Подвезу бесплатно" },
+  /* Legacy коммерческие рубрики — оставлены для совместимости со старыми записями */
   { key: "sell", label: "Продам" },
   { key: "buy", label: "Куплю" },
-  { key: "give", label: "Отдам даром" },
   { key: "services", label: "Услуги" },
   { key: "jobs", label: "Работа" },
   { key: "realty", label: "Недвижимость" },
   { key: "transport", label: "Транспорт" },
   { key: "other", label: "Разное" },
-  /* Legacy-рубрики (бывшая некоммерческая доска) — оставлены для совместимости */
-  { key: "need", label: "Приму в дар / Нужна помощь" },
-  { key: "lostfound", label: "Бюро находок (Потерял / Нашел)" },
 ];
 
 export const AD_RUBRIC_KEYS = new Set(AD_RUBRICS.map((r) => r.key));
+
+/** Активные некоммерческие рубрики (показываются в UI). */
+export const AD_ACTIVE_RUBRICS = ["give", "need", "lostfound", "barter", "pets", "ride"];
 
 export function adRubricLabel(key: string): string {
   return AD_RUBRICS.find((r) => r.key === key)?.label ?? "Разное";

@@ -723,25 +723,23 @@ export const FLAT_DATING_BOARD: FlatBoardProps = {
   publishMode: "direct",
 };
 
-/** Блок «Объявления» — доска объявлений жителей Сахалина (8 рубрик по schema). */
+/** Блок «Объявления» — некоммерческая доска взаимопомощи (6 рубрик). */
 export const FLAT_ADS_BOARD: FlatBoardProps = {
   boardId: "ads",
-  heading: "Объявления — доска жителей Сахалина",
+  heading: "Объявления — некоммерческая доска взаимопомощи",
   tabs: [
-    { key: "sell", label: "Продам" },
-    { key: "buy", label: "Куплю" },
     { key: "give", label: "Отдам даром" },
-    { key: "services", label: "Услуги" },
-    { key: "jobs", label: "Работа" },
-    { key: "realty", label: "Недвижимость" },
-    { key: "transport", label: "Транспорт" },
-    { key: "other", label: "Разное" },
+    { key: "need", label: "Приму в дар" },
+    { key: "lostfound", label: "Бюро находок" },
+    { key: "barter", label: "Бартер / Обмен" },
+    { key: "pets", label: "В добрые руки" },
+    { key: "ride", label: "Подвезу бесплатно" },
   ],
   tabParam: "rubric",
   postKey: "rubric",
   apiPath: "/api/obyavleniya",
   textareaLabel: "Описание и ваши контакты для связи",
   textareaPlaceholder:
-    "Что продаёте/ищете, город, любые удобные вам контакты: WhatsApp, Telegram, телефон или соцсеть.",
+    "Что отдаёте/ищете/обмениваете, город, любые удобные вам контакты: WhatsApp, Telegram, телефон или соцсеть.",
   emptyText: "Объявлений пока нет — ваше может стать первым.",
 };
