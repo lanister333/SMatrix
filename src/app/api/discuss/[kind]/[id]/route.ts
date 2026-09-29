@@ -211,10 +211,14 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ kind: stri
       );
     }
 
-    // Шаг 7: добавляем ссылку-источник в конец текста.
-    const origin = req.nextUrl.origin || "";
-    const sourceUrl = `${origin}${cfg.sourcePath(id)}`;
-    const fullBody = `${topicBody}\n\n— из публикации: ${sourceUrl}`.slice(0, 20000);
+    // Шаг 7: 29.09.2026 — ссылка-источник «— из публикации: ...»
+    // БОЛЬШЕ НЕ ДОБАВЛЯЕТСЯ в текст темы. По запросу пользователя
+    // тема форума должна быть самостоятельной сущностью, без обратной
+    // ссылки на исходную публикацию в разделе.
+    // Раньше здесь было:
+    //   const sourceUrl = `${origin}${cfg.sourcePath(id)}`;
+    //   const fullBody = `${topicBody}\n\n— из публикации: ${sourceUrl}`.slice(0, 20000);
+    const fullBody = topicBody.slice(0, 20000);
 
     // Шаг 8: прогоняем модерацию (как в /api/topics POST).
     const outcome = await moderateNewText(`${title}\n${fullBody}`);
