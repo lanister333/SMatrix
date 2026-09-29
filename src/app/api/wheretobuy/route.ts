@@ -59,6 +59,7 @@ function publicShape(p: {
   answerAuthorName: string;
   answeredAt: Date | null;
   answers?: Array<{ id: string; authorName: string; text: string; createdAt: Date }>;
+  author?: { gender: string | null } | null;
 }) {
   return {
     id: p.id,
@@ -68,6 +69,7 @@ function publicShape(p: {
     status: p.status,
     authorId: p.authorId,
     authorName: p.authorName,
+    authorGender: p.author?.gender ?? "unspecified",
     editedAt: p.editedAt,
     createdAt: p.createdAt,
     topicId: p.topicId,
@@ -140,7 +142,7 @@ export async function GET(req: NextRequest) {
         where: { authorId: user.id, isDeleted: false },
         orderBy: [{ createdAt: "desc" }, { id: "desc" }],
         take: 300,
-        include: { answers: { orderBy: { createdAt: "asc" } } },
+        include: { answers: { orderBy: { createdAt: "asc" } }, author: { select: { gender: true } } },
       });
       rows.sort(feedOrder);
       const topicIds = [...new Set(rows.map((r) => r.topicId).filter((v): v is number => v != null))];
@@ -166,7 +168,7 @@ export async function GET(req: NextRequest) {
       where: { isDeleted: false, isHiddenByAi: false },
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       take: 1000,
-      include: { answers: { orderBy: { createdAt: "asc" } } },
+      include: { answers: { orderBy: { createdAt: "asc" } }, author: { select: { gender: true } } },
     });
     const filtered = rows.filter((r) => matchesQuery(r, q) && matchesPlace(r, place));
     filtered.sort(feedOrder);

@@ -44,6 +44,7 @@ interface WhereToBuyItem {
   status: string; // seeking | found | irrelevant
   authorId: string;
   authorName: string;
+  authorGender?: string | null;
   editedAt: string | null;
   createdAt: string;
   topicId: number | null;
@@ -276,7 +277,7 @@ function WhereToBuyRow(props: {
       {/* ТЗ: шапка карточки — «📍 [Ник] · [Дата] · [Город]». П.7 (2026-09-24):
           ник окрашен по полу, как на форуме (g-male/g-female/g-neutral). */}
       <div className="wb-headrow" data-wb-head={item.id}>
-        📍 <b className={nickGenderClass(item.authorName)}>{item.authorName}</b> · {fmtDateTime(item.createdAt)}
+        📍 <b className={nickGenderClass(item.authorName, item.authorGender)}>{item.authorName}</b> · {fmtDateTime(item.createdAt)}
         {item.place ? ` · ${item.place}` : ""}
         {item.editedAt && " · изменено автором"}
       </div>

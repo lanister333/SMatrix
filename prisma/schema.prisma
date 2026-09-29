@@ -37,6 +37,8 @@ model User {
   recPosts      RecPost[]
   empPosts      EmpPost[]
   adListings    AdListing[]
+  /// 29.09.2026: back-relation для WhereToBuyPost.author (покраска ника).
+  wtbAuthored   WhereToBuyPost[] @relation("WtbAuthor")
 }
 
 model Session {
@@ -335,6 +337,8 @@ model WhereToBuyPost {
   answeredAt       DateTime?
   authorId     String
   authorName   String
+  /// 29.09.2026: relation для подгрузки gender автора (покраска ника по полу).
+  author       User?    @relation("WtbAuthor", fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   topicId      Int?     @unique
   topic        Topic?   @relation(fields: [topicId], references: [id])
   aiStatus     String   @default("ok") // ok | hidden | human
