@@ -789,7 +789,7 @@ export function HelpPage(props: {
         <aside className="hp-col-right right-column">
           <SakhDatetimeBlock />
           <div className="sakh-clock hp-clock-block hp-clock-rules">
-            <div className="sakh-clock-head">📋 Правила публикации</div>
+            <div className="sakh-clock-head">⚠️ Правила публикации</div>
             <div className="sakh-clock-body sakh-clock-body-content">
               <ol className="hp-ruleslist">
                 <li>Раздел предназначен только для бесплатной взаимопомощи.</li>

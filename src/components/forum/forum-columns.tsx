@@ -68,7 +68,7 @@ export default function ForumColumns({ children }: { children: React.ReactNode }
       <aside className="right-column">
         <SakhDatetimeBlock />
         <div className="sakh-clock forum-clock-block forum-clock-rules">
-          <div className="sakh-clock-head">📋 Правила форума</div>
+          <div className="sakh-clock-head">⚠️ Правила форума</div>
           <div className="sakh-clock-body sakh-clock-body-content">
             <div className="forum-keyrule">{FORUM_RULES.intro}</div>
             <ol className="forum-ruleslist">

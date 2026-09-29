@@ -1067,7 +1067,7 @@ export function WhereToBuyPage(props: {
           {/* ТЗ 2026-09-28 (правка 2): «О разделе» убран из правой колонки —
               теперь он в левой. Здесь остаётся только «Правила». */}
           <div className="sakh-clock wb-clock-block wb-clock-rules">
-            <div className="sakh-clock-head">📋 Правила «Где купить»</div>
+            <div className="sakh-clock-head">⚠️ Правила «Где купить»</div>
             <div className="sakh-clock-body sakh-clock-body-content">
               <div className="wb-keyrule">
                 Здесь спрашивают не «где купить вообще», а «где купить вот этот конкретный товар».

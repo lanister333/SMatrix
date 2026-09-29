@@ -817,7 +817,7 @@ export function AdsPage(props: {
       <aside className="ad-col ad-col-right right-column">
         <SakhDatetimeBlock />
         <div className="sakh-clock ad-clock-block ad-clock-rules">
-          <div className="sakh-clock-head">📋 Правила раздела</div>
+          <div className="sakh-clock-head">⚠️ Правила раздела</div>
           <div className="sakh-clock-body sakh-clock-body-content">
             <ol className="ad-rules">
               {ADS_RULES.map((rule, i) => (

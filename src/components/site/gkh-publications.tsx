@@ -589,7 +589,7 @@ export function GkhPage(props: {
       <aside className="right-column">
         <SakhDatetimeBlock />
         <div className="sakh-clock gkh-clock-block gkh-clock-rules" data-gkf-rules="1">
-          <div className="sakh-clock-head">📋 Правила публикации</div>
+          <div className="sakh-clock-head">⚠️ Правила публикации</div>
           <div className="sakh-clock-body sakh-clock-body-content">
             <div className="gkf-keyrule">{GKF_RULES_INTRO}</div>
             <ul className="gkf-rules" data-gkf-rules-list="1">

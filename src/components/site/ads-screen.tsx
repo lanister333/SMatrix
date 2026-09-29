@@ -182,7 +182,7 @@ export default function AdsScreen() {
             <aside className="right-column" data-ads-right="1">
               <SakhDatetimeBlock />
               <div className="sakh-clock ad-clock-block ad-clock-rules" data-ads-rules="1">
-                <div className="sakh-clock-head">📋 Правила раздела</div>
+                <div className="sakh-clock-head">⚠️ Правила раздела</div>
                 <div className="sakh-clock-body sakh-clock-body-content">
                   <ul className="ad-rules" data-ads-rules-list="1">
                     {ADS_RULES.map((r, i) => (

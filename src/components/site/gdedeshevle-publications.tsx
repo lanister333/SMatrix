@@ -1059,7 +1059,7 @@ export function GdedeshevlePage(props: {
           {/* ТЗ 2026-09-28 (правка 2): «О разделе» убран из правой колонки —
               теперь он в левой. Здесь остаётся только «Правила». */}
           <div className="sakh-clock cd-clock-block cd-clock-rules">
-            <div className="sakh-clock-head">📋 Правила «Где дешевле»</div>
+            <div className="sakh-clock-head">⚠️ Правила «Где дешевле»</div>
             <div className="sakh-clock-body sakh-clock-body-content">
               <div className="cd-keyrule">
                 Здесь сравнивают цену конкретного товара, а не спрашивают, где вообще дешевле покупать.

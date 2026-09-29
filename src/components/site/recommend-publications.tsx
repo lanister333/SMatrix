@@ -1438,7 +1438,7 @@ export function RecommendPage(props: {
         <aside className="rc-col-right right-column">
           <SakhDatetimeBlock />
           <div className="sakh-clock rc-clock-block rc-clock-rules">
-            <div className="sakh-clock-head">📋 Правила раздела</div>
+            <div className="sakh-clock-head">⚠️ Правила раздела</div>
             <div className="sakh-clock-body sakh-clock-body-content">
               <div className="rc-keyrule">
                 Здесь делятся личным опытом: одна публикация — одна организация или один сервис, честно и по существу.

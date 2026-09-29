@@ -475,7 +475,7 @@ export default function LoveSakhPage(props: {
       <aside className="right-column">
         <SakhDatetimeBlock />
         <div className="sakh-clock dk-clock-block dk-clock-rules" data-ls-rules="1">
-          <div className="sakh-clock-head">📋 Правила раздела</div>
+          <div className="sakh-clock-head">⚠️ Правила раздела</div>
           <div className="sakh-clock-body sakh-clock-body-content">
             <ul className="dk-rules" data-ls-rules-list="1">
               {LS_RULES.map((r, i) => (

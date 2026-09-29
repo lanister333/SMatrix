@@ -547,7 +547,7 @@ export function EmployersPage(props: {
       <aside className="right-column">
         <SakhDatetimeBlock />
         <div className="sakh-clock ep-clock-block ep-clock-rules" data-ep-rules="1">
-          <div className="sakh-clock-head">📋 Правила публикации</div>
+          <div className="sakh-clock-head">⚠️ Правила публикации</div>
           <div className="sakh-clock-body sakh-clock-body-content">
             <div className="ep-rulesframe" data-ep-rules-frame="1">
               <div className="ep-keyrule">{EP_RULES_INTRO}</div>

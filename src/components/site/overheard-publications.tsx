@@ -697,7 +697,7 @@ export function OverheardPage(props: {
             </div>
           </div>
           <div className="oh-sideblock">
-            <div className="oh-blocktitle">Правила «Подслушано»</div>
+            <div className="oh-blocktitle">⚠️ Правила «Подслушано»</div>
             <ol className="oh-ruleslist">
               {OVERHEARD_RULES.map((r, i) => (
                 <li key={i}>{r}</li>
