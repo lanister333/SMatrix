@@ -282,7 +282,7 @@ export default function CurrencyScreen() {
                     <tr key={b.bank} style={{ borderBottom: "1px solid #CED4DA" }}>
                       {/* КОЛОНКА БАНКА — ужата по ТЗ: шрифт 11.5, иконка 12,
                           gap 3, паддинг 3px 5px; «Россельхозбанк» целиком */}
-                      <td style={{ backgroundColor: "#06cdbd", color: "#fff", fontWeight: 700, padding: "3px 5px", borderRight: "1px solid #1E3A5F", whiteSpace: "nowrap", overflow: "hidden" }}>
+                      <td style={{ backgroundColor: "#8BADC2", color: "#1a2433", fontWeight: 700, padding: "3px 5px", borderRight: "1px solid #1E3A5F", whiteSpace: "nowrap", overflow: "hidden" }}>
                         <span style={{ display: "inline-flex", alignItems: "center", gap: "3px", maxWidth: "100%", fontSize: "11.5px", lineHeight: "21px" }}>
                           <BankIcon bank={b.bank} size={12} />
                           <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{b.bank}</span>
