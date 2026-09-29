@@ -140,47 +140,23 @@ function HelpCard(props: {
         <div className="hp-humannote">Публикация отправлена на дополнительную проверку человеку-модератору.</div>
       )}
 
-      {/* ТЗ 2026-09-23 «Кнопки „Обсудить на форуме“» (п.3/6): переход в
-          рубрику «Товары и услуги ▸ Услуги и специалисты». Статическая
-          ссылка справа, бирюзовая — как у «ЖКХ» и «Знакомств». */}
-      <div className="help-card-foot" data-hp-card-forumrow={item.id}>
-        <a
-          className="hp-btn-forum"
-          data-hp-card-forum={item.id}
-          href={HELP_FORUM_URL}
-          title="Обсудить в рубрике «Товары и услуги ▸ Услуги и специалисты»"
-        >
-          💬 Обсудить на форуме
-        </a>
-      </div>
-
       {(!closed || item.status === "resolved" || own) && (
-        <div className="help-item-footer">
+        <div className="help-item-footer hp-actrow-unified">
           {item.status === "resolved" && (
             <span className="resolved-text">✓ Взаимопомощь оказана</span>
           )}
-          {!closed && (
-            <div className="help-direct-contact">
-              <strong>Связь напрямую:</strong>{" "}
-              <a href="https://wa.me" target="_blank" rel="noreferrer" className="wa-action-link">
-                Написать в WhatsApp
-              </a>
-            </div>
-          )}
+          {/* 29.09.2026: блок «Связь напрямую: Написать в WhatsApp» УБРАН
+              по запросу пользователя. Связь с автором теперь только через
+              кнопку «💬 Обсудить на форуме» (крайняя справа в этом ряду). */}
+
+          {/* Все кнопки в ОДНОЙ строке. Кнопка «💬 Обсудить на форуме» —
+              крайняя справа (margin-left:auto). */}
           <div className="help-sys-actions">
             {own ? (
               closed ? (
-                <>
-                  <button className="hp-act" disabled={props.busy} onClick={() => props.onStatus(item, "reopen")}>
-                    Снова актуально
-                  </button>
-                  <button className="hp-act" disabled={props.busy} onClick={() => props.onEdit(item)}>
-                    Редактировать
-                  </button>
-                  <button className="hp-act hp-del" disabled={props.busy} onClick={() => props.onDelete(item)}>
-                    Удалить
-                  </button>
-                </>
+                <button className="hp-act" disabled={props.busy} onClick={() => props.onStatus(item, "reopen")}>
+                  Снова актуально
+                </button>
               ) : (
                 <>
                   <button className="hp-act" disabled={props.busy} onClick={() => props.onStatus(item, "resolve")}>
@@ -188,12 +164,6 @@ function HelpCard(props: {
                   </button>
                   <button className="hp-act" disabled={props.busy} onClick={() => props.onStatus(item, "irrelevant")}>
                     Неактуально
-                  </button>
-                  <button className="hp-act" disabled={props.busy} onClick={() => props.onEdit(item)}>
-                    Редактировать
-                  </button>
-                  <button className="hp-act hp-del" disabled={props.busy} onClick={() => props.onDelete(item)}>
-                    Удалить
                   </button>
                 </>
               )
@@ -204,7 +174,28 @@ function HelpCard(props: {
                 </button>
               )
             )}
+            {own && (
+              <>
+                <button className="hp-act" disabled={props.busy} onClick={() => props.onEdit(item)}>
+                  Редактировать
+                </button>
+                <button className="hp-act hp-del" disabled={props.busy} onClick={() => props.onDelete(item)}>
+                  Удалить
+                </button>
+              </>
+            )}
           </div>
+
+          {/* Кнопка «💬 Обсудить на форуме» — крайняя справа.
+              margin-left:auto прижимает её к правому краю ряда. */}
+          <a
+            className="hp-btn-forum hp-btn-forum-right"
+            data-hp-card-forum={item.id}
+            href={HELP_FORUM_URL}
+            title="Обсудить в рубрике «Товары и услуги ▸ Услуги и специалисты»"
+          >
+            💬 Обсудить на форуме
+          </a>
         </div>
       )}
     </article>
