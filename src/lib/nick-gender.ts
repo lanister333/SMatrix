@@ -20,16 +20,41 @@
 
 export type NickGender = "male" | "female" | "neutral";
 
-/** Согласные (кириллица; «й» — согласный) + латинские согласные. */
-const CONSONANTS = "бвгджзйклмнпрстфхцчшщbcdfghjklmnpqrstvwxz";
+/** Согласные (кириллица; «й» — согласный) + латинские согласные.
+ *  29.09.2026: добавлен «ь» (мягкий знак) — агентивные существительные
+ *  на «-тель» (любитель, водитель, строитель) — мужского рода. */
+const CONSONANTS = "бвгджзйклмнпрстфхцчшщьbcdfghjklmnpqrstvwxz";
 
-/** Пол по окончанию ника: «…а», «…я» — женский; согласная — мужской; иначе нейтральный. */
+/** Пол по окончанию ника с улучшенной эвристикой (29.09.2026):
+ *  1. Убираем трейлинг не-буквы (цифры, подчёркивания): «автолюбитель74» → «автолюбитель»
+ *  2. Если ЛЮБОЕ слово ника кончается на «а»/«я» → female
+ *     (ловит «мама двоих» → «мама» кончается на «а» → female)
+ *  3. Если последнее слово кончается на согласную (включая «ь») → male
+ *  4. Иначе → neutral */
 export function guessNickGender(name: string): NickGender {
   const s = (name ?? "").trim();
   if (!s) return "neutral";
-  const last = s[s.length - 1].toLowerCase();
-  if (last === "а" || last === "я") return "female";
+
+  // 29.09.2026: убираем трейлинг не-буквы (цифры, подчёркивания, пробелы)
+  const stripped = s.replace(/[^a-zA-Zа-яА-ЯёЁ]+$/, "");
+  if (!stripped) return "neutral";
+
+  // Разбиваем на слова (по пробелам и подчёркиваниям)
+  const words = stripped.split(/[\s_]+/).filter((w) => w.length > 0);
+  if (words.length === 0) return "neutral";
+
+  // 2. Если ЛЮБОЕ слово кончается на «а»/«я» → female
+  //    (мама двоих → «мама» на «а» → female)
+  for (const w of words) {
+    const wl = w[w.length - 1].toLowerCase();
+    if (wl === "а" || wl === "я" || wl === "a") return "female";
+  }
+
+  // 3. Последнее слово — согласная (включая «ь») → male
+  const lastWord = words[words.length - 1];
+  const last = lastWord[lastWord.length - 1].toLowerCase();
   if (CONSONANTS.includes(last)) return "male";
+
   return "neutral";
 }
 
