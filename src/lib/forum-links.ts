@@ -103,7 +103,7 @@ export const SECTION_FORUM: Record<string, SectionForumTarget> = {
 export function sectionDiscussHref(section: string, topicId: number | null | undefined): string {
   if (topicId) return forumTopicHref(topicId);
   const t = SECTION_FORUM[section];
-  return t ? forumCategoryHref(t.rubricSlug) : "/forum";
+  return t ? forumCategoryHref(t.rubricSlug) : "/?view=forum";
 }
 
 /**
@@ -145,7 +145,7 @@ export function sectionDiscussHrefWithPrefill(
   if (topicId) return forumTopicHref(topicId);
 
   const t = SECTION_FORUM[section];
-  if (!t) return "/forum";
+  if (!t) return "/?view=forum";
 
   // Базовый URL рубрики-назначения.
   const base = forumCategoryHref(t.rubricSlug);

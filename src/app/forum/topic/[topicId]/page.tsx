@@ -123,7 +123,7 @@ export default function ForumTopicPage(props: { params: Promise<{ topicId: strin
 
   const goNav = useCallback((k: string) => {
     if (k === "forum") {
-      window.location.href = "/forum";
+      window.location.href = "/?view=forum";
       return;
     }
     if (k === "podslyshano") { window.location.href = "/podslyshano"; return; }
@@ -156,7 +156,7 @@ export default function ForumTopicPage(props: { params: Promise<{ topicId: strin
 
               {resolved && topicId === null && (
                 <div className="sk-empty" data-forum-topic-miss="1">
-                  Тема не найдена. <a href="/forum">Открыть список рубрик форума</a>.
+                  Тема не найдена. <a href="/?view=forum">Открыть главную форума</a>.
                 </div>
               )}
 
@@ -170,13 +170,13 @@ export default function ForumTopicPage(props: { params: Promise<{ topicId: strin
                   backParams=""
                   onJumpDone={() => {}}
                   onBack={() => {
-                    window.location.href = backSlug ? forumCategoryHref(backSlug) : "/forum";
+                    window.location.href = backSlug ? forumCategoryHref(backSlug) : "/?view=forum";
                   }}
                   onGoForumHome={() => {
-                    window.location.href = "/forum";
+                    window.location.href = "/?view=forum";
                   }}
                   onOpenRubric={(r) => {
-                    window.location.href = r ? forumCategoryHref(r.slug) : "/forum";
+                    window.location.href = r ? forumCategoryHref(r.slug) : "/?view=forum";
                   }}
                   onNeedAuth={() => setAuthOpen(true)}
                   onNewTopic={() => {

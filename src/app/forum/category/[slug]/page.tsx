@@ -204,7 +204,7 @@ export default function ForumCategoryPage(props: { params: Promise<{ slug: strin
 
   const goNav = useCallback((k: string) => {
     if (k === "forum") {
-      window.location.href = "/forum";
+      window.location.href = "/?view=forum";
       return;
     }
     if (k === "podslyshano") { window.location.href = "/podslyshano"; return; }
@@ -234,7 +234,7 @@ export default function ForumCategoryPage(props: { params: Promise<{ slug: strin
             <div style={{ margin: "0 auto", maxWidth: 980, padding: "14px 12px 22px" }} data-forum-category="1">
               {/* Хлебные крошки: Форум → [Родитель] → Рубрика */}
               <div className="forum-cat-crumbs" data-forum-crumbs="1">
-                <a href="/forum">Форум</a>
+                <a href="/?view=forum">Форум</a>
                 {found?.parentName && (
                   <>
                   <span className="crumb-sep">→</span>
@@ -253,7 +253,7 @@ export default function ForumCategoryPage(props: { params: Promise<{ slug: strin
 
             {bootDone && !found && (
               <div className="sk-empty" data-forum-category-miss="1">
-                Рубрика не найдена. <a href="/forum">Открыть список рубрик форума</a>.
+                Рубрика не найдена. <a href="/?view=forum">Открыть главную форума</a>.
               </div>
             )}
 
@@ -280,7 +280,7 @@ export default function ForumCategoryPage(props: { params: Promise<{ slug: strin
                 }}
                 onNeedAuth={() => setAuthOpen(true)}
                 onOpenRubric={(r) => {
-                  window.location.href = r ? forumCategoryHref(r.slug) : "/forum";
+                  window.location.href = r ? forumCategoryHref(r.slug) : "/?view=forum";
                 }}
                 onOpenProfile={(n) => {
                   window.location.href = `/?user=${encodeURIComponent(n)}`;
