@@ -21,6 +21,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { AuthModal } from "@/components/forum/modals";
+import ForumColumns from "@/components/forum/forum-columns";
 import { DEFAULT_SETTINGS, isStaffRole, MainNav, Masthead, SiteFooter, useAuth, type SiteSettings } from "@/components/site/chrome";
 import { forumCategoryHref } from "@/lib/forum-links";
 
@@ -85,6 +86,8 @@ export default function ForumIndexPage() {
           <span className="tb-title">Форум — рубрики</span>
         </div>
         <div className="sk-shell">
+          {/* 29.09.2026: 3-колоночный layout форума — ForumColumns. */}
+          <ForumColumns>
           <div style={{ margin: "0 auto", maxWidth: 980, padding: "14px 12px 22px" }} data-forum-index="1">
             <p style={{ color: "#56657a", fontSize: 13.5, lineHeight: 1.55, margin: "0 0 14px" }}>
               Выберите рубрику — откроется список её тем. С каждой страницы сайта кнопка
@@ -149,6 +152,7 @@ export default function ForumIndexPage() {
               </>
             )}
           </div>
+          </ForumColumns>
         </div>
         <SiteFooter settings={settings} />
       </div>

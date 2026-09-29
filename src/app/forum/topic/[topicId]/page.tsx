@@ -24,6 +24,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import TopicView from "@/components/forum/topic-view";
+import ForumColumns from "@/components/forum/forum-columns";
 import { AuthModal, NewTopicModal } from "@/components/forum/modals";
 import { DEFAULT_SETTINGS, isStaffRole, MainNav, Masthead, SiteFooter, useAuth, type SiteSettings } from "@/components/site/chrome";
 import { forumCategoryHref, forumTopicHref } from "@/lib/forum-links";
@@ -145,48 +146,54 @@ export default function ForumTopicPage(props: { params: Promise<{ topicId: strin
           <span className="tb-title">Тема форума</span>
         </div>
         <div className="sk-shell">
-          <div style={{ margin: "0 auto", maxWidth: 980, padding: "14px 12px 22px" }} data-forum-topic-page="1">
-            {!resolved && <div className="sk-empty">Загрузка…</div>}
+          {/* 29.09.2026: 3-колоночный layout форума — единый со всеми
+              страницами сайта. Слева «О форуме», по центру — TopicView,
+              справа Время + «Правила форума». Применимо ко всем страницам
+              форума по запросу пользователя. */}
+          <ForumColumns>
+            <div style={{ margin: "0 auto", maxWidth: 980, padding: "14px 12px 22px" }} data-forum-topic-page="1">
+              {!resolved && <div className="sk-empty">Загрузка…</div>}
 
-            {resolved && topicId === null && (
-              <div className="sk-empty" data-forum-topic-miss="1">
-                Тема не найдена. <a href="/forum">Открыть список рубрик форума</a>.
-              </div>
-            )}
+              {resolved && topicId === null && (
+                <div className="sk-empty" data-forum-topic-miss="1">
+                  Тема не найдена. <a href="/forum">Открыть список рубрик форума</a>.
+                </div>
+              )}
 
-            {resolved && topicId !== null && (
-              <TopicView
-                topicId={topicId}
-                user={user as ForumUser | null}
-                token={token}
-                favorites={favorites}
-                jumpMsg={null}
-                backParams=""
-                onJumpDone={() => {}}
-                onBack={() => {
-                  window.location.href = backSlug ? forumCategoryHref(backSlug) : "/forum";
-                }}
-                onGoForumHome={() => {
-                  window.location.href = "/forum";
-                }}
-                onOpenRubric={(r) => {
-                  window.location.href = r ? forumCategoryHref(r.slug) : "/forum";
-                }}
-                onNeedAuth={() => setAuthOpen(true)}
-                onNewTopic={() => {
-                  if (!user || !token) {
-                    setAuthOpen(true);
-                    return;
-                  }
-                  setNewTopic(true);
-                }}
-                onOpenProfile={(n) => {
-                  window.location.href = `/?user=${encodeURIComponent(n)}`;
-                }}
-                notify={notify}
-              />
-            )}
-          </div>
+              {resolved && topicId !== null && (
+                <TopicView
+                  topicId={topicId}
+                  user={user as ForumUser | null}
+                  token={token}
+                  favorites={favorites}
+                  jumpMsg={null}
+                  backParams=""
+                  onJumpDone={() => {}}
+                  onBack={() => {
+                    window.location.href = backSlug ? forumCategoryHref(backSlug) : "/forum";
+                  }}
+                  onGoForumHome={() => {
+                    window.location.href = "/forum";
+                  }}
+                  onOpenRubric={(r) => {
+                    window.location.href = r ? forumCategoryHref(r.slug) : "/forum";
+                  }}
+                  onNeedAuth={() => setAuthOpen(true)}
+                  onNewTopic={() => {
+                    if (!user || !token) {
+                      setAuthOpen(true);
+                      return;
+                    }
+                    setNewTopic(true);
+                  }}
+                  onOpenProfile={(n) => {
+                    window.location.href = `/?user=${encodeURIComponent(n)}`;
+                  }}
+                  notify={notify}
+                />
+              )}
+            </div>
+          </ForumColumns>
         </div>
         <SiteFooter settings={settings} />
       </div>

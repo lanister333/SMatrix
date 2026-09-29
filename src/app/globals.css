@@ -32,6 +32,31 @@
 :root{--sm-turquoise:#06cdbd;--sm-turquoise-dark:#05a79b;--sm-turquoise-vivid:#00b3a4;--sm-navy:#1e3a5f;--sm-navy-deep:#16293f;--sm-paper:#E8EAEB;--sm-ink:#1a2433;--sm-rail:#249790}
 
 .sm-page{background:var(--sm-paper);color:var(--sm-ink);font-size:16px;line-height:1.55}
+
+/* 29.09.2026: 3-колоночный layout форума (forum-columns.tsx).
+   Те же правила что у .cd-clock-block / .wb-clock-block / .rc-clock-block:
+   override .sakh-clock-body для многострочного контента. */
+.forum-clock-block .sakh-clock-body-content{
+  height:auto !important;
+  align-items:stretch !important;
+  justify-content:flex-start !important;
+  padding:9px 10px !important;
+  text-align:left !important;
+}
+.forum-clock-block .forum-info,
+.forum-clock-block .forum-keyrule,
+.forum-clock-block .forum-ruleslist,
+.forum-clock-block .forum-rulesnote{
+  text-align:left;
+}
+.forum-info{color:#3d4a5c;font-size:13px;line-height:1.55}
+.forum-info p{margin:0 0 7px}
+.forum-info p:last-child{margin-bottom:0}
+.forum-info b{color:#1e293b}
+.forum-keyrule{color:#0a4fa8;background:#eef6fb;border:1px solid #9cc0dd;border-radius:2px;margin-bottom:8px;padding:7px 9px;font-size:13.5px;font-weight:700;line-height:1.5}
+.forum-ruleslist{color:#3d4a5c;margin:0;padding:0 0 0 18px;font-size:13px;line-height:1.55}
+.forum-ruleslist li{margin-bottom:4px}
+.forum-rulesnote{color:#56657a;margin-top:7px;font-size:12px;line-height:1.5}
 html,body{overflow-x:clip}
 /* ЗАДАЧА 14 (рестайл ПК), Шаг 3.1: подложка сайта — мягкий светло-серый
    вместо белого (var(--sm-paper) обновлён; body — страховка

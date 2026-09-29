@@ -22,6 +22,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import TopicList from "@/components/forum/topic-list";
+import ForumColumns from "@/components/forum/forum-columns";
 import { AuthModal, NewTopicModal } from "@/components/forum/modals";
 import { DEFAULT_SETTINGS, isStaffRole, MainNav, Masthead, SiteFooter, useAuth, type SiteSettings } from "@/components/site/chrome";
 import { forumCategoryHref, forumTopicHref } from "@/lib/forum-links";
@@ -226,12 +227,16 @@ export default function ForumCategoryPage(props: { params: Promise<{ slug: strin
           <span className="tb-title">{found ? found.name : "Рубрика форума"}</span>
         </div>
         <div className="sk-shell">
-          <div style={{ margin: "0 auto", maxWidth: 980, padding: "14px 12px 22px" }} data-forum-category="1">
-            {/* Хлебные крошки: Форум → [Родитель] → Рубрика */}
-            <div className="forum-cat-crumbs" data-forum-crumbs="1">
-              <a href="/forum">Форум</a>
-              {found?.parentName && (
-                <>
+          {/* 29.09.2026: 3-колоночный layout форума (как на всех страницах
+              сайта) — ForumColumns: слева «О форуме», по центру контент
+              рубрики, справа Время + «Правила форума». */}
+          <ForumColumns>
+            <div style={{ margin: "0 auto", maxWidth: 980, padding: "14px 12px 22px" }} data-forum-category="1">
+              {/* Хлебные крошки: Форум → [Родитель] → Рубрика */}
+              <div className="forum-cat-crumbs" data-forum-crumbs="1">
+                <a href="/forum">Форум</a>
+                {found?.parentName && (
+                  <>
                   <span className="crumb-sep">→</span>
                   <span>{found.parentName}</span>
                 </>
@@ -283,6 +288,7 @@ export default function ForumCategoryPage(props: { params: Promise<{ slug: strin
               />
             )}
           </div>
+          </ForumColumns>
         </div>
         <SiteFooter settings={settings} />
       </div>
