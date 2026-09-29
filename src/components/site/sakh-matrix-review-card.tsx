@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { forumCategoryHref, SECTION_FORUM } from "@/lib/forum-links";
 
 interface ReviewProps {
@@ -16,15 +16,17 @@ interface ReviewProps {
 export const SakhMatrixReviewCard: React.FC<{ review: ReviewProps }> = ({ review }) => {
   // ТЗ 2026-09-24 (пользователь): карточка — на ВСЮ ширину центральной
   // колонки, окантовка как у блока «SakhMatrix - Время» (1px solid #4A688C,
-  // Flat 2.0), кнопки «Рекомендую»/«Не рекомендую» рядом с «Обсудить на
-  // форуме» и КОМПАКТНЫЕ вертикальные отступы (p-6→p-3, my-6→my-3 и т.д.).
+  // Flat 2.0), КОМПАКТНЫЕ вертикальные отступы (p-6→p-3, my-6→my-3 и т.д.).
   // Маркер .rc-democard — стабильный селектор приёмочных проб.
-  // Голос демо-карточки — локальное состояние (без записи в БД):
-  // повторный клик снимает, соседняя кнопка переключает.
-  const [demoVote, setDemoVote] = useState<null | "recommend" | "notrecommend">(null);
+  //
+  // 29.09.2026: кнопки «👍 Рекомендую» / «👎 Не рекомендую» рядом с
+  // «💬 Обсудить на форуме» УБРАНЫ — голосование читателей упразднено
+  // (см. коммит 6f1fbdf). Оценку (позицию) делает только владелец
+  // сообщения при создании публикации. Демо-карточка теперь показывает
+  // только кнопку «💬 Обсудить на форуме».
   return (
     <div className="rc-democard w-full border border-[#4A688C] bg-white p-3 my-3 font-sans text-zinc-900 tracking-tight antialiased select-none">
-      
+
       {/* 1. ШАПКА КАРТОЧКИ (компакт: mb-4→mb-2) */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
         <div>
@@ -68,7 +70,7 @@ export const SakhMatrixReviewCard: React.FC<{ review: ReviewProps }> = ({ review
       {/* 4. ГЛОБАЛЬНЫЙ СИСТЕМНЫЙ ДИСКЛЕЙМЕР (компакт: mt-5 pt-3 → mt-2 pt-1.5) */}
       <div className="mt-2 text-[11px] leading-normal text-zinc-400 border-t border-zinc-100 pt-1.5">
         <p>
-          * Публикация отражает личный опыт автора <span className="font-semibold">{review.author}</span>. 
+          * Публикация отражает личный опыт автора <span className="font-semibold">{review.author}</span>.
           SakhMatrix не формирует официальный список «плохих» или «хороших» организаций и не является автором данного утверждения. [2]
         </p>
       </div>
@@ -78,7 +80,7 @@ export const SakhMatrixReviewCard: React.FC<{ review: ReviewProps }> = ({ review
         <span className="text-[10px] uppercase tracking-wider text-teal-600 font-bold block mb-1">
           Официальная позиция организации
         </span>
-        
+
         {review.businessResponse ? (
           <div className="bg-teal-50/20 border-l-2 border-teal-600 pl-4 py-1">
             <p className="text-sm italic leading-relaxed text-zinc-600">
@@ -92,28 +94,11 @@ export const SakhMatrixReviewCard: React.FC<{ review: ReviewProps }> = ({ review
         )}
       </div>
 
-      {/* 6. ТЗ 2026-09-24 (пользователь): «Обсудить на форуме» — ВНУТРИ
-          каждого сообщения, рядом с ней — две голосовые кнопки
-          «Рекомендую»/«Не рекомендую» (заменили «Полезный отзыв»); бирюзовая
-          .rc-btn-forum ведёт в рубрику «Товары и услуги ▸ Отзывы и
-          рекомендации» относительным путём /forum/category/… */}
+      {/* 6. ТЗ 2026-09-24: «Обсудить на форуме» — ВНУТРИ каждого сообщения.
+          29.09.2026: голосовые кнопки «Рекомендую»/«Не рекомендую» УБРАНЫ.
+          Бирюзовая .rc-btn-forum ведёт в рубрику «Товары и услуги ▸
+          Отзывы и рекомендации» относительным путём /forum/category/… */}
       <div className="rc-demo-forumrow rc-in">
-        <button
-          type="button"
-          className={`rc-votebtn rc-vote-yes${demoVote === "recommend" ? " is-on" : ""}`}
-          title="Согласен с отзывом — рекомендую"
-          onClick={() => setDemoVote(demoVote === "recommend" ? null : "recommend")}
-        >
-          👍 Рекомендую
-        </button>
-        <button
-          type="button"
-          className={`rc-votebtn rc-vote-no${demoVote === "notrecommend" ? " is-on" : ""}`}
-          title="Не согласен — не рекомендую"
-          onClick={() => setDemoVote(demoVote === "notrecommend" ? null : "notrecommend")}
-        >
-          👎 Не рекомендую
-        </button>
         <a
           className="rc-btn-forum is-none"
           href={forumCategoryHref(SECTION_FORUM.recommend.rubricSlug)}
