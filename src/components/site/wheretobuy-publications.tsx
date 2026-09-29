@@ -321,54 +321,61 @@ function WhereToBuyRow(props: {
 
       <div className="wb-sep" />
 
-      {/* Служебный ряд (мелкий) — ТОЛЬКО авторские статусы/правки.
-          П.2 (2026-09-24): «Пожаловаться» перенесена в основной ряд
-          .wb-actrow — на одну линию с «Ответить»/«Обсудить на форуме»
-          (смотрится слева, кнопки пары — справа). */}
-      {own && (
-      <div className="wb-secrow">
-        {/* ТЗ 2026-09-24 «Вопрос решён»: в актуальном вопросе (Ищу) автор
-            видит «✅ Вопрос решён» — только после подтверждения статус
-            станет «Найдено» и карточка тускнеет; у решённого/неактуального
-            вместо неё — «↩️ Вернуть в актуальные» (возврат в «Ищу»). */}
-        {item.status === "seeking" ? (
+      {/* 29.09.2026: ОДНА строка кнопок для всех (как в /rekomenduyu
+          commit 1a357a4). Раньше было 2 раздельных ряда:
+            .wb-secrow (только владелец): Вопрос решён / Неактуально / Редактировать / Удалить
+            .wb-actrow (общий): Пожаловаться (не владельцу) / Ответить / Обсудить на форуме
+          Теперь всё в одном ряду .wb-actrow.wb-actrow-unified.
+
+          Для ВЛАДЕЛЬЦА:
+            [✅ Вопрос решён / ↩️ Вернуть в актуальные] [Отметить «Неактуально»] [Редактировать] [Удалить] [📍 Ответить] [💬 Обсудить на форуме]
+
+          Для НЕ ВЛАДЕЛЬЦА:
+            [Пожаловаться] [📍 Ответить] [💬 Обсудить на форуме] */}
+
+      {/* ТЗ: внизу карточки — ЕДИНЫЙ ряд кнопок. */}
+      <div className="wb-actrow wb-actrow-unified" data-wb-actrow={item.id}>
+        {/* Кнопки автора — видны только владельцу */}
+        {own && (
           <>
-            <button
-              className="wb-act wb-solvebtn"
-              data-wb-solve={item.id}
-              disabled={props.busy}
-              onClick={() => askSolve(item)}
-            >
-              {SOLVE_BUTTON_LABEL}
+            {/* ТЗ 2026-09-24 «Вопрос решён»: в актуальном вопросе (Ищу) автор
+                видит «✅ Вопрос решён» — только после подтверждения статус
+                станет «Найдено» и карточка тускнеет; у решённого/неактуального
+                вместо неё — «↩️ Вернуть в актуальные». */}
+            {item.status === "seeking" ? (
+              <>
+                <button
+                  className="wb-act wb-solvebtn"
+                  data-wb-solve={item.id}
+                  disabled={props.busy}
+                  onClick={() => askSolve(item)}
+                >
+                  {SOLVE_BUTTON_LABEL}
+                </button>
+                <button className="wb-act wb-statusbtn" disabled={props.busy} onClick={() => props.onStatus(item, "irrelevant")}>
+                  Отметить «Неактуально»
+                </button>
+              </>
+            ) : (
+              <button
+                className="wb-act wb-reopenbtn"
+                data-wb-reopen={item.id}
+                disabled={props.busy}
+                onClick={() => props.onStatus(item, "seeking")}
+              >
+                {REOPEN_BUTTON_LABEL}
+              </button>
+            )}
+            <button className="wb-act" disabled={props.busy} onClick={() => props.onEdit(item)}>
+              Редактировать
             </button>
-            <button className="wb-act wb-statusbtn" disabled={props.busy} onClick={() => props.onStatus(item, "irrelevant")}>
-              Отметить «Неактуально»
+            <button className="wb-act wb-del" disabled={props.busy} onClick={() => props.onDelete(item)}>
+              Удалить
             </button>
           </>
-        ) : (
-          <button
-            className="wb-act wb-reopenbtn"
-            data-wb-reopen={item.id}
-            disabled={props.busy}
-            onClick={() => props.onStatus(item, "seeking")}
-          >
-            {REOPEN_BUTTON_LABEL}
-          </button>
         )}
-        <button className="wb-act" disabled={props.busy} onClick={() => props.onEdit(item)}>
-          Редактировать
-        </button>
-        <button className="wb-act wb-del" disabled={props.busy} onClick={() => props.onDelete(item)}>
-          Удалить
-        </button>
-      </div>
-      )}
 
-      {/* ТЗ: внизу карточки — ДВЕ кнопки в одном ряду:
-          [📍 Ответить] — синяя, [💬 Обсудить на форуме] — бирюзовая.
-          П.2 (2026-09-24): «Пожаловаться» (видна НЕ автору) — в том же
-          ряду СЛЕВА, на одной горизонтальной линии с парой. */}
-      <div className="wb-actrow">
+        {/* Кнопка «Пожаловаться» — только НЕ автору отзыва */}
         {!own && (
           <button className="wb-report" onClick={() => props.onComplain(item)}>
             Пожаловаться

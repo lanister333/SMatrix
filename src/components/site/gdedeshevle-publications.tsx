@@ -319,58 +319,58 @@ function CheapRow(props: {
 
       <div className="cd-sep" />
 
-      {/* Служебный ряд (мелкий) — ТОЛЬКО авторские статусы/правки.
-          П.2 (2026-09-24): «Пожаловаться» перенесена в основной ряд
-          .cd-actrow — на одну линию с «Ответить»/«Обсудить на форуме»
-          (смотрится слева, кнопки пары — справа). */}
-      {own && (
-      <div className="cd-secrow">
-        {/* ТЗ 2026-09-24 «Вопрос решён»: в актуальном вопросе (Сравниваю)
-            автор видит «✅ Вопрос решён» — только после подтверждения
-            статус станет «Цена зафиксирована» и карточка тускнеет;
-            у решённого/неактуального вместо неё — «↩️ Вернуть в
-            актуальные» (возврат в «Сравниваю»). */}
-        {item.status === "comparing" ? (
+      {/* 29.09.2026: ОДНА строка кнопок для всех (как в /rekomenduyu
+          commit 1a357a4 и /gde-kupit). Раньше было 2 раздельных ряда:
+            .cd-secrow (только владелец): Вопрос решён / Нашёл дешевле / Неактуально / Редактировать / Удалить
+            .cd-actrow (общий): Пожаловаться (не владельцу) / Ответить / Обсудить на форуме
+          Теперь всё в одном ряду .cd-actrow.cd-actrow-unified. */}
+
+      <div className="cd-actrow cd-actrow-unified" data-cd-actrow={item.id}>
+        {/* Кнопки автора — видны только владельцу */}
+        {own && (
           <>
-            <button
-              className="cd-act cd-solvebtn"
-              data-cd-solve={item.id}
-              disabled={props.busy}
-              onClick={() => askSolve(item)}
-            >
-              {SOLVE_BUTTON_LABEL}
+            {/* ТЗ 2026-09-24 «Вопрос решён»: в актуальном вопросе (Сравниваю)
+                автор видит «✅ Вопрос решён» — только после подтверждения
+                статус станет «Цена зафиксирована» и карточка тускнеет;
+                у решённого/неактуального вместо неё — «↩️ Вернуть в
+                актуальные» (возврат в «Сравниваю»). */}
+            {item.status === "comparing" ? (
+              <>
+                <button
+                  className="cd-act cd-solvebtn"
+                  data-cd-solve={item.id}
+                  disabled={props.busy}
+                  onClick={() => askSolve(item)}
+                >
+                  {SOLVE_BUTTON_LABEL}
+                </button>
+                <button className="cd-act cd-statusbtn" disabled={props.busy} onClick={() => props.onStatus(item, "cheaper")}>
+                  Отметить «Нашёл дешевле»
+                </button>
+                <button className="cd-act cd-statusbtn" disabled={props.busy} onClick={() => props.onStatus(item, "irrelevant")}>
+                  Отметить «Неактуально»
+                </button>
+              </>
+            ) : (
+              <button
+                className="cd-act cd-reopenbtn"
+                data-cd-reopen={item.id}
+                disabled={props.busy}
+                onClick={() => props.onStatus(item, "comparing")}
+              >
+                {REOPEN_BUTTON_LABEL}
+              </button>
+            )}
+            <button className="cd-act" disabled={props.busy} onClick={() => props.onEdit(item)}>
+              Редактировать
             </button>
-            <button className="cd-act cd-statusbtn" disabled={props.busy} onClick={() => props.onStatus(item, "cheaper")}>
-              Отметить «Нашёл дешевле»
-            </button>
-            <button className="cd-act cd-statusbtn" disabled={props.busy} onClick={() => props.onStatus(item, "irrelevant")}>
-              Отметить «Неактуально»
+            <button className="cd-act cd-del" disabled={props.busy} onClick={() => props.onDelete(item)}>
+              Удалить
             </button>
           </>
-        ) : (
-          <button
-            className="cd-act cd-reopenbtn"
-            data-cd-reopen={item.id}
-            disabled={props.busy}
-            onClick={() => props.onStatus(item, "comparing")}
-          >
-            {REOPEN_BUTTON_LABEL}
-          </button>
         )}
-        <button className="cd-act" disabled={props.busy} onClick={() => props.onEdit(item)}>
-          Редактировать
-        </button>
-        <button className="cd-act cd-del" disabled={props.busy} onClick={() => props.onDelete(item)}>
-          Удалить
-        </button>
-      </div>
-      )}
 
-      {/* ТЗ: внизу карточки — ДВЕ кнопки в одном ряду:
-          [📍 Ответить] — синяя, [💬 Обсудить на форуме] — бирюзовая.
-          П.2 (2026-09-24): «Пожаловаться» (видна НЕ автору) — в том же
-          ряду СЛЕВА, на одной горизонтальной линии с парой. */}
-      <div className="cd-actrow">
+        {/* Кнопка «Пожаловаться» — только НЕ автору отзыва */}
         {!own && (
           <button className="cd-report" onClick={() => props.onComplain(item)}>
             Пожаловаться
