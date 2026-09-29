@@ -716,6 +716,11 @@ model RecPost {
   isDeleted    Boolean  @default(false)
   deletedAt    DateTime?
   editedAt     DateTime?
+  /// 29.09.2026: «Вопрос решён» — автор публикации отмечает, что проблема
+  /// решена (видимость кнопки — только владелец сообщения). После отметки
+  /// карточка визуально помечается решённой (бейдж «✓ Решено»).
+  resolved     Boolean  @default(false)
+  resolvedAt   DateTime?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   complaints   RecComplaint[]

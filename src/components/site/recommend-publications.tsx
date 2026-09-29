@@ -44,6 +44,9 @@ interface RecItem {
    *  Если API не вернул (поля не было до 29.09.2026) — "unspecified",
    *  nickGenderClass использует эвристику по окончанию ника. */
   authorGender?: string | null;
+  /** 29.09.2026: «Вопрос решён» — автор отметил проблему решённой. */
+  resolved?: boolean;
+  resolvedAt?: string | null;
   editedAt: string | null;
   createdAt: string;
   topicId: number | null;
@@ -366,6 +369,7 @@ function RecRow(props: {
   onEdit: (item: RecItem) => void;
   onDelete: (item: RecItem) => void;
   onStance: (item: RecItem, stance: string) => void;
+  onResolve: (item: RecItem, resolved: boolean) => void;
   onComplain: (item: RecItem) => void;
   onVote: (item: RecItem, kind: "recommend" | "notrecommend") => void;
   onOrgDone: (msg: string) => void;
@@ -406,6 +410,12 @@ function RecRow(props: {
         <span className={`matrix-recommend-badge ${notrecommend ? "status-no" : "status-yes"}`}>
           {notrecommend ? "👎 Не рекомендую" : "👍 Рекомендую"}
         </span>
+        {/* 29.09.2026: бейдж «✓ Решено» — если автор отметил проблему решённой. */}
+        {item.resolved && (
+          <span className="matrix-recommend-badge status-resolved" title={item.resolvedAt ? `Решено: ${fmtResponseDate(item.resolvedAt)}` : "Отмечено как решённая"}>
+            ✓ Решено
+          </span>
+        )}
       </div>
 
       {/* ТЗ: поле суть — «Отзыв: [субъект]», ниже текст личного опыта
@@ -475,20 +485,30 @@ function RecRow(props: {
       )}
 
       {/* Служебный ряд автора — как .wb-secrow на «Где купить»: мелкие
-          кнопки позиции/правок ОТДЕЛЬНО от основного ряда. */}
+          кнопки позиции/правок ОТДЕЛЬНО от основного ряда.
+
+          29.09.2026 (правка 2): кнопки «Сменить на «Рекомендую»» и
+          «Сменить на «Не рекомендую»» УБРАНЫ — позиция отзыва
+          фиксируется при создании и не меняется (см. прошлый коммит
+          6f1fbdf — голосование читателей также убрано). Владелец
+          сообщения теперь видит только:
+            ✓ Вопрос решён (или «Снять отметку», если уже решено)
+            Редактировать
+            Удалить */}
       {own && !isFooterFixed && (
         <div className="rc-secrow" data-rc-secrow={item.id}>
-          {/* Позиция (Рекомендую ↔ Не рекомендую) — меняется автором, если опыт изменился. */}
-          {item.stance !== "recommend" && (
-            <button className="rc-act rc-stancebtn" disabled={props.busy} onClick={() => props.onStance(item, "recommend")}>
-              Сменить на «Рекомендую»
-            </button>
-          )}
-          {item.stance !== "notrecommend" && (
-            <button className="rc-act rc-stancebtn" disabled={props.busy} onClick={() => props.onStance(item, "notrecommend")}>
-              Сменить на «Не рекомендую»
-            </button>
-          )}
+          {/* 29.09.2026 (правка 1): «Вопрос решён» — кнопка видна только
+              владельцу сообщения. По клику — PATCH /api/recommend/[id]
+              с action="resolve", resolved=true/false (toggle). Когда
+              resolved=true, на карточке появляется бейдж «✓ Решено». */}
+          <button
+            className={`rc-act rc-resolve-btn${item.resolved ? " is-resolved" : ""}`}
+            disabled={props.busy}
+            onClick={() => props.onResolve(item, !item.resolved)}
+            title={item.resolved ? "Снять отметку «Вопрос решён»" : "Отметить, что проблема решена — кнопка видна только вам"}
+          >
+            {item.resolved ? "↺ Снять отметку «решено»" : "✓ Вопрос решён"}
+          </button>
           <button className="rc-act" disabled={props.busy} onClick={() => props.onEdit(item)}>
             Редактировать
           </button>
@@ -1143,6 +1163,28 @@ export function RecommendPage(props: {
     }
   };
 
+  /** 29.09.2026: «Вопрос решён» — автор отмечает проблему решённой (или
+   *  снимает отметку). Только владелец сообщения (проверяется на сервере
+   *  в PATCH /api/recommend/[id] action="resolve"). */
+  const resolvePost = async (item: RecItem, resolved: boolean) => {
+    setBusy(true);
+    try {
+      const r = await fetch(`/api/recommend/${item.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: props.token, action: "resolve", resolved }),
+      });
+      const d = await r.json();
+      if (!r.ok) throw Error(d.error || "Не удалось обновить статус");
+      props.notify(d.note || (resolved ? "Отмечено как решённая" : "Отметка «решено» снята"));
+      await load();
+    } catch (e) {
+      props.notify(e instanceof Error ? e.message : "Ошибка");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   /** ТЗ 2026-09-24 (пользователь): кнопки «Рекомендую»/«Не рекомендую» рядом
    * с «Обсудить на форуме» (заменили «Полезный отзыв»): один голос на
    * пользователя, повторный клик снимает, соседняя кнопка переключает.
@@ -1346,6 +1388,7 @@ export function RecommendPage(props: {
                 onEdit={openEdit}
                 onDelete={deleteItem}
                 onStance={setStance}
+                onResolve={resolvePost}
                 onComplain={setComplainItem}
                 onVote={vote}
                 onOrgDone={(msg) => {

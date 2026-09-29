@@ -45,7 +45,8 @@ const CREATE_LIMIT_PER_HOUR = 6;
 
 /** Публичный вид публикации (ТЗ 2026-09-21: + выделение человека, официальный ответ, полезность).
  *  29.09.2026: добавлен authorGender — для покраски ника по полу автора
- *  (как в форуме, через nickGenderClass(name, profileGender)). */
+ *  (как в форуме, через nickGenderClass(name, profileGender)).
+ *  29.09.2026: добавлен resolved/resolvedAt — автор отмечает проблему решённой. */
 function publicShape(p: {
   id: string;
   subject: string;
@@ -64,6 +65,8 @@ function publicShape(p: {
   topicId: number | null;
   _count?: { usefulVotes: number };
   author?: { gender: string | null } | null;
+  resolved?: boolean;
+  resolvedAt?: Date | null;
 }) {
   return {
     id: p.id,
@@ -83,6 +86,8 @@ function publicShape(p: {
     createdAt: p.createdAt,
     topicId: p.topicId,
     usefulCount: p._count?.usefulVotes ?? 0,
+    resolved: p.resolved ?? false,
+    resolvedAt: p.resolvedAt ?? null,
   };
 }
 

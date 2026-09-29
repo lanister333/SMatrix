@@ -2115,6 +2115,13 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .matrix-recommend-badge{font-size:13px;font-weight:700;padding:4px 10px;border-radius:6px}
 .matrix-recommend-badge.status-yes{background:#ecfdf5;color:#065f46}
 .matrix-recommend-badge.status-no{background:#fef2f2;color:#991b1b}
+/* 29.09.2026: бейдж «✓ Решено» — автор отметил проблему решённой. */
+.matrix-recommend-badge.status-resolved{background:#e0f2fe;color:#075985;border:1px solid #0284c7}
+/* 29.09.2026: кнопка «✓ Вопрос решён» в служебном ряду автора. */
+.rc-act.rc-resolve-btn{color:#075985;border:1px solid #0284c7;background:#e0f2fe;padding:4px 10px;border-radius:3px}
+.rc-act.rc-resolve-btn:hover{background:#bae6fd}
+.rc-act.rc-resolve-btn.is-resolved{background:#0284c7;color:#fff}
+.rc-act.rc-resolve-btn.is-resolved:hover{background:#0369a1}
 .review-target-object{font-size:18px;font-weight:700;color:#1e293b;margin:0 0 10px 0;line-height:1.35;word-break:break-word;overflow-wrap:anywhere}
 .review-experience-text{font-size:14px;line-height:1.6;color:#334155;margin:0 0 16px 0;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere}
 /* Блок похвалы конкретного человека */

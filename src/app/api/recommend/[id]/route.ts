@@ -21,7 +21,7 @@ import { premoderateReviewText } from "@/lib/moderation/premoderation";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-const ACTIONS = new Set(["edit", "delete", "stance"]);
+const ACTIONS = new Set(["edit", "delete", "stance", "resolve"]);
 const STANCES = new Set(["recommend", "notrecommend"]);
 
 /**
@@ -118,6 +118,22 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
         notrecommend: "Позиция изменена: «Не рекомендую»",
       };
       return NextResponse.json({ ok: true, stance, note: notes[stance] ?? "" });
+    }
+
+    // 29.09.2026: «Вопрос решён» — автор публикации отмечает проблему
+    // решённой (или снимает отметку). Только владелец сообщения (проверка
+    // авторства выше — action разрешён только автору).
+    if (action === "resolve") {
+      const resolved = !!body.resolved;
+      await db.recPost.update({
+        where: { id },
+        data: { resolved, resolvedAt: resolved ? new Date() : null },
+      });
+      return NextResponse.json({
+        ok: true,
+        resolved,
+        note: resolved ? "Отмечено как решённая" : "Отметка «решено» снята",
+      });
     }
 
     // action === "edit"
