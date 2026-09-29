@@ -3420,7 +3420,9 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
 .crt-table thead th{background:#f2f6f9;font-weight:700;line-height:1.2}
 .crt-table thead th b{display:block;font-size:12.5px}
 .crt-table thead th small{display:block;font-weight:400;color:#56657a;font-size:10.5px;margin-top:1px}
-.crt-table tbody th{text-align:left;font-size:13px;background:#f7fafc;font-weight:700;overflow-wrap:anywhere;word-break:break-word}
+/* 29.09.2026: колонка с именами банков покрашена в бирюзовый цвет
+   (var(--sm-turquoise) #06cdbd — фирменная бирюза сайта), белый текст. */
+.crt-table tbody th{text-align:left;font-size:13px;background:#06cdbd;color:#fff;font-weight:700;overflow-wrap:anywhere;word-break:break-word}
 .crt-table td b{display:block;font-size:13.5px;font-variant-numeric:tabular-nums}
 .crt-table td i{display:block;font-style:normal;font-size:11px;color:#56657a;margin-top:1px;font-variant-numeric:tabular-nums}
 .crt-table-split td.is-best{background:#E2F0D9 !important; border-right: 1px solid #1E3A5F !important} /* Зелёный фон + жирная граница не обрывается */
