@@ -256,9 +256,9 @@ export default function CurrencyScreen() {
                       увеличены 12.5→15px bold; вторая строка — только знак
                       и номинал («за 1000» у JPY/KRW; THB — за 1). */}
                   <tr>
-                    <th style={{ backgroundColor: "#E0F5F3", padding: "5px 8px", fontWeight: "bold", fontSize: "13px", color: "#333", borderRight: "1px solid #1E3A5F", textAlign: "center" }}>Банк</th>
+                    <th style={{ backgroundColor: "#D6E4ED", padding: "5px 8px", fontWeight: "bold", fontSize: "13px", color: "#333", borderRight: "1px solid #1E3A5F", textAlign: "center" }}>Банк</th>
                     {CUR_COLS.map((c) => (
-                      <th key={c.key} colSpan={2} style={{ backgroundColor: "#E0F5F3", padding: "5px 8px", fontWeight: "bold", fontSize: "15px", color: "#333", borderRight: c.key !== LAST_CUR_KEY ? "1px solid #1E3A5F" : "1px solid #E0F5F3", textAlign: "center" }}>
+                      <th key={c.key} colSpan={2} style={{ backgroundColor: "#D6E4ED", padding: "5px 8px", fontWeight: "bold", fontSize: "15px", color: "#333", borderRight: c.key !== LAST_CUR_KEY ? "1px solid #1E3A5F" : "1px solid #D6E4ED", textAlign: "center" }}>
                         {c.code}<br />
                         <span style={{ fontSize: "10px", fontWeight: "normal", color: "#666" }}>
                           {c.sign}{c.unit ? ` (${c.unit})` : ""}
@@ -268,11 +268,11 @@ export default function CurrencyScreen() {
                   </tr>
                   {/* СТРОКА 2: КУПИМ / ПРОДАДИМ — компактный ряд */}
                   <tr>
-                    <th style={{ backgroundColor: "#E8FAF8", borderRight: "1px solid #1E3A5F", borderBottom: "1px solid #1E3A5F", padding: "3px 6px" }}></th>
+                    <th style={{ backgroundColor: "#D6E4ED", borderRight: "1px solid #1E3A5F", borderBottom: "1px solid #1E3A5F", padding: "3px 6px" }}></th>
                     {CUR_COLS.map((c) => (
                       <Fragment key={c.key}>
-                        <th style={{ backgroundColor: "#E8FAF8", color: "#2E7D32", fontSize: "9px", fontWeight: "bold", padding: "3px 6px", textAlign: "center", borderBottom: "1px solid #1E3A5F" }}>КУПИМ</th>
-                        <th style={{ backgroundColor: "#E8FAF8", color: "#C62828", fontSize: "9px", fontWeight: "bold", padding: "3px 6px", textAlign: "center", borderRight: c.key !== LAST_CUR_KEY ? "1px solid #1E3A5F" : "none", borderBottom: "1px solid #1E3A5F" }}>ПРОДАДИМ</th>
+                        <th style={{ backgroundColor: "#D6E4ED", color: "#2E7D32", fontSize: "9px", fontWeight: "bold", padding: "3px 6px", textAlign: "center", borderBottom: "1px solid #1E3A5F" }}>КУПИМ</th>
+                        <th style={{ backgroundColor: "#D6E4ED", color: "#C62828", fontSize: "9px", fontWeight: "bold", padding: "3px 6px", textAlign: "center", borderRight: c.key !== LAST_CUR_KEY ? "1px solid #1E3A5F" : "none", borderBottom: "1px solid #1E3A5F" }}>ПРОДАДИМ</th>
                       </Fragment>
                     ))}
                   </tr>
@@ -351,7 +351,7 @@ export default function CurrencyScreen() {
 
           {/* КАЛЬКУЛЯТОР-КОНВЕРТЕР: шапка-полоса var(--sm-navy) во всю
               ширину блока, белый bold по центру; THB в select (за 1 бат). */}
-          <div style={{ marginTop: "15px", padding: "12px", backgroundColor: "#E0F5F3", border: "1px solid #1E3A5F" }}>
+          <div style={{ marginTop: "15px", padding: "12px", backgroundColor: "#D6E4ED", border: "1px solid #1E3A5F" }}>
             <div style={{ margin: "-12px -12px 8px", padding: "8px 12px", backgroundColor: "#1E3A5F", color: "#FFFFFF", fontWeight: "bold", fontSize: "14px", textAlign: "center" }}>Калькулятор-конвертер</div>
             <div style={{ fontSize: "11px", color: "#56657a", marginBottom: "8px" }}>
               Расчёт по лучшему курсу из таблицы выше. JPY и KRW — за 1000 единиц, THB — за 1 бат.
@@ -391,10 +391,10 @@ export default function CurrencyScreen() {
           </div>
 
           {/* «Отделения и кассы банков» — единый фирменный стиль (шапка-
-              полоса #1E3A5F, подложка #E0F5F3, острые углы). ТЗ 2026-09-23
+              полоса #1E3A5F, подложка #D6E4ED, острые углы). ТЗ 2026-09-23
               «Доработка»: состав = ВСЕ 15 банков таблицы (девятка —
               реальные адреса/телефоны ЮС; Т-Банку — честный онлайн-статус). */}
-          <div style={{ marginTop: "15px", padding: "12px", backgroundColor: "#E0F5F3", border: "1px solid #1E3A5F" }}>
+          <div style={{ marginTop: "15px", padding: "12px", backgroundColor: "#D6E4ED", border: "1px solid #1E3A5F" }}>
             <div style={{ margin: "-12px -12px 8px", padding: "8px 12px", backgroundColor: "#1E3A5F", color: "#FFFFFF", fontWeight: "bold", fontSize: "14px", textAlign: "center" }}>Отделения и кассы банков</div>
             {BANK_BRANCHES.map((b, i) => (
               <div key={b.bank} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "5px 0", borderBottom: i < BANK_BRANCHES.length - 1 ? "1px solid #CED4DA" : "none" }}>
