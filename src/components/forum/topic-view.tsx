@@ -908,86 +908,16 @@ export default function TopicView(props: {
         </div>
       </div>
 
-      {/* ШАГ 17 (ТЗ п.4/25.15): ссылка из темы обратно на исходную публикацию «Подслушано Сахалин».
-          Показывается только у тем, созданных из раздела; обычные темы форума не затронуты. */}
-      {topic.overheard ? (
-        <div className="oh-sourcebar">
-          Источник:{" "}
-          <a href={`/podslyshano?post=${(topic.overheard as { id: string }).id}`}>
-            Подслушано Сахалин — «{(topic.overheard as { title: string }).title}»
-          </a>
-        </div>
-      ) : null}
-
-      {/* ШАГ 18 (ТЗ п.12): ссылка из темы обратно на исходный вопрос «Где купить».
-          Показывается только у тем, созданных из раздела; обычные темы форума не затронуты. */}
-      {topic.wheretobuy ? (
-        <div className="wb-sourcebar">
-          Источник:{" "}
-          <a href={`/gde-kupit?post=${(topic.wheretobuy as { id: string }).id}`}>
-            Где купить — «{(topic.wheretobuy as { title: string }).title}»
-          </a>
-        </div>
-      ) : null}
-
-      {/* ШАГ 19 (ТЗ п.14/16): ссылка из темы обратно на проблему «ЖКХ и городские
-          проблемы». Если публикация удалена автором, тема сохраняется — вместо
-          ссылки показывается «Исходная публикация была удалена автором.» (п.16). */}
-      {topic.gkh ? (
-        (topic.gkh as { isDeleted: boolean }).isDeleted ? (
-          <div className="gkh-sourcebar">Исходная публикация была удалена автором.</div>
-        ) : (
-          <div className="gkh-sourcebar">
-            Источник:{" "}
-            <a href={`/gkh?post=${(topic.gkh as { id: string }).id}`}>
-              ЖКХ и городские проблемы — «{(topic.gkh as { title: string }).title}»
-            </a>
-          </div>
-        )
-      ) : null}
-
-      {/* ШАГ 23 (ТЗ п.17): ссылка из темы обратно на исходный вопрос «Где дешевле».
-          Показывается только у тем, созданных из раздела; обычные темы форума не затронуты. */}
-      {topic.gdedeshevle ? (
-        (topic.gdedeshevle as { isDeleted: boolean }).isDeleted ? (
-          <div className="cd-sourcebar">Исходная публикация была удалена автором.</div>
-        ) : (
-          <div className="cd-sourcebar">
-            Источник:{" "}
-            <a href={`/gde-deshevle?post=${(topic.gdedeshevle as { id: string }).id}`}>
-              Где дешевле — «{(topic.gdedeshevle as { title: string }).title}»
-            </a>
-          </div>
-        )
-      ) : null}
-
-      {/* ШАГ 20: ссылка из темы обратно на публикацию «Рекомендую / Не рекомендую». */}
-      {topic.recommend ? (
-        (topic.recommend as { isDeleted: boolean }).isDeleted ? (
-          <div className="rc-sourcebar">Исходная публикация была удалена автором.</div>
-        ) : (
-          <div className="rc-sourcebar">
-            Источник:{" "}
-            <a href={`/rekomenduyu?post=${(topic.recommend as { id: string }).id}`}>
-              Рекомендую / Не рекомендую — «{(topic.recommend as { title: string }).title}»
-            </a>
-          </div>
-        )
-      ) : null}
-
-      {/* ШАГ 25: ссылка из темы обратно на отзыв «О работодателях». */}
-      {topic.employers ? (
-        (topic.employers as { isDeleted: boolean }).isDeleted ? (
-          <div className="ep-sourcebar">Исходная публикация была удалена автором.</div>
-        ) : (
-          <div className="ep-sourcebar">
-            Источник:{" "}
-            <a href={`/o-rabotodatelyah?post=${(topic.employers as { id: string }).id}`}>
-              О работодателях — «{(topic.employers as { title: string }).title}»
-            </a>
-          </div>
-        )
-      ) : null}
+      {/* 29.09.2026: блоки «Источник: ...» со ссылками на исходные публикации
+          УБРАНЫ по запросу пользователя — относится ко всем темам форума,
+          созданным из разделов «Подслушано», «Где купить», «ЖКХ»,
+          «Где дешевле», «Рекомендую / Не рекомендую», «О работодателях».
+          Ранее здесь было 6 отдельных блоков: .oh-sourcebar, .wb-sourcebar,
+          .gkh-sourcebar, .cd-sourcebar, .rc-sourcebar, .ep-sourcebar.
+          Каждый показывал «Источник: [ссылка на раздел — название публикации]»
+          или «Исходная публикация была удалена автором.»
+          Теперь тема форума — самостоятельная сущность без обратной ссылки
+          на исходную карточку. */}
 
       {topic.isArchived && (
         <div className="sk-archive-note">
