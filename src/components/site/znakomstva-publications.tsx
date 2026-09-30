@@ -415,9 +415,10 @@ export default function LoveSakhPage(props: {
                     <span className="dk-card-city" data-ls-card-city={it.id}>
                       {it.place}
                     </span>
-                    <span className="dk-card-nick" data-ls-card-nick={it.id}>
-                      {it.nick || "Аноним"}
-                    </span>
+                    {/* 2026-10-01: раздел «Знакомства» — полностью анонимный.
+                        Ник автора не показывается нигде на странице; только
+                        город и (если есть) статус «Неактуально». ТЗ: на
+                        странице знакомств не должно быть ников. */}
                     {stale && (
                       <span className="dk-status dk-status-stale" data-ls-card-status={it.id}>
                         Неактуально
