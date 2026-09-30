@@ -2418,6 +2418,22 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .ep-guesthint{color:#475569;font-size:13px;line-height:1.5;margin-top:10px}
 /* Карточка трудового факта: белая, тонкая светло-серая рамка (ТЗ Flat 2.0) */
 .ep-card{background:#fff;border:1px solid #d4d4d8;border-radius:0;margin-bottom:10px;padding:10px 12px}
+/* 29.09.2026: цветные карточки как у /rekomenduyu — stance-based border-left. */
+.ep-card.ep-positive{border-left:4px solid #10b981}
+.ep-card.ep-negative{border-left:4px solid #ef4444}
+
+/* 29.09.2026: блок-легенда «Цвета карточек» для /o-rabotodatelyah. */
+.ep-legend{font-size:13px;line-height:1.5;color:#3d4a5c}
+.ep-legend-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:9px}
+.ep-legend-row:last-of-type{margin-bottom:6px}
+.ep-legend-swatch{
+  flex:0 0 24px;width:24px;height:24px;border-radius:3px;
+  border:1px solid #b6c2d1;margin-top:1px;display:inline-block;
+}
+.ep-legend-swatch.swatch-positive{background:#ecfdf5;border-left:4px solid #10b981;border-color:#10b981}
+.ep-legend-swatch.swatch-negative{background:#fef2f2;border-left:4px solid #ef4444;border-color:#ef4444}
+.ep-legend-note{margin:8px 0 0;padding-top:7px;border-top:1px solid #e2e8f0;color:#56657a;font-size:12px;line-height:1.5}
+.ep-legend b{color:#1e293b}
 .ep-card.ep-highlight{background:#fff8dc;outline:2px solid #e8cf6e;transition:background 1.2s ease}
 .ep-card-top{align-items:baseline;display:flex;flex-wrap:wrap;gap:4px 10px}
 .ep-card-place{color:#1a1a1a;font-size:13.5px;font-weight:700}

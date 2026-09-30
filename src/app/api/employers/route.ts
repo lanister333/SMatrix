@@ -59,6 +59,7 @@ function publicShape(p: {
   orgResponseText?: string;
   orgResponseAt?: Date | null;
   orgResponseByName?: string;
+  stance?: string;
 }) {
   return {
     id: p.id,
@@ -69,6 +70,7 @@ function publicShape(p: {
     personMention: p.personMention,
     authorId: p.authorId,
     authorName: p.authorName,
+    stance: p.stance ?? "",
     editedAt: p.editedAt,
     createdAt: p.createdAt,
     topicId: p.topicId,

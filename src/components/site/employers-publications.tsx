@@ -44,6 +44,11 @@ interface EmpItem {
   personMention: string;
   authorId: string;
   authorName: string;
+  /** 29.09.2026: stance — recommend (зелёная карточка) | notrecommend (красная). */
+  stance?: string;
+  orgResponseText?: string;
+  orgResponseAt?: string | null;
+  orgResponseByName?: string;
   editedAt: string | null;
   createdAt: string;
   topicId: number | null;
@@ -323,8 +328,31 @@ export function EmployersPage(props: {
             </div>
           </div>
         </div>
+
+        {/* 29.09.2026: блок «🎨 Цвета карточек» — как на /rekomenduyu. */}
+        <div className="sakh-clock ep-clock-block ep-clock-legend">
+          <div className="sakh-clock-head">🎨 Цвета карточек</div>
+          <div className="sakh-clock-body sakh-clock-body-content">
+            <div className="ep-legend">
+              <div className="ep-legend-row">
+                <span className="ep-legend-swatch swatch-positive" />
+                <div>
+                  <b>Зелёная рамка</b> — автор рекомендует работодателя (положительный опыт работы).
+                </div>
+              </div>
+              <div className="ep-legend-row">
+                <span className="ep-legend-swatch swatch-negative" />
+                <div>
+                  <b>Красная рамка</b> — автор не рекомендует (отрицательный опыт). Критика разрешена — это суть раздела.
+                </div>
+              </div>
+              <p className="ep-legend-note">
+                Раздел фиксирует сухой личный трудовой опыт. Цвет рамки — это позиция автора на момент публикации, основанная на личном опыте.
+              </p>
+            </div>
+          </div>
+        </div>
       </aside>
-      <div className="center-column">
         <div className="ep-head" data-ep-head="1">
           <h1 className="ep-title" data-ep-title="1">
             О работодателях
@@ -471,7 +499,7 @@ export function EmployersPage(props: {
             {list.map((it) => {
               const state = it.topicId ? it.topicState ?? "open" : "none";
               return (
-                <article key={it.id} className={`ep-card${highlightId === it.id ? " ep-highlight" : ""}`} data-ep-card={it.id}>
+                <article key={it.id} className={`ep-card${it.stance === "recommend" ? " ep-positive" : it.stance === "notrecommend" ? " ep-negative" : ""}${highlightId === it.id ? " ep-highlight" : ""}`} data-ep-card={it.id}>
                   <div className="ep-card-top">
                     <span className="ep-card-place" data-ep-card-place={it.id}>
                       📍 {it.employer} ({it.city})
