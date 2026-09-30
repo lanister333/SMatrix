@@ -302,6 +302,11 @@ function TideWaveChart({ tides, nowIso }: { tides: TidesData; nowIso: string }) 
         {nowX !== null && (
           <g>
             <line x1={nowX} x2={nowX} y1={padT} y2={baseY} stroke="#1f3a5f" strokeWidth="1.5" strokeDasharray="3 3" />
+            {/* 2026-10-01: после preserveAspectRatio=\"none\" и max-height:180
+                текст «сейчас» вертикально сжался (8.5px вместо 13.8px до сжатия
+                графика). Возвращаем вертикальный размер через transform
+                scale(1, 1.63) + компенсация позиции по Y. Горизонтальный
+                размер НЕ трогаем — «остальное ничего не менять». */}
             <text
               x={Math.min(Math.max(nowX, padL + 18), W - padR - 18)}
               y={padT - 8}
@@ -309,6 +314,7 @@ function TideWaveChart({ tides, nowIso }: { tides: TidesData; nowIso: string }) 
               fontSize="10"
               fontWeight="700"
               fill="#1f3a5f"
+              transform={`translate(0 ${(padT - 8) * (1 - 1.63)}) scale(1 1.63)`}
             >
               сейчас
             </text>
