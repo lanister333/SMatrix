@@ -183,16 +183,10 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
           },
         });
 
-        // Первое сообщение темы (ТЗ п.14): исходный текст проблемы + ссылка
-        // на публикацию + место и текущий статус.
-        const originPath = `/gkh?post=${problem.id}`;
-        const hostHdr = req.headers.get("host") ?? "";
-        const proto = req.headers.get("x-forwarded-proto") ?? (hostHdr.startsWith("localhost") || hostHdr.startsWith("127.") ? "http" : "https");
-        const originUrl = hostHdr ? `${proto}://${hostHdr}${originPath}` : originPath;
-        const placeLine = problem.place ? `Место: ${problem.place}\n` : "";
-        const dateLine = problem.problemDate ? `Дата обнаружения: ${problem.problemDate}\n` : "";
-        const statusLine = GKH_STATUS_LABELS[problem.status] ?? problem.status;
-        const firstBody = `Проблема из раздела «ЖКХ и городские проблемы»:\n\n«${problem.title}»\n\n${problem.text}\n\n${placeLine}${dateLine}Текущий статус: ${statusLine}\nАвтор публикации: ${problem.authorName}\nОпубликовано: ${new Date(problem.createdAt).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" })}\n\nИсточник: ЖКХ и городские проблемы\n${originUrl}`;
+        // Первое сообщение темы: только заголовок и текст проблемы.
+        // 2026-10-01: ТЗ — убрать все описательные блоки. Тема форума —
+        // самостоятельная сущность, без обратной ссылки на исходную публикацию.
+        const firstBody = `${problem.title}\n\n${problem.text}`.slice(0, 20000);
 
         await tx.message.create({
           data: {

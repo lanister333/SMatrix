@@ -168,14 +168,12 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
           },
         });
 
-        // Первое сообщение темы: исходная публикация + ссылка на источник.
-        const originPath = `/rekomenduyu?post=${post.id}`;
-        const hostHdr = req.headers.get("host") ?? "";
-        const proto = req.headers.get("x-forwarded-proto") ?? (hostHdr.startsWith("localhost") || hostHdr.startsWith("127.") ? "http" : "https");
-        const originUrl = hostHdr ? `${proto}://${hostHdr}${originPath}` : originPath;
-        const placeLine = post.place ? `Место: ${post.place}\n` : "";
-        const stanceLine = post.stance === "notrecommend" ? "Не рекомендую" : "Рекомендую";
-        const firstBody = `Публикация из раздела «Рекомендую / Не рекомендую»:\n\nКого: ${post.subject} (${stanceLine})\n\n«${post.title}»\n\n${post.text}\n\n${placeLine}Автор публикации: ${post.authorName}\nОпубликовано: ${new Date(post.createdAt).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" })}\n\nИсточник: Рекомендую / Не рекомендую\n${originUrl}`;
+        // Первое сообщение темы: только заголовок и текст публикации.
+        // 2026-10-01: ТЗ — убрать все описательные блоки («Публикация из
+        // раздела», «Кого:», «Автор публикации», «Опубликовано»,
+        // «Источник: ...» со ссылкой на исходную публикацию).
+        // Тема форума — самостоятельная сущность, без обратной ссылки.
+        const firstBody = `${post.title}\n\n${post.text}`.slice(0, 20000);
 
         await tx.message.create({
           data: {

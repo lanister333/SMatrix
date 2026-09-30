@@ -141,11 +141,11 @@ export default function ForumCategoryPage(props: { params: Promise<{ slug: strin
           message = d.text || "";
         }
 
-        // Ссылка-источник в конец сообщения — обратная навигация.
-        const origin = typeof window !== "undefined" ? window.location.origin : "";
-        const srcLine = prefillSource ? `\n\n— из публикации: ${origin}${prefillSource}` : "";
+        // 2026-10-01: ТЗ — ссылка-источник «— из публикации: ...» БОЛЬШЕ НЕ
+        // добавляется в конец сообщения. Тема форума — самостоятельная
+        // сущность, без обратной ссылки на исходную карточку.
         setPrefillTitle(title);
-        setPrefillMessage(`${message}${srcLine}`.slice(0, 20000));
+        setPrefillMessage(`${message}`.slice(0, 20000));
       } catch {
         if (!cancelled) setPrefillError("Сеть недоступна — откройте форму вручную");
       } finally {

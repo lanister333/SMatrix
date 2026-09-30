@@ -181,13 +181,10 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
         });
 
         // Первое сообщение темы: исходный вопрос + ссылка на источник (ТЗ п.17/24/25).
-        const originPath = `/gde-deshevle?post=${post.id}`;
-        const hostHdr = req.headers.get("host") ?? "";
-        const proto = req.headers.get("x-forwarded-proto") ?? (hostHdr.startsWith("localhost") || hostHdr.startsWith("127.") ? "http" : "https");
-        const originUrl = hostHdr ? `${proto}://${hostHdr}${originPath}` : originPath;
-        const placeLine = post.place ? `Место: ${post.place}\n` : "";
-        const statusLine = post.status === "comparing" ? "Сравниваю" : post.status === "cheaper" ? "Нашёл дешевле" : "Неактуально";
-        const firstBody = `Вопрос из раздела «Где дешевле»:\n\n«${post.title}»\n\n${post.text}\n\n${placeLine}Статус вопроса: ${statusLine}\nАвтор публикации: ${post.authorName}\nОпубликовано: ${new Date(post.createdAt).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" })}\n\nИсточник: Где дешевле\n${originUrl}`;
+        // Первое сообщение темы: только заголовок и текст публикации.
+        // 2026-10-01: ТЗ — убрать все описательные блоки. Тема форума —
+        // самостоятельная сущность, без обратной ссылки на исходную публикацию.
+        const firstBody = `${post.title}\n\n${post.text}`.slice(0, 20000);
 
         await tx.message.create({
           data: {
