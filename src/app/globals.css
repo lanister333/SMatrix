@@ -1667,9 +1667,12 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .dk-newbtn{cursor:pointer;background:#eef6fb;border:1px solid #9cc0dd;color:#0a5caa;padding:7px 14px;font-family:inherit;font-size:14px;font-weight:700}
 .dk-newbtn:hover{background:#e2eff9}
 .dk-search{display:flex;gap:6px;margin-top:9px}
-.dk-search input{border:1px solid #1E3A5F;flex:1 1 auto;min-width:0;padding:6px 9px;font-family:inherit;font-size:13.5px}
+.dk-search input{border:1px solid #1E3A5F;background:#fff;flex:1 1 auto;min-width:0;padding:6px 9px;font-family:inherit;font-size:13.5px}
 .dk-search button{cursor:pointer;background:#f0f3f7;border:1px solid #b6c2d1;color:#3d4a5c;padding:6px 12px;font-family:inherit;font-size:13px;white-space:nowrap}
 .dk-search button:hover{background:#e6ebf1}
+/* 2026-10-01: кнопка «Найти» — синяя (как навигация), окно поиска — белое. */
+.dk-search button[data-ls-search-apply="1"]{background:#1E3A5F;border-color:#1E3A5F;color:#fff;font-weight:700}
+.dk-search button[data-ls-search-apply="1"]:hover{background:#2a4d7a}
 .dk-search .dk-search-reset{color:#8296ab;text-decoration:underline}
 .dk-tabnote{color:#4a3f63;background:#f4f1f9;border:1px solid #cbbfe0;border-radius:2px;margin-top:9px;padding:6px 9px;font-size:12.5px;line-height:1.5}
 .dk-item{padding:10px 2px 9px}
