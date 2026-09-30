@@ -1801,7 +1801,7 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .gkf-newbtn{cursor:pointer;background:#eef6fb;border:1px solid #9cc0dd;color:#0a5caa;font-family:inherit;font-size:14px;font-weight:700;margin-top:9px;padding:7px 14px}
 .gkf-newbtn:hover{background:#e2eff9}
 .gkf-search{display:flex;gap:6px;margin-top:9px}
-.gkf-search input{border:1px solid #1E3A5F;flex:1 1 auto;min-width:0;padding:6px 9px;font-family:inherit;font-size:13.5px}
+.gkf-search input{background:#ffffff;border:1px solid #1E3A5F;flex:1 1 auto;min-width:0;padding:6px 9px;font-family:inherit;font-size:13.5px}
 .gkf-search button{cursor:pointer;background:#f0f3f7;border:1px solid #b6c2d1;color:#3d4a5c;padding:6px 12px;font-family:inherit;font-size:13px;white-space:nowrap}
 .gkf-search button:hover{background:#e6ebf1}
 .gkf-search-reset{background:0 0;border:0;color:#8296ab;cursor:pointer;font-family:inherit;font-size:12.5px;text-decoration:underline;padding:0}
