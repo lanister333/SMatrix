@@ -2622,6 +2622,31 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .ad-item-contact a:hover,.help-item-contact a:hover,[data-flat-card-contact] a:hover{color:#1e40af;text-decoration:none}
 .dk-card-text a:link,.dk-card-text a:visited{color:#1d4ed8;font-weight:700;text-decoration:underline}
 .dk-card-text a:hover{color:#1e40af;text-decoration:none}
+
+/* 2026-10-01: МОБАЙЛ-АДАПТАЦИЯ всех правок сессии.
+   На узких экранах (≤480px) слегка докручиваем плотность, чтобы
+   всё смотрелось компактно и читаемо:
+     • dk-card-text — line-height 1.5 → 1.35 (плотнее на мобайле)
+     • ad-item-contact / help-item-contact — padding 6px 9px → 4px 8px,
+       font 13px → 12.5px (компактнее на узком экране)
+     • tide-chart svg — max-height 180px → 150px (компактнее
+       по вертикали на мобайле)
+     • tide-row — padding 2px 6px (было 2px 8px)
+     • wth-metric, wth-pass — на мобайле меньше отступы
+   Касается только ≤480px; десктоп не тронут. */
+@media (max-width:480px){
+  .dk-card-text{line-height:1.35}
+  .ad-item-contact,.help-item-contact{padding:4px 8px;font-size:12.5px;margin-top:4px}
+  .ad-item-contact b,.help-item-contact b{font-size:11.5px}
+  [data-flat-card-contact]{padding:4px 8px !important;font-size:12px !important}
+  .sm-nick-gender{font-size:inherit}
+  .tide-chart svg{max-height:150px !important}
+  .tide-row{padding:2px 6px !important}
+  .wth-metric{padding:3px 6px !important}
+  .wth-pass{padding:2px 6px !important;margin:0 0 1px !important}
+  .help-item-body p{line-height:1.3}
+  .ad-item-text{line-height:1.35}
+}
 .ad-price{color:#1e5c2e;background:#eef7ef;border:1px solid #bcd9c2;border-radius:2px;display:inline-block;padding:0 6px;font-size:12.5px;font-weight:700;line-height:1.6;white-space:nowrap}
 .ad-actrow{margin-top:3px}
 .ad-act{color:#0a5caa;cursor:pointer;background:0 0;border:0;margin-right:12px;padding:3px 0;font-family:inherit;font-size:12.5px;text-decoration:underline}
