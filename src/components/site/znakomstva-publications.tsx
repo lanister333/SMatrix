@@ -59,6 +59,7 @@ import SakhDatetimeBlock from "@/components/site/sakh-datetime-block";
 import { SAKHALIN_CITIES } from "@/components/site/flat-board";
 import { DATING_CATEGORIES } from "@/lib/znakomstva";
 import type { ForumUser } from "@/lib/ui";
+import { hasContact, CONTACT_ERROR } from "@/lib/contact-check";
 
 /** Анкета в публичной выдаче API (authorId наружу не отдаётся никогда). */
 interface LsItem {
@@ -208,6 +209,9 @@ export default function LoveSakhPage(props: {
     if (!formTab) return setErr("Выберите вкладку анкеты.");
     if (city.trim().length < 2) return setErr("Укажите город.");
     if (text.trim().length < 10) return setErr("Напишите текст анкеты с контактами (от 10 символов).");
+    // 2026-10-01: ТЗ — страница знакомств полностью анонимная, но КОНТАКТ
+    // для связи обязателен (телефон, @telegram, https-ссылка, email).
+    if (!hasContact(text)) return setErr(CONTACT_ERROR);
     setBusy(true);
     try {
       const r = await fetch("/api/znakomstva", {
@@ -348,7 +352,7 @@ export default function LoveSakhPage(props: {
             {/* ОДНО большое текстовое поле для текста и контактов. */}
             <div style={{ marginTop: 10 }}>
               <label htmlFor="ls-text" style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#3f3f46" }}>
-                Ваше объявление и контакты
+                Ваше объявление и контакты <span style={{ color: "#AA3333" }}>*</span>
               </label>
               <textarea
                 id="ls-text"
@@ -356,7 +360,7 @@ export default function LoveSakhPage(props: {
                 value={text}
                 maxLength={8000}
                 onChange={(e) => changeText(e.target.value)}
-                placeholder="Кого и для чего ищете, город, любые удобные вам контакты: WhatsApp, Telegram, телефон или соцсеть"
+                placeholder="Кого и для чего ищете, город. Контакты обязательны: WhatsApp, Telegram (@ник), телефон или ссылка — без контакта анкета не публикуется"
               />
             </div>
             <div style={{ marginTop: 10 }}>

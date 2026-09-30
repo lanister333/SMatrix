@@ -13,6 +13,7 @@
 import { useCallback, useEffect, useState } from "react";
 import SakhDatetimeBlock from "@/components/site/sakh-datetime-block";
 import type { ForumUser } from "@/lib/ui";
+import { hasContact, CONTACT_ERROR } from "@/lib/contact-check";
 
 interface HelpItem {
   id: string;
@@ -257,6 +258,12 @@ function HelpCreateModal(props: {
     }
 
     setErr("");
+    // 2026-10-01: ТЗ — контакт обязателен. Проверяем поле контакта и текст
+    // (контакт мог быть указан внутри описания просьбы).
+    if (!hasContact(contact) && !hasContact(text)) {
+      setErr(CONTACT_ERROR);
+      return;
+    }
     setBusy(true);
     try {
       const r = await fetch("/api/help", {
@@ -315,12 +322,12 @@ function HelpCreateModal(props: {
           </div>
 
           <div className="form-flat-group">
-            <label htmlFor="help-contact">Ваши контактные данные для прямой связи</label>
+            <label htmlFor="help-contact">Ваши контактные данные для прямой связи <span style={{ color: "#AA3333" }}>*</span></label>
             <input
               type="text"
               id="help-contact"
               className="input-flat"
-              placeholder="Например: WhatsApp +7 (9XX) XXX-XX-XX, Иван"
+              placeholder="Например: WhatsApp +7 (9XX) XXX-XX-XX, Иван. Без контакта просьба не публикуется"
               required
               value={contact}
               onChange={(e) => setContact(e.target.value)}
@@ -365,6 +372,11 @@ function HelpFormModal(props: {
     }
     if (text.trim().length < 10) {
       setErr("Опишите ситуацию подробнее — минимум 10 символов");
+      return;
+    }
+    // 2026-10-01: ТЗ — контакт обязателен при редактировании тоже.
+    if (!hasContact(contactData) && !hasContact(text)) {
+      setErr(CONTACT_ERROR);
       return;
     }
     setBusy(true);
@@ -420,13 +432,13 @@ function HelpFormModal(props: {
             />
           </div>
           <div className="sk-modal-row">
-            <label htmlFor="hp-f-contact">Контактные данные — необязательно (можно указать их в тексте)</label>
+            <label htmlFor="hp-f-contact">Контактные данные <span style={{ color: "#AA3333" }}>*</span></label>
             <input
               id="hp-f-contact"
               value={contactData}
               maxLength={200}
               onChange={(e) => setContactData(e.target.value)}
-              placeholder="Телефон, Telegram или другой контакт"
+              placeholder="Телефон, Telegram (@ник), WhatsApp или ссылка — без контакта просьба не публикуется"
             />
           </div>
           <div className="sk-modal-demo">

@@ -16,6 +16,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import SakhDatetimeBlock from "@/components/site/sakh-datetime-block";
 import type { ForumUser } from "@/lib/ui";
+import { hasContact, CONTACT_ERROR } from "@/lib/contact-check";
 
 interface AdMediaItem {
   id?: string;
@@ -95,7 +96,7 @@ const ADS_RULES = [
   "Восемь рубрик: Продам, Куплю, Отдам даром, Услуги, Работа, Недвижимость, Транспорт, Разное. Других рубрик нет.",
   "Продавать свои вещи и предлагать свои услуги можно — это суть раздела.",
   "Указывайте цену (или «бесплатно») и способ связи — так объявление полезнее.",
-  "Цена и контакты — необязательные поля: можно указать их прямо в тексте.",
+  "Цена — необязательное поле. Контакт СПОСОБ СВЯЗИ — обязательный: без телефона, мессенджера или ссылки объявление не публикуется.",
   "Мошенничество запрещено: просьбы перевести предоплату вперёд — нарушение.",
   "Запрещённые к продаже товары — нарушение: наркотики, оружие, поддельные документы.",
   "Публиковать чужие персональные данные запрещено.",
@@ -310,6 +311,12 @@ function AdFormModal(props: {
       setErr("Напишите текст объявления — минимум 10 символов");
       return;
     }
+    // 2026-10-01: ТЗ — контакт обязателен (без него объявление не публикуется).
+    // Проверяем и отдельное поле contact, и сам текст (контакт мог быть в тексте).
+    if (!hasContact(contact) && !hasContact(text)) {
+      setErr(CONTACT_ERROR);
+      return;
+    }
     setBusy(true);
     try {
       const payload: Record<string, unknown> = isEdit
@@ -417,13 +424,13 @@ function AdFormModal(props: {
             </div>
           </div>
           <div className="ad-field">
-            <label className="ad-label" htmlFor="ad-contact">Способ связи (необязательно)</label>
+            <label className="ad-label" htmlFor="ad-contact">Способ связи <span style={{ color: "#AA3333" }}>*</span></label>
             <input
               id="ad-contact"
               className="ad-input"
               value={contact}
               maxLength={200}
-              placeholder="Телефон, мессенджер, время для звонков"
+              placeholder="Телефон, мессенджер (@telegram, wa.me/…), ссылка — без контакта объявление не публикуется"
               onChange={(e) => setContact(e.target.value)}
             />
           </div>
