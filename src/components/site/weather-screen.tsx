@@ -314,7 +314,7 @@ function TideWaveChart({ tides, nowIso }: { tides: TidesData; nowIso: string }) 
               fontSize="10"
               fontWeight="700"
               fill="#1f3a5f"
-              transform={`translate(0 ${(padT - 8) * (1 - 1.63)}) scale(1 1.63)`}
+              transform={`translate(0 ${(padT - 8) * (1 - 2.5)}) scale(1 2.5)`}
             >
               сейчас
             </text>
