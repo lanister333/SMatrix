@@ -550,7 +550,7 @@ export function EmployersPage(props: {
                             } catch { props.notify("Сеть недоступна"); }
                           }}
                           title="Официальный ответ организации — виден только представителю, ровно один ответ"
-                          style={{ cursor: "pointer", background: "#0a5caa", border: "1px solid #084c8b", color: "#fff", padding: "6px 14px", fontFamily: "inherit", fontSize: "13px", fontWeight: 700, whiteSpace: "nowrap", borderRadius: "2px" }}
+                          style={{ cursor: "pointer", background: "#e0f2fe", border: "1px solid #0284c7", color: "#075985", padding: "6px 14px", fontFamily: "inherit", fontSize: "13px", fontWeight: 700, whiteSpace: "nowrap", borderRadius: "2px" }}
                         >
                           🏢 Ответ организации
                         </button>
