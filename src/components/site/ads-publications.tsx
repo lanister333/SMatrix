@@ -16,7 +16,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import SakhDatetimeBlock from "@/components/site/sakh-datetime-block";
 import type { ForumUser } from "@/lib/ui";
-import { hasContact, CONTACT_ERROR } from "@/lib/contact-check";
+import { hasContact, CONTACT_ERROR, renderContacts } from "@/lib/contact-check";
 
 interface AdMediaItem {
   id?: string;
@@ -182,14 +182,18 @@ function AdRow(props: {
                 · <b>Место:</b> {item.place}
               </>
             )}
-            {item.contact && (
-              <>
-                {" "}
-                · <b>Связь:</b> {item.contact}
-              </>
-            )}
             {item.editedAt && " · изменено автором"}
           </div>
+          {/* 2026-10-01: ТЗ — контакт обязателен; показываем его отдельной
+              выделенной строкой под метаинфо, чтобы покупатель сразу
+              видел способ связи (был спрятан в одной строке с мета).
+              Контакты — ПОДСВЕЧЕНЫ СИНИМ и КЛИКАБЕЛЬНЫ: tel: → позвонить,
+              t.me/ → Telegram, mailto: → почта, https:// → новая вкладка. */}
+          {item.contact && (
+            <div className="ad-item-contact">
+              <b>📞 Связь:</b> {renderContacts(item.contact)}
+            </div>
+          )}
           <div className="ad-actrow">
             {own ? (
               <>

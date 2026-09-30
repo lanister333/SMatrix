@@ -778,6 +778,9 @@ li.sk-rubric-row{display:block}
 .help-status-badge.gray{background:#e2e8f0;color:#475569}
 .help-item-body h4{font-size:16px;color:#1e293b;margin:0 0 4px 0;font-weight:700;word-break:break-word;overflow-wrap:anywhere}
 .help-item-body p{font-size:13.5px;line-height:1.45;color:#334155;margin:0;white-space:pre-wrap;word-break:break-word}
+/* 2026-10-01: строка «📞 Связь:» под текстом просьбы — обязателен контакт. */
+.help-item-contact{margin-top:8px;padding:6px 9px;background:#ecfdf5;border:1px solid #6ee7b7;border-radius:2px;font-size:13px;color:#065f46;word-break:break-word;overflow-wrap:anywhere}
+.help-item-contact b{color:#047857}
 .help-item-footer{margin-top:8px;padding-top:6px;border-top:1px solid #f1f5f9;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center}
 /* 29.09.2026: унифицированный ряд кнопок (.hp-actrow-unified) — все
    кнопки в одной строке, кнопка «💬 Обсудить на форуме» крайняя справа. */
@@ -2610,6 +2613,15 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .ad-footinfo{min-width:0;flex:1 1 auto}
 .ad-item-meta{align-items:center;color:#56657a;display:flex;flex-wrap:wrap;gap:4px 6px;font-size:12.5px;line-height:1.6}
 .ad-item-meta b{color:#3d4a5c;font-weight:700}
+/* 2026-10-01: выделенная строка «📞 Связь:» под мета — обязательный контакт.
+   Контакты внутри (телефон, @telegram, https, email) рендерятся как
+   <a> синего цвета — tel: → позвонить, t.me/ → Telegram, mailto: → почта. */
+.ad-item-contact{margin-top:6px;padding:6px 9px;background:#ecfdf5;border:1px solid #6ee7b7;border-radius:2px;font-size:13px;color:#065f46;word-break:break-word;overflow-wrap:anywhere}
+.ad-item-contact b{color:#047857}
+.ad-item-contact a:link,.ad-item-contact a:visited,.help-item-contact a:link,.help-item-contact a:visited,[data-flat-card-contact] a:link,[data-flat-card-contact] a:visited{color:#1d4ed8;font-weight:700;text-decoration:underline}
+.ad-item-contact a:hover,.help-item-contact a:hover,[data-flat-card-contact] a:hover{color:#1e40af;text-decoration:none}
+.dk-card-text a:link,.dk-card-text a:visited{color:#1d4ed8;font-weight:700;text-decoration:underline}
+.dk-card-text a:hover{color:#1e40af;text-decoration:none}
 .ad-price{color:#1e5c2e;background:#eef7ef;border:1px solid #bcd9c2;border-radius:2px;display:inline-block;padding:0 6px;font-size:12.5px;font-weight:700;line-height:1.6;white-space:nowrap}
 .ad-actrow{margin-top:3px}
 .ad-act{color:#0a5caa;cursor:pointer;background:0 0;border:0;margin-right:12px;padding:3px 0;font-family:inherit;font-size:12.5px;text-decoration:underline}

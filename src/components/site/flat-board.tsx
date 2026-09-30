@@ -45,6 +45,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/components/site/chrome";
+import { renderContacts } from "@/lib/contact-check";
 
 export interface FlatTab {
   key: string;
@@ -135,6 +136,9 @@ type FeedItem = {
   nick?: string;
   status: string;
   createdAt: string;
+  /** 2026-10-01: ТЗ — контакт обязателен; показываем его отдельной
+   *  выделенной строкой под текстом карточки (не прячем в мета). */
+  contact?: string;
 };
 
 const PAGE_SIZE = 50;
@@ -184,6 +188,8 @@ export default function FlatBoard(props: FlatBoardProps) {
           nick: String(x.nick ?? ""),
           status: String(x.status ?? "actual"),
           createdAt: String(x.createdAt ?? ""),
+          /* 2026-10-01: контакт обязателен — берём из contact (Ads API). */
+          contact: x.contact ? String(x.contact) : "",
         }));
         setItems((prev) => (opts.append && prev ? [...prev, ...rows] : rows));
         setPage(p);
@@ -419,6 +425,30 @@ export default function FlatBoard(props: FlatBoardProps) {
                 >
                   {it.body}
                 </div>
+                {/* 2026-10-01: ТЗ — контакт обязателен. Показываем его
+                    отдельной выделенной зелёной строкой под текстом, чтобы
+                    покупатель сразу видел способ связи с автором.
+                    Контакты (телефон, @telegram, https, email) — ПОДСВЕЧЕНЫ
+                    СИНИМ и КЛИКАБЕЛЬНЫ: tel: → позвонить, t.me/ → Telegram,
+                    mailto: → почта, https:// → открыть в новой вкладке. */}
+                {it.contact && (
+                  <div
+                    data-flat-card-contact={it.id}
+                    style={{
+                      marginTop: 6,
+                      padding: "6px 9px",
+                      background: "#ecfdf5",
+                      border: "1px solid #6ee7b7",
+                      fontSize: 13,
+                      color: "#065f46",
+                      wordBreak: "break-word",
+                      overflowWrap: "anywhere",
+                    }}
+                  >
+                    <b style={{ color: "#047857" }}>📞 Связь:</b>{" "}
+                    {renderContacts(it.contact)}
+                  </div>
+                )}
               </article>
             );
           })

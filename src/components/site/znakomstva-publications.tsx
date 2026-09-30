@@ -59,7 +59,7 @@ import SakhDatetimeBlock from "@/components/site/sakh-datetime-block";
 import { SAKHALIN_CITIES } from "@/components/site/flat-board";
 import { DATING_CATEGORIES } from "@/lib/znakomstva";
 import type { ForumUser } from "@/lib/ui";
-import { hasContact, CONTACT_ERROR } from "@/lib/contact-check";
+import { hasContact, CONTACT_ERROR, renderContacts } from "@/lib/contact-check";
 
 /** Анкета в публичной выдаче API (authorId наружу не отдаётся никогда). */
 interface LsItem {
@@ -433,9 +433,13 @@ export default function LoveSakhPage(props: {
                     </span>
                   </div>
                   {/* Текст объявления вместе с ПРЯМЫМИ контактами автора:
-                      выводится как введён, ничего не скрывается (ТЗ). */}
+                      выводится как введён, ничего не скрывается (ТЗ).
+                      2026-10-01 (правка 2): контакты внутри текста
+                      (телефон, @telegram, https, email) ПОДСВЕЧЕНЫ СИНИМ
+                      и КЛИКАБЕЛЬНЫ — tel: → позвонить, t.me/ → Telegram,
+                      mailto: → почта, https:// → открыть в новой вкладке. */}
                   <div className="dk-card-text" data-ls-card-text={it.id}>
-                    {it.body}
+                    {renderContacts(it.body)}
                   </div>
                   {/* ТЗ 2026-09-23, ЖЁСТКОЕ ПРАВИЛО: кнопок «Обсудить на
                       форуме» на странице Знакомств НЕТ — общение идёт

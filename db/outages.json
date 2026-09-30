@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-30T18:41:37.514Z",
+  "updated": "2026-09-30T19:11:37.518Z",
   "items": [
     {
       "source": "Сахалинэнерго",
@@ -22,7 +22,19 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-30T00:32:00.000Z",
-      "fetchedAt": "2026-09-30T18:41:37.514Z"
+      "fetchedAt": "2026-09-30T19:11:37.518Z"
+    },
+    {
+      "source": "СКК",
+      "title": "Отключение горячей воды 30.09.2026 с 09:00 до 18:00",
+      "url": "https://skk65.ru/otkljuchenie-goryachej-vody-30-09-2026-s-09-00-do-18-00/",
+      "addresses": [],
+      "short": "Отключение горячей воды 30.09.2026 с 09:00 до 18:00",
+      "when": "с 09:00 до 18:00",
+      "kind": "hot",
+      "type": "planned",
+      "publishedAt": "2026-09-29T05:14:28Z",
+      "fetchedAt": "2026-09-30T19:11:37.518Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -38,7 +50,33 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-29T03:03:00.000Z",
-      "fetchedAt": "2026-09-30T18:41:37.514Z"
+      "fetchedAt": "2026-09-30T19:11:37.518Z"
+    },
+    {
+      "source": "СКК",
+      "title": "Отключение горячей воды с 29.09.2026 04:40 по 03.10.2026 20:00",
+      "url": "https://skk65.ru/otkljuchenie-goryachej-vody-29-09-2026g-s-04-40-do-16-40/",
+      "addresses": [
+        "ул. Комсомольская, 231, 233, 233А, 235, 237, 237А, 239, 241, 241А, 243А."
+      ],
+      "short": "ул. Комсомольская, 231, 233, 233А, 235, 237, 237А, 239, 241…",
+      "when": "",
+      "kind": "hot",
+      "type": "planned",
+      "publishedAt": "2026-09-28T18:04:01Z",
+      "fetchedAt": "2026-09-30T19:11:37.518Z"
+    },
+    {
+      "source": "СКК",
+      "title": "Отключение горячей воды 29.09.2026 с 09:00 до 13:00",
+      "url": "https://skk65.ru/otkljuchenie-goryachej-vody-29-09-2026-s-09-00-do-13-00/",
+      "addresses": [],
+      "short": "Отключение горячей воды 29.09.2026 с 09:00 до 13:00",
+      "when": "с 09:00 до 13:00",
+      "kind": "hot",
+      "type": "planned",
+      "publishedAt": "2026-09-28T03:57:54Z",
+      "fetchedAt": "2026-09-30T19:11:37.518Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -58,7 +96,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-28T01:58:00.000Z",
-      "fetchedAt": "2026-09-30T18:41:37.514Z"
+      "fetchedAt": "2026-09-30T19:11:37.518Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -74,7 +112,49 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-28T01:50:00.000Z",
-      "fetchedAt": "2026-09-30T18:41:37.514Z"
+      "fetchedAt": "2026-09-30T19:11:37.518Z"
+    },
+    {
+      "source": "СКК",
+      "title": "Отключение горячей воды 28.09.2026 с 13:40 до 23:40",
+      "url": "https://skk65.ru/otkljuchenie-goryachej-vody-28-09-2026-s-10-30-do-16-00/",
+      "addresses": [
+        "ул. Комсомольская, 231, 233, 233А, 235, 237, 237А, 239, 241, 241А, 243А."
+      ],
+      "short": "ул. Комсомольская, 231, 233, 233А, 235, 237, 237А, 239, 241…",
+      "when": "с 13:40 до 23:40",
+      "kind": "hot",
+      "type": "planned",
+      "publishedAt": "2026-09-27T23:24:21Z",
+      "fetchedAt": "2026-09-30T19:11:37.518Z"
+    },
+    {
+      "source": "СКК",
+      "title": "Отключение горячей воды 28.09.2026 с 09:40 до 11:20",
+      "url": "https://skk65.ru/otkljuchenie-goryachej-vody-28-09-2026-s-09-40-do-15-00/",
+      "addresses": [
+        "ул. Комсомольская, 241."
+      ],
+      "short": "ул. Комсомольская, 241",
+      "when": "с 09:40 до 11:20",
+      "kind": "hot",
+      "type": "planned",
+      "publishedAt": "2026-09-27T22:38:55Z",
+      "fetchedAt": "2026-09-30T19:11:37.518Z"
+    },
+    {
+      "source": "СКК",
+      "title": "Отключение горячей воды с 23.09.2026 09:35 по 01.10.2026 09:00",
+      "url": "https://skk65.ru/otkljuchenie-goryachej-vody-s-23-09-2026-09-35-po-30-09-2026-11-00/",
+      "addresses": [
+        "ул. Физкультурная, 22, 22А, 22Б, 24, 24А, 26, 26А, 26Б, 28; пр. Мира, 65/1, 65/2."
+      ],
+      "short": "ул. Физкультурная, 22, 22А, 22Б, 24, 24А, 26, 26А, 26Б, 28;…",
+      "when": "",
+      "kind": "hot",
+      "type": "planned",
+      "publishedAt": "2026-09-27T22:30:10Z",
+      "fetchedAt": "2026-09-30T19:11:37.518Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -94,7 +174,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-25T00:50:00.000Z",
-      "fetchedAt": "2026-09-30T18:41:37.514Z"
+      "fetchedAt": "2026-09-30T19:11:37.518Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -111,7 +191,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-25T00:11:00.000Z",
-      "fetchedAt": "2026-09-30T18:41:37.514Z"
+      "fetchedAt": "2026-09-30T19:11:37.518Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -126,7 +206,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-24T02:14:00.000Z",
-      "fetchedAt": "2026-09-30T18:41:37.514Z"
+      "fetchedAt": "2026-09-30T19:11:37.518Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -141,7 +221,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-24T02:01:00.000Z",
-      "fetchedAt": "2026-09-30T18:41:37.514Z"
+      "fetchedAt": "2026-09-30T19:11:37.518Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -167,7 +247,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-23T23:41:00.000Z",
-      "fetchedAt": "2026-09-30T18:41:37.514Z"
+      "fetchedAt": "2026-09-30T19:11:37.518Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -193,13 +273,8 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-21T02:41:00.000Z",
-      "fetchedAt": "2026-09-30T18:41:37.514Z"
+      "fetchedAt": "2026-09-30T19:11:37.518Z"
     }
   ],
-  "errors": [
-    {
-      "source": "СКК",
-      "error": "прямой: fetch failed; SDK: Function invoke failed with status 500: {\"result\":null,\"error\":\"Page reader failed: request failed with status 422: {\\\"code\\\":422,\\\"data\\\":null,\\\"message\\\":\\\"JINA request returned 422 for https:/skk65.ru/wp-json/wp/v2/posts: {\\\\\\\"data\\\\\\\":null,\\\\\\\"cause\\\\\\\":{\\\\\\\"log\\\\\\\":[\\\\\\\"  - navigating to \\\\\\\\\\\\\\\"https://skk65.ru/wp-json/wp/v2/posts\\\\\\\\\\\\\\\", waiting until \\\\\\\\\\\\\\\"networkidle\\\\\\\\\\\\\\\"\\\\\\\"],\\\\\\\"name\\\\\\\":\\\\\\\"Error\\\\\\\"},\\\\\\\"code\\\\\\\":422,\\\\\\\"name\\\\\\\":\\\\\\\"AssertionFailureError\\\\\\\",\\\\\\\"status\\\\\\\":42206,\\\\\\\"message\\\\\\\":\\\\\\\"Failed to goto https://skk65.ru: Error: page.goto: net::ERR_CONNECTION_REFUSED at https://skk65.ru/wp-json/wp/v2/posts\\\\\\\\nCall log:\\\\\\\\n  - navigating to \\\\\\\\\\\\\\\"https://skk65.ru/wp-json/wp/v2/posts\\\\\\\\\\\\\\\", waiting until \\\\\\\\\\\\\\\"networkidle\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\",\\\\\\\"readableMessage\\\\\\\":\\\\\\\"AssertionFailureError: Failed to goto https://skk65.ru: Error: page.goto: net::ERR_CONNECTION_REFUSED at https://skk65.ru/wp-json/wp/v2/posts\\\\\\\\nCall log:\\\\\\\\n  - navigating to \\\\\\\\\\\\\\\"https://skk65.ru/wp-json/wp/v2/posts\\\\\\\\\\\\\\\", waiting until \\\\\\\\\\\\\\\"networkidle\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\"}\\\",\\\"name\\\":\\\"UpstreamError\\\"}\\n\"}"
-    }
-  ]
+  "errors": []
 }
