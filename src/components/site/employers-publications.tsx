@@ -353,6 +353,9 @@ export function EmployersPage(props: {
           </div>
         </div>
       </aside>
+
+      {/* ============ ЦЕНТРАЛЬНАЯ КОЛОНКА (Лента трудовых фактов) ============ */}
+      <div className="center-column">
         <div className="ep-head" data-ep-head="1">
           <h1 className="ep-title" data-ep-title="1">
             О работодателях
