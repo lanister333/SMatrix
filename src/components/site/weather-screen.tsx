@@ -635,6 +635,114 @@ section.mp-panel[aria-label="Оперативная обстановка на п
   padding:7px 10px !important;
   margin:0 0 6px !important;
 }
+
+/* 2026-10-01: КОМПАКТНОСТЬ ПО ВЕРТИКАЛИ. ТЗ: «на странице погода слишком
+   много воздуха по вертикали — надо всё сделать компактнее». Уменьшаем
+   paddings, margins, gaps; размер шрифтов и температурной ячейки
+   уменьшаем умеренно — чтобы читаемость сохранилась, но лишний воздух
+   ушёл. Все правила с !important, чтобы перебить более ранние правила
+   этого же блока. */
+
+/* Между блоками — 12px → 5px */
+section.mp-panel[aria-label="Погода в Южно-Сахалинске"],
+section.mp-panel[aria-label="Температура по районам Сахалина и Курил"],
+section.mp-panel[aria-label="Оперативная обстановка на перевалах"],
+.sk .sidebar-card{
+  margin-bottom:5px !important;
+}
+
+/* Шапки блоков — 8px 12px → 4px 10px */
+section.mp-panel[aria-label="Погода в Южно-Сахалинске"] > .mp-paneltitle,
+section.mp-panel[aria-label="Температура по районам Сахалина и Курил"] > .mp-paneltitle,
+section.mp-panel[aria-label="Оперативная обстановка на перевалах"] > .mp-paneltitle,
+.sk .sidebar-card > .card-header{
+  padding:4px 10px !important;
+  font-size:13px !important;
+}
+
+/* Крупная температура 38px → 28px; line-height 1 → 0.95 */
+section.mp-panel[aria-label="Погода в Южно-Сахалинске"] .wth-now-t,
+.sk .big-temp{
+  font-size:28px !important;
+  line-height:.95 !important;
+}
+
+/* Описание погоды 16px → 14px */
+section.mp-panel[aria-label="Погода в Южно-Сахалинске"] .wth-now-l,
+.sk .weather-desc{
+  font-size:14px !important;
+}
+
+/* Метрики (влажность/давление/ветер): gap 8 → 4, padding 9px 10px → 4px 8px */
+section.mp-panel[aria-label="Погода в Южно-Сахалинске"] .wth-metrics{
+  gap:4px !important;
+}
+section.mp-panel[aria-label="Погода в Южно-Сахалинске"] .wth-metric{
+  padding:4px 8px !important;
+  gap:1px !important;
+}
+section.mp-panel[aria-label="Погода в Южно-Сахалинске"] .wth-metric b{
+  font-size:13px;
+}
+
+/* Строки районов — padding 10px 14px → 4px 10px */
+section.mp-panel[aria-label="Температура по районам Сахалина и Курил"] .wth-bub,
+.sk .district-row{
+  padding:4px 10px !important;
+}
+section.mp-panel[aria-label="Температура по районам Сахалина и Курил"] .wth-bub-n,
+.sk .district-name{
+  font-size:13px !important;
+}
+section.mp-panel[aria-label="Температура по районам Сахалина и Курил"] .wth-bub-t,
+.sk .district-temp{
+  font-size:14px !important;
+}
+
+/* Заголовки групп (ЮГ/ЦЕНТР/...) — margin 10/6 → 3/1; padding 3/10 → 2/8 */
+section.mp-panel[aria-label="Температура по районам Сахалина и Курил"] .wth-gt,
+.sk .district-group-title{
+  margin:3px 0 1px !important;
+  padding:2px 8px !important;
+  font-size:11px !important;
+}
+
+/* Панель деталей часа — padding 10px 14px → 4px 10px */
+section.mp-panel[aria-label="Погода в Южно-Сахалинске"] .hour-details{
+  padding:4px 10px !important;
+  font-size:12px !important;
+}
+
+/* Метка «Почасовой прогноз на сегодня» — padding 4/10 → 2/8 */
+section.mp-panel[aria-label="Погода в Южно-Сахалинске"] .wth-hours-l{
+  padding:2px 8px !important;
+  font-size:11px !important;
+}
+
+/* Ячейки почасовки hour-cell — компактнее по высоте */
+section.mp-panel[aria-label="Погода в Южно-Сахалинске"] .hour-cell{
+  padding:2px 4px !important;
+}
+
+/* Прогноз по дням (meteoblue) — плашка и коробка компактнее */
+section.mp-panel[aria-label="Погода в Южно-Сахалинске"] .wth-daily-l{
+  margin:4px 0 2px !important;
+  padding:2px 8px !important;
+}
+.wth-daily-box{padding:3px !important}
+
+/* Ячейки лога «Обстановка на перевалах» — padding 7/10 → 3/8; margin 6 → 2 */
+section.mp-panel[aria-label="Оперативная обстановка на перевалах"] .wth-pass{
+  padding:3px 8px !important;
+  margin:0 0 2px !important;
+}
+
+/* График приливов — компактнее */
+.tide-chart{margin:0 0 4px !important;padding:4px !important}
+.tide-cap{margin:0 0 2px !important;font-size:10px !important}
+
+/* Уменьшить размер контейнера виджета (метеоблю/погода) по высоте */
+.wth-daily-in{max-height:200px}
 `;
 
 /* Стили волнового графика приливов (2026-09-21): только фирменные цвета,

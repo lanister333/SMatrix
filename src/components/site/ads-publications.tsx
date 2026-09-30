@@ -17,6 +17,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import SakhDatetimeBlock from "@/components/site/sakh-datetime-block";
 import type { ForumUser } from "@/lib/ui";
 import { hasContact, CONTACT_ERROR, renderContacts } from "@/lib/contact-check";
+import { nickGenderClass } from "@/lib/nick-gender";
 
 interface AdMediaItem {
   id?: string;
@@ -175,7 +176,7 @@ function AdRow(props: {
         <div className="ad-footinfo">
           <div className="ad-item-meta">
             {item.price && <span className="ad-price">{item.price}</span>}
-            <b>Автор:</b> {item.authorName} · {fmtDateTime(item.createdAt)}
+            <b>Автор:</b> <b className={nickGenderClass(item.authorName)}>{item.authorName}</b> · {fmtDateTime(item.createdAt)}
             {item.place && (
               <>
                 {" "}

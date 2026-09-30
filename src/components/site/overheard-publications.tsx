@@ -21,6 +21,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import SakhDatetimeBlock from "@/components/site/sakh-datetime-block";
 import type { ForumUser } from "@/lib/ui";
 import { sectionDiscussHref } from "@/lib/forum-links";
+import { nickGenderClass } from "@/lib/nick-gender";
 
 interface OverheardItem {
   id: string;
@@ -128,7 +129,7 @@ function OverheardRow(props: {
       <div className="oh-foot">
         <div className="oh-footinfo">
           <div className="oh-item-meta">
-            <b>Автор:</b> {item.authorName} · {fmtDateTime(item.createdAt)}
+            <b>Автор:</b> <b className={nickGenderClass(item.authorName)}>{item.authorName}</b> · {fmtDateTime(item.createdAt)}
             {item.place && (
               <>
                 {" "}

@@ -34,6 +34,7 @@ import SakhDatetimeBlock from "@/components/site/sakh-datetime-block";
 import type { ForumUser } from "@/lib/ui";
 import { discussOnForum } from "@/lib/discuss";
 import { SAKHALIN_CITIES } from "@/components/site/flat-board";
+import { nickGenderClass } from "@/lib/nick-gender";
 
 interface EmpItem {
   id: string;
@@ -508,7 +509,7 @@ export function EmployersPage(props: {
                       📍 {it.employer} ({it.city})
                     </span>
                     <span className="ep-card-meta" data-ep-card-meta={it.id}>
-                      {it.authorName || "Аноним"} · {fmtDay(it.createdAt)}
+                      <b className={nickGenderClass(it.authorName)}>{it.authorName || "Аноним"}</b> · {fmtDay(it.createdAt)}
                       {it.editedAt ? " · изменено автором" : ""}
                     </span>
                   </div>

@@ -46,6 +46,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/components/site/chrome";
 import { renderContacts } from "@/lib/contact-check";
+import { nickGenderClass } from "@/lib/nick-gender";
 
 export interface FlatTab {
   key: string;
@@ -398,10 +399,12 @@ export default function FlatBoard(props: FlatBoardProps) {
                     {it.place}
                   </span>
                   {/* ТЗ 2026-09-23: ник автора БЕЗ аватара (гостям и авторам
-                      без ника — «Аноним»); сортировка ленты — новые сверху. */}
+                      без ника — «Аноним»); сортировка ленты — новые сверху.
+                      2026-10-01: цвет ника — по полу (мужской/женский/нейтральный). */}
                   <span
                     data-flat-card-nick={it.id}
-                    style={{ fontSize: 12.5, fontWeight: 600, color: "#0a5caa" }}
+                    style={{ fontSize: 12.5, fontWeight: 600 }}
+                    className={nickGenderClass(it.nick || "")}
                   >
                     {it.nick || "Аноним"}
                   </span>

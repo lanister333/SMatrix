@@ -77,6 +77,7 @@ import SakhDatetimeBlock from "@/components/site/sakh-datetime-block";
 import { SAKHALIN_CITIES } from "@/components/site/flat-board";
 import { GKH_STATUS_LABELS } from "@/lib/gkh";
 import type { ForumUser } from "@/lib/ui";
+import { nickGenderClass } from "@/lib/nick-gender";
 
 /** Сигнал в публичной выдаче API (authorId наружу не отдаётся). */
 interface GkfItem {
@@ -590,7 +591,7 @@ export function GkhPage(props: {
                       📍 {it.place}
                     </span>
                     <span className="gkf-card-nick" data-gkf-card-nick={it.id}>
-                      {it.authorName || "Аноним"}
+                      <b className={nickGenderClass(it.authorName)}>{it.authorName || "Аноним"}</b>
                     </span>
                     <span className="gkf-card-date" data-gkf-card-date={it.id}>
                       📅 {fmtDay(it.createdAt)}

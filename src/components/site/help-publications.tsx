@@ -14,6 +14,7 @@ import { useCallback, useEffect, useState } from "react";
 import SakhDatetimeBlock from "@/components/site/sakh-datetime-block";
 import type { ForumUser } from "@/lib/ui";
 import { hasContact, CONTACT_ERROR, renderContacts } from "@/lib/contact-check";
+import { nickGenderClass } from "@/lib/nick-gender";
 
 interface HelpItem {
   id: string;
@@ -120,7 +121,7 @@ function HelpCard(props: {
         <span className={`help-status-badge${closed ? " gray" : ""}`}>
           {closed ? (STATUS_LABELS[item.status] ?? item.status) : "Актуально"}
         </span>
-        <span className="help-item-author">👤 Ник: {item.authorName}</span>
+        <span className="help-item-author">👤 Ник: <b className={nickGenderClass(item.authorName)}>{item.authorName}</b></span>
         <span className="help-item-date">
           {closed ? fmtLongDate(item.createdAt) : fmtDateTime(item.createdAt)}
         </span>
