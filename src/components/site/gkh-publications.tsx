@@ -86,8 +86,17 @@ interface GkfItem {
   status: string;
   text: string;
   actions: string;
+  authorId: string;
   authorName: string;
   createdAt: string;
+  /** Официальный ответ организации (один на публикацию). */
+  orgResponseText?: string;
+  orgResponseAt?: string | null;
+  orgResponseByName?: string;
+  /** Привязка к теме форума (если уже создана). */
+  topicId?: number | null;
+  topicState?: string; // none | open | closed | archived
+  editedAt?: string | null;
 }
 
 const PAGE_SIZE = 15;
@@ -177,6 +186,7 @@ export function GkhPage(props: {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [note, setNote] = useState("");
+  const [highlightId, setHighlightId] = useState<string | null>(null);
 
   const listTopRef = useRef<HTMLDivElement | null>(null);
 
@@ -198,8 +208,15 @@ export function GkhPage(props: {
           status: String(x.status ?? "active"),
           text: String(x.text ?? ""),
           actions: String(x.actions ?? ""),
+          authorId: String(x.authorId ?? ""),
           authorName: String(x.authorName ?? ""),
           createdAt: String(x.createdAt ?? ""),
+          orgResponseText: x.orgResponseText ? String(x.orgResponseText) : undefined,
+          orgResponseAt: x.orgResponseAt ? String(x.orgResponseAt) : null,
+          orgResponseByName: x.orgResponseByName ? String(x.orgResponseByName) : undefined,
+          topicId: x.topicId != null ? Number(x.topicId) : null,
+          topicState: x.topicState ? String(x.topicState) : undefined,
+          editedAt: x.editedAt ? String(x.editedAt) : null,
         }));
         setItems(rows);
         setTotal(Number(d.total ?? rows.length));
@@ -218,6 +235,23 @@ export function GkhPage(props: {
     load({ page: 1 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appliedQ, appliedPlace]);
+
+  // Глубокая ссылка из темы форума: /gkh?post=ID — подсветить карточку.
+  useEffect(() => {
+    const postId = new URLSearchParams(window.location.search).get("post");
+    if (!postId) return;
+    setHighlightId(postId);
+    const t = window.setInterval(() => {
+      const el = document.querySelector(`[data-gkf-card="${postId}"]`);
+      if (el) {
+        el.scrollIntoView({ block: "center" });
+        window.clearInterval(t);
+        window.setTimeout(() => setHighlightId(null), 4000);
+      }
+    }, 300);
+    window.setTimeout(() => window.clearInterval(t), 12000);
+    return () => window.clearInterval(t);
+  }, []);
 
   const applySearch = () => {
     setAppliedQ(q.trim());
