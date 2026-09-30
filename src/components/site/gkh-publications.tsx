@@ -362,7 +362,45 @@ export function GkhPage(props: {
             </div>
           </div>
         </div>
+
+        {/* 29.09.2026: блок «🎨 Цвета карточек» — как на /rekomenduyu и /o-rabotodatelyah. */}
+        <div className="sakh-clock gkh-clock-block gkh-clock-legend">
+          <div className="sakh-clock-head">🎨 Цвета карточек</div>
+          <div className="sakh-clock-body sakh-clock-body-content">
+            <div className="gkh-legend">
+              <div className="gkh-legend-row">
+                <span className="gkh-legend-swatch swatch-active" />
+                <div>
+                  <b>Оранжевая рамка</b> — проблема в поиске решения. Проблема зафиксирована, ожидает реакции.
+                </div>
+              </div>
+              <div className="gkh-legend-row">
+                <span className="gkh-legend-swatch swatch-in-progress" />
+                <div>
+                  <b>Синяя рамка</b> — передано в УК. Управляющая компания взяла проблему в работу.
+                </div>
+              </div>
+              <div className="gkh-legend-row">
+                <span className="gkh-legend-swatch swatch-solved" />
+                <div>
+                  <b>Зелёная рамка</b> — проблема решена. Автор подтвердил устранение.
+                </div>
+              </div>
+              <div className="gkh-legend-row">
+                <span className="gkh-legend-swatch swatch-rejected" />
+                <div>
+                  <b>Красная рамка</b> — отклонена. Признали необоснованной или неактуальной.
+                </div>
+              </div>
+              <p className="gkh-legend-note">
+                Статус меняет автор. Ответ организации НЕ меняет статус автоматически.
+              </p>
+            </div>
+          </div>
+        </div>
       </aside>
+
+      {/* ================= ЦЕНТРАЛЬНАЯ КОЛОНКА (Лента городских фактов) ================= */}
       <div className="center-column">
         <div className="gkf-head" data-gkf-head="1">
           {/* Пункт 1: заголовок; пункт 2: подзаголовок одной строкой. */}
@@ -512,7 +550,7 @@ export function GkhPage(props: {
               const stLabel = GKH_STATUS_LABELS[it.status] ?? it.status;
               const stCls = GKF_STATUS_CLASS[it.status] ?? "gkf-status is-search";
               return (
-                <article key={it.id} className="gkf-card" data-gkf-card={it.id}>
+                <article key={it.id} className={`gkf-card gkf-status-border-${it.status ?? "active"}${highlightId === it.id ? " gkf-highlight" : ""}`} data-gkf-card={it.id}>
                   <div className="gkf-card-top">
                     <span className="gkf-card-place" data-gkf-card-place={it.id}>
                       📍 {it.place}

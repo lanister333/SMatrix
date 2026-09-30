@@ -1816,6 +1816,26 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .gkf-guesthint{color:#475569;font-size:13px;line-height:1.5;margin-top:10px}
 /* Карточка Flat 2.0: адрес · ник · дата / статус / Проблема / Действия / кнопка */
 .gkf-card{background:#fff;border:1px solid #d4d4d8;border-radius:0;margin-bottom:10px;padding:10px 12px}
+/* 29.09.2026: цветные карточки по статусу — как у /rekomenduyu и /o-rabotodatelyah. */
+.gkf-card.gkf-status-border-active{border-left:4px solid #f59e0b}
+.gkf-card.gkf-status-border-in_progress{border-left:4px solid #3b82f6}
+.gkf-card.gkf-status-border-solved{border-left:4px solid #10b981}
+.gkf-card.gkf-status-border-rejected{border-left:4px solid #ef4444}
+
+/* 29.09.2026: блок-легенда «Цвета карточек» для /gkh. */
+.gkh-legend{font-size:13px;line-height:1.5;color:#3d4a5c}
+.gkh-legend-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:9px}
+.gkh-legend-row:last-of-type{margin-bottom:6px}
+.gkh-legend-swatch{
+  flex:0 0 24px;width:24px;height:24px;border-radius:3px;
+  border:1px solid #b6c2d1;margin-top:1px;display:inline-block;
+}
+.gkh-legend-swatch.swatch-active{background:#fef3c7;border-left:4px solid #f59e0b;border-color:#f59e0b}
+.gkh-legend-swatch.swatch-in-progress{background:#dbeafe;border-left:4px solid #3b82f6;border-color:#3b82f6}
+.gkh-legend-swatch.swatch-solved{background:#ecfdf5;border-left:4px solid #10b981;border-color:#10b981}
+.gkh-legend-swatch.swatch-rejected{background:#fef2f2;border-left:4px solid #ef4444;border-color:#ef4444}
+.gkh-legend-note{margin:8px 0 0;padding-top:7px;border-top:1px solid #e2e8f0;color:#56657a;font-size:12px;line-height:1.5}
+.gkh-legend b{color:#1e293b}
 .gkf-card-top{align-items:baseline;display:flex;flex-wrap:wrap;gap:4px 10px}
 .gkf-card-place{color:#1a1a1a;font-size:13.5px;font-weight:700}
 .gkf-card-nick{color:#0a5caa;font-size:12.5px;font-weight:600}
