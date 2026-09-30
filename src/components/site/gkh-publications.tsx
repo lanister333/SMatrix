@@ -563,8 +563,7 @@ export function GkhPage(props: {
                     отдельный JS-логику не формируем, оставляем как в публикации).
                   */}
                   <div className="gkf-card-foot">
-                    {/* 29.09.2026: орг. ответ (если уже есть) — показываем
-                        ВО ВСЮ ШИРИНУ карточки (width:100%), кнопка форума — ПОД ним. */}
+                    {/* 29.09.2026: орг. ответ — ВО ВСЮ ШИРИНУ карточки. */}
                     {it.orgResponseText ? (
                       <div className="gkf-org-response" style={{ width: "100%", padding: "6px 8px", background: "#e0f2fe", border: "1px solid #0284c7", borderRadius: "2px", marginBottom: "6px", fontSize: "13px", boxSizing: "border-box" }}>
                         <b style={{ color: "#075985" }}>🏢 Официальный ответ организации</b>
@@ -572,10 +571,9 @@ export function GkhPage(props: {
                         <p style={{ margin: "4px 0 0", color: "#1a2433" }}>{it.orgResponseText}</p>
                       </div>
                     ) : null}
-                    {/* Кнопка форума — ПОД ответом организации. */}
-                    {/* Если ответа нет — org rep видит кнопку «🏢 Ответ организации» слева. */}
-                    <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
-                      {props.user?.orgRep && props.user.id !== it.authorId && !it.orgResponseText && props.token ? (
+                    {/* 29.09.2026: кнопка «🏢 Ответ организации» — СЛЕВА, отдельная строка. */}
+                    {props.user?.orgRep && props.user.id !== it.authorId && !it.orgResponseText && props.token ? (
+                      <div style={{ marginBottom: "6px" }}>
                         <button
                           type="button"
                           className="gkf-btn-org-response"
@@ -599,17 +597,19 @@ export function GkhPage(props: {
                         >
                           🏢 Ответ организации
                         </button>
-                      ) : null}
-                      <button
-                        type="button"
-                        className="gkf-btn-forum"
-                        data-gkf-card-forum={it.id}
-                        onClick={() => discussOnForum("gkh", it.id, props.token, props.onNeedAuth)}
-                        title="Создать тему обсуждения в рубрике «ЖКХ и управляющие компании»"
-                      >
-                        💬 Обсудить на форуме ЖКХ
-                      </button>
-                    </div>
+                      </div>
+                    ) : null}
+                    {/* 29.09.2026: «💬 Обсудить на форуме» — ПОД ответом организации,
+                        на отдельной строке. */}
+                    <button
+                      type="button"
+                      className="gkf-btn-forum"
+                      data-gkf-card-forum={it.id}
+                      onClick={() => discussOnForum("gkh", it.id, props.token, props.onNeedAuth)}
+                      title="Создать тему обсуждения в рубрике «ЖКХ и управляющие компании»"
+                    >
+                      💬 Обсудить на форуме ЖКХ
+                    </button>
                   </div>
                 </article>
               );

@@ -522,8 +522,7 @@ export function EmployersPage(props: {
                     + personMention (новые поля Flat 2.0, не legacy title/text).
                   */}
                   <div className="ep-card-foot">
-                    {/* 29.09.2026: орг. ответ — ВО ВСЮ ШИРИНУ карточки,
-                        кнопка форума — ПОД ним. */}
+                    {/* 29.09.2026: орг. ответ — ВО ВСЮ ШИРИНУ карточки. */}
                     {it.orgResponseText ? (
                       <div style={{ width: "100%", padding: "6px 8px", background: "#e0f2fe", border: "1px solid #0284c7", borderRadius: "2px", marginBottom: "6px", fontSize: "13px", boxSizing: "border-box" }}>
                         <b style={{ color: "#075985" }}>🏢 Официальный ответ организации</b>
@@ -531,9 +530,9 @@ export function EmployersPage(props: {
                         <p style={{ margin: "4px 0 0", color: "#1a2433" }}>{it.orgResponseText}</p>
                       </div>
                     ) : null}
-                    {/* Кнопки — ПОД ответом организации. */}
-                    <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
-                      {props.user?.orgRep && props.user.id !== it.authorId && !it.orgResponseText && props.token ? (
+                    {/* 29.09.2026: кнопка «🏢 Ответ организации» — отдельная строка. */}
+                    {props.user?.orgRep && props.user.id !== it.authorId && !it.orgResponseText && props.token ? (
+                      <div style={{ marginBottom: "6px" }}>
                         <button
                           type="button"
                           onClick={async () => {
@@ -556,17 +555,19 @@ export function EmployersPage(props: {
                         >
                           🏢 Ответ организации
                         </button>
-                      ) : null}
-                      <button
-                        type="button"
-                        className={`ep-btn-forum is-${state}`}
-                        data-ep-card-forum={it.id}
-                        onClick={() => discussOnForum("employers", it.id, props.token, props.onNeedAuth)}
-                        title="Создать тему обсуждения в рубрике «Карьера, бизнес ▸ Работодатели»"
-                      >
-                        {forumButtonLabel(it.topicId ? it.topicState : "none")}
-                      </button>
-                    </div>
+                      </div>
+                    ) : null}
+                    {/* 29.09.2026: «💬 Обсудить на форуме» — ПОД ответом организации,
+                        на отдельной строке. */}
+                    <button
+                      type="button"
+                      className={`ep-btn-forum is-${state}`}
+                      data-ep-card-forum={it.id}
+                      onClick={() => discussOnForum("employers", it.id, props.token, props.onNeedAuth)}
+                      title="Создать тему обсуждения в рубрике «Карьера, бизнес ▸ Работодатели»"
+                    >
+                      {forumButtonLabel(it.topicId ? it.topicState : "none")}
+                    </button>
                   </div>
                 </article>
               );
