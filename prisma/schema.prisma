@@ -802,6 +802,11 @@ model EmpPost {
   isDeleted     Boolean  @default(false)
   deletedAt     DateTime?
   editedAt      DateTime?
+  /// 29.09.2026: официальный ответ организации (как в GkhProblem и RecPost).
+  orgResponseText   String   @default("")
+  orgResponseAt     DateTime?
+  orgResponseById   String?
+  orgResponseByName String   @default("")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   complaints    EmpComplaint[]
