@@ -5545,3 +5545,38 @@ Stage Summary:
 - Блок «Подслушано Сахалин» на главной: высота динамически ровно под 5 строк, скорость автопрокрутки 0.2px/кадр (~12px/сек, в 2 раза медленнее прежних 0.4px/кадр).
 - Живые проверки: главная / → 200, /rekomenduyu → 200, /gkh → 200, TypeScript → 0 ошибок.
 - Архив загружен на gofile.io (litterbox/catbox/transfer.sh/0x0.st/file.io/tmpfiles — все упали в прошлый раз, спас только gofile).
+
+---
+Task ID: gkh-broken-fix-2026-10-01
+Agent: Super Z (main)
+Task: Пользователь: «страница жкх не открывается»
+
+Work Log:
+- Проверка: curl /gkh → HTTP 200, но в HTML НЕТ карточек (только «Загрузка…»)
+- agent-browser: confirmed — страница застревает на loading
+- npx tsc --noEmit → 8 ошибок в src/components/site/gkh-publications.tsx:
+  1. line 553: Cannot find name 'highlightId' (TS2552)
+  2. lines 605, 609: Property 'orgResponseText' does not exist on type 'GkfItem'
+  3. lines 608: Property 'orgResponseByName' does not exist on type 'GkfItem'
+  4. line 613: Property 'authorId' does not exist on type 'GkfItem'
+- Причина: предыдущий коммит 4917581 (цветные карточки ЖКХ) добавил в JSX
+  ссылки на поля и переменные, которых не было в интерфейсе GkfItem и в
+  маппере load(). React вызывал ReferenceError на `highlightId` при рендере
+  карточек clients-side — страница падала, оставаясь на «Загрузка…».
+
+Исправлено в src/components/site/gkh-publications.tsx:
+1. interface GkfItem расширен полями: authorId, orgResponseText?,
+   orgResponseAt?, orgResponseByName?, topicId?, topicState?, editedAt?
+2. load() теперь маппит все эти поля из ответа /api/gkh (раньше брал
+   только 8 базовых полей — authorId и orgResponse* терялись)
+3. Добавлено состояние: const [highlightId, setHighlightId] = useState<string | null>(null)
+4. Добавлен useEffect для глубокой ссылки /gkh?post=ID (как на
+   /o-rabotodatelyah): при заходе по URL с ?post=ID карточка
+   подсвечивается и страница автоскроллится к ней.
+
+Stage Summary:
+- npx tsc --noEmit → 0 ошибок в gkh-publications.tsx
+- curl /gkh → HTTP 200, в HTML видны article-карточки
+- agent-browser snapshot: 15 карточек отрендерены, видны статусы,
+  авторы, даты, 2 карточки имеют «🏢 Официальный ответ организации»
+- Коммит 87c5375 запушен в origin/main (lanister333/SMatrix)
