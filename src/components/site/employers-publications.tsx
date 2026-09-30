@@ -531,17 +531,8 @@ export function EmployersPage(props: {
                       </div>
                     ) : null}
                     <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
-                      <button
-                        type="button"
-                        className={`ep-btn-forum is-${state}`}
-                        data-ep-card-forum={it.id}
-                        onClick={() => discussOnForum("employers", it.id, props.token, props.onNeedAuth)}
-                        title="Создать тему обсуждения в рубрике «Карьера, бизнес ▸ Работодатели»"
-                      >
-                        {forumButtonLabel(it.topicId ? it.topicState : "none")}
-                      </button>
-                      {/* 29.09.2026: кнопка «🏢 Ответ организации» — для org rep,
-                          не автора, если ответа ещё нет. Рядом с форумом. */}
+                      {/* 29.09.2026: кнопка «🏢 Ответ организации» — ТЕПЕРЬ СЛЕВА
+                          (поменяли местами с «💬 Обсудить на форуме»). */}
                       {props.user?.orgRep && props.user.id !== it.authorId && !it.orgResponseText && props.token ? (
                         <button
                           type="button"
@@ -566,6 +557,16 @@ export function EmployersPage(props: {
                           🏢 Ответ организации
                         </button>
                       ) : null}
+                      {/* «💬 Обсудить на форуме» — ТЕПЕРЬ СПРАВА */}
+                      <button
+                        type="button"
+                        className={`ep-btn-forum is-${state}`}
+                        data-ep-card-forum={it.id}
+                        onClick={() => discussOnForum("employers", it.id, props.token, props.onNeedAuth)}
+                        title="Создать тему обсуждения в рубрике «Карьера, бизнес ▸ Работодатели»"
+                      >
+                        {forumButtonLabel(it.topicId ? it.topicState : "none")}
+                      </button>
                     </div>
                   </div>
                 </article>
