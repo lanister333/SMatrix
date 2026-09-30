@@ -572,17 +572,9 @@ export function GkhPage(props: {
                       </div>
                     ) : null}
                     <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
-                      <button
-                        type="button"
-                        className="gkf-btn-forum"
-                        data-gkf-card-forum={it.id}
-                        onClick={() => discussOnForum("gkh", it.id, props.token, props.onNeedAuth)}
-                        title="Создать тему обсуждения в рубрике «ЖКХ и управляющие компании»"
-                      >
-                        💬 Обсудить на форуме ЖКХ
-                      </button>
-                      {/* 29.09.2026: кнопка «🏢 Ответ организации» — для org rep,
-                          не автора, если ответа ещё нет. Рядом с форумом. */}
+                      {/* 29.09.2026: кнопка «🏢 Ответ организации» — СЛЕВА
+                          (поменяли местами с «💬 Обсудить на форуме»).
+                          Исчезает, если ответ уже добавлен (!it.orgResponseText). */}
                       {props.user?.orgRep && props.user.id !== it.authorId && !it.orgResponseText && props.token ? (
                         <button
                           type="button"
@@ -608,6 +600,16 @@ export function GkhPage(props: {
                           🏢 Ответ организации
                         </button>
                       ) : null}
+                      {/* «💬 Обсудить на форуме» — СПРАВА */}
+                      <button
+                        type="button"
+                        className="gkf-btn-forum"
+                        data-gkf-card-forum={it.id}
+                        onClick={() => discussOnForum("gkh", it.id, props.token, props.onNeedAuth)}
+                        title="Создать тему обсуждения в рубрике «ЖКХ и управляющие компании»"
+                      >
+                        💬 Обсудить на форуме ЖКХ
+                      </button>
                     </div>
                   </div>
                 </article>
