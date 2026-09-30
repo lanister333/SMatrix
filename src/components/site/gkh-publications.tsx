@@ -571,9 +571,8 @@ export function GkhPage(props: {
                         <p style={{ margin: "4px 0 0", color: "#1a2433" }}>{it.orgResponseText}</p>
                       </div>
                     ) : null}
-                    {/* 29.09.2026: кнопка «🏢 Ответ организации» — СЛЕВА, отдельная строка. */}
+                    {/* 29.09.2026: «🏢 Ответ организации» — В ОДНОЙ строке с «💬 Обсудить на форуме» (оба справа). */}
                     {props.user?.orgRep && props.user.id !== it.authorId && !it.orgResponseText && props.token ? (
-                      <div style={{ marginBottom: "6px" }}>
                         <button
                           type="button"
                           className="gkf-btn-org-response"
@@ -597,7 +596,6 @@ export function GkhPage(props: {
                         >
                           🏢 Ответ организации
                         </button>
-                      </div>
                     ) : null}
                     {/* 29.09.2026: «💬 Обсудить на форуме» — ПОД ответом организации,
                         на отдельной строке. */}

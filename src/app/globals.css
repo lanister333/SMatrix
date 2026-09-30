@@ -1830,10 +1830,10 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .gkf-card-row{display:flex;gap:8px;margin-top:7px}
 .gkf-rowlabel{color:#3d4a5c;flex:0 0 auto;font-size:13px;font-weight:700}
 .gkf-card-text,.gkf-card-actions{color:#1a1a1a;font-family:inherit;font-size:14px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
-/* 29.09.2026: display:flex, justify-content:flex-end — кнопки справа. */
-.gkf-card-foot{display:flex;justify-content:flex-end;flex-direction:column;align-items:flex-end;margin-top:9px}
-/* 29.09.2026: display:inline-block — справа, единый размер со всеми кнопками. */
-.gkf-btn-forum{background:#0d9488;border-radius:2px;color:#fff !important;cursor:pointer;display:inline-block;font-family:inherit;font-size:13px;font-weight:700;padding:6px 14px;text-decoration:none !important;white-space:nowrap;margin-top:6px}
+/* 29.09.2026: flex-end — кнопки справа в одну строку. */
+.gkf-card-foot{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:6px;align-items:center;margin-top:9px}
+/* 29.09.2026: inline-block, единый размер, margin-top:0 (отступ в .gkf-card-foot). */
+.gkf-btn-forum{background:#0d9488;border-radius:2px;color:#fff !important;cursor:pointer;display:inline-block;font-family:inherit;font-size:13px;font-weight:700;padding:6px 14px;text-decoration:none !important;white-space:nowrap}
 .gkf-btn-forum:hover{background:#0f766e;color:#fff !important}
 .gkf-btn-forum:visited{color:#fff !important}
 /* Форма — 3 обязательных шага (суть / адрес и время / действия) */
@@ -2429,12 +2429,12 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .ep-card-text{color:#1a1a1a;font-family:inherit;font-size:14px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
 .ep-card-mention{color:#0a4fa8}
 .ep-card-disclaimer{color:#8a94a2;font-size:12px;font-style:italic;line-height:1.5;margin-top:8px}
-/* 29.09.2026: display:flex, justify-content:flex-end — кнопки справа. */
-.ep-card-foot{display:flex;justify-content:flex-end;flex-direction:column;align-items:flex-end;margin-top:9px}
+/* 29.09.2026: flex-end — кнопки справа в одну строку. */
+.ep-card-foot{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:6px;align-items:center;margin-top:9px}
 /* Кнопка форума — единая логика ТЗ 2026-09-23: <a> с относительной ссылкой,
    справа; состояния none/open — синяя/бирюзовая, closed/archived — серые */
-/* 29.09.2026: display:inline-block — справа, единый размер. */
-.ep-btn-forum{border-radius:2px;border:0;cursor:pointer;display:inline-block;font-family:inherit;font-size:13px;font-weight:700;padding:6px 14px;text-decoration:none !important;white-space:nowrap;flex-shrink:0;margin-top:6px}
+/* 29.09.2026: inline-block, единый размер, margin-top:0. */
+.ep-btn-forum{border-radius:2px;border:0;cursor:pointer;display:inline-block;font-family:inherit;font-size:13px;font-weight:700;padding:6px 14px;text-decoration:none !important;white-space:nowrap;flex-shrink:0}
 .ep-btn-forum.is-none{color:#fff !important;background:#0a5caa}
 .ep-btn-forum.is-none:hover{background:#084c8b}
 .ep-btn-forum.is-open{color:#fff !important;background:var(--sm-turquoise,#06cdbd)}
