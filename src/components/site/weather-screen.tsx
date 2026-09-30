@@ -740,6 +740,21 @@ section.mp-panel[aria-label="Оперативная обстановка на п
 /* График приливов — компактнее */
 .tide-chart{margin:0 0 4px !important;padding:4px !important}
 .tide-cap{margin:0 0 2px !important;font-size:10px !important}
+/* 2026-10-01 (правка 2): блок «Приливы и отливы» — сжать по вертикали.
+   SVG-график: ограничиваем max-height — viewBox сохраняет пропорции,
+   волна остаётся читаемой, но высота режется с 315px до ~180px.
+   tide-row: padding 7px → 2px; margin-bottom 6px → 1px; font 13/15 → 11/13.
+   mp-w-upd (строка источника): padding 4px → 1px; font 11.5px → 10.5px.
+   Итог: блок 605px → ~360px (−245px). */
+.tide-chart svg{display:block;width:100%;max-height:180px !important;height:auto}
+.tide-row{padding:2px 8px !important;margin-bottom:1px !important;border-radius:0 !important;font-size:11px !important}
+.tide-kind{font-size:11px !important}
+.tide-time{font-size:11px !important}
+.tide-h{font-size:13px !important}
+.tides-list{gap:0 !important}
+.tide-note{margin-top:1px !important;font-size:10.5px !important}
+.tides-body .mp-w-upd{padding:1px 8px !important;font-size:10.5px !important;margin-top:2px !important}
+.tides-body{padding:4px !important}
 
 /* Уменьшить размер контейнера виджета (метеоблю/погода) по высоте */
 .wth-daily-in{max-height:200px}
