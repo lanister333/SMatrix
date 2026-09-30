@@ -522,17 +522,17 @@ export function EmployersPage(props: {
                     + personMention (новые поля Flat 2.0, не legacy title/text).
                   */}
                   <div className="ep-card-foot">
-                    {/* 29.09.2026: орг. ответ (если уже есть) — показываем текстом */}
+                    {/* 29.09.2026: орг. ответ — ВО ВСЮ ШИРИНУ карточки,
+                        кнопка форума — ПОД ним. */}
                     {it.orgResponseText ? (
-                      <div style={{ padding: "6px 8px", background: "#e0f2fe", border: "1px solid #0284c7", borderRadius: "2px", marginBottom: "6px", fontSize: "13px" }}>
+                      <div style={{ width: "100%", padding: "6px 8px", background: "#e0f2fe", border: "1px solid #0284c7", borderRadius: "2px", marginBottom: "6px", fontSize: "13px", boxSizing: "border-box" }}>
                         <b style={{ color: "#075985" }}>🏢 Официальный ответ организации</b>
                         {it.orgResponseByName ? <span style={{ color: "#56657a" }}> · {it.orgResponseByName}</span> : null}
                         <p style={{ margin: "4px 0 0", color: "#1a2433" }}>{it.orgResponseText}</p>
                       </div>
                     ) : null}
+                    {/* Кнопки — ПОД ответом организации. */}
                     <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
-                      {/* 29.09.2026: кнопка «🏢 Ответ организации» — ТЕПЕРЬ СЛЕВА
-                          (поменяли местами с «💬 Обсудить на форуме»). */}
                       {props.user?.orgRep && props.user.id !== it.authorId && !it.orgResponseText && props.token ? (
                         <button
                           type="button"
@@ -557,7 +557,6 @@ export function EmployersPage(props: {
                           🏢 Ответ организации
                         </button>
                       ) : null}
-                      {/* «💬 Обсудить на форуме» — ТЕПЕРЬ СПРАВА */}
                       <button
                         type="button"
                         className={`ep-btn-forum is-${state}`}
