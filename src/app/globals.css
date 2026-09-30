@@ -421,7 +421,7 @@ li.sk-rubric-row{display:block}
 .sk-btn-reply:hover{background:#084c8b}
 .sk-topicactions .sk-btn-answer{color:#fff;background:#0a5caa;border:1px solid #084c8b;border-radius:2px;margin-right:12px;padding:4px 14px;font-size:13px;text-decoration:none}
 .sk-topicactions .sk-btn-answer:hover{color:#fff;background:#084c8b;text-decoration:none}
-.sk-msg-body{white-space:pre-wrap;word-break:break-word;padding:2px 0 2px;font-size:14px;line-height:1.25;margin-bottom:2px}
+.sk-msg-body{white-space:pre-wrap;word-break:break-word;padding:2px 0 2px;font-size:14px;line-height:1.1;margin-bottom:2px}
 .sk-ai-badge{color:#8a6d1a;text-overflow:ellipsis;white-space:nowrap;background:#fdf3d7;border:1px solid #e2cd8a;border-radius:2px;max-width:340px;padding:0 5px;font-size:11.5px;overflow:hidden}
 .sk-flood-btn{color:#4a5b6d;cursor:pointer;background:0 0;border:0;padding:3px 0;font-family:inherit;font-size:12.5px;line-height:1.3;text-decoration:underline}
 .sk-flood-btn:hover{color:#d3402c}
@@ -5025,7 +5025,7 @@ div[style*="background-color: rgb(0, 74, 143)"] {
 .sk-topicactions .sk-btn-answer{padding:3px 12px;margin-right:10px;font-size:12.5px}
 .sk-topicactions{margin-bottom:8px}
 /* Тело: 14/1.25 → 13.5/1.22, плотнее на 1px */
-.sk-msg-body{font-size:13.5px;line-height:1.22;padding:1px 0;margin-bottom:1px}
+.sk-msg-body{font-size:13.5px;line-height:1.1;padding:1px 0;margin-bottom:1px}
 /* Цитаты Сахкома (реставрация + компакт ТЗ): серый блок, шапка-ссылка */
 .sk-quote{background:#f3f5f7;border-left:3px solid #b9cde2;margin:3px 0 0;padding:2px 6px;border-radius:2px}
 .sk-quote-head{color:#0a5caa;cursor:pointer;display:block;font-size:12px;font-weight:700;line-height:1.3;margin-bottom:0;text-decoration:underline}
