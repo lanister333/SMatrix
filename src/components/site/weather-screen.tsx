@@ -263,7 +263,12 @@ function TideWaveChart({ tides, nowIso }: { tides: TidesData; nowIso: string }) 
   return (
     <figure className="tide-chart">
       <figcaption className="tide-cap">Уровень моря, м — сутки назад и 3 дня вперёд</figcaption>
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="График приливов и отливов: волны уровня моря по часам">
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        preserveAspectRatio="none"
+        role="img"
+        aria-label="График приливов и отливов: волны уровня моря по часам"
+      >
         {grid.map((g, i) => (
           <g key={`g${i}`}>
             <line x1={padL} x2={W - padR} y1={Y(g)} y2={Y(g)} stroke="#d6e4f0" strokeWidth="1" />
