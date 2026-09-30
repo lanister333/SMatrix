@@ -24,7 +24,9 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 const ACTIONS = new Set(["edit", "delete", "status"]);
-const STATUSES = new Set(["active", "closed"]);
+// 29.09.2026: добавлен статус "resolved" — «Вопрос решён» (виден только автору).
+// После resolved объявление уходит в архив (показывается серым ниже активных).
+const STATUSES = new Set(["active", "closed", "resolved"]);
 
 export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   try {
@@ -73,6 +75,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
       const notes: Record<string, string> = {
         closed: "Объявление снято с публикации. Оно останется в разделе — так покупатели увидят, что предложение уже не актуально.",
         active: "Объявление снова актуально",
+        resolved: "Вопрос решён — объявление ушло в архив.",
       };
       return NextResponse.json({ ok: true, status, note: notes[status] ?? "" });
     }

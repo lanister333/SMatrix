@@ -70,7 +70,7 @@ const AD_RUBRICS = [
   { key: "other", label: "Разное" },
 ];
 
-const STATUS_LABELS: Record<string, string> = { active: "Актуально", closed: "Снято с публикации" };
+const STATUS_LABELS: Record<string, string> = { active: "Актуально", closed: "Снято с публикации", resolved: "✓ Решено" };
 
 /** Дата и время публикации: «8 сентября, 14:30». */
 function fmtDateTime(iso: string): string {
@@ -148,7 +148,7 @@ function AdRow(props: {
   const [photoIdx, setPhotoIdx] = useState(0);
   const media = item.media ?? [];
   return (
-    <article className={`ad_item${props.highlight ? " ad-highlight" : ""}${item.status === "closed" ? " is-closed" : ""}`} data-ad-id={item.id}>
+    <article className={`ad_item${props.highlight ? " ad-highlight" : ""}${item.status === "closed" ? " is-closed" : ""}${item.status === "resolved" ? " is-resolved" : ""}`} data-ad-id={item.id}>
       <div className="ad-item-rubric">
         <span className={`ad-rubric-badge rb-${item.rubric}`}>{item.rubricLabel}</span>
         <span className={`ad-status is-${item.status}`}>{STATUS_LABELS[item.status] ?? item.status}</span>
@@ -192,15 +192,29 @@ function AdRow(props: {
           <div className="ad-actrow">
             {own ? (
               <>
+                {/* 29.09.2026: кнопка «✅ Вопрос решён» — видна только автору.
+                    После нажатия объявление уходит в архив (status=resolved).
+                    Кнопка видна только когда объявление активно (status=active). */}
+                {item.status === "active" && (
+                  <button className="ad-act ad-resolve-btn" disabled={props.busy} onClick={() => props.onStatus(item, "resolved")}>
+                    ✅ Вопрос решён
+                  </button>
+                )}
+                {/* 29.09.2026: если resolved — показываем «↩ Вернуть в актуальные» */}
+                {item.status === "resolved" && (
+                  <button className="ad-act ad-statusbtn" disabled={props.busy} onClick={() => props.onStatus(item, "active")}>
+                    ↩ Вернуть в актуальные
+                  </button>
+                )}
                 {item.status === "active" ? (
                   <button className="ad-act ad-statusbtn" disabled={props.busy} onClick={() => props.onStatus(item, "closed")}>
                     Снять с публикации
                   </button>
-                ) : (
+                ) : item.status !== "resolved" ? (
                   <button className="ad-act ad-statusbtn" disabled={props.busy} onClick={() => props.onStatus(item, "active")}>
                     Вернуть в «Актуально»
                   </button>
-                )}
+                ) : null}
                 <button className="ad-act" disabled={props.busy} onClick={() => props.onEdit(item)}>
                   Редактировать
                 </button>

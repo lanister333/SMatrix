@@ -2538,6 +2538,13 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .ad_item+.ad_item{border-top:1px solid #e4e8ee}
 .ad_item.ad-highlight{background:#fff8dc;outline:2px solid #e8cf6e;transition:background 1.2s ease}
 .ad_item.is-closed{opacity:.62}
+/* 29.09.2026: resolved (Вопрос решён) — объявление уходит в архив.
+   Стиль как у closed (полупрозрачное), но с зелёным бейджем. */
+.ad_item.is-resolved{opacity:.62}
+.ad_item.is-resolved::after{content:"✓ Решено";display:inline-block;margin-left:6px;font-size:11px;font-weight:700;color:#2e7d32;background:#E2F0D9;border:1px solid #bcd9c2;border-radius:2px;padding:1px 5px}
+/* 29.09.2026: кнопка «✅ Вопрос решён» — бирюзовая, как у других resolve-кнопок */
+.ad-act.ad-resolve-btn{color:#075985;border:1px solid #0284c7;background:#e0f2fe;padding:4px 10px;border-radius:3px}
+.ad-act.ad-resolve-btn:hover{background:#bae6fd}
 .ad-item-rubric{align-items:center;display:flex;flex-wrap:wrap;gap:6px;margin-bottom:2px}
 .ad-rubric-badge{border:1px solid #b6c2d1;border-radius:2px;display:inline-block;padding:0 6px;font-size:11.5px;font-weight:700;line-height:1.6;white-space:nowrap}
 .ad-rubric-badge.rb-sell{background:#eef6fb;border-color:#9cc0dd;color:#0a5caa}
