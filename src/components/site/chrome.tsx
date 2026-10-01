@@ -193,6 +193,8 @@ const NAV_USEFUL = [
   { label: "Курс валют", href: "/currency.php" },
   { label: "Отключения", href: "/disconnections.php" },
   { label: "Пробки", href: "/traffic.php" },
+  // 2026-10-01: добавлен раздел «Транспорт» — расписание авиа/вода/ЖД.
+  { label: "Транспорт", href: "/transport.php" },
 ];
 
 /**

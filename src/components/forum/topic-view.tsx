@@ -120,6 +120,10 @@ function MessageRow(props: {
   quoteOf?: { author: string; num: number; body: string; onGo?: () => void } | null;
   onReply: () => void;
   onComplain: () => void;
+  /** 2026-10-01: кнопка «Не по делу» — быстрая жалоба одной кнопкой
+   *  (category="other", comment="Не по делу (сообщение не по теме
+   *  обсуждения)") без открытия модального окна. */
+  onOfftopic: () => void;
   onFav: () => void;
   onPermalink: () => void;
   onEdit: () => void;
@@ -213,6 +217,13 @@ function MessageRow(props: {
         {/* ШАГ 10: жалоба на сообщение — модальное окно с 7 причинами */}
         <button className="sk-flood-btn" onClick={props.onComplain} title="Жалоба уходит ИИ-модератору; спорные случаи рассмотрит человек">
           Пожаловаться
+        </button>
+        {/* 2026-10-01: кнопка «Не по делу» — быстрая жалоба без модалки.
+            Гостю показывается, но требует авторизации (onNeedAuth в
+            родителе). Залогиненый клик → POST /api/messages/<id>/complaint
+            с category="other" + comment="Не по делу…" → уведомление. */}
+        <button className="sk-flood-btn" onClick={props.onOfftopic} title="Быстрая жалоба: сообщение не по теме обсуждения">
+          Не по делу
         </button>
         {own && (
           <button className="sk-flood-btn" onClick={props.onEdit}>
@@ -736,6 +747,34 @@ export default function TopicView(props: {
         }
       }}
       onComplain={() => setComplainMsg(m)}
+      /** 2026-10-01: «Не по делу» — быстрая жалоба без модалки.
+       *  Гостю → onNeedAuth. Залогиненому → POST /api/messages/<id>/complaint
+       *  с category="other" + comment="Не по делу (сообщение не по теме
+       *  обсуждения)" → toast-уведомление «Отправлено». */
+      onOfftopic={async () => {
+        if (!props.user || !props.token) {
+          props.onNeedAuth();
+          return;
+        }
+        try {
+          const r = await fetch(`/api/messages/${m.id}/complaint`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              category: "other",
+              comment: "Не по делу (сообщение не по теме обсуждения)",
+            }),
+          });
+          const d = await r.json().catch(() => ({}));
+          if (!r.ok) {
+            props.notify(d.error || "Не удалось отправить жалобу");
+            return;
+          }
+          props.notify("Жалоба «Не по делу» отправлена модерации");
+        } catch {
+          props.notify("Сеть недоступна — попробуйте ещё раз");
+        }
+      }}
       onFav={() => {
         favorites.toggle(topicId);
         props.notify(favorites.has(topicId) ? "Удалено из избранного" : "Тема добавлена в избранное");
