@@ -2307,8 +2307,9 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
   /* 2026-10-01: сократить воздух между строками:
      «Рекомендую / Не рекомендую» → «Последние публикации / Мои публикации»
      → «＋ Поделиться опытом». Все три в .rc-head-bar — уменьшаем gap
-     и margin-bottom контейнера. */
-  .rc-head-bar{gap:4px 8px !important;margin-bottom:4px !important}
+     и margin-bottom контейнера.
+     Правка 2: ещё меньше воздуха между title и nav-inline (gap 4→0). */
+  .rc-head-bar{gap:0 8px !important;margin-bottom:4px !important}
   .rc-head-right{gap:4px 8px !important}
   /* 2026-10-01: пагер «← Новее | Страница 1 из 2 · всего 17 | Старее →»
      на мобайле — В ОДИН РЯД без переносов: flex-wrap:nowrap, шрифт мельче,
