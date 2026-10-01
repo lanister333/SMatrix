@@ -3327,6 +3327,48 @@ a.pl-entry-detail:hover{color:#0a5caa}
     align-items:center;
   }
   /* 2026-10-01 (мобайл): кружок-аватар с буквой ника + выпадающее меню. */
+  /* 2026-10-01 (мобайл): иконка-вафля (как у Google) + выпадающее меню с иконками. */
+  .sm-waffle-btn{
+    display:inline-grid;
+    grid-template-columns:repeat(3,4px);
+    grid-template-rows:repeat(3,4px);
+    gap:3px;
+    background:transparent;
+    border:0;
+    cursor:pointer;
+    padding:8px 10px;
+    flex-shrink:0;
+  }
+  .sm-waffle-dot{
+    width:4px;height:4px;border-radius:1px;background:#fff;
+  }
+  .sm-waffle-menu{
+    position:absolute;top:34px;left:0;z-index:300;
+    min-width:280px;max-width:100vw;
+    background:#fff;border:1px solid var(--sm-navy);
+    box-shadow:0 4px 16px rgba(0,0,0,0.15);
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:0;
+    padding:6px;
+    max-height:70vh;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .sm-waffle-menu::-webkit-scrollbar{display:none}
+  .sm-waffle-item{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;text-decoration:none;
+    padding:10px 4px;gap:4px;
+    border-radius:4px;
+    color:#1a2433;
+  }
+  .sm-waffle-item:hover{background:#f4f8fb}
+  .sm-waffle-item:active{background:#e6eef5}
+  .sm-waffle-icon{font-size:20px;line-height:1}
+  .sm-waffle-label{font-size:10px;line-height:1.2;font-weight:600}
+
   .sm-avatar-circle-wrap{position:relative;flex-shrink:0}
   .sm-avatar-circle{
     width:30px;height:30px;border-radius:50%;

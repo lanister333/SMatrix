@@ -239,6 +239,7 @@ export function MainNav(props: {
   // 2026-10-01 (мобайл): кружок-аватар + выпадающее меню (Войти/Регистрация/Профиль/Выйти).
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
   const avatarRef = useRef<HTMLDivElement>(null);
+  const [waffleOpen, setWaffleOpen] = useState(false);
   const auth = useAuth();
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -306,14 +307,89 @@ export function MainNav(props: {
           Логика авторизации (useAuth, openAuth, handleLogin, handleLogout)
           общая с десктопной навигацией ниже — единственный источник правды. */}
       <div className="sm-mh-mobile-bar">
+        {/* 2026-10-01 (мобайл): иконка-вафля (как у Google) вместо текста
+            «☰ Разделы портала». Клик → выпадает меню с иконками разделов. */}
         <button
           type="button"
-          className="sm-mh-burger sm-mh-burger-in-bar"
-          aria-label="Открыть меню разделов"
-          onClick={() => window.dispatchEvent(new CustomEvent("sm-toggle-mobile-menu"))}
+          className="sm-waffle-btn"
+          aria-label="Меню разделов"
+          onClick={() => setWaffleOpen((v) => !v)}
+          title="Разделы портала"
         >
-          ☰ Разделы портала
+          <span className="sm-waffle-dot" />
+          <span className="sm-waffle-dot" />
+          <span className="sm-waffle-dot" />
+          <span className="sm-waffle-dot" />
+          <span className="sm-waffle-dot" />
+          <span className="sm-waffle-dot" />
+          <span className="sm-waffle-dot" />
+          <span className="sm-waffle-dot" />
+          <span className="sm-waffle-dot" />
         </button>
+        {waffleOpen && (
+          <div className="sm-waffle-menu" onClick={(e) => e.stopPropagation()}>
+            <a className="sm-waffle-item" href="/" onClick={(e) => { e.preventDefault(); setWaffleOpen(false); window.location.href = "/?view=forum"; }}>
+              <span className="sm-waffle-icon">💬</span>
+              <span className="sm-waffle-label">Форум</span>
+            </a>
+            <a className="sm-waffle-item" href="/obyavleniya" onClick={() => setWaffleOpen(false)}>
+              <span className="sm-waffle-icon">📋</span>
+              <span className="sm-waffle-label">Объявления</span>
+            </a>
+            <a className="sm-waffle-item" href="/znakomstva" onClick={() => setWaffleOpen(false)}>
+              <span className="sm-waffle-icon">❤️</span>
+              <span className="sm-waffle-label">Знакомства</span>
+            </a>
+            <a className="sm-waffle-item" href="/rekomenduyu" onClick={() => setWaffleOpen(false)}>
+              <span className="sm-waffle-icon">👍</span>
+              <span className="sm-waffle-label">Рекомендую</span>
+            </a>
+            <a className="sm-waffle-item" href="/o-rabotodatelyah" onClick={() => setWaffleOpen(false)}>
+              <span className="sm-waffle-icon">💼</span>
+              <span className="sm-waffle-label">Работодатели</span>
+            </a>
+            <a className="sm-waffle-item" href="/gkh" onClick={() => setWaffleOpen(false)}>
+              <span className="sm-waffle-icon">🏠</span>
+              <span className="sm-waffle-label">ЖКХ</span>
+            </a>
+            <a className="sm-waffle-item" href="/help" onClick={() => setWaffleOpen(false)}>
+              <span className="sm-waffle-icon">🆘</span>
+              <span className="sm-waffle-label">Помощь</span>
+            </a>
+            <a className="sm-waffle-item" href="/podslyshano" onClick={() => setWaffleOpen(false)}>
+              <span className="sm-waffle-icon">👂</span>
+              <span className="sm-waffle-label">Подслушано</span>
+            </a>
+            <a className="sm-waffle-item" href="/gde-kupit" onClick={() => setWaffleOpen(false)}>
+              <span className="sm-waffle-icon">🛒</span>
+              <span className="sm-waffle-label">Где купить</span>
+            </a>
+            <a className="sm-waffle-item" href="/gde-deshevle" onClick={() => setWaffleOpen(false)}>
+              <span className="sm-waffle-icon">💰</span>
+              <span className="sm-waffle-label">Где дешевле</span>
+            </a>
+            <a className="sm-waffle-item" href="/weather.php" onClick={() => setWaffleOpen(false)}>
+              <span className="sm-waffle-icon">🌤️</span>
+              <span className="sm-waffle-label">Погода</span>
+            </a>
+            <a className="sm-waffle-item" href="/currency.php" onClick={() => setWaffleOpen(false)}>
+              <span className="sm-waffle-icon">💱</span>
+              <span className="sm-waffle-label">Курсы</span>
+            </a>
+            <a className="sm-waffle-item" href="/disconnections.php" onClick={() => setWaffleOpen(false)}>
+              <span className="sm-waffle-icon">⚡</span>
+              <span className="sm-waffle-label">Отключения</span>
+            </a>
+            <a className="sm-waffle-item" href="/traffic.php" onClick={() => setWaffleOpen(false)}>
+              <span className="sm-waffle-icon">🚗</span>
+              <span className="sm-waffle-label">Пробки</span>
+            </a>
+            <a className="sm-waffle-item" href="/transport.php" onClick={() => setWaffleOpen(false)}>
+              <span className="sm-waffle-icon">🚍</span>
+              <span className="sm-waffle-label">Транспорт</span>
+            </a>
+          </div>
+        )}
         <div className="sm-mh-mobile-auth">
           {/* 2026-10-01 (мобайл): кружок с буквой ника + выпадающее меню.
               Гость: кружок «?» → меню (Войти, Регистрация).
