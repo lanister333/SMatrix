@@ -3382,10 +3382,10 @@ a.pl-entry-detail:hover{color:#0a5caa}
     width:100%;
     background:#fff;
     border:1px solid #33517a;
-    border-radius:2px;
-    padding:4px 8px;
+    border-radius:4px;
+    padding:5px 10px;
     font-family:inherit;
-    font-size:12px;
+    font-size:13px;
     color:#1a2433;
     outline:none;
   }
