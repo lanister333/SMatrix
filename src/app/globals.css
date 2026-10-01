@@ -2304,6 +2304,12 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
   /* Кнопка форума — длинная метка переносится (flex-wrap у footer-actions) */
   .rc-btn-forum{white-space:normal;text-align:left}
   .rc-pager{justify-content:center}
+  /* 2026-10-01: пагер «← Новее | Страница 1 из 2 · всего 17 | Старее →»
+     на мобайле — В ОДИН РЯД без переносов: flex-wrap:nowrap, шрифт мельче,
+     padding кнопок компактнее, чтобы 3 элемента умещались на 320-375px. */
+  .rc-pager{flex-wrap:nowrap !important;font-size:11px !important;gap:4px !important;justify-content:space-between !important;padding:4px 0 2px !important}
+  .rc-pager button{padding:3px 6px !important;font-size:11px !important;line-height:1.1 !important}
+  .rc-pager span{font-size:11px !important;line-height:1.1 !important;white-space:nowrap !important;overflow:hidden !important;text-overflow:ellipsis !important;flex:1 1 auto !important;min-width:0 !important;text-align:center !important}
 }
 /* Субъект (кого) и позиция (Рекомендую / Не рекомендую) */
 .rc-stances{display:flex;flex-direction:column;gap:4px}
