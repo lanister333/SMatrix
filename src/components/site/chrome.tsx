@@ -315,10 +315,10 @@ export function MainNav(props: {
               <button
                 type="button"
                 className="sm-mh-mobile-authbtn sm-mh-mobile-nick"
-                title="Ваш публичный профиль"
+                title="Ваш профиль"
                 onClick={() => openProfile(auth.user!.nickname)}
               >
-                {auth.user.nickname}
+                👤 {auth.user.nickname}
               </button>
               <button
                 type="button"
@@ -438,8 +438,8 @@ export function MainNav(props: {
           </form>
           {auth.user ? (
             <>
-              <button className="sm-mainnav-link sm-nav-nick" title="Ваш публичный профиль" onClick={() => openProfile(auth.user!.nickname)}>
-                {auth.user.nickname}
+              <button className="sm-mainnav-link sm-nav-nick" title="Ваш профиль" onClick={() => openProfile(auth.user!.nickname)}>
+                👤 {auth.user.nickname}
               </button>
               <button className="sm-mainnav-link sm-nav-out border-r-0" onClick={handleLogout}>
                 выйти
@@ -531,13 +531,13 @@ export function MainNav(props: {
                   <button
                     type="button"
                     className="sm-mdrawer-authbtn"
-                    title="Ваш публичный профиль"
+                    title="Ваш профиль"
                     onClick={() => {
                       setMOpen(false);
                       openProfile(auth.user!.nickname);
                     }}
                   >
-                    {auth.user.nickname} — профиль
+                    👤 Мой профиль ({auth.user.nickname})
                   </button>
                   <button
                     type="button"
