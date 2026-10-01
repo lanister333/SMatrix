@@ -377,7 +377,7 @@ function WhereToBuyRow(props: {
         )}
 
         {/* Кнопка «Пожаловаться» — только НЕ автору отзыва */}
-        {!own && (
+        {!own && user && (
           <button className="wb-report" onClick={() => props.onComplain(item)}>
             Пожаловаться
           </button>
@@ -672,13 +672,12 @@ function WhereToBuyComplaintModal(props: {
           <div className="sk-modal-row">
             <label>Причина</label>
             {WTB_COMPLAINT_REASONS.map((r) => (
-              <label key={r.key} style={{ display: "flex", gap: 6, alignItems: "flex-start", fontWeight: 400, fontSize: 13.5 }}>
+              <label key={r.key} className="complaint-option">
                 <input
                   type="radio"
                   name="wb-complaint"
                   checked={category === r.key}
                   onChange={() => setCategory(r.key)}
-                  style={{ marginTop: 2 }}
                 />
                 {r.label}
               </label>

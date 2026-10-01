@@ -557,7 +557,7 @@ function RecRow(props: {
         )}
 
         {/* Кнопка «Пожаловаться» — только НЕ автору отзыва */}
-        {!own && (
+        {!own && user && (
           <button className="rc-report" data-rc-report={item.id} onClick={() => props.onComplain(item)}>
             Пожаловаться
           </button>
@@ -771,12 +771,10 @@ function RecFormModal(props: {
             <div className="sk-modal-row">
               <label>Ваша позиция</label>
               <div className="rc-stances">
-                <label style={{ display: "flex", gap: 6, alignItems: "flex-start", fontWeight: 400, fontSize: 13.5 }}>
-                  <input type="radio" name="rc-stance" checked={stance === "recommend"} onChange={() => { setStance("recommend"); clearWarnings(); }} style={{ marginTop: 2 }} />
+                <label className="complaint-option">
                   Рекомендую — опыт положительный
                 </label>
-                <label style={{ display: "flex", gap: 6, alignItems: "flex-start", fontWeight: 400, fontSize: 13.5 }}>
-                  <input type="radio" name="rc-stance" checked={stance === "notrecommend"} onChange={() => { setStance("notrecommend"); clearWarnings(); }} style={{ marginTop: 2 }} />
+                <label className="complaint-option">
                   Не рекомендую — опыт отрицательный
                 </label>
               </div>
@@ -942,13 +940,12 @@ function RecComplaintModal(props: {
           <div className="sk-modal-row">
             <label>Причина</label>
             {RC_COMPLAINT_REASONS.map((r) => (
-              <label key={r.key} style={{ display: "flex", gap: 6, alignItems: "flex-start", fontWeight: 400, fontSize: 13.5 }}>
+              <label key={r.key} className="complaint-option">
                 <input
                   type="radio"
                   name="rc-complaint"
                   checked={category === r.key}
                   onChange={() => setCategory(r.key)}
-                  style={{ marginTop: 2 }}
                 />
                 {r.label}
               </label>

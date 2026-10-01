@@ -149,9 +149,11 @@ function OverheardRow(props: {
                 </button>
               </>
             ) : (
-              <button className="oh-report" onClick={() => props.onComplain(item)}>
-                Пожаловаться
-              </button>
+              user && (
+                <button className="oh-report" onClick={() => props.onComplain(item)}>
+                  Пожаловаться
+                </button>
+              )
             )}
           </div>
         </div>
@@ -342,13 +344,12 @@ function OverheardComplaintModal(props: {
           <div className="sk-modal-row">
             <label>Причина</label>
             {OVERHEARD_COMPLAINT_REASONS.map((r) => (
-              <label key={r.key} style={{ display: "flex", gap: 6, alignItems: "flex-start", fontWeight: 400, fontSize: 13.5 }}>
+              <label key={r.key} className="complaint-option">
                 <input
                   type="radio"
                   name="oh-complaint"
                   checked={category === r.key}
                   onChange={() => setCategory(r.key)}
-                  style={{ marginTop: 2 }}
                 />
                 {r.label}
               </label>

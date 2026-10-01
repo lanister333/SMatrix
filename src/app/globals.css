@@ -1292,6 +1292,34 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .sk-modal-row{flex-direction:column;gap:5px;margin-bottom:10px;display:flex}
 .sk-modal-row label{color:#2d3c4c;font-size:13px;font-weight:700}
 .sk-modal-row input,.sk-modal-row select,.sk-modal-row textarea{background:#fff;border:1px solid #1E3A5F;width:100%;padding:7px 9px;font-family:inherit;font-size:14px}
+/* 2026-10-01: radio и checkbox НЕ получают стилизованный input — они
+   должны оставаться маленькими нативными кнопками выбора.
+   Прежде правило выше применялось к radio в модалке жалобы:
+   radio становился width:100% + border + padding → пункты «Мошенничество,
+   Платная услуга, Реклама…» разъезжались хаотично. */
+.sk-modal-row input[type="radio"],.sk-modal-row input[type="checkbox"]{
+  width:auto !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+  background:transparent !important;
+  cursor:pointer;
+}
+.sk-modal-row label.complaint-option{
+  display:flex !important;
+  align-items:center !important;
+  gap:6px !important;
+  width:100% !important;
+  font-weight:400 !important;
+  font-size:13.5px !important;
+  color:#2d3c4c !important;
+  padding:3px 0 !important;
+  cursor:pointer;
+}
+.sk-modal-row label.complaint-option input[type="radio"]{
+  flex:none !important;
+  margin:0 !important;
+}
 .sk-modal-row textarea{resize:vertical;min-height:110px;line-height:1.55}
 .sk-modal-hint{color:#56657a;margin:6px 0 0;font-size:12.5px;line-height:1.55}
 .sk-modal-demo{color:#7a5c10;background:#fdf6e3;border:1px dashed #d8c184;margin-bottom:8px;padding:7px 9px;font-size:12.5px;line-height:1.5}

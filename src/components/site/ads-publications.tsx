@@ -229,9 +229,11 @@ function AdRow(props: {
                 </button>
               </>
             ) : (
-              <button className="ad-report" onClick={() => props.onComplain(item)}>
-                Пожаловаться
-              </button>
+              user && (
+                <button className="ad-report" onClick={() => props.onComplain(item)}>
+                  Пожаловаться
+                </button>
+              )
             )}
           </div>
         </div>
