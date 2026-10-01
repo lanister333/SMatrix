@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import type React from "react";
 import { FolderOpen, MessageSquare } from "lucide-react";
 import {
   FAV_KEY,
@@ -779,7 +780,7 @@ export default function App() {
         {/* 2026-10-01 (мобайл): голубая шапка (sk-topbar) — ВСЕГДА
             показывается (на всех SPA-видах), с названием страницы по
             центру. На форуме также кнопка «☰ Категории форума» слева. */}
-        <div className="sk-topbar" style={{ position: "relative", padding: "16px 8px" }}>
+        <div className="sk-topbar" style={{ position: "relative", padding: "20px 8px !important" } as React.CSSProperties}>
           {view === "forum" && !topicId && (
             <button aria-label="Открыть меню" onClick={() => setMobileMenu(true)}>
               ☰ Категории форума
