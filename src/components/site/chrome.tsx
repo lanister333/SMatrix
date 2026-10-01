@@ -318,7 +318,7 @@ export function MainNav(props: {
                 title="Ваш профиль"
                 onClick={() => openProfile(auth.user!.nickname)}
               >
-                👤 {auth.user.nickname}
+                <span style={{ color: "#f59e0b" }}>👤</span> {auth.user.nickname}
               </button>
               <button
                 type="button"
@@ -439,7 +439,7 @@ export function MainNav(props: {
           {auth.user ? (
             <>
               <button className="sm-mainnav-link sm-nav-nick" title="Ваш профиль" onClick={() => openProfile(auth.user!.nickname)}>
-                👤 {auth.user.nickname}
+                <span style={{ color: "#f59e0b" }}>👤</span> {auth.user.nickname}
               </button>
               <button className="sm-mainnav-link sm-nav-out border-r-0" onClick={handleLogout}>
                 выйти
@@ -537,7 +537,7 @@ export function MainNav(props: {
                       openProfile(auth.user!.nickname);
                     }}
                   >
-                    👤 Мой профиль ({auth.user.nickname})
+                    <span style={{ color: "#f59e0b" }}>👤</span> Мой профиль ({auth.user.nickname})
                   </button>
                   <button
                     type="button"

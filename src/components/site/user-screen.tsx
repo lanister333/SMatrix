@@ -231,6 +231,12 @@ export default function UserScreen() {
                 <div className="sk-loading">{error}</div>
               ) : !data ? (
                 <div className="sk-loading">Загрузка профиля…</div>
+              ) : !isOwn ? (
+                /* 2026-10-01: профиль может смотреть только собственник.
+                   Другие пользователи видят сообщение, а не чужие данные. */
+                <div className="sk-loading" style={{ color: "#56657a", padding: "20px 10px" }}>
+                  Профиль пользователя может просматривать только его владелец.
+                </div>
               ) : (
                 <>
                   <div className="sk-profilebox">
