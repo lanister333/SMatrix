@@ -363,7 +363,7 @@ export default function FlatBoard(props: FlatBoardProps) {
             style={tabBtn(tab === t.key)}
             onClick={() => setTab(t.key)}
           >
-            {`[ ${t.label} ]`}
+            {t.label}
           </button>
         ))}
       </div>
@@ -516,7 +516,7 @@ export default function FlatBoard(props: FlatBoardProps) {
                   style={tabBtn(formTab === t.key)}
                   onClick={() => setFormTab(t.key)}
                 >
-                  {`[ ${t.label} ]`}
+                  {t.label}
                 </button>
               ))}
             </div>
