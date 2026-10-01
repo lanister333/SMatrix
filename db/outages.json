@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-01T16:54:03.431Z",
+  "updated": "2026-10-01T16:59:48.507Z",
   "items": [
     {
       "source": "СКК",
@@ -11,7 +11,19 @@
       "kind": "hot",
       "type": "planned",
       "publishedAt": "2026-10-01T11:23:51Z",
-      "fetchedAt": "2026-10-01T16:54:03.431Z"
+      "fetchedAt": "2026-10-01T16:59:48.507Z"
+    },
+    {
+      "source": "СКК",
+      "title": "Отключение горячего водоснабжения 01.10.2026 с 17:45 до 24:00",
+      "url": "https://skk65.ru/otkljuchenie-goryachego-vodosnabzheniya-01-10-2026-s-17-45-do-24-00/",
+      "addresses": [],
+      "short": "Отключение горячего водоснабжения 01.10.2026 с 17:45 до 24:…",
+      "when": "с 17:45 до 24:00",
+      "kind": "hot",
+      "type": "planned",
+      "publishedAt": "2026-10-01T07:31:53Z",
+      "fetchedAt": "2026-10-01T16:59:48.507Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -27,7 +39,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-10-01T02:36:00.000Z",
-      "fetchedAt": "2026-10-01T16:54:03.431Z"
+      "fetchedAt": "2026-10-01T16:59:48.507Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -60,7 +72,21 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-10-01T00:33:00.000Z",
-      "fetchedAt": "2026-10-01T16:54:03.431Z"
+      "fetchedAt": "2026-10-01T16:59:48.507Z"
+    },
+    {
+      "source": "СКК",
+      "title": "Отключение горячей воды 01.10.2026 с 06:30 до 17:00",
+      "url": "https://skk65.ru/otkljuchenie-goryachej-vody-01-10-2026-06-30-do-17-00/",
+      "addresses": [
+        "ул. Пуркаева, 31В, 31Б, 31А, 31, 33, 35, 35А."
+      ],
+      "short": "ул. Пуркаева, 31В, 31Б, 31А, 31, 33, 35, 35А",
+      "when": "с 06:30 до 17:00",
+      "kind": "hot",
+      "type": "planned",
+      "publishedAt": "2026-09-30T19:50:28Z",
+      "fetchedAt": "2026-10-01T16:59:48.507Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -83,7 +109,19 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-30T00:32:00.000Z",
-      "fetchedAt": "2026-10-01T16:54:03.431Z"
+      "fetchedAt": "2026-10-01T16:59:48.507Z"
+    },
+    {
+      "source": "СКК",
+      "title": "Отключение горячей воды 30.09.2026 с 09:00 до 12:10",
+      "url": "https://skk65.ru/otkljuchenie-goryachej-vody-30-09-2026-s-09-00-do-18-00/",
+      "addresses": [],
+      "short": "Отключение горячей воды 30.09.2026 с 09:00 до 12:10",
+      "when": "с 09:00 до 12:10",
+      "kind": "hot",
+      "type": "planned",
+      "publishedAt": "2026-09-29T05:14:28Z",
+      "fetchedAt": "2026-10-01T16:59:48.507Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -99,7 +137,33 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-29T03:03:00.000Z",
-      "fetchedAt": "2026-10-01T16:54:03.431Z"
+      "fetchedAt": "2026-10-01T16:59:48.507Z"
+    },
+    {
+      "source": "СКК",
+      "title": "Отключение горячей воды с 29.09.2026 04:40 по 03.10.2026 20:00",
+      "url": "https://skk65.ru/otkljuchenie-goryachej-vody-29-09-2026g-s-04-40-do-16-40/",
+      "addresses": [
+        "ул. Комсомольская, 231, 233, 233А, 235, 237, 237А, 239, 241, 241А, 243А."
+      ],
+      "short": "ул. Комсомольская, 231, 233, 233А, 235, 237, 237А, 239, 241…",
+      "when": "",
+      "kind": "hot",
+      "type": "planned",
+      "publishedAt": "2026-09-28T18:04:01Z",
+      "fetchedAt": "2026-10-01T16:59:48.507Z"
+    },
+    {
+      "source": "СКК",
+      "title": "Отключение горячей воды 29.09.2026 с 09:00 до 13:00",
+      "url": "https://skk65.ru/otkljuchenie-goryachej-vody-29-09-2026-s-09-00-do-13-00/",
+      "addresses": [],
+      "short": "Отключение горячей воды 29.09.2026 с 09:00 до 13:00",
+      "when": "с 09:00 до 13:00",
+      "kind": "hot",
+      "type": "planned",
+      "publishedAt": "2026-09-28T03:57:54Z",
+      "fetchedAt": "2026-10-01T16:59:48.507Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -119,7 +183,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-28T01:58:00.000Z",
-      "fetchedAt": "2026-10-01T16:54:03.431Z"
+      "fetchedAt": "2026-10-01T16:59:48.507Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -135,7 +199,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-28T01:50:00.000Z",
-      "fetchedAt": "2026-10-01T16:54:03.431Z"
+      "fetchedAt": "2026-10-01T16:59:48.507Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -155,7 +219,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-25T00:50:00.000Z",
-      "fetchedAt": "2026-10-01T16:54:03.431Z"
+      "fetchedAt": "2026-10-01T16:59:48.507Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -172,7 +236,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-25T00:11:00.000Z",
-      "fetchedAt": "2026-10-01T16:54:03.431Z"
+      "fetchedAt": "2026-10-01T16:59:48.507Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -187,7 +251,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-24T02:01:00.000Z",
-      "fetchedAt": "2026-10-01T16:54:03.431Z"
+      "fetchedAt": "2026-10-01T16:59:48.507Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -213,7 +277,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-21T02:41:00.000Z",
-      "fetchedAt": "2026-10-01T16:54:03.431Z"
+      "fetchedAt": "2026-10-01T16:59:48.507Z"
     }
   ],
   "errors": []

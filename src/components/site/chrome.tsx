@@ -412,7 +412,7 @@ export function MainNav(props: {
             placeholder="Поиск…"
             aria-label="Поиск"
             maxLength={120}
-            style={{ width:"100%", background:"#fff", border:"1px solid #33517a", borderRadius:"4px", padding:"5px 10px", fontFamily:"inherit", fontSize:"13px", color:"#1a2433", outline:"none" }}
+            style={{ width:"100%", background:"#fff", border:"1px solid #33517a", borderRadius:"6px", padding:"6px 12px", fontFamily:"inherit", fontSize:"14px", color:"#1a2433", outline:"none" }}
           />
         </form>
         <div className="sm-mh-mobile-auth">
