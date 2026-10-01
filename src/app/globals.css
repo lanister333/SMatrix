@@ -93,6 +93,11 @@ body{background:#E8EAEB}
    призыва к взаимопомощи) — строго чистый белый #FFFFFF на бирюзовом
    фоне; тёмно-синих цветов текста в шапке нет. */
 @media (min-width:768px){.header-logo{padding-top:6px;padding-bottom:6px}}
+/* 2026-10-01: на десктопе мобильная синяя полоса .sm-mh-mobile-bar
+   (с кнопкой ☰ под бирюзовой шапкой) СКРЫТА — на десктопе кнопка ☰
+   живёт внутри бирюзовой шапки. Это правило работает для всех ширин
+   ≥481px (не только ≥768px), чтобы на планшетах тоже была скрыта. */
+@media (min-width:481px){.sm-mh-mobile-bar{display:none !important}}
 /* Stage 2 (директива «Отцентрировать логотип + подтянуть призыв»):
    - убран top:2px на логотипе (больше не нужен с md:items-center)
    - line-height:50px на .header-slogan заменён на 1.3 — лозунг
@@ -3081,21 +3086,61 @@ a.pl-entry-detail:hover{color:#0a5caa}
   /* ---- Шаг 3: шапка одной строкой до 60px, синее меню скрыто, шторка ☰ Меню ----
      Итерация 2 (ТЗ): обе серые панели меню ужаты по высоте ~в 1,5 раза
      (49→33px) — внутренние отступы до минимума */
-  .sm-mh-wrap{flex-direction:row;align-items:center;padding:4px}
-  .sm-mh-main{display:flex;align-items:center;gap:8px;min-width:0}
+  /* 2026-10-01: бирюзовая шапка +25% по вертикали (padding 4→8, font 25→31),
+     синяя полоса .sk-topbar сжата (padding 4→2, button 5→2 line-height 1.2→1),
+     логотип отцентрирован (justify-content:center на .sm-mh-main и .sm-mh-wrap). */
+  .sm-mh-wrap{flex-direction:row;align-items:center;justify-content:center;padding:8px}
+  .sm-mh-main{display:flex;align-items:center;justify-content:center;gap:8px;min-width:0;width:100%}
   .sm-mh-main > p{display:none}
   .sm-mh-side{display:none}
-  .sm-masthead-title{font-size:25px;line-height:1}
+  .sm-masthead-title{font-size:31px;line-height:1}
   .sm-mainnav{display:none}
   /* ТЗ 2026-09-21: полоска под шапкой — только на мобайле, где синяя полоса
      меню скрыта (на десктопе шапка смыкается с .sm-mainnav без бордера) */
   .sm-masthead{border-bottom:2px solid var(--sm-navy)}
   .sm-mh-burger{display:inline-flex;align-items:center;flex:none;background:var(--sm-navy);color:#fff;border:1px solid var(--sm-navy-deep);padding:4px 8px;font-family:inherit;font-size:13px;font-weight:700;line-height:1;cursor:pointer}
   .sm-mh-burger:active{background:var(--sm-navy-deep)}
-  /* Панель «☰ Меню / Форум» — тоже ниже в 1,5 раза (~52→35px):
-     min-height 46/40px сброшены, вертикальный padding ужат до 4-5px */
-  .sk-topbar{min-height:0;padding:4px 8px}
-  .sk-topbar button{min-height:0;padding:5px 8px;line-height:1.2}
+
+  /* Синяя полоса .sk-topbar (на странице форума «☰ Категории форума | Форум»)
+     сжимаем по вертикали: padding 4→2, button padding 5→2, line-height 1.2→1,
+     button min-height держим на 0 (как было). Экономим ~6px по высоте. */
+  .sk-topbar{min-height:0;padding:2px 8px !important}
+  .sk-topbar button{min-height:0;padding:2px 8px !important;line-height:1 !important}
+  .sk-topbar .tb-title{font-size:14px !important;line-height:1.1 !important}
+  /* 2026-10-01 (только мобайл): кнопка ☰ ВНУТРИ бирюзовой шапки скрыта —
+     вместо неё рисуется отдельная синяя полоса .sm-mh-mobile-bar ПОД
+     шапкой (правило ниже). Десктоп не затронут — там .sm-mh-mobile-bar
+     скрыт через display:none в @media (min-width:481px). */
+  .sm-mh-burger.sm-mh-burger-in-header{display:none !important}
+  /* Синяя полоса под бирюзовой шапкой: цвет — var(--sm-navy) как у
+     .sm-mainnav (на мобайле скрыта), кнопка ☰ занимает всю ширину
+     полосы, выровнена по левому краю (текст кнопки не центрировать —
+     как будто это продолжение скрытой синей ленты). */
+  .sm-mh-mobile-bar{
+    display:block;
+    background:var(--sm-navy);
+    border-bottom:1px solid var(--sm-navy-deep);
+    padding:0;
+  }
+  .sm-mh-mobile-bar .sm-mh-burger.sm-mh-burger-in-bar{
+    display:inline-flex;
+    align-items:center;
+    background:transparent;
+    border:0;
+    color:#fff;
+    padding:8px 12px;
+    font-family:inherit;
+    font-size:13.5px;
+    font-weight:700;
+    line-height:1.2;
+    cursor:pointer;
+  }
+  .sm-mh-mobile-bar .sm-mh-burger.sm-mh-burger-in-bar:active{
+    background:var(--sm-navy-deep);
+  }
+  /* Панель «☰ Меню / Форум» — компактная на мобайле:
+     мин. высоты сброшены, padding сжат до 2px (см. выше правило
+     .sk-topbar в этом же media-блоке, строки ~3107). */
   /* Левая выдвижная шторка (монтируется только в открытом состоянии) */
   .sm-mdrawer-backdrop{position:fixed;inset:0;background:#00000059;z-index:240}
   .sm-mdrawer{position:fixed;top:0;bottom:0;left:0;z-index:250;width:280px;max-width:84vw;background:#fff;border-right:2px solid var(--sm-navy);overflow-y:auto;display:flex;flex-direction:column;animation:sm-drawer-in .18s ease-out}

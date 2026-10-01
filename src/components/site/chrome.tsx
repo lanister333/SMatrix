@@ -44,7 +44,10 @@ export function Masthead(props: { settings: SiteSettings }) {
   // невидим (navy на navy-полосе .sm-mainnav) и ломал равенство полосок
   // активной кнопки; для мобайла (≤480px, полоса скрыта) полоска вернута
   // правилом .sm-masthead в существующем @media-блоке globals.css
+  // 2026-10-01: return обёрнут в <> Fragment — после </header> добавлена
+  // мобильная синяя полоса .sm-mh-mobile-bar с кнопкой ☰ (десктоп: скрыта).
   return (
+    <>
     <header
       className="w-full sm-masthead"
       /* ТЗ 2026-09-21 «шапку сайта окрась в цвет как у блока поддержка
@@ -95,9 +98,11 @@ export function Masthead(props: { settings: SiteSettings }) {
           ПК-версию правки не затрагивают. */}
       <div className="sm-mh-wrap mx-auto flex max-w-[1280px] flex-col gap-0 px-3 py-2 md:flex-row md:items-center md:justify-between md:gap-6 md:px-4 md:py-3">
         <div className="sm-mh-main min-w-0">
+          {/* Десктоп: кнопка ☰ внутри бирюзовой шапки (как было). Мобайл:
+              дублирующая кнопка в .sm-mh-mobile-bar ниже — здесь скрываем. */}
           <button
             type="button"
-            className="sm-mh-burger"
+            className="sm-mh-burger sm-mh-burger-in-header"
             aria-label="Открыть меню разделов"
             onClick={() => window.dispatchEvent(new CustomEvent("sm-toggle-mobile-menu"))}
           >
@@ -144,6 +149,23 @@ export function Masthead(props: { settings: SiteSettings }) {
         </div>
       </div>
     </header>
+
+    {/* 2026-10-01 (только мобайл): синяя полоса с кнопкой ☰ Разделы портала
+        ПОД бирюзовой шапкой, ВЫШЕ скрытой на мобайле синей ленты .sm-mainnav.
+        На десктопе блок скрыт (display:none через @media min-width:481px);
+        кнопка внутри бирюзовой шапки (.sm-mh-burger-in-header) на мобайле
+        тоже скрыта — пользователь видит только эту синюю полосу. */}
+    <div className="sm-mh-mobile-bar">
+      <button
+        type="button"
+        className="sm-mh-burger sm-mh-burger-in-bar"
+        aria-label="Открыть меню разделов"
+        onClick={() => window.dispatchEvent(new CustomEvent("sm-toggle-mobile-menu"))}
+      >
+        ☰ Разделы портала
+      </button>
+    </div>
+  </>
   );
 }
 
