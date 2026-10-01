@@ -3365,8 +3365,9 @@ a.pl-entry-detail:hover{color:#0a5caa}
   }
   .sm-waffle-item:hover{background:#f4f8fb}
   .sm-waffle-item:active{background:#e6eef5}
-  .sm-waffle-icon{font-size:20px;line-height:1}
-  .sm-waffle-label{font-size:10px;line-height:1.2;font-weight:600}
+  .sm-waffle-icon{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;background:#1E3A5F;color:#fff}
+  .sm-waffle-icon svg{display:block}
+  .sm-waffle-label{font-size:11px;line-height:1.2;font-weight:600}
 
   /* 2026-10-01 (мобайл): белое окно поиска по центру синей полосы.
      Поуже по горизонтали — добавлены margin 0 6px чтобы не прилипало

@@ -340,63 +340,63 @@ export function MainNav(props: {
         {waffleOpen && (
           <div className="sm-waffle-menu" onClick={(e) => e.stopPropagation()}>
             <a className="sm-waffle-item" href="/" onClick={(e) => { e.preventDefault(); setWaffleOpen(false); window.location.href = "/?view=forum"; }}>
-              <span className="sm-waffle-icon">💬</span>
+              <span className="sm-waffle-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
               <span className="sm-waffle-label">Форум</span>
             </a>
             <a className="sm-waffle-item" href="/obyavleniya" onClick={() => setWaffleOpen(false)}>
-              <span className="sm-waffle-icon">📋</span>
+              <span className="sm-waffle-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg></span>
               <span className="sm-waffle-label">Объявления</span>
             </a>
             <a className="sm-waffle-item" href="/znakomstva" onClick={() => setWaffleOpen(false)}>
-              <span className="sm-waffle-icon">❤️</span>
+              <span className="sm-waffle-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span>
               <span className="sm-waffle-label">Знакомства</span>
             </a>
             <a className="sm-waffle-item" href="/rekomenduyu" onClick={() => setWaffleOpen(false)}>
-              <span className="sm-waffle-icon">👍</span>
+              <span className="sm-waffle-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M7 10v12M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88z"/></svg></span>
               <span className="sm-waffle-label">Рекомендую</span>
             </a>
             <a className="sm-waffle-item" href="/o-rabotodatelyah" onClick={() => setWaffleOpen(false)}>
-              <span className="sm-waffle-icon">💼</span>
-              <span className="sm-waffle-label">Работодатели</span>
+              <span className="sm-waffle-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>
+              <span className="sm-waffle-label">Работа</span>
             </a>
             <a className="sm-waffle-item" href="/gkh" onClick={() => setWaffleOpen(false)}>
-              <span className="sm-waffle-icon">🏠</span>
+              <span className="sm-waffle-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg></span>
               <span className="sm-waffle-label">ЖКХ</span>
             </a>
             <a className="sm-waffle-item" href="/help" onClick={() => setWaffleOpen(false)}>
-              <span className="sm-waffle-icon">🆘</span>
+              <span className="sm-waffle-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></span>
               <span className="sm-waffle-label">Помощь</span>
             </a>
             <a className="sm-waffle-item" href="/podslyshano" onClick={() => setWaffleOpen(false)}>
-              <span className="sm-waffle-icon">👂</span>
+              <span className="sm-waffle-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M8 8a4 4 0 0 1 8 0c0 2-2 4-4 4s-4-2-4-4z"/><path d="M5 12.5a7 7 0 0 1 14 0"/><path d="M2 10a10 10 0 0 1 20 0"/></svg></span>
               <span className="sm-waffle-label">Подслушано</span>
             </a>
             <a className="sm-waffle-item" href="/gde-kupit" onClick={() => setWaffleOpen(false)}>
-              <span className="sm-waffle-icon">🛒</span>
+              <span className="sm-waffle-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></span>
               <span className="sm-waffle-label">Где купить</span>
             </a>
             <a className="sm-waffle-item" href="/gde-deshevle" onClick={() => setWaffleOpen(false)}>
-              <span className="sm-waffle-icon">💰</span>
+              <span className="sm-waffle-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
               <span className="sm-waffle-label">Где дешевле</span>
             </a>
             <a className="sm-waffle-item" href="/weather.php" onClick={() => setWaffleOpen(false)}>
-              <span className="sm-waffle-icon">🌤️</span>
+              <span className="sm-waffle-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17.5 19a4.5 4.5 0 1 0 0-9h-1.8A7 7 0 1 0 4 14"/></svg></span>
               <span className="sm-waffle-label">Погода</span>
             </a>
             <a className="sm-waffle-item" href="/currency.php" onClick={() => setWaffleOpen(false)}>
-              <span className="sm-waffle-icon">💱</span>
+              <span className="sm-waffle-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
               <span className="sm-waffle-label">Курсы</span>
             </a>
             <a className="sm-waffle-item" href="/disconnections.php" onClick={() => setWaffleOpen(false)}>
-              <span className="sm-waffle-icon">⚡</span>
+              <span className="sm-waffle-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></span>
               <span className="sm-waffle-label">Отключения</span>
             </a>
             <a className="sm-waffle-item" href="/traffic.php" onClick={() => setWaffleOpen(false)}>
-              <span className="sm-waffle-icon">🚗</span>
+              <span className="sm-waffle-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M5 17H3V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v12h-2"/><path d="M14 17V9a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-1"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="18.5" cy="17.5" r="2.5"/></svg></span>
               <span className="sm-waffle-label">Пробки</span>
             </a>
             <a className="sm-waffle-item" href="/transport.php" onClick={() => setWaffleOpen(false)}>
-              <span className="sm-waffle-icon">🚍</span>
+              <span className="sm-waffle-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M8 6v6M16 6v6M2 12h19.5M17.5 5.5 16 4M4 6.5 5.5 5M7 12l-2 9M17 12l2 9"/></svg></span>
               <span className="sm-waffle-label">Транспорт</span>
             </a>
           </div>
