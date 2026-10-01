@@ -2,8 +2,8 @@
 
 /**
  * ТЗ 2026-09-24 «Обсудить на форуме — авто-создание темы»:
- * клиентский helper для всех 5 разделов сайта (recommend, wheretobuy,
- * gdedeshevle, employers, gkh).
+ * клиентский helper для всех 6 разделов сайта (recommend, wheretobuy,
+ * gdedeshevle, employers, gkh, help).
  *
  * Поведение:
  *  1. Если пользователь не залогинен — вызывает onNeedAuth() (открывает
@@ -15,17 +15,17 @@
  *  5. Если сервер вернул needAuth (маловероятно — мы уже проверили token) —
  *     открывает AuthModal. Если вернул error — показывает alert.
  *
- * Этот helper ИЗБАВЛЯЕТ от дублирования кода в 5 карточках: каждая карточка
+ * Этот helper ИЗБАВЛЯЕТ от дублирования кода в 6 карточках: каждая карточка
  * просто вызывает discussOnForum(kind, postId, token, onNeedAuth).
  */
 
-export type DiscussKind = "recommend" | "wheretobuy" | "gdedeshevle" | "employers" | "gkh";
+export type DiscussKind = "recommend" | "wheretobuy" | "gdedeshevle" | "employers" | "gkh" | "help";
 
 /**
  * Инициирует авто-создание (или поиск существующей) темы для обсуждения
  * публикации на форуме. После ответа сервера — редиректит пользователя.
  *
- * @param kind        Тип публикации (recommend/wheretobuy/gdedeshevle/employers/gkh).
+ * @param kind        Тип публикации (recommend/wheretobuy/gdedeshevle/employers/gkh/help).
  * @param postId      Cuid публикации (как в card.id).
  * @param token       Токен текущего пользователя (null для гостя).
  * @param onNeedAuth  Колбэк, который открывает AuthModal, если гость.

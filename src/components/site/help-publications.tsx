@@ -15,6 +15,7 @@ import SakhDatetimeBlock from "@/components/site/sakh-datetime-block";
 import type { ForumUser } from "@/lib/ui";
 import { hasContact, CONTACT_ERROR, renderContacts } from "@/lib/contact-check";
 import { nickGenderClass } from "@/lib/nick-gender";
+import { discussOnForum } from "@/lib/discuss";
 
 interface HelpItem {
   id: string;
@@ -110,6 +111,10 @@ function HelpCard(props: {
   onEdit: (item: HelpItem) => void;
   onDelete: (item: HelpItem) => void;
   onComplain: (item: HelpItem) => void;
+  /** 2026-10-01: токен залогиненного пользователя для авто-создания темы
+   *  через POST /api/discuss/help/<id> (как у других разделов). */
+  token: string | null;
+  onNeedAuth: () => void;
 }) {
   const { item, user } = props;
   const own = !!(user && item.authorId === user.id);
@@ -200,15 +205,23 @@ function HelpCard(props: {
           </div>
 
           {/* Кнопка «💬 Обсудить на форуме» — крайняя справа.
-              margin-left:auto прижимает её к правому краю ряда. */}
-          <a
+              2026-10-01: АВТО-СОЗДАНИЕ темы форума при клике (как у других
+              разделов). Прежде была статичная ссылка <a href> на рубрику —
+              пользователь должен был сам создавать тему. Теперь кнопка
+              вызывает discussOnForum("help", id, token, onNeedAuth),
+              которая POST /api/discuss/help/<id> создаёт тему с заголовком
+              = title публикации и редиректит пользователя в готовую тему.
+              Гостю — onNeedAuth (открытие AuthModal). Если у публикации
+              уже есть topicId — сразу редирект без дубликата. */}
+          <button
+            type="button"
             className="hp-btn-forum hp-btn-forum-right"
             data-hp-card-forum={item.id}
-            href={HELP_FORUM_URL}
-            title="Обсудить в рубрике «Товары и услуги ▸ Услуги и специалисты»"
+            onClick={() => discussOnForum("help", item.id, props.token, props.onNeedAuth)}
+            title="Создать тему обсуждения в рубрике «Товары и услуги ▸ Услуги и специалисты»"
           >
             💬 Обсудить на форуме
-          </a>
+          </button>
         </div>
       )}
     </article>
@@ -802,6 +815,8 @@ export function HelpPage(props: {
                   onEdit={openEdit}
                   onDelete={deleteItem}
                   onComplain={setComplainItem}
+                  token={props.token}
+                  onNeedAuth={props.onNeedAuth}
                 />
               ))}
           </div>

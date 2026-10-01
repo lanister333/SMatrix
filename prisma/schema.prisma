@@ -108,6 +108,9 @@ model Topic {
   recPost        RecPost?
   /// ШАГ 25. Отзыв «О работодателях», к которому привязана тема.
   empPost        EmpPost?
+  /// 2026-10-01: публикация «Нужна помощь», к которой привязана тема
+  /// (0..1, у публикации уникально — максимум одна тема на просьбу).
+  helpPublication HelpPublication?
 }
 
 model Message {
@@ -242,6 +245,12 @@ model HelpPublication {
   status       String          @default("active")
   authorId     String
   authorName   String
+  /// 2026-10-01: ссылка на тему форума (0..1, уникально — максимум одна
+  /// тема на публикацию; ни повторные нажатия, ни обновление страницы,
+  /// ни параллельные запросы нескольких пользователей не создадут
+  /// дубликатов). При удалении темы — cascade null (тема остаётся).
+  topicId      Int?            @unique
+  topic        Topic?          @relation(fields: [topicId], references: [id])
   aiStatus     String          @default("ok") // ok | hidden | human
   aiNote       String          @default("")
   hiddenReason String          @default("")

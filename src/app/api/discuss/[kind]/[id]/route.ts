@@ -53,9 +53,9 @@ export const maxDuration = 60;
  */
 interface KindConfig {
   /** Имя prisma-модели для db.<model>.findUnique — RecPost, WhereToBuyPost и т.д. */
-  prismaModel: "recPost" | "whereToBuyPost" | "cheapPost" | "empPost" | "gkhProblem";
+  prismaModel: "recPost" | "whereToBuyPost" | "cheapPost" | "empPost" | "gkhProblem" | "helpPublication";
   /** Ключ в карте SECTION_FORUM — для получения slug рубрики-назначения. */
-  sectionKey: "recommend" | "wheretobuy" | "gdedeshevle" | "employers" | "gkh";
+  sectionKey: "recommend" | "wheretobuy" | "gdedeshevle" | "employers" | "gkh" | "help";
   /** Относительный URL страницы-источника с якорем на публикацию. */
   sourcePath: (id: string) => string;
 }
@@ -86,6 +86,11 @@ const KINDS: Record<string, KindConfig> = {
     sectionKey: "gkh",
     sourcePath: (id) => `/gkh#gkh-${id}`,
   },
+  help: {
+    prismaModel: "helpPublication",
+    sectionKey: "help",
+    sourcePath: (id) => `/help#help-${id}`,
+  },
 };
 
 /**
@@ -114,6 +119,15 @@ function buildTopicTitleBody(kind: string, post: Record<string, unknown>): { tit
     if (post.text) parts.push(`Проблема:\n${post.text}`);
     if (post.actions) parts.push(`Действия:\n${post.actions}`);
     return { title, body: parts.join("\n\n") };
+  }
+  if (kind === "help") {
+    // 2026-10-01: «Нужна помощь» — заголовок темы = title публикации
+    // (например, «Помочь найти кота»), тело = описание просьбы (text).
+    // Контакт contactData не дублируем в тему — он остаётся в карточке
+    // помощи (зелёная плашка «📞 Связь:»).
+    const title = String(post.title || "").slice(0, 150);
+    const body = String(post.text || "");
+    return { title, body };
   }
   // recommend / wheretobuy / gdedeshevle — стандартные title + text.
   // У RecPost есть ещё поле subject — используем его как fallback для заголовка.
@@ -166,8 +180,10 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ kind: stri
       isHiddenByAi: true,
       title: true,
       text: true,
-      place: true,
     };
+    // place есть НЕ во всех моделях (HelpPublication без place) — добавляем
+    // только для kinds, у которых это поле есть в схеме.
+    if (kind !== "help") baseSelect.place = true;
     if (kind === "recommend") baseSelect.subject = true;
     if (kind === "employers") {
       baseSelect.employer = true;
