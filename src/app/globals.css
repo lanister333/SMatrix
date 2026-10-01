@@ -4010,6 +4010,33 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
   .dis-phones td{padding:0 4px;font-size:12.5px}
   .sk a.dis-ph-tel{display:block;padding:13px 2px;line-height:20px;font-size:14.5px} /* строка-тач-цель 46px ≥44px; тап — сразу вызов */
 
+  /* 2026-10-01 (правка для /disconnections.php): всё компактнее по
+     вертикали — слишком много воздуха. Сжимаем paddings, line-heights,
+     gap, margin-bottom с !important (перебивают ранние правила выше). */
+  .dis-cardbody{padding:3px 4px !important}
+  .dis-filters{gap:4px !important;padding-top:2px !important;padding-bottom:2px !important}
+  .dis-chip{padding:3px 8px !important;font-size:11.5px !important;line-height:1.1 !important;border-radius:2px !important}
+  .dis-list{padding:1px 0 !important}
+  .dis-item{padding:2px 4px !important}
+  .dis-title{font-size:11.5px !important;line-height:1.15 !important}
+  .dis-when{font-size:10px !important;line-height:1.1 !important;margin-top:0 !important}
+  .dis-addr{margin-top:1px !important;padding-left:9px !important;font-size:11px !important;line-height:1.15 !important}
+  .dis-addr li{margin-top:0 !important;padding-top:0 !important}
+  .dis-empty{padding:3px 4px !important;font-size:11.5px !important;line-height:1.2 !important}
+  .dis-upd{padding:0 4px 2px !important;font-size:10px !important;line-height:1.1 !important}
+  .dis-phones td{padding:2px 4px !important;font-size:11.5px !important;line-height:1.15 !important}
+  .sk a.dis-ph-tel{padding:5px 2px !important;line-height:14px !important;font-size:12px !important}
+  .mp-off-list{padding:1px 0 !important}
+  .mp-off-line{padding:3px 4px !important;gap:4px !important}
+  .mp-off-org{font-size:10px !important;line-height:1.1 !important}
+  .mp-off-addr{font-size:11px !important;line-height:1.15 !important}
+  .mp-off-time{font-size:9.5px !important;line-height:1.1 !important}
+  .mp-offnote{padding:3px 4px !important;font-size:11.5px !important;line-height:1.2 !important;gap:5px !important}
+  .mp-off-live{padding:3px 4px !important;font-size:11.5px !important;line-height:1.2 !important;gap:5px !important}
+  /* Заголовок «Отключения» и шапки блоков служб — компактнее */
+  .mp-paneltitle{padding:2px 5px !important;font-size:11.5px !important;line-height:1.1 !important}
+  .mp-paneltitle .tri{font-size:7px !important}
+
   /* ---- Шаг 9: страница /currency.php — сквозная мессенджерная
      плотность (отступы 6px, системные шрифты): таблица 6 банков × 5
      валют влезает в узкий экран без горизонтальной прокрутки
