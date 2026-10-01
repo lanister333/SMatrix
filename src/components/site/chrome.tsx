@@ -206,6 +206,17 @@ const NAV_USEFUL = [
  * работает без правок этих экранов — после входа/выхода делается перезагрузка,
  * если экран не передал свои обработчики onLogin/onLogout.
  */
+/** 2026-10-01: генерирует стабильный hue (0-360) из ника — каждый
+ *  пользователь получает свой цвет аватара (красный, синий, зелёный…),
+ *  цвет не меняется между перезагрузками. */
+function nickColorHue(nick: string): number {
+  let h = 0;
+  for (let i = 0; i < nick.length; i++) {
+    h = (h * 31 + nick.charCodeAt(i)) % 360;
+  }
+  return h;
+}
+
 export function MainNav(props: {
   current: string;
   isAdmin: boolean;
@@ -393,13 +404,25 @@ export function MainNav(props: {
         <div className="sm-mh-mobile-auth">
           {/* 2026-10-01 (мобайл): кружок с буквой ника + выпадающее меню.
               Гость: кружок «?» → меню (Войти, Регистрация).
-              Залогинен: кружок с первой буквой ника → меню (Профиль, Выйти). */}
-          <div className="sm-avatar-circle-wrap" ref={avatarRef}>
+              Залогинен: кружок с первой буквой ника → меню (Профиль, Выйти).
+              2026-10-01 (правка 2): кружок покрашен рандомным цветом
+              (по хэшу ника — стабильно для каждого пользователя), с
+              отступом от краёв шапки (margin:4px). */}
+          <div className="sm-avatar-circle-wrap" ref={avatarRef} style={{ margin: "4px" }}>
             <button
               type="button"
               className="sm-avatar-circle"
               onClick={() => setAvatarMenuOpen((v) => !v)}
               title={auth.user ? auth.user.nickname : "Меню входа"}
+              style={auth.user ? {
+                background: `hsl(${nickColorHue(auth.user.nickname)}, 65%, 50%)`,
+                borderColor: `hsl(${nickColorHue(auth.user.nickname)}, 65%, 35%)`,
+                color: "#fff",
+              } : {
+                background: "#6b7280",
+                borderColor: "#4b5563",
+                color: "#fff",
+              }}
             >
               {auth.user ? auth.user.nickname.charAt(0).toUpperCase() : "?"}
             </button>

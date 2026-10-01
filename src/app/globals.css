@@ -3372,13 +3372,12 @@ a.pl-entry-detail:hover{color:#0a5caa}
   .sm-avatar-circle-wrap{position:relative;flex-shrink:0}
   .sm-avatar-circle{
     width:30px;height:30px;border-radius:50%;
-    border:2px solid #f59e0b;
-    background:#1E3A5F;color:#f59e0b;
+    border:2px solid;
     font-size:14px;font-weight:700;
     display:flex;align-items:center;justify-content:center;
     cursor:pointer;flex-shrink:0;padding:0;
+    box-shadow:0 1px 3px rgba(0,0,0,0.3);
   }
-  .sm-avatar-circle:hover{background:#2a4d7a}
   .sm-avatar-menu{
     position:absolute;top:34px;right:0;z-index:300;
     min-width:160px;
