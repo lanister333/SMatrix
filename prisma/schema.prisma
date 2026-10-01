@@ -137,6 +137,15 @@ model Message {
   aiStatus     String    @default("ok")
   aiNote       String    @default("")
   needHuman    Boolean   @default(false)
+  /// 2026-10-01: уровень нарушения (1-4). 4=нет нарушения, 3=нарушение
+  /// правил общения, 2=серьёзное, 1=критическая опасность.
+  modLevel     Int       @default(4)
+  /// 2026-10-01: технический статус AI: WATCH | LIMIT | STOP | ALERT
+  aiAction     String    @default("WATCH")
+  /// 2026-10-01: уверенность AI (0.0 - 1.0)
+  aiConfidence Float     @default(0.0)
+  /// 2026-10-01: сработавший сигнал (короткое описание)
+  aiSignal     String    @default("")
   floodCount   Int       @default(0)
   isCollapsed  Boolean   @default(false)
   isHiddenByAi Boolean   @default(false)
@@ -146,6 +155,8 @@ model Message {
   editedAt     DateTime?
   createdAt    DateTime  @default(now())
   complaints   Complaint[]
+  /// 2026-10-01: история решений по этому сообщению
+  modHistory   ModerationHistory[]
 }
 
 model Complaint {
@@ -218,6 +229,26 @@ model AdminLog {
   targetLabel String   @default("") // человекочитаемое описание объекта
   details     String   @default("") // дополнительные сведения
   createdAt   DateTime @default(now())
+}
+
+/// 2026-10-01: История решений модерации по одному сообщению.
+/// Каждое изменение решения (AI предложил → админ изменил → итог) —
+/// отдельная запись. Не создаёт новые карточки в журнале —
+/// одна карточка = одно сообщение, внутри — история.
+/// actor: "ai" | ник администратора
+/// action: "propose" | "publish" | "hide" | "delete" | "warn" | "limit" | "ban" | "escalate" | "emergency_stop"
+/// result: финальный итог (сообщение опубликовано / скрыто / удалено / ...)
+model ModerationHistory {
+  id         String   @id @default(cuid())
+  messageId  String
+  message    Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  actor      String   // "ai" или ник администратора
+  actorRole  String   @default("ai") // ai | owner | admin | moderator
+  action     String   // propose | publish | hide | delete | warn | limit | ban | escalate | emergency_stop
+  reason     String   @default("") // причина решения
+  result     String   @default("") // финальный итог
+  confidence Float    @default(0.0) // уверенность (только для actor=ai)
+  createdAt  DateTime @default(now())
 }
 
 /// ШАГ 12. Настройки сайта (ключ-значение), меняются владельцем.

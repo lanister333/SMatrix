@@ -434,7 +434,42 @@ interface ModerationEntry {
   aiNote: string;
   complaintsCount: number;
   complaints: { id: string; category: string; comment: string; aiVerdict: string; aiNote: string; createdAt: string }[];
+  /** 2026-10-01: новые поля для карточки проверки */
+  modLevel?: number;
+  aiAction?: string;
+  aiConfidence?: number;
+  aiSignal?: string;
+  num?: number;
+  createdAt?: string;
 }
+
+/** 2026-10-01: Метки уровней нарушения (1-4). */
+const LEVEL_LABELS: Record<number, { label: string; color: string; bg: string }> = {
+  1: { label: "Уровень 1 — критическая опасность", color: "#fff", bg: "#b91c1c" },
+  2: { label: "Уровень 2 — серьёзное нарушение", color: "#fff", bg: "#d97706" },
+  3: { label: "Уровень 3 — нарушение правил общения", color: "#1a2433", bg: "#fde68a" },
+  4: { label: "Уровень 4 — нарушения нет", color: "#1a2433", bg: "#d1fae5" },
+};
+
+/** 2026-10-01: Метки технического статуса AI. */
+const AI_ACTION_LABELS: Record<string, string> = {
+  WATCH: "наблюдение",
+  LIMIT: "рекомендуется ограничение",
+  STOP: "остановить публикацию",
+  ALERT: "срочно уведомить администратора",
+};
+
+/** 2026-10-01: Метки действий администратора. */
+const ADMIN_ACTIONS: { key: string; label: string; color: string; confirm?: boolean }[] = [
+  { key: "publish", label: "Оставить", color: "#16a34a" },
+  { key: "hide", label: "Скрыть", color: "#d97706" },
+  { key: "delete", label: "Удалить", color: "#dc2626", confirm: true },
+  { key: "warn", label: "Предупредить", color: "#eab308", confirm: true },
+  { key: "limit", label: "Ограничить", color: "#f97316", confirm: true },
+  { key: "ban", label: "Заблокировать", color: "#991b1b", confirm: true },
+  { key: "escalate", label: "На доп. проверку", color: "#6366f1" },
+  { key: "emergency_stop", label: "Срочно остановить", color: "#7f1d1d", confirm: true },
+];
 
 interface AdminSanction {
   id: string;
@@ -470,314 +505,8 @@ interface AdminAppeal {
   createdAt: string;
 }
 
-function ModerationSection(props: { token: string | null; notify: (m: string) => void; onOpenTopic: (id: number) => void }) {
-  const [tab, setTab] = useState<"queue" | "sanctions" | "appeals">("queue");
-  const [entries, setEntries] = useState<ModerationEntry[]>([]);
-  const [sanctions, setSanctions] = useState<AdminSanction[]>([]);
-  const [appeals, setAppeals] = useState<AdminAppeal[]>([]);
-  const [q, setQ] = useState("");
-  const [error, setError] = useState("");
-  const [saNick, setSaNick] = useState("");
-  const [saKind, setSaKind] = useState("warning");
-  const [saReason, setSaReason] = useState("");
 
-  const load = useCallback(() => {
-    if (!props.token) return;
-    const sp = new URLSearchParams({ token: props.token, limit: "60" });
-    if (q.trim()) sp.set("q", q.trim());
-    fetch(`/api/moderation?${sp}`)
-      .then(async (r) => {
-        const d = await r.json();
-        if (!r.ok) throw Error(d.error);
-        return d;
-      })
-      .then((d) => setEntries(d.entries || []))
-      .catch((e) => setError(e.message));
-  }, [props.token, q]);
-
-  const loadSanctions = useCallback(() => {
-    if (!props.token) return;
-    fetch(`/api/admin/sanctions?token=${encodeURIComponent(props.token)}`)
-      .then(async (r) => {
-        const d = await r.json();
-        if (!r.ok) throw Error(d.error);
-        return d;
-      })
-      .then((d) => {
-        setSanctions(d.sanctions || []);
-        setAppeals(d.appeals || []);
-      })
-      .catch((e) => setError(e.message));
-  }, [props.token]);
-
-  useEffect(() => {
-    const t = window.setTimeout(load, 0);
-    return () => window.clearTimeout(t);
-  }, [load]);
-
-  useEffect(() => {
-    if (tab === "sanctions" || tab === "appeals") loadSanctions();
-  }, [tab, loadSanctions]);
-
-  const decide = async (type: string, id: string, decision: string) => {
-    if (!props.token) return;
-    const r = await fetch("/api/admin/decide", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type, id, decision, token: props.token }),
-    });
-    const d = await r.json();
-    props.notify(r.ok ? `Решение применено: ${decision}` : d.error || "Ошибка");
-    load();
-  };
-
-  const sanctionAction = async (payload: Record<string, unknown>, okMsg?: string) => {
-    if (!props.token) return;
-    try {
-      const r = await fetch("/api/admin/sanction", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...payload, token: props.token }),
-      });
-      const d = await r.json();
-      if (!r.ok) throw Error(d.error || "Ошибка");
-      props.notify(okMsg || d.note || "Готово");
-      loadSanctions();
-    } catch (e) {
-      props.notify(e instanceof Error ? e.message : "Ошибка");
-    }
-  };
-
-  const applySanctionForm = async () => {
-    if (!saNick.trim() || saReason.trim().length < 5) {
-      props.notify("Укажите ник и причину (минимум 5 символов)");
-      return;
-    }
-    await sanctionAction(
-      { action: "apply", nick: saNick.trim(), kind: saKind, reason: saReason.trim() },
-      `Санкция применена: ${KIND_LABELS[saKind]} для ${saNick.trim()}`
-    );
-    setSaNick("");
-    setSaReason("");
-  };
-
-  return (
-    <div>
-      <div className="border-b border-[#C9D4E2] p-2">
-        <div className="flex flex-wrap gap-1.5">
-          <button className={`sm-btn ${tab === "queue" ? "sm-btn-primary" : ""}`} onClick={() => setTab("queue")}>
-            Очередь ({entries.length})
-          </button>
-          <button className={`sm-btn ${tab === "sanctions" ? "sm-btn-primary" : ""}`} onClick={() => setTab("sanctions")}>
-            Санкции
-          </button>
-          <button className={`sm-btn ${tab === "appeals" ? "sm-btn-primary" : ""}`} onClick={() => setTab("appeals")}>
-            Апелляции
-          </button>
-        </div>
-        {tab === "queue" && (
-          <div className="mt-2 flex gap-2">
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Поиск по журналу…"
-              className="flex-1 border border-[#1E3A5F] px-2.5 py-1.5 text-[14px] outline-none"
-            />
-            <button className="sm-btn" onClick={load}>
-              Обновить
-            </button>
-          </div>
-        )}
-        {error && <p className="mt-2 text-[13.5px] text-[#B22335]">{error}</p>}
-      </div>
-
-      {tab === "queue" && (
-        <ul className="max-h-[70vh] divide-y divide-[#D8DEE7] overflow-y-auto">
-          {entries.length === 0 && <li className="p-4 text-center text-[14px] text-[#56657a]">Записей нет.</li>}
-          {entries.map((e) => (
-            <li key={e.id} className="px-3 py-2.5 text-[14px]">
-              <div className="flex flex-wrap items-center gap-2">
-                <b>{e.author}</b>
-                <span className="text-[12.5px] text-[#56657a]">в теме «{e.topic.title}»</span>
-                {e.isHiddenByAi && <span className="border border-[#1E3A5F] px-1.5 text-[12px] font-bold">скрыто ИИ: {e.hiddenReason}</span>}
-                {e.isDeleted && <span className="border border-[#1E3A5F] bg-[#F2F6FA] px-1.5 text-[12px] font-bold">удалено</span>}
-                {e.needHuman && (
-                  <span className="border border-[#B22335] px-1.5 text-[12px] font-bold text-[#B22335]">требуется решение администратора</span>
-                )}
-                {e.complaintsCount > 0 && <span className="text-[12px] text-[#B22335]">жалоб: {e.complaintsCount}</span>}
-                <a className="ml-auto text-[12.5px] text-[#0A5CAA] underline" onClick={() => props.onOpenTopic(e.topic.id)}>
-                  открыть тему
-                </a>
-              </div>
-              {e.aiNote && <div className="mt-0.5 text-[12.5px] text-[#56657a]">ИИ: {e.aiNote}</div>}
-              {e.complaints.length > 0 && (
-                <div className="mt-1 space-y-0.5 text-[12px] text-[#5a3a3a]">
-                  {e.complaints.map((c) => (
-                    <div key={c.id}>
-                      ⚑ {CATEGORY_LABELS[c.category] ?? c.category}
-                      {c.comment ? ` — «${c.comment}»` : ""}
-                      <span className="text-[12px] text-[#8a6d6d]">
-                        {" "}
-                        · {VERDICT_LABELS[c.aiVerdict] ?? c.aiVerdict}
-                        {c.aiNote ? `: ${c.aiNote}` : ""}
-                        {` · ${fmtDateTime(c.createdAt)}`}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <p className="mt-1 line-clamp-2 text-[14.5px]">{e.body}</p>
-              <div className="mt-1.5 flex flex-wrap gap-1.5">
-                <button className="sm-btn" onClick={() => decide("message", e.id, "publish")}>
-                  опубликовать
-                </button>
-                <button className="sm-btn" onClick={() => decide("message", e.id, "hide")}>
-                  скрыть
-                </button>
-                <button className="sm-btn" onClick={() => decide("message", e.id, "delete")}>
-                  удалить
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {tab === "sanctions" && (
-        <div className="max-h-[70vh] overflow-y-auto p-3">
-          <p className="mb-2 text-[13px] leading-relaxed text-[#4a5b6d]">
-            Мягкая лестница: первое небольшое нарушение — предупреждение без блокировки; повторное — ограничение на 1 час;
-            продолжение — до 24 часов; серьёзное — до 3 дней. Постоянная блокировка — только в исключительных случаях
-            (систематический спам, мошенничество, постоянный обход ограничений). Санкции ИИ помечены и могут быть отменены человеком.
-          </p>
-          <div className="mb-3 flex flex-wrap items-center gap-1.5 border border-[#C9D4E2] bg-[#F7FAFD] p-2">
-            <input
-              value={saNick}
-              onChange={(e) => setSaNick(e.target.value)}
-              placeholder="Ник пользователя"
-              className="w-[170px] border border-[#1E3A5F] px-2 py-1.5 text-[13.5px] outline-none"
-            />
-            <select value={saKind} onChange={(e) => setSaKind(e.target.value)} className="border border-[#1E3A5F] px-2 py-1.5 text-[13.5px]">
-              {Object.entries(KIND_LABELS).map(([k, v]) => (
-                <option key={k} value={k}>
-                  {v}
-                </option>
-              ))}
-            </select>
-            <input
-              value={saReason}
-              onChange={(e) => setSaReason(e.target.value)}
-              placeholder="Причина санкции"
-              className="min-w-[180px] flex-1 border border-[#1E3A5F] px-2 py-1.5 text-[13.5px] outline-none"
-            />
-            <button className="sm-btn sm-btn-primary" onClick={applySanctionForm}>
-              Применить санкцию
-            </button>
-          </div>
-          {sanctions.length === 0 && <p className="p-2 text-center text-[14px] text-[#56657a]">Санкций нет.</p>}
-          <ul className="divide-y divide-[#D8DEE7]">
-            {sanctions.map((s) => (
-              <li key={s.id} className="px-1 py-2 text-[14px]">
-                <div className="flex flex-wrap items-center gap-2">
-                  <b>{s.user}</b>
-                  <span className="border border-[#1E3A5F] bg-[#F2F6FA] px-1.5 text-[12px] font-bold">{KIND_LABELS[s.kind] ?? s.kind}</span>
-                  <span className={`text-[12px] ${s.source === "ai" ? "text-[#8a6d1a]" : "text-[#1e7e34]"}`}>
-                    {s.source === "ai" ? "применил ИИ (автоматически)" : "применил человек-модератор"}
-                  </span>
-                  {s.hasOpenAppeal && <span className="text-[12px] font-bold text-[#B22335]">есть открытая апелляция</span>}
-                  {s.revoked ? (
-                    <span className="text-[12px] text-[#56657a]">
-                      отменена ({s.revokedBy}){s.revokedReason ? `: ${s.revokedReason}` : ""}
-                    </span>
-                  ) : s.expiresAt && s.kind !== "ban" ? (
-                    <span className="text-[12px] text-[#4a5b6d]">до {fmtDateTime(s.expiresAt)}</span>
-                  ) : s.kind === "ban" ? (
-                    <span className="text-[12px] font-bold text-[#B22335]">бессрочно</span>
-                  ) : (
-                    <span className="text-[12px] text-[#4a5b6d]">без ограничения аккаунта</span>
-                  )}
-                  <span className="text-[12.5px] text-[#56657a]">{fmtDateTime(s.createdAt)}</span>
-                </div>
-                <div className="mt-0.5 text-[13.5px]">Причина: {s.reason}</div>
-                {!s.revoked && (
-                  <div className="mt-1">
-                    <button
-                      className="sm-btn"
-                      onClick={() => {
-                        if (window.confirm(`Отменить санкцию «${KIND_LABELS[s.kind] ?? s.kind}» для ${s.user}?`))
-                          sanctionAction({ action: "revoke", sanctionId: s.id }, "Санкция отменена человеком-модератором");
-                      }}
-                    >
-                      отменить (решение человека)
-                    </button>
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {tab === "appeals" && (
-        <div className="max-h-[70vh] overflow-y-auto p-3">
-          <p className="mb-2 text-[13px] leading-relaxed text-[#4a5b6d]">
-            Апелляции рассматривает только человек-модератор — ИИ не участвует в пересмотре решений. «Удовлетворить» отменяет
-            решение ИИ: санкция снимается, скрытое сообщение публикуется.
-          </p>
-          {appeals.length === 0 && <p className="p-2 text-center text-[14px] text-[#56657a]">Апелляций нет.</p>}
-          <ul className="divide-y divide-[#D8DEE7]">
-            {appeals.map((a) => (
-              <li key={a.id} className="px-1 py-2.5 text-[14px]">
-                <div className="flex flex-wrap items-center gap-2">
-                  <b>{a.userNick}</b>
-                  <span className={`text-[12px] font-bold ${a.status === "open" ? "text-[#B22335]" : a.status === "accepted" ? "text-[#1e7e34]" : "text-[#56657a]"}`}>
-                    {a.status === "open" ? "ожидает человека-модератора" : a.status === "accepted" ? "удовлетворена" : "отклонена"}
-                  </span>
-                  {a.sanction && (
-                    <span className="border border-[#1E3A5F] bg-[#F2F6FA] px-1.5 text-[12px] font-bold">
-                      оспаривает санкцию: {KIND_LABELS[a.sanction.kind] ?? a.sanction.kind}
-                      {a.sanction.revoked ? " (уже отменена)" : ""}
-                    </span>
-                  )}
-                  {a.message && (
-                    <span className="border border-[#1E3A5F] bg-[#F2F6FA] px-1.5 text-[12px] font-bold">
-                      оспаривает скрытие сообщения №{a.message.num} в теме «{a.message.topic.title}»
-                    </span>
-                  )}
-                  <span className="text-[12.5px] text-[#56657a]">{fmtDateTime(a.createdAt)}</span>
-                </div>
-                <p className="mt-1 whitespace-pre-wrap text-[13.5px]">{a.text}</p>
-                {a.status === "open" ? (
-                  <div className="mt-1.5 flex flex-wrap gap-1.5">
-                    <button
-                      className="sm-btn sm-btn-primary"
-                      onClick={() => sanctionAction({ action: "resolveAppeal", appealId: a.id, decision: "accepted" }, "Апелляция удовлетворена — решение отменено")}
-                    >
-                      удовлетворить (отменить решение)
-                    </button>
-                    <button
-                      className="sm-btn"
-                      onClick={() => sanctionAction({ action: "resolveAppeal", appealId: a.id, decision: "rejected" }, "Апелляция отклонена")}
-                    >
-                      отклонить
-                    </button>
-                  </div>
-                ) : (
-                  <div className="mt-0.5 text-[12px] text-[#56657a]">
-                    {a.resolvedBy ? `Рассмотрел: ${a.resolvedBy}. ` : ""}
-                    {a.note}
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ================= Жалобы ================= */
+/* ================= 2026-10-01: Карточка проверки сообщения ================= */
 
 interface AdminComplaint {
   id: string;
@@ -800,11 +529,6 @@ interface AdminComplaint {
   };
 }
 
-/**
- * ШАГ 16. Блок модерации самостоятельного раздела «Нужна помощь»:
- * нерешённые жалобы на объявления + очередь (скрытые ИИ и спорные случаи).
- * Человек-модератор может скрыть, вернуть или удалить объявление.
- */
 const HELP_COMPLAINT_LABELS: Record<string, string> = {
   fraud: "Мошенничество",
   paid: "Скрытая платная услуга",
@@ -814,6 +538,313 @@ const HELP_COMPLAINT_LABELS: Record<string, string> = {
   forbidden: "Запрещённый контент",
   other: "Другое",
 };
+
+function ModerationSection(props: { token: string | null; notify: (m: string) => void; onOpenTopic: (id: number) => void }) {
+  const [tab, setTab] = useState<"queue" | "sanctions" | "appeals">("queue");
+  const [entries, setEntries] = useState<ModerationEntry[]>([]);
+  const [sanctions, setSanctions] = useState<AdminSanction[]>([]);
+  const [appeals, setAppeals] = useState<AdminAppeal[]>([]);
+  const [q, setQ] = useState("");
+  const [error, setError] = useState("");
+  const [saNick, setSaNick] = useState("");
+  const [saKind, setSaKind] = useState("warning");
+  const [saReason, setSaReason] = useState("");
+  const [checkId, setCheckId] = useState<string | null>(null);
+
+  const load = useCallback(() => {
+    if (!props.token) return;
+    const sp = new URLSearchParams({ token: props.token, limit: "60" });
+    if (q.trim()) sp.set("q", q.trim());
+    fetch(`/api/moderation?${sp}`)
+      .then(async (r) => { const d = await r.json(); if (!r.ok) throw Error(d.error); return d; })
+      .then((d) => setEntries(d.entries || []))
+      .catch((e) => setError(e.message));
+  }, [props.token, q]);
+
+  const loadSanctions = useCallback(() => {
+    if (!props.token) return;
+    fetch(`/api/admin/sanctions?token=${encodeURIComponent(props.token)}`)
+      .then(async (r) => { const d = await r.json(); if (!r.ok) throw Error(d.error); return d; })
+      .then((d) => { setSanctions(d.sanctions || []); setAppeals(d.appeals || []); })
+      .catch((e) => setError(e.message));
+  }, [props.token]);
+
+  useEffect(() => { const t = window.setTimeout(load, 0); return () => window.clearTimeout(t); }, [load]);
+  useEffect(() => { if (tab === "sanctions" || tab === "appeals") loadSanctions(); }, [tab, loadSanctions]);
+
+  if (checkId) {
+    return <ModerationCheckCard messageId={checkId} token={props.token} notify={props.notify} onClose={() => { setCheckId(null); load(); }} onOpenTopic={props.onOpenTopic} />;
+  }
+
+  return (
+    <div>
+      <div className="border-b border-[#C9D4E2] p-2">
+        <div className="flex flex-wrap gap-1.5">
+          <button className={`sm-btn ${tab === "queue" ? "sm-btn-primary" : ""}`} onClick={() => setTab("queue")}>Очередь ({entries.length})</button>
+          <button className={`sm-btn ${tab === "sanctions" ? "sm-btn-primary" : ""}`} onClick={() => setTab("sanctions")}>Санкции</button>
+          <button className={`sm-btn ${tab === "appeals" ? "sm-btn-primary" : ""}`} onClick={() => setTab("appeals")}>Апелляции</button>
+        </div>
+        {tab === "queue" && (
+          <div className="mt-2 flex gap-2">
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Поиск…" className="flex-1 border border-[#1E3A5F] px-2.5 py-1.5 text-[14px] outline-none" />
+            <button className="sm-btn" onClick={load}>Обновить</button>
+          </div>
+        )}
+        {error && <p className="mt-2 text-[13.5px] text-[#B22335]">{error}</p>}
+      </div>
+
+      {tab === "queue" && (
+        <div className="max-h-[70vh] overflow-y-auto">
+          {entries.length === 0 && <p className="p-4 text-center text-[14px] text-[#56657a]">Записей нет.</p>}
+          {entries.map((e) => {
+            const lvl = e.modLevel ?? 4; const li = LEVEL_LABELS[lvl] ?? LEVEL_LABELS[4]; const cp = Math.round((e.aiConfidence ?? 0) * 100);
+            return (
+              <div key={e.id} className="border-b border-[#D8DEE7] px-3 py-2.5 text-[14px]">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="px-2 py-0.5 text-[11px] font-bold rounded" style={{ color: li.color, background: li.bg }}>{li.label}</span>
+                  {e.needHuman && <span className="border border-[#B22335] px-1.5 text-[11px] font-bold text-[#B22335]">требует решения</span>}
+                  {e.isHiddenByAi && <span className="border border-[#1E3A5F] px-1.5 text-[11px] font-bold">скрыто ИИ</span>}
+                  {e.isDeleted && <span className="border border-[#1E3A5F] bg-[#F2F6FA] px-1.5 text-[11px] font-bold">удалено</span>}
+                  {e.complaintsCount > 0 && <span className="text-[11px] text-[#B22335]">жалоб: {e.complaintsCount}</span>}
+                  <b className="text-[13px]">{e.author}</b>
+                  {e.createdAt && <span className="text-[11px] text-[#56657a]">{fmtDateTime(e.createdAt)}</span>}
+                </div>
+                <p className="mt-1 line-clamp-2 text-[13.5px] text-[#334155]">{e.body}</p>
+                <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                  <span className="text-[11px] text-[#56657a]">AI: {AI_ACTION_LABELS[e.aiAction ?? "WATCH"] ?? e.aiAction}{cp > 0 && ` · ${cp}%`}</span>
+                  <button className="sm-btn sm-btn-primary ml-auto" onClick={() => setCheckId(e.id)}>Открыть проверку</button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {tab === "sanctions" && (
+        <div className="max-h-[70vh] overflow-y-auto p-3">
+          <div className="mb-3 flex flex-wrap items-center gap-1.5 border border-[#C9D4E2] bg-[#F7FAFD] p-2">
+            <input value={saNick} onChange={(e) => setSaNick(e.target.value)} placeholder="Ник" className="w-[170px] border border-[#1E3A5F] px-2 py-1.5 text-[13.5px] outline-none" />
+            <select value={saKind} onChange={(e) => setSaKind(e.target.value)} className="border border-[#1E3A5F] px-2 py-1.5 text-[13.5px]">{Object.entries(KIND_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
+            <input value={saReason} onChange={(e) => setSaReason(e.target.value)} placeholder="Причина" className="min-w-[180px] flex-1 border border-[#1E3A5F] px-2 py-1.5 text-[13.5px] outline-none" />
+            <button className="sm-btn sm-btn-primary" onClick={async () => {
+              if (!saNick.trim() || saReason.trim().length < 5) { props.notify("Укажите ник и причину"); return; }
+              try { const r = await fetch("/api/admin/sanction", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "apply", nick: saNick.trim(), kind: saKind, reason: saReason.trim(), token: props.token }) }); const d = await r.json(); if (!r.ok) throw Error(d.error); props.notify(d.note || "Санкция применена"); setSaNick(""); setSaReason(""); loadSanctions(); } catch (e) { props.notify(e instanceof Error ? e.message : "Ошибка"); }
+            }}>Применить</button>
+          </div>
+          {sanctions.length === 0 && <p className="p-2 text-center text-[14px] text-[#56657a]">Санкций нет.</p>}
+          {sanctions.map((s) => (
+            <div key={s.id} className="border-b border-[#D8DEE7] px-1 py-2 text-[14px]">
+              <div className="flex flex-wrap items-center gap-2">
+                <b>{s.user}</b>
+                <span className="border border-[#1E3A5F] bg-[#F2F6FA] px-1.5 text-[12px] font-bold">{KIND_LABELS[s.kind] ?? s.kind}</span>
+                <span className={`text-[12px] ${s.source === "ai" ? "text-[#8a6d1a]" : "text-[#1e7e34]"}`}>{s.source === "ai" ? "ИИ" : "человек"}</span>
+                {s.revoked && <span className="text-[12px] text-[#56657a]">отменена</span>}
+                {!s.revoked && s.expiresAt && s.kind !== "ban" && <span className="text-[12px] text-[#56657a]">до {fmtDateTime(s.expiresAt)}</span>}
+              </div>
+              <p className="text-[12.5px] text-[#56657a] mt-0.5">{s.reason}</p>
+              {!s.revoked && <button className="sm-btn mt-1" onClick={async () => { const r2 = window.prompt("Причина отмены:"); if (!r2 || r2.trim().length < 5) return; try { const r = await fetch("/api/admin/sanction", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "revoke", id: s.id, reason: r2.trim(), token: props.token }) }); const d = await r.json(); if (!r.ok) throw Error(d.error); props.notify(d.note || "Отменена"); loadSanctions(); } catch (e) { props.notify(e instanceof Error ? e.message : "Ошибка"); } }}>Отменить</button>}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {tab === "appeals" && (
+        <div className="max-h-[70vh] overflow-y-auto p-3">
+          {appeals.length === 0 && <p className="p-2 text-center text-[14px] text-[#56657a]">Апелляций нет.</p>}
+          {appeals.map((a) => (
+            <div key={a.id} className="border border-[#C9D4E2] p-3 mb-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <b>{a.userNick}</b>
+                <span className={`text-[12px] font-bold ${a.status === "open" ? "text-[#B22335]" : "text-[#1e7e34]"}`}>{a.status === "open" ? "открыта" : a.status === "accepted" ? "принята" : "отклонена"}</span>
+                <span className="text-[12px] text-[#56657a]">{fmtDateTime(a.createdAt)}</span>
+              </div>
+              <p className="mt-1 text-[13.5px]">{a.text}</p>
+              {a.status === "open" && (
+                <div className="mt-2 flex gap-1.5">
+                  <button className="sm-btn sm-btn-primary" onClick={async () => { try { const r = await fetch("/api/admin/decide", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "appeal", id: a.id, decision: "accept", token: props.token }) }); const d = await r.json(); if (!r.ok) throw Error(d.error); props.notify(d.note || "Принята"); loadSanctions(); } catch (e) { props.notify(e instanceof Error ? e.message : "Ошибка"); } }}>Принять</button>
+                  <button className="sm-btn" onClick={async () => { try { const r = await fetch("/api/admin/decide", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "appeal", id: a.id, decision: "reject", token: props.token }) }); const d = await r.json(); if (!r.ok) throw Error(d.error); props.notify(d.note || "Отклонена"); loadSanctions(); } catch (e) { props.notify(e instanceof Error ? e.message : "Ошибка"); } }}>Отклонить</button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* 2026-10-01: Карточка проверки сообщения */
+interface CheckCardData {
+  message: { id: string; num: number; authorName: string; authorId: string | null; body: string; createdAt: string; isDeleted: boolean; isHiddenByAi: boolean; hiddenReason: string; needHuman: boolean; aiStatus: string; aiNote: string; modLevel: number; aiAction: string; aiConfidence: number; aiSignal: string; };
+  topic: { id: number; title: string };
+  rubric: { id: number; name: string; slug: string } | null;
+  context: { id: string; num: number; authorName: string; body: string; createdAt: string; isDeleted: boolean; isHiddenByAi: boolean; isCurrent: boolean }[];
+  complaints: { id: string; category: string; comment: string; reporterName: string; aiVerdict: string; aiNote: string; resolved: boolean; createdAt: string }[];
+  history: { id: string; actor: string; actorRole: string; action: string; reason: string; result: string; confidence: number; createdAt: string }[];
+  userSanctions: { id: string; kind: string; reason: string; source: string; expiresAt: string | null; revoked: boolean; createdAt: string }[];
+}
+
+function ModerationCheckCard(props: { messageId: string; token: string | null; notify: (m: string) => void; onClose: () => void; onOpenTopic: (id: number) => void; }) {
+  const [data, setData] = useState<CheckCardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<string | null>(null);
+  const [confirmReason, setConfirmReason] = useState("");
+
+  useEffect(() => {
+    setLoading(true);
+    fetch(`/api/moderation/${props.messageId}?token=${encodeURIComponent(props.token ?? "")}`)
+      .then(async (r) => { const d = await r.json(); if (!r.ok) throw Error(d.error); return d; })
+      .then((d: CheckCardData) => setData(d))
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+  }, [props.messageId, props.token]);
+
+  const doAction = async (action: string, reason: string) => {
+    setBusy(true);
+    try {
+      const r = await fetch(`/api/moderation/${props.messageId}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: props.token, action, reason }) });
+      const d = await r.json();
+      if (!r.ok) throw Error(d.error);
+      props.notify(d.note || "Готово");
+      setConfirmAction(null); setConfirmReason("");
+      const r2 = await fetch(`/api/moderation/${props.messageId}?token=${encodeURIComponent(props.token ?? "")}`);
+      const d2 = await r2.json();
+      if (r2.ok) setData(d2);
+    } catch (e) { props.notify(e instanceof Error ? e.message : "Ошибка"); }
+    finally { setBusy(false); }
+  };
+
+  if (loading) return <div className="p-6 text-center text-[14px] text-[#56657a]">Загрузка проверки…</div>;
+  if (error) return <div className="p-6 text-center text-[14px] text-[#B22335]">{error}</div>;
+  if (!data) return null;
+
+  const m = data.message; const lvl = m.modLevel ?? 4; const li = LEVEL_LABELS[lvl] ?? LEVEL_LABELS[4]; const cp = Math.round((m.aiConfidence ?? 0) * 100);
+
+  return (
+    <div className="p-3">
+      <div className="mb-3 flex items-center gap-3">
+        <button className="sm-btn" onClick={props.onClose}>← Назад</button>
+        <h2 className="text-[16px] font-bold text-[#1E3A5F]">Проверка сообщения №{m.num}</h2>
+      </div>
+
+      {/* 1. Сообщение */}
+      <div className="border border-[#1E3A5F] bg-[#F8FAFD] p-3 mb-3">
+        <div className="flex flex-wrap items-center gap-2 mb-2">
+          <b className="text-[14px]">{m.authorName}</b>
+          <span className="text-[12px] text-[#56657a]">{fmtDateTime(m.createdAt)}</span>
+          <a className="text-[12px] text-[#0A5CAA] underline" onClick={() => props.onOpenTopic(data.topic.id)}>тема: «{data.topic.title}»</a>
+          {data.rubric && <span className="text-[12px] text-[#56657a]">рубрика: {data.rubric.name}</span>}
+        </div>
+        <p className="text-[14px] leading-relaxed whitespace-pre-wrap">{m.body}</p>
+        {m.isHiddenByAi && <p className="mt-2 text-[12px] text-[#8a6d1a]">⚠️ Скрыто ИИ: {m.hiddenReason}</p>}
+        {m.isDeleted && <p className="mt-2 text-[12px] text-[#B22335]">⚠️ Удалено</p>}
+      </div>
+
+      {/* 2. Контекст */}
+      {data.context.length > 0 && (
+        <div className="mb-3">
+          <h3 className="text-[13px] font-bold text-[#1E3A5F] mb-1">Контекст</h3>
+          <div className="space-y-1">
+            {data.context.map((c) => (
+              <div key={c.id} className={`p-2 text-[12.5px] ${c.isCurrent ? "border border-[#1E3A5F] bg-[#EEF3F8]" : "bg-[#F8FAFD]"}`}>
+                <b>№{c.num} {c.authorName}</b>
+                {c.isCurrent && <span className="ml-2 text-[10px] text-[#1E3A5F] font-bold">← текущее</span>}
+                <p className="mt-0.5 text-[#334155]">{c.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 3. Жалобы */}
+      <div className="mb-3">
+        <h3 className="text-[13px] font-bold text-[#1E3A5F] mb-1">Жалобы</h3>
+        {data.complaints.length === 0 ? <p className="text-[13px] text-[#56657a]">Жалоб нет</p> : (
+          <div className="space-y-1">
+            {data.complaints.map((c) => (
+              <div key={c.id} className="border border-[#E2D4D4] bg-[#FDF8F8] p-2 text-[12.5px]">
+                <b>⚑ {c.category}</b>
+                {c.comment && <span> — «{c.comment}»</span>}
+                <span className="text-[#8a6d6d] ml-2">{fmtDateTime(c.createdAt)}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* 4. Решение AI */}
+      <div className="border border-[#1E3A5F] p-3 mb-3">
+        <h3 className="text-[13px] font-bold text-[#1E3A5F] mb-2">Решение AI</h3>
+        <div className="flex flex-wrap items-center gap-2 mb-2">
+          <span className="px-2 py-0.5 text-[11px] font-bold rounded" style={{ color: li.color, background: li.bg }}>{li.label}</span>
+          <span className="text-[12px] text-[#4a5b6d]">статус: <b>{AI_ACTION_LABELS[m.aiAction ?? "WATCH"] ?? m.aiAction}</b></span>
+          {cp > 0 && <span className="text-[12px] text-[#4a5b6d]">уверенность: <b>{cp}%</b></span>}
+        </div>
+        {m.aiSignal && <p className="text-[12.5px] text-[#56657a]">сигнал: {m.aiSignal}</p>}
+        {m.aiNote && <p className="text-[12.5px] text-[#56657a] mt-1">причина: {m.aiNote}</p>}
+      </div>
+
+      {/* 5. История нарушений */}
+      {data.userSanctions.length > 0 && (
+        <div className="mb-3">
+          <h3 className="text-[13px] font-bold text-[#1E3A5F] mb-1">История нарушений</h3>
+          <div className="space-y-1">
+            {data.userSanctions.map((s) => (
+              <div key={s.id} className="border border-[#E2D4D4] bg-[#FDF8F8] p-2 text-[12.5px]">
+                <b>{KIND_LABELS[s.kind] ?? s.kind}</b>
+                <span className="text-[#8a6d6d] ml-2">{s.source === "ai" ? "ИИ" : "человек"}</span>
+                <span className="text-[#56657a] ml-2">{fmtDateTime(s.createdAt)}</span>
+                {s.revoked && <span className="text-[#1e7e34] ml-2">отменена</span>}
+                <p className="text-[#56657a] mt-0.5">{s.reason}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 6. История решений */}
+      {data.history.length > 0 && (
+        <div className="mb-3">
+          <h3 className="text-[13px] font-bold text-[#1E3A5F] mb-1">История решений</h3>
+          <div className="space-y-1">
+            {data.history.map((h) => (
+              <div key={h.id} className="border-l-2 border-[#1E3A5F] pl-3 py-1 text-[12.5px]">
+                <span className="text-[#56657a]">{fmtDateTime(h.createdAt)}</span> — <b>{h.actor === "ai" ? "AI" : h.actor}</b> — {ADMIN_ACTIONS.find((a) => a.key === h.action)?.label ?? h.action}
+                {h.reason && <span className="text-[#56657a]"> — {h.reason}</span>}
+                {h.result && <span className="text-[#1e7e34]"> → {h.result}</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 7. Действия администратора */}
+      <div className="border-t border-[#C9D4E2] pt-3">
+        <h3 className="text-[13px] font-bold text-[#1E3A5F] mb-2">Действия</h3>
+        {confirmAction ? (
+          <div className="border border-[#1E3A5F] bg-[#F8FAFD] p-3">
+            <p className="text-[13px] mb-2">Подтвердите: <b>{ADMIN_ACTIONS.find((a) => a.key === confirmAction)?.label}</b></p>
+            <textarea value={confirmReason} onChange={(e) => setConfirmReason(e.target.value)} placeholder="Причина (обязательно)" className="w-full border border-[#1E3A5F] px-2.5 py-1.5 text-[13.5px] outline-none mb-2" rows={2} />
+            <div className="flex gap-1.5">
+              <button className="sm-btn sm-btn-primary" disabled={busy} onClick={() => doAction(confirmAction, confirmReason.trim())}>{busy ? "Выполняется…" : "Подтвердить"}</button>
+              <button className="sm-btn" onClick={() => { setConfirmAction(null); setConfirmReason(""); }}>Отмена</button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-1.5">
+            {ADMIN_ACTIONS.map((a) => (
+              <button key={a.key} className="px-3 py-1.5 text-[12.5px] font-bold border rounded transition-colors" style={{ color: a.color, borderColor: a.color, background: "transparent" }} disabled={busy} onClick={() => { if (a.confirm) setConfirmAction(a.key); else doAction(a.key, ""); }}>
+                {a.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function HelpModerationBlock(props: { token: string | null; notify: (m: string) => void }) {
   const [data, setData] = useState<{
