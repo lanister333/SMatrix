@@ -60,15 +60,16 @@ interface ProfileData {
     isClosed: boolean;
     createdAt: string;
     views: number;
-    rubric?: { name: string } | null;
-    _count?: { messages: number };
+    rubricName?: string;
+    answers?: number;
   }>;
   messages: Array<{
     id: string;
     num: number;
     snippet: string;
     createdAt: string;
-    topic: { id: number; title: string };
+    topicId: number;
+    topicTitle: string;
   }>;
   topicsShown: number;
   messagesShown: number;
@@ -404,9 +405,9 @@ export default function UserScreen() {
                             )}
                           </div>
                           <div className="prow-meta">
-                            {t.rubric?.name && <>{t.rubric.name} · </>}
+                            {t.rubricName && <>{t.rubricName} · </>}
                             создана {fmtDate(t.createdAt)} · ответов:{" "}
-                            {t._count?.messages ?? 0} · просмотров: {t.views}
+                            {t.answers ?? 0} · просмотров: {t.views}
                           </div>
                         </div>
                       ))}
@@ -430,10 +431,10 @@ export default function UserScreen() {
                         <div
                           key={m.id}
                           className="prow"
-                          onClick={() => openTopicAt(m.topic.id, m.num)}
+                          onClick={() => openTopicAt(m.topicId, m.num)}
                         >
                           <div className="prow-title">
-                            <a>{m.topic.title}</a>
+                            <a>{m.topicTitle}</a>
                             <span className="sr-badge">
                               сообщение №{m.num}
                             </span>
