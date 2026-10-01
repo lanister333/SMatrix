@@ -2306,8 +2306,9 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
   .rc-pager{justify-content:center}
   /* 2026-10-01: пагер «← Новее | Страница 1 из 2 · всего 17 | Старее →»
      на мобайле — В ОДИН РЯД без переносов: flex-wrap:nowrap, шрифт мельче,
-     padding кнопок компактнее, чтобы 3 элемента умещались на 320-375px. */
-  .rc-pager{flex-wrap:nowrap !important;font-size:11px !important;gap:4px !important;justify-content:space-between !important;padding:4px 0 2px !important}
+     padding кнопок компактнее, чтобы 3 элемента умещались на 320-375px.
+     Правка 2: воздух сверху и снизу одинаковый (padding-top=padding-bottom=6px). */
+  .rc-pager{flex-wrap:nowrap !important;font-size:11px !important;gap:4px !important;justify-content:space-between !important;padding:6px 0 6px !important;margin-top:4px !important;margin-bottom:4px !important}
   .rc-pager button{padding:3px 6px !important;font-size:11px !important;line-height:1.1 !important}
   .rc-pager span{font-size:11px !important;line-height:1.1 !important;white-space:nowrap !important;overflow:hidden !important;text-overflow:ellipsis !important;flex:1 1 auto !important;min-width:0 !important;text-align:center !important}
 }
