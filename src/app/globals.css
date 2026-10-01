@@ -3082,9 +3082,28 @@ a.pl-entry-detail:hover{color:#0a5caa}
   .center-column{padding-left:8px !important;padding-right:8px !important}
   /* 2026-10-01 (правка 2): FlatBoard вкладки-кнопки на мобайле — меньше
      по вертикали (padding 7/12 → 3/8, font 13.5 → 11.5) и явно
-     выровнены по левому краю (justify-content:flex-start). */
-  [data-flat-tabs]{justify-content:flex-start !important;margin-bottom:4px !important}
-  [data-flat-tab]{padding:3px 8px !important;font-size:11.5px !important;line-height:1.1 !important}
+     выровнены по левому краю (justify-content:flex-start).
+     Правка 3: вкладки в 2 ряда по 3 (grid 3 колонки) — вместо 3 рядов
+     3-2-1, теперь всегда 2 ряда по 3 вкладки. Заголовок блока
+     «Объявления — некоммерческая доска» — убрать воздух: marginTop
+     section 18 → 4, margin-bottom h2 10 → 2, font 16 → 13. */
+  [data-flat-tabs]{
+    display:grid !important;
+    grid-template-columns:repeat(3,1fr) !important;
+    gap:4px !important;
+    margin-bottom:4px !important;
+  }
+  [data-flat-tab]{
+    padding:3px 4px !important;
+    font-size:11px !important;
+    line-height:1.1 !important;
+    text-align:center !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+  }
+  [data-flat-board]{margin-top:4px !important}
+  [data-flat-board] > h2{margin:0 0 2px !important;font-size:13px !important;line-height:1.15 !important}
   .oh-sideblock,.wb-sideblock,.cd-sideblock,.rc-sideblock,.ep-sideblock,.dk-sideblock,.gkh-sideblock,.pl-sidebox{padding:4px 5px;margin-bottom:6px}
   .ad-sidebox{padding:4px 5px;margin-bottom:6px}
   .oh-item,.wb-item,.cd-item,.rc-item,.ep-item,.dk-item,.gkh-item,.pl-entry{padding:5px 2px}
