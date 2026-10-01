@@ -4029,14 +4029,31 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
      заголовок «Пробки» теперь .mp-paneltitle.mp-paneltitle-plain */
   .trf-mapwrap{margin:5px -6px 0;width:calc(100% + 12px);max-width:none;border-left:none;border-right:none;border-radius:0} /* карта — 100% ширины экрана смартфона: боковые поля .trf-body (6px) компенсированы (calc +12px, max-width:none), край карты = край рамки .sakh-card */
   .trf-map{height:250px} /* компактная высота ТЗ, ширина — вся карточка */
-  .trf-log{padding:0 4px 6px}
-  .trf-log-item{padding:5px 0}
-  .trf-log-h b{font-size:12px}
-  .trf-log-h span{font-size:10px}
-  .trf-log-t{font-size:12px;line-height:1.35}
-  .trf-empty{padding:6px 4px;font-size:12.5px}
-  .trf-roads td{padding:6px 4px;font-size:12.5px}
-  .trf-badge{padding:5px 7px;font-size:12px;min-width:74px}
+
+  /* 2026-10-01 (только мобайл): всё на странице /traffic.php СЖАТЬ
+     по вертикали, КРОМЕ карты (.trf-map, .trf-mapwrap — НЕ трогать).
+     compress paddings, line-heights, margins on:
+       • .mp-panel — margin-bottom 6 → 3
+       • .mp-paneltitle — padding 4/5 → 2/5 (header of section)
+       • .trf-log, .trf-log-item — paddings 5/6 → 2/3
+       • .trf-log-t — line-height 1.35 → 1.15
+       • .trf-empty, .trf-roads td — padding 6 → 3
+       • .trf-badge — padding 5 → 2 */
+  .mp-panel{margin-bottom:3px}
+  .mp-paneltitle{padding:2px 5px;font-size:12.5px;line-height:1.15}
+  .mp-paneltitle .tri{font-size:8px}
+  .trf-body{padding:3px 6px !important}
+  .trf-log{padding:0 4px 3px !important}
+  .trf-log-item{padding:2px 0 !important}
+  .trf-log-h b{font-size:11.5px !important}
+  .trf-log-h span{font-size:10px !important}
+  .trf-log-t{font-size:12px !important;line-height:1.15 !important;margin-top:1px !important}
+  .trf-empty{padding:3px 4px !important;font-size:12px !important}
+  .trf-roads td{padding:3px 4px !important;font-size:12.5px !important;line-height:1.15 !important}
+  .trf-badge{padding:2px 7px !important;font-size:11.5px !important;line-height:1.1 !important;min-width:64px !important}
+  /* 2026-10-01: старые правила ниже поглощены !important-правилами выше
+     (были .trf-log{padding:0 4px 6px}, .trf-log-item{padding:5px 0} и т.д.
+     — все перекрыты компактными !important-версиями). */
 
   /* ---- Задача 13: информеры главной — фикс багов. п.1: заголовок
      «▼ Пробки» — ссылка на /traffic.php; при тапе вся синяя плашка
