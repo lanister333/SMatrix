@@ -3138,6 +3138,46 @@ a.pl-entry-detail:hover{color:#0a5caa}
   .sm-mh-mobile-bar .sm-mh-burger.sm-mh-burger-in-bar:active{
     background:var(--sm-navy-deep);
   }
+  /* 2026-10-01: правая часть мобильной синей полосы — кнопки
+     «Войти» / «Регистрация» (гостю) или «никнейм» / «выйти» (залогинен).
+     Кнопки — прозрачные, белый текст, вертикальный padding 8px как у
+     левой кнопки ☰, рамка 1px слева у каждой (кроме первой). */
+  .sm-mh-mobile-auth{
+    margin-left:auto;
+    display:flex;
+    align-items:center;
+  }
+  .sm-mh-mobile-authbtn{
+    background:transparent;
+    border:0;
+    border-left:1px solid #33517a;
+    color:#fff;
+    padding:8px 10px;
+    font-family:inherit;
+    font-size:12.5px;
+    font-weight:700;
+    line-height:1.2;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .sm-mh-mobile-authbtn:active{
+    background:var(--sm-navy-deep);
+  }
+  .sm-mh-mobile-authbtn.sm-mh-mobile-register{
+    /* Кнопка «Регистрация» — выделенная: бирюзовый фон, тёмно-синий текст */
+    background:var(--sm-turquoise);
+    color:var(--sm-navy);
+    border-left:0;
+  }
+  .sm-mh-mobile-authbtn.sm-mh-mobile-register:active{
+    background:#06b5a6;
+  }
+  .sm-mh-mobile-authbtn.sm-mh-mobile-nick{
+    /* Ник пользователя — обрезается, если длинный */
+    max-width:120px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
   /* Панель «☰ Меню / Форум» — компактная на мобайле:
      мин. высоты сброшены, padding сжат до 2px (см. выше правило
      .sk-topbar в этом же media-блоке, строки ~3107). */

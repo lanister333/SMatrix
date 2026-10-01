@@ -44,10 +44,7 @@ export function Masthead(props: { settings: SiteSettings }) {
   // невидим (navy на navy-полосе .sm-mainnav) и ломал равенство полосок
   // активной кнопки; для мобайла (≤480px, полоса скрыта) полоска вернута
   // правилом .sm-masthead в существующем @media-блоке globals.css
-  // 2026-10-01: return обёрнут в <> Fragment — после </header> добавлена
-  // мобильная синяя полоса .sm-mh-mobile-bar с кнопкой ☰ (десктоп: скрыта).
   return (
-    <>
     <header
       className="w-full sm-masthead"
       /* ТЗ 2026-09-21 «шапку сайта окрась в цвет как у блока поддержка
@@ -149,23 +146,6 @@ export function Masthead(props: { settings: SiteSettings }) {
         </div>
       </div>
     </header>
-
-    {/* 2026-10-01 (только мобайл): синяя полоса с кнопкой ☰ Разделы портала
-        ПОД бирюзовой шапкой, ВЫШЕ скрытой на мобайле синей ленты .sm-mainnav.
-        На десктопе блок скрыт (display:none через @media min-width:481px);
-        кнопка внутри бирюзовой шапки (.sm-mh-burger-in-header) на мобайле
-        тоже скрыта — пользователь видит только эту синюю полосу. */}
-    <div className="sm-mh-mobile-bar">
-      <button
-        type="button"
-        className="sm-mh-burger sm-mh-burger-in-bar"
-        aria-label="Открыть меню разделов"
-        onClick={() => window.dispatchEvent(new CustomEvent("sm-toggle-mobile-menu"))}
-      >
-        ☰ Разделы портала
-      </button>
-    </div>
-  </>
   );
 }
 
@@ -310,6 +290,62 @@ export function MainNav(props: {
 
   return (
     <>
+      {/* 2026-10-01 (только мобайл ≤480px): синяя полоса ПОД бирюзовой шапкой
+          с кнопкой ☰ Разделы портала (слева) и кнопками «Войти» /
+          «Зарегистрироваться» (справа, для гостя), либо «никнейм — профиль» +
+          «выйти» (для залогиненного). На десктопе блок скрыт через
+          @media (min-width:481px){.sm-mh-mobile-bar{display:none !important}}.
+          Логика авторизации (useAuth, openAuth, handleLogin, handleLogout)
+          общая с десктопной навигацией ниже — единственный источник правды. */}
+      <div className="sm-mh-mobile-bar">
+        <button
+          type="button"
+          className="sm-mh-burger sm-mh-burger-in-bar"
+          aria-label="Открыть меню разделов"
+          onClick={() => window.dispatchEvent(new CustomEvent("sm-toggle-mobile-menu"))}
+        >
+          ☰ Разделы портала
+        </button>
+        <div className="sm-mh-mobile-auth">
+          {auth.user ? (
+            <>
+              <button
+                type="button"
+                className="sm-mh-mobile-authbtn sm-mh-mobile-nick"
+                title="Ваш публичный профиль"
+                onClick={() => openProfile(auth.user!.nickname)}
+              >
+                {auth.user.nickname}
+              </button>
+              <button
+                type="button"
+                className="sm-mh-mobile-authbtn sm-mh-mobile-out"
+                onClick={handleLogout}
+              >
+                выйти
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="sm-mh-mobile-authbtn sm-mh-mobile-login"
+                onClick={() => openAuth("login")}
+              >
+                Войти
+              </button>
+              <button
+                type="button"
+                className="sm-mh-mobile-authbtn sm-mh-mobile-register"
+                onClick={() => openAuth("register")}
+              >
+                Регистрация
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
       <nav className="sm-mainnav w-full" aria-label="Главная навигация портала">
       {/* ШАГ 13: навигация переносами — никаких горизонтальных прокруток;
           ШАГ 27: справа — поиск (единственный на странице) и вход/регистрация */}
