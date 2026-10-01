@@ -3115,9 +3115,13 @@ a.pl-entry-detail:hover{color:#0a5caa}
   /* Синяя полоса под бирюзовой шапкой: цвет — var(--sm-navy) как у
      .sm-mainnav (на мобайле скрыта), кнопка ☰ занимает всю ширину
      полосы, выровнена по левому краю (текст кнопки не центрировать —
-     как будто это продолжение скрытой синей ленты). */
+     как будто это продолжение скрытой синей ленты).
+     2026-10-01 (правка 2): display:flex, align-items:stretch — чтобы
+     кнопка ☰ слева и блок .sm-mh-mobile-auth справа стояли в ОДНОЙ
+     строке (было display:block → auth-блок уходит на новую строку). */
   .sm-mh-mobile-bar{
-    display:block;
+    display:flex !important;
+    align-items:stretch;
     background:var(--sm-navy);
     border-bottom:1px solid var(--sm-navy-deep);
     padding:0;
