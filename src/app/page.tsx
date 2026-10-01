@@ -776,13 +776,17 @@ export default function App() {
         onLogout={() => logout()}
       />
       <div className="sk" style={{ minHeight: 0, flex: "1 0 auto" }}>
+        {/* 2026-10-01 (мобайл): topbar «☰ Категории форума | Форум» —
+            ТОЛЬКО на странице форума (не на Главной). Текст «Форум»
+            отцентрирован. На Главной topbar не показывается. */}
+        {!isHome && (
         <div className="sk-topbar">
           <button aria-label="Открыть меню" onClick={() => setMobileMenu(true)}>
             ☰ Категории форума
           </button>
-          <span className="tb-title">{isHome ? "Главная" : "Форум"}</span>
-          {/* ШАГ 11: бирюзовая кнопка «Главная» удалена — дублирует кнопку «Главная» в главном меню */}
+          <span className="tb-title">Форум</span>
         </div>
+        )}
         {mobileMenu && <div className="sk-menu-backdrop" onClick={() => setMobileMenu(false)} />}
         <div className="sk-shell">
         {/* ГЛОБАЛЬНАЯ СЕТКА ВСЕГО САЙТА (жёсткая директива «Фиксация 850px»):
