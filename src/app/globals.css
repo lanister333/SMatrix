@@ -3871,6 +3871,29 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
   .mp-rt-best td.bestcell b{display:inline;font-size:11px}
   .mp-rt-best td.bestcell i{display:inline;font-size:8.5px;line-height:1.15;margin-left:2px}
 
+  /* 2026-10-01 (правка для /currency.php): всё компактнее + таблица
+     скроллится горизонтально (на 375px 13-колоночная таблица 1096px не
+     влезает — даём горизонтальный скролл вместо обрезания справа).
+     Сжимаем: .cur-table-wrap → overflow-x:auto; .cur-calc и .cur-branches
+     → padding 12→6, margin 15→6, внутренние шрифты мельче. */
+  .cur-table-wrap{overflow-x:auto !important;overflow-y:hidden !important;-webkit-overflow-scrolling:touch}
+  .cur-table-wrap > table{min-width:720px !important}
+  .cur-calc{margin-top:6px !important;padding:6px !important}
+  .cur-calc > div:first-child{margin:-6px -6px 4px !important;padding:4px 6px !important;font-size:12px !important}
+  .cur-calc input,.cur-calc select{font-size:12px !important;padding:5px 8px !important;height:30px !important}
+  .cur-calc label > span{font-size:10px !important}
+  .cur-calc button{font-size:11px !important;padding:5px 8px !important}
+  .cur-calc > div:last-child{margin-top:4px !important;padding:5px 6px !important}
+  .cur-calc > div:last-child b{font-size:13px !important}
+  .cur-calc > div:last-child div{font-size:10px !important;margin-top:2px !important}
+  .cur-branches{margin-top:6px !important;padding:6px !important}
+  .cur-branches > div:first-child{margin:-6px -6px 4px !important;padding:4px 6px !important;font-size:12px !important}
+  .cur-branches > div{padding:3px 0 !important;gap:6px !important}
+  .cur-branches > div > div:first-child{min-width:90px !important}
+  .cur-branches > div > div:first-child b{font-size:11px !important}
+  .cur-branches > div > div:nth-child(2){font-size:11px !important}
+  .cur-branches > div > div:last-child a{font-size:11px !important;padding:2px 5px !important}
+
   /* Шаг №7 («Отключения»): плотный список — строго 3 самые свежие
      записи (сортировку по времени публикации делает API). Адреса —
      мелкий системный шрифт 12px; длинные названия улиц переносятся

@@ -237,8 +237,11 @@ export default function CurrencyScreen() {
                колонка банка 136px + ВСЕ 12 колонок курсов РОВНО по 80px
                (136+960=1096 ≤ 1105): сетка строго симметрична, имена
                банков не обрезаны («Россельхозбанк» — 116px текста
-               помещается при шрифте 11.5px). */
-            <div style={{ border: "1px solid #1E3A5F", overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+               помещается при шрифте 11.5px).
+               2026-10-01 (мобайл): контейнер получает класс .cur-table-wrap
+               — на ≤480px CSS переключает overflow:hidden → overflow-x:auto,
+               таблица скроллится горизонтально на узких экранах. */
+            <div className="cur-table-wrap" style={{ border: "1px solid #1E3A5F", overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", fontFamily: "system-ui, sans-serif" }}>
                 <colgroup>
                   <col style={{ width: "136px" }} />
@@ -350,8 +353,10 @@ export default function CurrencyScreen() {
           )}
 
           {/* КАЛЬКУЛЯТОР-КОНВЕРТЕР: шапка-полоса var(--sm-navy) во всю
-              ширину блока, белый bold по центру; THB в select (за 1 бат). */}
-          <div style={{ marginTop: "15px", padding: "12px", backgroundColor: "#D6E4ED", border: "1px solid #1E3A5F" }}>
+              ширину блока, белый bold по центру; THB в select (за 1 бат).
+              2026-10-01 (мобайл): контейнер .cur-calc — на ≤480px CSS
+              сжимает padding/margin/font-size. */}
+          <div className="cur-calc" style={{ marginTop: "15px", padding: "12px", backgroundColor: "#D6E4ED", border: "1px solid #1E3A5F" }}>
             <div style={{ margin: "-12px -12px 8px", padding: "8px 12px", backgroundColor: "#1E3A5F", color: "#FFFFFF", fontWeight: "bold", fontSize: "14px", textAlign: "center" }}>Калькулятор-конвертер</div>
             <div style={{ fontSize: "11px", color: "#56657a", marginBottom: "8px" }}>
               Расчёт по лучшему курсу из таблицы выше. JPY и KRW — за 1000 единиц, THB — за 1 бат.
@@ -393,8 +398,10 @@ export default function CurrencyScreen() {
           {/* «Отделения и кассы банков» — единый фирменный стиль (шапка-
               полоса #1E3A5F, подложка #D6E4ED, острые углы). ТЗ 2026-09-23
               «Доработка»: состав = ВСЕ 15 банков таблицы (девятка —
-              реальные адреса/телефоны ЮС; Т-Банку — честный онлайн-статус). */}
-          <div style={{ marginTop: "15px", padding: "12px", backgroundColor: "#D6E4ED", border: "1px solid #1E3A5F" }}>
+              реальные адреса/телефоны ЮС; Т-Банку — честный онлайн-статус).
+              2026-10-01 (мобайл): контейнер .cur-branches — на ≤480px CSS
+              сжимает padding/margin, строки становятся вертикально компактнее. */}
+          <div className="cur-branches" style={{ marginTop: "15px", padding: "12px", backgroundColor: "#D6E4ED", border: "1px solid #1E3A5F" }}>
             <div style={{ margin: "-12px -12px 8px", padding: "8px 12px", backgroundColor: "#1E3A5F", color: "#FFFFFF", fontWeight: "bold", fontSize: "14px", textAlign: "center" }}>Отделения и кассы банков</div>
             {BANK_BRANCHES.map((b, i) => (
               <div key={b.bank} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "5px 0", borderBottom: i < BANK_BRANCHES.length - 1 ? "1px solid #CED4DA" : "none" }}>
