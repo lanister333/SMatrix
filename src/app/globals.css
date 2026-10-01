@@ -3369,6 +3369,31 @@ a.pl-entry-detail:hover{color:#0a5caa}
   .sm-waffle-icon{font-size:20px;line-height:1}
   .sm-waffle-label{font-size:10px;line-height:1.2;font-weight:600}
 
+  /* 2026-10-01 (мобайл): белое окно поиска по центру синей полосы. */
+  .sm-mobile-search{
+    flex:1 1 auto;
+    min-width:0;
+    display:flex;
+    align-items:center;
+  }
+  .sm-mobile-search input{
+    width:100%;
+    background:#fff;
+    border:1px solid #33517a;
+    border-radius:2px;
+    padding:4px 8px;
+    font-family:inherit;
+    font-size:12px;
+    color:#1a2433;
+    outline:none;
+  }
+  .sm-mobile-search input:focus{
+    border-color:#fff;
+  }
+  .sm-mobile-search input::placeholder{
+    color:#8a9aaa;
+  }
+
   .sm-avatar-circle-wrap{position:relative;flex-shrink:0}
   .sm-avatar-circle{
     width:30px;height:30px;border-radius:50%;

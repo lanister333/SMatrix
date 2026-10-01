@@ -401,6 +401,17 @@ export function MainNav(props: {
             </a>
           </div>
         )}
+        {/* 2026-10-01 (мобайл): белое окно поиска по центру синей полосы. */}
+        <form className="sm-mobile-search" onSubmit={(e) => { e.preventDefault(); const qv = q.trim(); if (qv.length >= 2) { if (props.onSearch) props.onSearch(qv); else window.location.href = `/?view=search&q=${encodeURIComponent(qv)}`; } }}>
+          <input
+            type="text"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Поиск…"
+            aria-label="Поиск"
+            maxLength={120}
+          />
+        </form>
         <div className="sm-mh-mobile-auth">
           {/* 2026-10-01 (мобайл): кружок с буквой ника + выпадающее меню.
               Гость: кружок «?» → меню (Войти, Регистрация).

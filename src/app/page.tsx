@@ -776,17 +776,19 @@ export default function App() {
         onLogout={() => logout()}
       />
       <div className="sk" style={{ minHeight: 0, flex: "1 0 auto" }}>
-        {/* 2026-10-01 (мобайл): topbar «☰ Категории форума | Форум» —
-            ТОЛЬКО на странице форума (не на Главной). Текст «Форум»
-            отцентрирован. На Главной topbar не показывается. */}
-        {!isHome && (
-        <div className="sk-topbar">
-          <button aria-label="Открыть меню" onClick={() => setMobileMenu(true)}>
-            ☰ Категории форума
-          </button>
-          <span className="tb-title">Форум</span>
+        {/* 2026-10-01 (мобайл): голубая шапка (sk-topbar) — ВСЕГДА
+            показывается (на всех SPA-видах), с названием страницы по
+            центру. На форуме также кнопка «☰ Категории форума» слева. */}
+        <div className="sk-topbar" style={{ position: "relative" }}>
+          {view === "forum" && !topicId && (
+            <button aria-label="Открыть меню" onClick={() => setMobileMenu(true)}>
+              ☰ Категории форума
+            </button>
+          )}
+          <span className="tb-title">
+            {topicId ? "Тема форума" : view === "forum" ? "Форум" : view === "search" ? "Поиск" : view === "rules" ? "Правила" : view === "appeal" ? "Апелляция" : view === "about" ? "О проекте" : view === "admin" ? "Админка" : "Главная"}
+          </span>
         </div>
-        )}
         {mobileMenu && <div className="sk-menu-backdrop" onClick={() => setMobileMenu(false)} />}
         <div className="sk-shell">
         {/* ГЛОБАЛЬНАЯ СЕТКА ВСЕГО САЙТА (жёсткая директива «Фиксация 850px»):
