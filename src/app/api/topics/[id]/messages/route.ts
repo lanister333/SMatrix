@@ -81,7 +81,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
       );
     }
 
-    let parent = null;
+    let parent: { topicId: number; id: string; depth: number } | null = null;
     if (parentId) {
       parent = await db.message.findUnique({ where: { id: parentId } });
       if (!parent || parent.topicId !== topicId) parent = null;
@@ -116,6 +116,10 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
         needHuman: outcome.needHuman,
         isHiddenByAi: outcome.action === "hide",
         hiddenReason: outcome.hiddenReason ?? "",
+        modLevel: outcome.modLevel ?? 4,
+        aiAction: outcome.aiAction ?? "WATCH",
+        aiConfidence: outcome.aiConfidence === "high" ? 0.9 : outcome.aiConfidence === "medium" ? 0.6 : 0.3,
+        aiSignal: outcome.aiSignal ?? "",
       },
     });
 

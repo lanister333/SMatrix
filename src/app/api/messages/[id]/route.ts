@@ -66,6 +66,10 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
         needHuman: outcome.needHuman,
         isHiddenByAi: outcome.action === "hide",
         hiddenReason: outcome.hiddenReason ?? "",
+        modLevel: outcome.modLevel ?? 4,
+        aiAction: outcome.aiAction ?? "WATCH",
+        aiConfidence: outcome.aiConfidence === "high" ? 0.9 : outcome.aiConfidence === "medium" ? 0.6 : 0.3,
+        aiSignal: outcome.aiSignal ?? "",
       },
     });
 

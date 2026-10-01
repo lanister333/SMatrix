@@ -21,19 +21,21 @@ export type ModerationAction = "allow" | "block" | "hide" | "human";
 
 export interface ModerationOutcome {
   action: ModerationAction;
-  /** Сообщение пользователю при блокировке отправки (только для action="block"). */
   blockMessage?: string;
-  /** Причина скрытия (action="hide") — попадает в hiddenReason. */
   hiddenReason?: string;
-  /** Заметка ИИ — попадает в aiNote. */
   aiNote?: string;
-  /** Требуется решение человека-модератора. */
   needHuman: boolean;
-  /** Источник вердикта. «slogan» — ИИ-фильтр лозунгов ЖКХ (ТЗ №2 от 2026-09-23, п.17). */
   source: "profanity" | "card-filter" | "slogan" | "ai" | "fallback";
-  /** Категория нарушения (ШАГ 11 — для лестницы санкций). */
   category?: string;
   hits?: { word: string; stem: string; mode: string }[];
+  /** 2026-10-01: уровень нарушения (1-4). */
+  modLevel?: number;
+  /** 2026-10-01: технический статус AI: WATCH | LIMIT | STOP | ALERT. */
+  aiAction?: string;
+  /** 2026-10-01: уверенность AI: low | medium | high. */
+  aiConfidence?: string;
+  /** 2026-10-01: сработавший сигнал. */
+  aiSignal?: string;
 }
 
 /**
@@ -57,29 +59,64 @@ export async function moderateNewText(text: string): Promise<ModerationOutcome> 
   // Шаг 2. ИИ-модератор: контекст, скрытые нарушения, защита мнений.
   try {
     const ai = await aiModerate(text);
-    if (ai.verdict === "violation") {
+    // 2026-10-01: маппинг нового формата (level 1-4, action) → ModerationOutcome
+    if (ai.action === "ALERT" || (ai.level <= 1)) {
+      // Критическая опасность — скрыть и уведомить администратора
       return {
         action: "hide",
-        hiddenReason: ai.reason,
+        hiddenReason: ai.reason || "критическая опасность — скрыто ИИ",
+        aiNote: ai.note,
+        needHuman: true,
+        source: "ai",
+        category: ai.category,
+        modLevel: ai.level,
+        aiAction: ai.action,
+        aiConfidence: ai.confidence,
+        aiSignal: ai.signal,
+      };
+    }
+    if (ai.action === "STOP" || ai.verdict === "violation") {
+      // Серьёзное нарушение — скрыть
+      return {
+        action: "hide",
+        hiddenReason: ai.reason || "нарушение правил — скрыто ИИ",
         aiNote: ai.note,
         needHuman: false,
         source: "ai",
         category: ai.category,
+        modLevel: ai.level,
+        aiAction: ai.action,
+        aiConfidence: ai.confidence,
+        aiSignal: ai.signal,
       };
     }
-    if (ai.verdict === "ambiguous") {
+    if (ai.needsHuman || ai.action === "LIMIT" || ai.verdict === "ambiguous") {
+      // Спорный случай — передать администратору
       return {
         action: "human",
         aiNote: ai.note,
         needHuman: true,
         source: "ai",
         category: ai.category,
+        modLevel: ai.level,
+        aiAction: ai.action,
+        aiConfidence: ai.confidence,
+        aiSignal: ai.signal,
       };
     }
-    return { action: "allow", aiNote: ai.note, needHuman: false, source: "ai", category: ai.category };
+    // Нормальное сообщение — публиковать
+    return {
+      action: "allow",
+      aiNote: ai.note,
+      needHuman: false,
+      source: "ai",
+      category: ai.category,
+      modLevel: ai.level,
+      aiAction: ai.action,
+      aiConfidence: ai.confidence,
+      aiSignal: ai.signal,
+    };
   } catch {
-    // ИИ недоступен: текст лексический фильтр прошёл — публикуем,
-    // но обязательно ставим в очередь человеку-модератору.
     return {
       action: "human",
       aiNote: "ИИ-модератор недоступен — требуется проверка человеком",
