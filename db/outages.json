@@ -1,6 +1,18 @@
 {
-  "updated": "2026-10-01T16:44:57.131Z",
+  "updated": "2026-10-01T16:54:03.431Z",
   "items": [
+    {
+      "source": "СКК",
+      "title": "Отключение горячего водоснабжения 01.10.2026 с 22:00 до 06:00 02.10.2026",
+      "url": "https://skk65.ru/otkljuchenie-goryachego-vodosnabzheniya-01-10-2026-s-22-00-do-06-00-02-10-2026/",
+      "addresses": [],
+      "short": "Отключение горячего водоснабжения 01.10.2026 с 22:00 до 06:…",
+      "when": "с 22:00 до 06:00",
+      "kind": "hot",
+      "type": "planned",
+      "publishedAt": "2026-10-01T11:23:51Z",
+      "fetchedAt": "2026-10-01T16:54:03.431Z"
+    },
     {
       "source": "Сахалинэнерго",
       "title": "Плановые работы в рамках ремонтной программы на 23л-Ю-6 15.10.2026 с 14:00 до 17:00",
@@ -15,7 +27,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-10-01T02:36:00.000Z",
-      "fetchedAt": "2026-10-01T16:44:57.131Z"
+      "fetchedAt": "2026-10-01T16:54:03.431Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -48,7 +60,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-10-01T00:33:00.000Z",
-      "fetchedAt": "2026-10-01T16:44:57.131Z"
+      "fetchedAt": "2026-10-01T16:54:03.431Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -71,7 +83,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-30T00:32:00.000Z",
-      "fetchedAt": "2026-10-01T16:44:57.131Z"
+      "fetchedAt": "2026-10-01T16:54:03.431Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -87,7 +99,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-29T03:03:00.000Z",
-      "fetchedAt": "2026-10-01T16:44:57.131Z"
+      "fetchedAt": "2026-10-01T16:54:03.431Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -107,7 +119,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-28T01:58:00.000Z",
-      "fetchedAt": "2026-10-01T16:44:57.131Z"
+      "fetchedAt": "2026-10-01T16:54:03.431Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -123,7 +135,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-28T01:50:00.000Z",
-      "fetchedAt": "2026-10-01T16:44:57.131Z"
+      "fetchedAt": "2026-10-01T16:54:03.431Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -143,7 +155,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-25T00:50:00.000Z",
-      "fetchedAt": "2026-10-01T16:44:57.131Z"
+      "fetchedAt": "2026-10-01T16:54:03.431Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -160,7 +172,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-25T00:11:00.000Z",
-      "fetchedAt": "2026-10-01T16:44:57.131Z"
+      "fetchedAt": "2026-10-01T16:54:03.431Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -175,7 +187,7 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-24T02:01:00.000Z",
-      "fetchedAt": "2026-10-01T16:44:57.131Z"
+      "fetchedAt": "2026-10-01T16:54:03.431Z"
     },
     {
       "source": "Сахалинэнерго",
@@ -201,13 +213,8 @@
       "kind": "electro",
       "type": "planned",
       "publishedAt": "2026-09-21T02:41:00.000Z",
-      "fetchedAt": "2026-10-01T16:44:57.131Z"
+      "fetchedAt": "2026-10-01T16:54:03.431Z"
     }
   ],
-  "errors": [
-    {
-      "source": "СКК",
-      "error": "прямой: fetch failed; SDK: Function invoke failed with status 500: {\"result\":null,\"error\":\"Page reader failed: request failed with status 422: {\\\"code\\\":422,\\\"data\\\":null,\\\"message\\\":\\\"JINA request returned 422 for https:/skk65.ru/wp-json/wp/v2/posts: {\\\\\\\"data\\\\\\\":null,\\\\\\\"cause\\\\\\\":{\\\\\\\"log\\\\\\\":[\\\\\\\"  - navigating to \\\\\\\\\\\\\\\"https://skk65.ru/wp-json/wp/v2/posts\\\\\\\\\\\\\\\", waiting until \\\\\\\\\\\\\\\"networkidle\\\\\\\\\\\\\\\"\\\\\\\"],\\\\\\\"name\\\\\\\":\\\\\\\"Error\\\\\\\"},\\\\\\\"code\\\\\\\":422,\\\\\\\"name\\\\\\\":\\\\\\\"AssertionFailureError\\\\\\\",\\\\\\\"status\\\\\\\":42206,\\\\\\\"message\\\\\\\":\\\\\\\"Failed to goto https://skk65.ru: Error: page.goto: net::ERR_CONNECTION_REFUSED at https://skk65.ru/wp-json/wp/v2/posts\\\\\\\\nCall log:\\\\\\\\n  - navigating to \\\\\\\\\\\\\\\"https://skk65.ru/wp-json/wp/v2/posts\\\\\\\\\\\\\\\", waiting until \\\\\\\\\\\\\\\"networkidle\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\",\\\\\\\"readableMessage\\\\\\\":\\\\\\\"AssertionFailureError: Failed to goto https://skk65.ru: Error: page.goto: net::ERR_CONNECTION_REFUSED at https://skk65.ru/wp-json/wp/v2/posts\\\\\\\\nCall log:\\\\\\\\n  - navigating to \\\\\\\\\\\\\\\"https://skk65.ru/wp-json/wp/v2/posts\\\\\\\\\\\\\\\", waiting until \\\\\\\\\\\\\\\"networkidle\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\"}\\\",\\\"name\\\":\\\"UpstreamError\\\"}\\n\"}"
-    }
-  ]
+  "errors": []
 }

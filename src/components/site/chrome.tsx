@@ -401,8 +401,10 @@ export function MainNav(props: {
             </a>
           </div>
         )}
-        {/* 2026-10-01 (мобайл): белое окно поиска по центру синей полосы. */}
-        <form className="sm-mobile-search" onSubmit={(e) => { e.preventDefault(); const qv = q.trim(); if (qv.length >= 2) { if (props.onSearch) props.onSearch(qv); else window.location.href = `/?view=search&q=${encodeURIComponent(qv)}`; } }}>
+        {/* 2026-10-01 (мобайл): белое окно поиска по центру синей полосы.
+            Стили inline — обходим кэш CDN preview-сервера (CSS chunk не
+            меняет хэш в dev-режиме Turbopack). */}
+        <form className="sm-mobile-search" style={{ flex:"1 1 auto", minWidth:0, display:"flex", alignItems:"center", margin:"0 6px" }} onSubmit={(e) => { e.preventDefault(); const qv = q.trim(); if (qv.length >= 2) { if (props.onSearch) props.onSearch(qv); else window.location.href = `/?view=search&q=${encodeURIComponent(qv)}`; } }}>
           <input
             type="text"
             value={q}
@@ -410,6 +412,7 @@ export function MainNav(props: {
             placeholder="Поиск…"
             aria-label="Поиск"
             maxLength={120}
+            style={{ width:"100%", background:"#fff", border:"1px solid #33517a", borderRadius:"4px", padding:"5px 10px", fontFamily:"inherit", fontSize:"13px", color:"#1a2433", outline:"none" }}
           />
         </form>
         <div className="sm-mh-mobile-auth">
