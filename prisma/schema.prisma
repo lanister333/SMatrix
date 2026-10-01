@@ -30,6 +30,13 @@ model User {
   orgRep        Boolean   @default(false)
   /// ШАГ 19. Название организации представителя (показывается при официальном ответе).
   orgName       String    @default("")
+  /// 2026-10-01: профиль пользователя — город, телефон, о себе,
+  /// подписки на рассылку и уведомления.
+  city          String    @default("")
+  phone         String    @default("")
+  bio           String    @default("")
+  newsletterSubscribed Boolean @default(false)
+  notificationsSubscribed Boolean @default(false)
   gkhProblems   GkhProblem[]
   gkhUpdates    GkhUpdate[]
   datingPosts   DatingPost[]

@@ -1389,6 +1389,15 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .sk-profilebox .pb-nick{font-size:18px;font-weight:700}
 .sk-profilebox .pb-reg{color:#4a5b6d;font-size:12.5px}
 .sk-profilebox .pb-counts{color:#3d4a5c;margin-top:6px;font-size:13.5px}
+/* 2026-10-01: дополнительные поля профиля + кнопки управления */
+.sk-profilebox .pb-fields{margin-top:8px;display:flex;flex-direction:column;gap:4px}
+.sk-profilebox .pb-field{color:#3d4a5c;font-size:13px;line-height:1.4}
+.sk-profilebox .pb-field b{color:#1e3a5f;font-weight:700}
+.sk-profilebox .pb-actions{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px}
+.sk-profilebox .pb-act{cursor:pointer;background:#f0f3f7;border:1px solid #b6c2d1;color:#0a5caa;padding:5px 12px;font-family:inherit;font-size:12.5px;font-weight:700;border-radius:2px}
+.sk-profilebox .pb-act:hover{background:#e6ebf1}
+.sk-profilebox .pb-act.pb-logout{color:#c40000;border-color:#d98a80}
+.sk-profilebox .pb-act.pb-logout:hover{background:#fdf3f1}
 .sk-profilelist{background:#fff;border:1px solid var(--sm-navy)}
 .sk-profilelist .prow{cursor:pointer;border-bottom:1px solid #dbe4ec;padding:10px 12px}
 .sk-profilelist .prow:hover{background:#f4f8fb}

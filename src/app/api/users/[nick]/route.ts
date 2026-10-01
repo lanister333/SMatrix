@@ -32,9 +32,18 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ nick: strin
 
     return NextResponse.json({
       user: {
+        id: user.id,
         nickname: user.nickname,
         gender: user.gender,
         createdAt: user.createdAt,
+        city: user.city,
+        phone: user.phone,
+        bio: user.bio,
+        email: user.email,
+        newsletterSubscribed: user.newsletterSubscribed,
+        notificationsSubscribed: user.notificationsSubscribed,
+        orgRep: user.orgRep,
+        orgName: user.orgName,
       },
       topicsCount,
       messagesCount,
