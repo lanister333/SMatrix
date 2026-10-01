@@ -3103,13 +3103,9 @@ a.pl-entry-detail:hover{color:#0a5caa}
     text-overflow:ellipsis !important;
   }
   [data-flat-board]{margin-top:10px !important}
-  [data-flat-board] > h2{
-    margin:0 0 10px !important;
-    font-size:16px !important;
-    line-height:1.2 !important;
-    color:#1E3A5F !important;
-    font-weight:700 !important;
-  }
+  /* 2026-10-01: заголовок «Объявления — некоммерческая доска взаимопомощи»
+     на мобайле СКРЫТ по запросу пользователя. Десктоп не тронут. */
+  [data-flat-board] > h2{display:none !important}
   .oh-sideblock,.wb-sideblock,.cd-sideblock,.rc-sideblock,.ep-sideblock,.dk-sideblock,.gkh-sideblock,.pl-sidebox{padding:4px 5px;margin-bottom:6px}
   .ad-sidebox{padding:4px 5px;margin-bottom:6px}
   .oh-item,.wb-item,.cd-item,.rc-item,.ep-item,.dk-item,.gkh-item,.pl-entry{padding:5px 2px}
