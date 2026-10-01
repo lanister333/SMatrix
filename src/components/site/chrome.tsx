@@ -318,7 +318,7 @@ export function MainNav(props: {
                 title="Ваш профиль"
                 onClick={() => openProfile(auth.user!.nickname)}
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" style="display:inline-block;vertical-align:-2px"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> {auth.user.nickname}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" style={{display:"inline-block",verticalAlign:"-2px"}}><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> {auth.user.nickname}
               </button>
               <button
                 type="button"
@@ -439,7 +439,7 @@ export function MainNav(props: {
           {auth.user ? (
             <>
               <button className="sm-mainnav-link sm-nav-nick" title="Ваш профиль" onClick={() => openProfile(auth.user!.nickname)}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" style="display:inline-block;vertical-align:-2px"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> {auth.user.nickname}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" style={{display:"inline-block",verticalAlign:"-2px"}}><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> {auth.user.nickname}
               </button>
               <button className="sm-mainnav-link sm-nav-out border-r-0" onClick={handleLogout}>
                 выйти
@@ -537,7 +537,7 @@ export function MainNav(props: {
                       openProfile(auth.user!.nickname);
                     }}
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" style="display:inline-block;vertical-align:-2px"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> Мой профиль ({auth.user.nickname})
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" style={{display:"inline-block",verticalAlign:"-2px"}}><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> Мой профиль ({auth.user.nickname})
                   </button>
                   <button
                     type="button"
