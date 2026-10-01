@@ -236,6 +236,9 @@ export function MainNav(props: {
   // mMore — аккордеон «Ещё» внутри шторки (вместо десктопного absolute-списка).
   const [mOpen, setMOpen] = useState(false);
   const [mMore, setMMore] = useState(false);
+  // 2026-10-01 (мобайл): кружок-аватар + выпадающее меню (Войти/Регистрация/Профиль/Выйти).
+  const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
+  const avatarRef = useRef<HTMLDivElement>(null);
   const auth = useAuth();
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -244,6 +247,8 @@ export function MainNav(props: {
       if (ref.current && !ref.current.contains(t)) setOpen(false);
       // ТЗ 2026-09-21: клик вне «Полезного» закрывает его дропдаун
       if (usefulRef.current && !usefulRef.current.contains(t)) setUsefulOpen(false);
+      // 2026-10-01: клик вне кружка-аватара закрывает его меню
+      if (avatarRef.current && !avatarRef.current.contains(t)) setAvatarMenuOpen(false);
     };
     document.addEventListener("click", h);
     return () => document.removeEventListener("click", h);
@@ -310,42 +315,42 @@ export function MainNav(props: {
           ☰ Разделы портала
         </button>
         <div className="sm-mh-mobile-auth">
-          {auth.user ? (
-            <>
-              <button
-                type="button"
-                className="sm-mh-mobile-authbtn sm-mh-mobile-nick"
-                title="Ваш профиль"
-                onClick={() => openProfile(auth.user!.nickname)}
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" style={{display:"inline-block",verticalAlign:"-2px"}}><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> {auth.user.nickname}
-              </button>
-              <button
-                type="button"
-                className="sm-mh-mobile-authbtn sm-mh-mobile-out"
-                onClick={handleLogout}
-              >
-                выйти
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                type="button"
-                className="sm-mh-mobile-authbtn sm-mh-mobile-login"
-                onClick={() => openAuth("login")}
-              >
-                Войти
-              </button>
-              <button
-                type="button"
-                className="sm-mh-mobile-authbtn sm-mh-mobile-register"
-                onClick={() => openAuth("register")}
-              >
-                Регистрация
-              </button>
-            </>
-          )}
+          {/* 2026-10-01 (мобайл): кружок с буквой ника + выпадающее меню.
+              Гость: кружок «?» → меню (Войти, Регистрация).
+              Залогинен: кружок с первой буквой ника → меню (Профиль, Выйти). */}
+          <div className="sm-avatar-circle-wrap" ref={avatarRef}>
+            <button
+              type="button"
+              className="sm-avatar-circle"
+              onClick={() => setAvatarMenuOpen((v) => !v)}
+              title={auth.user ? auth.user.nickname : "Меню входа"}
+            >
+              {auth.user ? auth.user.nickname.charAt(0).toUpperCase() : "?"}
+            </button>
+            {avatarMenuOpen && (
+              <div className="sm-avatar-menu" onClick={(e) => e.stopPropagation()}>
+                {auth.user ? (
+                  <>
+                    <button className="sm-avatar-menu-item" onClick={() => { setAvatarMenuOpen(false); openProfile(auth.user!.nickname); }}>
+                      👤 Мой профиль
+                    </button>
+                    <button className="sm-avatar-menu-item sm-avatar-logout" onClick={() => { setAvatarMenuOpen(false); handleLogout(); }}>
+                      Выйти
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button className="sm-avatar-menu-item" onClick={() => { setAvatarMenuOpen(false); openAuth("login"); }}>
+                      Войти
+                    </button>
+                    <button className="sm-avatar-menu-item" onClick={() => { setAvatarMenuOpen(false); openAuth("register"); }}>
+                      Регистрация
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

@@ -3326,6 +3326,33 @@ a.pl-entry-detail:hover{color:#0a5caa}
     display:flex;
     align-items:center;
   }
+  /* 2026-10-01 (мобайл): кружок-аватар с буквой ника + выпадающее меню. */
+  .sm-avatar-circle-wrap{position:relative;flex-shrink:0}
+  .sm-avatar-circle{
+    width:30px;height:30px;border-radius:50%;
+    border:2px solid #f59e0b;
+    background:#1E3A5F;color:#f59e0b;
+    font-size:14px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;flex-shrink:0;padding:0;
+  }
+  .sm-avatar-circle:hover{background:#2a4d7a}
+  .sm-avatar-menu{
+    position:absolute;top:34px;right:0;z-index:300;
+    min-width:160px;
+    background:#fff;border:1px solid var(--sm-navy);
+    box-shadow:0 4px 12px rgba(0,0,0,0.15);
+    display:flex;flex-direction:column;
+  }
+  .sm-avatar-menu-item{
+    text-align:left;background:#fff;border:0;border-bottom:1px solid #e4e8ee;
+    padding:8px 12px;font-family:inherit;font-size:13px;font-weight:600;
+    color:#1a2433;cursor:pointer;white-space:nowrap;
+  }
+  .sm-avatar-menu-item:last-child{border-bottom:0}
+  .sm-avatar-menu-item:hover{background:#f4f8fb}
+  .sm-avatar-menu-item.sm-avatar-logout{color:#c40000}
+  .sm-avatar-menu-item.sm-avatar-logout:hover{background:#fdf3f1}
   .sm-mh-mobile-authbtn{
     background:transparent;
     border:0;
