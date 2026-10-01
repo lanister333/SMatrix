@@ -283,7 +283,7 @@ export default function ForumCategoryPage(props: { params: Promise<{ slug: strin
                   window.location.href = r ? forumCategoryHref(r.slug) : "/?view=forum";
                 }}
                 onOpenProfile={(n) => {
-                  window.location.href = `/?user=${encodeURIComponent(n)}`;
+                  window.location.href = `/user/${encodeURIComponent(n)}`;
                 }}
               />
             )}

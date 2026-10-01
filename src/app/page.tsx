@@ -603,11 +603,8 @@ export default function App() {
   );
 
   const openProfile = useCallback((nick: string) => {
-    setTopicId(null);
-    setJumpMsg(null);
-    setProfileNick(nick);
-    window.history.pushState(null, "", `/?user=${encodeURIComponent(nick)}`);
-    window.scrollTo(0, 0);
+    // 2026-10-01: отдельная страница профиля /user/[nick] (прежде SPA-вид ?user=).
+    window.location.href = `/user/${encodeURIComponent(nick)}`;
   }, []);
 
   const needAuthGate = useCallback(() => {

@@ -187,7 +187,7 @@ export default function ForumTopicPage(props: { params: Promise<{ topicId: strin
                     setNewTopic(true);
                   }}
                   onOpenProfile={(n) => {
-                    window.location.href = `/?user=${encodeURIComponent(n)}`;
+                    window.location.href = `/user/${encodeURIComponent(n)}`;
                   }}
                   notify={notify}
                 />
