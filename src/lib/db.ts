@@ -7,8 +7,8 @@ const globalForPrisma = globalThis as unknown as {
 // Fallback для деплоя платформы: снапшот может не включать .env (DATABASE_URL),
 // тогда PrismaClient падал на health-check ("Environment variable not found").
 // Реальный process.env.DATABASE_URL всегда приоритетен; фолбэк — стандартный
-// абсолютный путь проекта этого окружения.
-const databaseUrl = process.env.DATABASE_URL ?? 'file:/home/z/my-project/db/custom.db'
+// абсолютный путь проекта этого окружения (включая поддиректорию smatrix).
+const databaseUrl = process.env.DATABASE_URL ?? 'file:/home/z/my-project/smatrix/db/custom.db'
 
 export const db =
   globalForPrisma.prisma ??
