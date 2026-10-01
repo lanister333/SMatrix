@@ -3128,9 +3128,9 @@ a.pl-entry-detail:hover{color:#0a5caa}
     background:transparent;
     border:0;
     color:#fff;
-    padding:8px 12px;
+    padding:8px 10px;
     font-family:inherit;
-    font-size:13.5px;
+    font-size:12px;
     font-weight:700;
     line-height:1.2;
     cursor:pointer;
@@ -3140,8 +3140,8 @@ a.pl-entry-detail:hover{color:#0a5caa}
   }
   /* 2026-10-01: правая часть мобильной синей полосы — кнопки
      «Войти» / «Регистрация» (гостю) или «никнейм» / «выйти» (залогинен).
-     Кнопки — прозрачные, белый текст, вертикальный padding 8px как у
-     левой кнопки ☰, рамка 1px слева у каждой (кроме первой). */
+     Шрифт мелкий (11px), padding 8/6 — чтобы кнопки умещались в одну
+     строку с левой кнопкой ☰ «Разделы портала» на узких экранах 320-375px. */
   .sm-mh-mobile-auth{
     margin-left:auto;
     display:flex;
@@ -3152,9 +3152,9 @@ a.pl-entry-detail:hover{color:#0a5caa}
     border:0;
     border-left:1px solid #33517a;
     color:#fff;
-    padding:8px 10px;
+    padding:8px 6px;
     font-family:inherit;
-    font-size:12.5px;
+    font-size:11px;
     font-weight:700;
     line-height:1.2;
     cursor:pointer;
@@ -3174,7 +3174,7 @@ a.pl-entry-detail:hover{color:#0a5caa}
   }
   .sm-mh-mobile-authbtn.sm-mh-mobile-nick{
     /* Ник пользователя — обрезается, если длинный */
-    max-width:120px;
+    max-width:90px;
     overflow:hidden;
     text-overflow:ellipsis;
   }
