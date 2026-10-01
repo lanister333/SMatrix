@@ -3095,6 +3095,14 @@ a.pl-entry-detail:hover{color:#0a5caa}
   .sm-mh-main > p{display:none}
   .sm-mh-side{display:none}
   .sm-masthead-title{font-size:31px;line-height:1}
+  /* 2026-10-01 (правка 3): компенсация transform: skew + scaleX —
+     базовый .sm-masthead-title имеет transform-origin:0 100% (левый
+     нижний угол), из-за чего scaleX(1.48) растягивает текст ВПРАВО,
+     и видимо он оказывается не по центру, а смещённым вправо. На
+     мобайле меняем origin на 50% 100% (центр снизу) — растяжение
+     идёт в обе стороны от центра, визуальный центр текста совпадает
+     с центром .header-logo (text-align:center выше). */
+  .sm-masthead-title{transform-origin:50% 100% !important}
   /* 2026-10-01 (правка 2): гарантированно центрируем логотип —
      .header-logo имеет display:block (от Tailwind-класса «block»),
      занимает всю ширину родителя; text-align:center центрирует
