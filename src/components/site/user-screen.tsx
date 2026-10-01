@@ -74,8 +74,14 @@ interface ProfileData {
   messagesShown: number;
 }
 
-export default function UserScreen(props: { nick: string }) {
-  const { user, token, login } = useAuth();
+export default function UserScreen() {
+  // 2026-10-01: ник читаем из URL (/user/[nick]) на стороне клиента —
+  // не передаём через props из page.tsx (async server component вызывал
+  // проблемы с гидрацией — страница застревала на «Загрузка профиля…»).
+  const nick = typeof window !== "undefined"
+    ? decodeURIComponent(window.location.pathname.split("/user/")[1] || "")
+    : "";
+  const { user, token } = useAuth();
   const [settings, setSettings] = useState<SiteSettings>(DEFAULT_SETTINGS);
   const [data, setData] = useState<ProfileData | null>(null);
   const [error, setError] = useState("");
@@ -109,7 +115,7 @@ export default function UserScreen(props: { nick: string }) {
 
   useEffect(() => {
     setError("");
-    fetch(`/api/users/${encodeURIComponent(props.nick)}`)
+    fetch(`/api/users/${encodeURIComponent(nick)}`)
       .then(async (r) => (r.ok ? r.json() : Promise.reject(new Error("Пользователь не найден"))))
       .then((d: ProfileData) => {
         setData(d);
@@ -124,7 +130,7 @@ export default function UserScreen(props: { nick: string }) {
         setError(e instanceof Error ? e.message : "Ошибка загрузки");
         setData(null);
       });
-  }, [props.nick]);
+  }, [nick]);
 
   const goNav = useCallback((k: string) => {
     window.location.href = NAV_ROUTES[k] ?? "/";
@@ -141,7 +147,7 @@ export default function UserScreen(props: { nick: string }) {
     setBusy(true);
     setFormErr("");
     try {
-      const r = await fetch(`/api/users/${encodeURIComponent(props.nick)}/update`, {
+      const r = await fetch(`/api/users/${encodeURIComponent(nick)}/update`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -160,7 +166,7 @@ export default function UserScreen(props: { nick: string }) {
       setNote(d.note || "Профиль обновлён");
       window.setTimeout(() => setNote(""), 4000);
       // Reload profile
-      fetch(`/api/users/${encodeURIComponent(props.nick)}`)
+      fetch(`/api/users/${encodeURIComponent(nick)}`)
         .then((r) => r.json())
         .then((d: ProfileData) => setData(d))
         .catch(() => {});
@@ -175,7 +181,7 @@ export default function UserScreen(props: { nick: string }) {
     setBusy(true);
     setFormErr("");
     try {
-      const r = await fetch(`/api/users/${encodeURIComponent(props.nick)}/password`, {
+      const r = await fetch(`/api/users/${encodeURIComponent(nick)}/password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, oldPassword: pwOld, newPassword: pwNew }),
