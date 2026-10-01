@@ -4094,8 +4094,21 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
 
   /* 1) Рамка сообщения: единые внутренние отступы 6px; внешние между
      сообщениями — 4px; элементы выстраиваются плотной цепочкой (зазор 4px) */
-  .sk-msg{display:flex;flex-wrap:wrap;align-items:center;gap:2px 4px;padding:6px;margin-bottom:4px}
-  .sk-msg-head{display:contents}
+  .sk-msg{display:flex;flex-direction:column;gap:2px;padding:6px;margin-bottom:4px}
+  /* 2026-10-01: .sk-msg-head — НЕ display:contents, а flex-row —
+     чтобы кнопки (Пожаловаться/Не по делу/Ответить) стояли в той же
+     строке, что и №/автор/дата, прижатые вправо через spacer.
+     Прежде display:contents растворял шапку, и кнопки уезжали на новую строку. */
+  .sk-msg-head{display:flex !important;flex-wrap:nowrap !important;align-items:center;gap:2px 4px;background:transparent;border:0;padding:0;margin:0;min-height:0;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .sk-msg-head::-webkit-scrollbar{display:none}
+  /* 2026-10-01: кнопки и текст шапки — очень компактные, чтобы все
+     влезли в одну строку на 375px: font 9-10px, padding минимален. */
+  .sk-msg-num{font-size:10px !important;flex-shrink:0}
+  .sk-msg-author{font-size:11px !important;max-width:60px !important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:1}
+  .sk-msg-time{font-size:9px !important;flex-shrink:0}
+  .sk-msg-actions{flex-shrink:0 !important}
+  .sk-msg-actions .sk-flood-btn{font-size:9px !important;padding:0 !important}
+  .sk-msg-actions .sk-btn-answer{font-size:9px !important;padding:1px 4px !important}
 
   /* 2) Верхняя цепочка: № сообщения, ник, дата — одной строкой; ник
      усечивается многоточием, чтобы цепочка не ломалась на длинных никах */
@@ -4104,7 +4117,8 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
   .sk-msg-time{order:3;font-size:11px}
   .sk-msg-new{order:4}
   .sk-ai-badge{order:6}
-  .sk-msg-spacer{display:none} /* распорка «прижать вправо» не нужна — цепочка компактная */
+  .sk-msg-spacer{display:block !important; flex:1 !important; order:5} /* распорка — прижать кнопки вправо */
+  .sk-msg-actions{order:6 !important; flex-shrink:0 !important; margin-left:auto !important}
 
   /* 3) Кнопка «Ответить» внутри сообщения — compact-стиль по ТЗ:
      шрифт 12px, padding 3px 8px (вдвое ниже исходной 8px 13px/13px) */
