@@ -3088,12 +3088,18 @@ a.pl-entry-detail:hover{color:#0a5caa}
      (49→33px) — внутренние отступы до минимума */
   /* 2026-10-01: бирюзовая шапка +25% по вертикали (padding 4→8, font 25→31),
      синяя полоса .sk-topbar сжата (padding 4→2, button 5→2 line-height 1.2→1),
-     логотип отцентрирован (justify-content:center на .sm-mh-main и .sm-mh-wrap). */
+     логотип отцентрирован (justify-content:center на .sm-mh-main и .sm-mh-wrap
+     + text-align:center на .header-logo, чтобы h1 внутри тоже встал по центру). */
   .sm-mh-wrap{flex-direction:row;align-items:center;justify-content:center;padding:8px}
   .sm-mh-main{display:flex;align-items:center;justify-content:center;gap:8px;min-width:0;width:100%}
   .sm-mh-main > p{display:none}
   .sm-mh-side{display:none}
   .sm-masthead-title{font-size:31px;line-height:1}
+  /* 2026-10-01 (правка 2): гарантированно центрируем логотип —
+     .header-logo имеет display:block (от Tailwind-класса «block»),
+     занимает всю ширину родителя; text-align:center центрирует
+     вложенный h1 (логотип SakhMatrix). */
+  .header-logo{text-align:center !important;display:block;width:100%}
   .sm-mainnav{display:none}
   /* ТЗ 2026-09-21: полоска под шапкой — только на мобайле, где синяя полоса
      меню скрыта (на десктопе шапка смыкается с .sm-mainnav без бордера) */
