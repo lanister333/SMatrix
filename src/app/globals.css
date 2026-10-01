@@ -422,6 +422,27 @@ li.sk-rubric-row{display:block}
 .sk-msg-author{color:#0a5caa;font-size:13.5px;font-weight:700}
 .sk-msg-time{color:#56657a;font-size:12.5px}
 .sk-msg-spacer{flex:1}
+/* 2026-10-01: контейнер для кнопок сообщения (Пожаловаться / Не по делу /
+   Редактировать / Удалить / Ответить) — все в ОДНУ строку без переносов.
+   Раньше кнопки были прямыми flex-детьми .sk-msg (или .sk-msg-head) с
+   flex-wrap:wrap → раскидывались на 2-3 строки. Теперь — отдельный
+   flex-row с nowrap + горизонтальный скролл при переполнении. */
+.sk-msg-actions{
+  display:flex;
+  flex-wrap:nowrap;
+  align-items:center;
+  gap:8px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.sk-msg-actions::-webkit-scrollbar{display:none}
+.sk-msg-actions > .sk-flood-btn,
+.sk-msg-actions > .sk-btn-answer{
+  flex-shrink:0;
+  white-space:nowrap;
+  order:0 !important; /* сброс order — кнопки идут в естественном DOM порядке */
+}
 .sk-btn-reply{color:#fff;cursor:pointer;white-space:nowrap;background:#0a5caa;border:1px solid #084c8b;border-radius:2px;padding:3px 10px;font-family:inherit;font-size:12.5px;font-weight:700}
 .sk-btn-reply:hover{background:#084c8b}
 .sk-topicactions .sk-btn-answer{color:#fff;background:#0a5caa;border:1px solid #084c8b;border-radius:2px;margin-right:12px;padding:4px 14px;font-size:13px;text-decoration:none}
