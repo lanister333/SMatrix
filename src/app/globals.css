@@ -3069,9 +3069,67 @@ a.pl-entry-detail:hover{color:#0a5caa}
   .sk-shell{padding:0 0 6px}
   .sk-layout{padding:0 4px}
   .sk-topicbox{padding:4px 5px;margin-bottom:6px}
+  /* 2026-10-01: на странице темы форума — заголовок темы СВЕРХУ
+     на всю ширину, под ним — кнопки «☆ Добавить в избранное» и
+     «Ответить» в одну строку. Прежде было в одной flex-строке:
+     заголовок слева, кнопки справа — на узком экране заголовок
+     ужался и переносился.
+     Используем flex-wrap:wrap + flex-basis:100% на заголовке —
+     заголовок занимает всю первую строку, кнопки идут в ряд ниже. */
+  .sk-topicbox .t-title{
+    flex-direction:row !important;
+    flex-wrap:wrap !important;
+    align-items:flex-start !important;
+    justify-content:flex-start !important;
+    gap:6px 8px !important;
+  }
+  .sk-topicbox .t-title .t-title-text{
+    flex:0 0 100% !important;
+    width:100% !important;
+    font-size:14px !important;
+    line-height:1.25 !important;
+    margin-bottom:0 !important;
+  }
+  .sk-topicbox .t-title .sk-fav-btn-in-title,
+  .sk-topicbox .t-title .sk-btn-answer-in-title{
+    padding:3px 10px !important;
+    font-size:12px !important;
+    line-height:1.2 !important;
+    margin:0 !important;
+    flex:0 0 auto !important;
+  }
   .sk-msg{margin-bottom:6px}
   .sk-toolbar{gap:4px;padding:4px 8px 8px;margin-bottom:6px} /* Task44: зазор 4px, сверху 4px (фильтры прижаты к рамке), бока/низ 8px */
-  .sk-crumbs{margin-bottom:6px;padding:4px 5px}
+  /* 2026-10-01: хлебные крошки на ВСЕХ страницах форума
+     (Форум → Рубрика → Тема) — в ОДНУ строку с горизонтальным скроллом.
+     Прежде было display:block, текст переносился на 3-4 строки. Теперь:
+     display:flex; flex-wrap:nowrap; overflow-x:auto — помещается
+     в одну строку, при переполнении — свайп по горизонтали. */
+  .sk-crumbs,.forum-cat-crumbs{
+    display:flex !important;
+    flex-wrap:nowrap !important;
+    align-items:center !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    white-space:nowrap !important;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    gap:0 !important;
+    margin-bottom:6px;
+    padding:4px 5px;
+  }
+  .sk-crumbs::-webkit-scrollbar,.forum-cat-crumbs::-webkit-scrollbar{display:none}
+  .sk-crumbs a,.sk-crumbs span,.sk-crumbs .sep,
+  .forum-cat-crumbs a,.forum-cat-crumbs span,.forum-cat-crumbs .crumb-sep,.forum-cat-crumbs b{
+    flex-shrink:0 !important;
+    white-space:nowrap !important;
+  }
+  .sk-crumbs a,.forum-cat-crumbs a{
+    padding:3px 0 !important;
+    display:inline-block !important;
+  }
+  .sk-crumbs .sep{margin:0 5px !important}
+  .forum-cat-crumbs .crumb-sep{margin:0 5px !important}
   .sk-sideblock,.sk-sidezone{padding:4px 5px;margin-bottom:6px}
   .sk-mainheader{margin:6px 0}
   .sk-listhead,.sk-row{padding:4px 5px}
