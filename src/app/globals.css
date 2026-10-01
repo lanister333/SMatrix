@@ -3168,13 +3168,15 @@ a.pl-entry-detail:hover{color:#0a5caa}
     background:var(--sm-navy-deep);
   }
   .sm-mh-mobile-authbtn.sm-mh-mobile-register{
-    /* Кнопка «Регистрация» — выделенная: бирюзовый фон, тёмно-синий текст */
-    background:var(--sm-turquoise);
-    color:var(--sm-navy);
-    border-left:0;
+    /* 2026-10-01: бирюзовая рамка/фон УБРАНЫ по запросу — кнопка
+       «Регистрация» теперь выглядит как «Войти»: прозрачный фон,
+       белый текст. Визуального выделения нет — обе кнопки однотипны. */
+    background:transparent;
+    color:#fff;
+    border-left:1px solid #33517a;
   }
   .sm-mh-mobile-authbtn.sm-mh-mobile-register:active{
-    background:#06b5a6;
+    background:var(--sm-navy-deep);
   }
   .sm-mh-mobile-authbtn.sm-mh-mobile-nick{
     /* Ник пользователя — обрезается, если длинный */
