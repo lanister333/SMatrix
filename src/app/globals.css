@@ -3075,6 +3075,11 @@ a.pl-entry-detail:hover{color:#0a5caa}
      (у семейства ad- контейнеры зовутся ad-grid/ad-sidebox/ad-entry) */
   .oh-layout,.wb-layout,.cd-layout,.rc-layout,.ep-layout,.dk-layout,.gkh-layout{padding:0 4px}
   .ad-grid{padding:0 4px}
+  /* 2026-10-01: на мобайле ≤480px центральная колонка .center-column
+     получила горизонтальный padding 8px — иначе контент (заголовок раздела,
+     вкладки FlatBoard, кнопки создания) «залипал» на левом краю экрана.
+     Вертикальный padding 0 сохраняется — его дают дочерние секции. */
+  .center-column{padding-left:8px !important;padding-right:8px !important}
   .oh-sideblock,.wb-sideblock,.cd-sideblock,.rc-sideblock,.ep-sideblock,.dk-sideblock,.gkh-sideblock,.pl-sidebox{padding:4px 5px;margin-bottom:6px}
   .ad-sidebox{padding:4px 5px;margin-bottom:6px}
   .oh-item,.wb-item,.cd-item,.rc-item,.ep-item,.dk-item,.gkh-item,.pl-entry{padding:5px 2px}
