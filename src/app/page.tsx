@@ -780,7 +780,7 @@ export default function App() {
         {/* 2026-10-01 (мобайл): голубая шапка (sk-topbar) — ВСЕГДА
             показывается (на всех SPA-видах), с названием страницы по
             центру. На форуме также кнопка «☰ Категории форума» слева. */}
-        <div className="sk-topbar" style={{ position: "relative" }}>
+        <div className="sk-topbar" style={{ position: "relative", padding: "8px 10px !important", minHeight: "0 !important" } as React.CSSProperties}>
           {view === "forum" && !topicId && (
             <button aria-label="Открыть меню" onClick={() => setMobileMenu(true)}>
               ☰ Категории форума
