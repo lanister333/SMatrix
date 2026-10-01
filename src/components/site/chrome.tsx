@@ -287,7 +287,8 @@ export function MainNav(props: {
   };
   const openProfile = (nick: string) => {
     if (props.onOpenProfile) props.onOpenProfile(nick);
-    else window.location.href = `/?user=${encodeURIComponent(nick)}`;
+    // 2026-10-01: отдельная страница профиля /user/[nick] (прежде SPA-вид ?user=).
+    else window.location.href = `/user/${encodeURIComponent(nick)}`;
   };
 
   return (
