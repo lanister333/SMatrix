@@ -177,31 +177,6 @@ function MessageRow(props: {
             изменено
           </span>
         )}
-        {/* Директива «как на Сахкоме»: стрелка └ + имя адресата — кликабельная
-            синяя ссылка, плавно перематывает к сообщению-родителю (как на то
-            сообщение, на которое нажали «Ответить»). Имя — из parentAuthor
-            ответа (подставляет API); переход — по parentNum через gotoMessage
-            (работает и через страницы темы: gotoMessage сам переключит страницу
-            и подсветит цель). */}
-        {m.parentAuthor && (
-          m.parentNum ? (
-            <a
-              className="sk-msg-parent"
-              title={`Плавно перейти к сообщению №${m.parentNum} от ${m.parentAuthor}, на которое дан ответ${props.parentPage != null ? ` (стр. ${props.parentPage})` : ""}`}
-              onClick={(e) => {
-                e.preventDefault();
-                props.onGoParent?.();
-              }}
-            >
-              └ ответ <b className={`sk-nick g-${m.parentAuthorGender === "male" || m.parentAuthorGender === "female" ? m.parentAuthorGender : "neutral"}`}>{m.parentAuthor}</b>
-              {props.parentPage != null && <span className="sk-msg-parent-page"> (стр. {props.parentPage})</span>}
-            </a>
-          ) : (
-            <span className="sk-msg-parent" title={`Ответ на сообщение пользователя ${m.parentAuthor}`}>
-              └ ответ <b className={`sk-nick g-${m.parentAuthorGender === "male" || m.parentAuthorGender === "female" ? m.parentAuthorGender : "neutral"}`}>{m.parentAuthor}</b>
-            </span>
-          )
-        )}
         {m.aiNote && (
           <span className="sk-ai-badge" title={m.aiNote}>
             🛡 ИИ: {m.aiNote}
@@ -216,7 +191,10 @@ function MessageRow(props: {
             сообщениям форума (текущим и будущим) — единый шаблон .sk-msg.
             2026-10-01: все 3+ кнопки обёрнуты в .sk-msg-actions — единая
             flex-строка без переносов (раньше flex-wrap:wrap на .sk-msg
-            раскидывал кнопки на 2-3 строки; пользователь попросил в одну). */}
+            раскидывал кнопки на 2-3 строки; пользователь попросил в одну).
+            2026-10-02: parent («└ ответ [имя]») перенесён из sk-msg-head
+            в sk-msg-body (в начало), чтобы head был в одну строку:
+            #N, ник, дата, spacer, Пожаловаться, Не по делу, Ответить. */}
         <div className="sk-msg-actions">
         {/* ШАГ 10: жалоба на сообщение — модальное окно с 7 причинами */}
         <button className="sk-flood-btn" onClick={props.onComplain} title="Жалоба уходит ИИ-модератору; спорные случаи рассмотрит человек">
@@ -249,6 +227,30 @@ function MessageRow(props: {
         </div>
       </div>
       <div className="sk-msg-body">
+        {/* 2026-10-02: parent («└ ответ [имя]») — перенесён из sk-msg-head
+            в НАЧАЛО sk-msg-body, перед цитатой и текстом. Так sk-msg-head
+            остаётся в одну строку (#N, ник, дата, кнопки), а parent стоит
+            отдельной строкой над текстом сообщения — тоже кликабельная
+            синяя ссылка с плавной перемоткой к сообщению-родителю. */}
+        {m.parentAuthor && (
+          m.parentNum ? (
+            <a
+              className="sk-msg-parent sk-msg-parent-in-body"
+              title={`Плавно перейти к сообщению №${m.parentNum} от ${m.parentAuthor}, на которое дан ответ${props.parentPage != null ? ` (стр. ${props.parentPage})` : ""}`}
+              onClick={(e) => {
+                e.preventDefault();
+                props.onGoParent?.();
+              }}
+            >
+              └ ответ <b className={`sk-nick g-${m.parentAuthorGender === "male" || m.parentAuthorGender === "female" ? m.parentAuthorGender : "neutral"}`}>{m.parentAuthor}</b>
+              {props.parentPage != null && <span className="sk-msg-parent-page"> (стр. {props.parentPage})</span>}
+            </a>
+          ) : (
+            <span className="sk-msg-parent sk-msg-parent-in-body" title={`Ответ на сообщение пользователя ${m.parentAuthor}`}>
+              └ ответ <b className={`sk-nick g-${m.parentAuthorGender === "male" || m.parentAuthorGender === "female" ? m.parentAuthorGender : "neutral"}`}>{m.parentAuthor}</b>
+            </span>
+          )
+        )}
         {/* Цитата Сахкома: шапка-ссылка (перемотка к исходному сообщению)
             + усечённое тело. Рендерится ДО основного текста ответа. */}
         {props.quoteOf && (

@@ -6154,7 +6154,9 @@ div[style*="background-color: rgb(0, 74, 143)"] {
    экрана, ломая flex-spacer, и кнопки «Ответить»/«Пожаловаться»
    съезжали. Теперь parent занимает максимум 130px, лишнее обрезается
    «…». Spacer flex:1 снова работает, sk-msg-actions прижимается к
-   правому краю, «Ответить» (последняя в DOM) становится первой справа. */
+   правому краю, «Ответить» (последняя в DOM) становится первой справа.
+   2026-10-02 (v2): line-height 1.7 → 1.15, padding 0 6px → 0 5px —
+   сжато по вертикали, parent занимает ~12px высоты вместо ~18px. */
 @media (max-width: 768px) {
   .sk-msg-parent {
     max-width: 130px !important;
@@ -6162,6 +6164,8 @@ div[style*="background-color: rgb(0, 74, 143)"] {
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
     vertical-align: middle;
+    line-height: 1.15 !important;
+    padding: 0 5px !important;
   }
   .sk-msg-parent b {
     overflow: hidden !important;
@@ -6170,34 +6174,17 @@ div[style*="background-color: rgb(0, 74, 143)"] {
     max-width: 100px;
     display: inline-block;
     vertical-align: middle;
+    line-height: 1.15 !important;
   }
 }
 
-/* 2026-10-02 (v5, мобайл): на мобиле .sk-msg-head — flex-wrap:wrap
-   (отменяет nowrap из @media max-width:480px), overflow:visible
-   (отменяет overflow-x:auto). Parent «└ ответ vetrov» остаётся на
-   строке 1, sk-msg-actions переходит на строку 2 с flex-basis:100% +
-   justify-content:flex-end — кнопки прижаты к правому краю viewport,
-   синяя «Ответить» (последняя в DOM) — первая справа. */
+/* 2026-10-02 (мобайл): .sk-msg-parent-in-body — parent («└ ответ [имя]»)
+   в sk-msg-body (после переноса из sk-msg-head). Inline-block + margin-bottom
+   чтобы стоял отдельной строкой над текстом сообщения. */
 @media (max-width: 768px) {
-  .sk-msg-head {
-    flex-wrap: wrap !important;
-    overflow: visible !important;
-    overflow-x: visible !important;
-  }
-  .sk-msg-head .sk-msg-actions {
-    flex: 0 0 100% !important;
-    width: 100% !important;
-    justify-content: flex-end !important;
-    overflow: visible !important;
-    margin-left: 0 !important;
-  }
-  .sk-msg-actions > .sk-flood-btn,
-  .sk-msg-actions > .sk-btn-answer {
-    flex-shrink: 1 !important;
-    min-width: 0 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
+  .sk-msg-parent-in-body {
+    display: inline-block !important;
+    margin: 0 0 4px 0 !important;
+    line-height: 1.15 !important;
   }
 }
