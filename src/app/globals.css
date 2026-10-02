@@ -6222,3 +6222,18 @@ div[style*="background-color: rgb(0, 74, 143)"] {
     font-size: 12px !important;
   }
 }
+
+/* 2026-10-02 (мобайл, v2): .sk-charcount:empty — display:none. Раньше
+   пустой div .sk-charcount (когда символов < 9000) занимал ~20px
+   вертикали между textarea и кнопкой «Отправить мнение». Теперь
+   если символов мало — счётчик не рендерится, кнопка подтянута
+   к textarea. align-items:baseline на flex-контейнере с кнопкой и
+   ссылкой — они выровнены по базовой линии шрифта. */
+@media (max-width: 768px) {
+  .sk-charcount:empty {
+    display: none !important;
+  }
+  .sk-qr textarea {
+    margin-bottom: 0 !important;
+  }
+}
