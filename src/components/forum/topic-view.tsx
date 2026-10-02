@@ -1080,22 +1080,24 @@ export default function TopicView(props: {
             <div className="sk-charcount">
               {reply.length > 9000 && <span className={reply.length > 9500 ? "over" : ""}>{reply.length}/10000</span>}
             </div>
-            <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
               <button className="sk-btn-classic" disabled={sending || !reply.trim()} onClick={sendReply}>
                 {sending ? "Проверка ИИ…" : "Отправить мнение"}
               </button>
               {/* 2026-10-02: текст «Чтобы писать на форуме, войдите или
                   зарегистрируйтесь — ссылка в левой колонке» удалён по
                   просьбе пользователя — кнопка всё равно требует входа
-                  (disabled если нет user). */}
+                  (disabled если нет user).
+                  2026-10-02 (v2): ссылка «К списку тем» перенесена ВНУТРЬ
+                  этого div — теперь стоит в один ряд с кнопкой
+                  «Отправить мнение» (flex-row, gap 10px). */}
+              <a className="sk-backlink" onClick={props.onBack}>
+                « К списку тем
+              </a>
             </div>
           </>
         )}
       </div>
-
-      <a className="sk-backlink" onClick={props.onBack}>
-        « К списку тем
-      </a>
 
       {complainMsg && (
         <ComplaintModal
