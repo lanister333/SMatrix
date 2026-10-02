@@ -6172,3 +6172,32 @@ div[style*="background-color: rgb(0, 74, 143)"] {
     vertical-align: middle;
   }
 }
+
+/* 2026-10-02 (v5, мобайл): на мобиле .sk-msg-head — flex-wrap:wrap
+   (отменяет nowrap из @media max-width:480px), overflow:visible
+   (отменяет overflow-x:auto). Parent «└ ответ vetrov» остаётся на
+   строке 1, sk-msg-actions переходит на строку 2 с flex-basis:100% +
+   justify-content:flex-end — кнопки прижаты к правому краю viewport,
+   синяя «Ответить» (последняя в DOM) — первая справа. */
+@media (max-width: 768px) {
+  .sk-msg-head {
+    flex-wrap: wrap !important;
+    overflow: visible !important;
+    overflow-x: visible !important;
+  }
+  .sk-msg-head .sk-msg-actions {
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    justify-content: flex-end !important;
+    overflow: visible !important;
+    margin-left: 0 !important;
+  }
+  .sk-msg-actions > .sk-flood-btn,
+  .sk-msg-actions > .sk-btn-answer {
+    flex-shrink: 1 !important;
+    min-width: 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+}
