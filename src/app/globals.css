@@ -6452,3 +6452,39 @@ div[style*="background-color: rgb(0, 74, 143)"] {
     flex-shrink: 0 !important;
   }
 }
+
+/* 2026-10-02 (мобайл, v2): страницы «Где купить» и «Где дешевле» —
+   3 кнопки «Последние вопросы», «Мои публикации», «Задать вопрос»
+   растянуты на всю ширину. Каждая кнопка — flex:1 (равная доля
+   ширины). overflow-x:visible (не скроллится), nowrap. */
+@media (max-width: 768px) {
+  .wb-head-right,
+  .cd-head-right {
+    overflow-x: visible !important;
+  }
+  .wb-nav-inline,
+  .cd-nav-inline {
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+  .wb-nav-inline button,
+  .cd-nav-inline button {
+    flex: 1 !important;
+    min-width: 0 !important;
+    text-align: center !important;
+    padding: 4px 4px !important;
+    font-size: 13px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  .wb-addbtn,
+  .cd-addbtn {
+    flex: 1 !important;
+    text-align: center !important;
+    padding: 4px 6px !important;
+    font-size: 13px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+}
