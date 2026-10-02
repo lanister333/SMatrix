@@ -6493,8 +6493,12 @@ div[style*="background-color: rgb(0, 74, 143)"] {
   }
   .wb-addbtn,
   .cd-addbtn {
-    /* 2026-10-02 (v4): ещё уже по вертикали — padding 1px, line-height:1. */
+    /* 2026-10-02 (v4): ещё уже по вертикали — padding 1px, line-height:1,
+       height:auto, min-height:0, display:inline-block (не flex). */
     flex: 0 0 auto !important;
+    display: inline-block !important;
+    height: auto !important;
+    min-height: 0 !important;
     text-align: center !important;
     padding: 1px 6px !important;
     font-size: 10px !important;
