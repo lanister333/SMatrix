@@ -1865,7 +1865,9 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
    «Обсудить на форуме ЖКХ» — справа и бирюзовая (указ 2026-09-23,
    правила .dk-btn-forum). ============================================================ */
 .gkf-head{margin-bottom:10px}
-.gkf-title{color:#1a1a1a;font-size:22px;font-weight:700;margin:0}
+/* 2026-10-02: цвет «ЖКХ и городские проблемы» изменён с чёрного #1a1a1a
+   на синий #0a5caa (как у других заголовков разделов). */
+.gkf-title{color:#0a5caa;font-size:22px;font-weight:700;margin:0}
 .gkf-desc{color:#56657a;font-size:13.5px;margin-top:3px}
 .gkf-newbtn{cursor:pointer;background:#eef6fb;border:1px solid #9cc0dd;color:#0a5caa;font-family:inherit;font-size:14px;font-weight:700;margin-top:9px;padding:7px 14px}
 .gkf-newbtn:hover{background:#e2eff9}
