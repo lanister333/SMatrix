@@ -6431,7 +6431,8 @@ div[style*="background-color: rgb(0, 74, 143)"] {
   .wb-title,
   .cd-title {
     white-space: nowrap !important;
-    font-size: 13px !important;
+    /* 2026-10-02: вернуть крупный размер заголовка (было 13px). */
+    font-size: 20px !important;
     flex-shrink: 0 !important;
     margin: 0 !important;
   }
@@ -6492,12 +6493,12 @@ div[style*="background-color: rgb(0, 74, 143)"] {
   }
   .wb-addbtn,
   .cd-addbtn {
-    /* 2026-10-02 (v2): flex:1 — кнопка «Задать вопрос» растягивается
-       на всё свободное место по горизонтали. */
-    flex: 1 !important;
+    /* 2026-10-02 (v3): уменьшена — flex:0 0 auto (не растягивается),
+       font-size 10px, padding компактный. */
+    flex: 0 0 auto !important;
     text-align: center !important;
-    padding: 4px 8px !important;
-    font-size: 13px !important;
+    padding: 3px 6px !important;
+    font-size: 10px !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
