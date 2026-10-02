@@ -787,7 +787,7 @@ export default function App() {
         <div className="sk-topbar">
           {view === "forum" && !topicId && (
             <button aria-label="Открыть меню" onClick={() => setMobileMenu(true)}>
-              ☰ Категории форума
+              ☰ Категории
             </button>
           )}
           <span className="tb-title">
