@@ -4,6 +4,8 @@ import { userByToken } from "@/lib/auth";
 import { handleApiError } from "@/lib/api";
 import { moderateNewText, restrictionBlockMessage } from "@/lib/moderation";
 import { getActiveRestriction, handleConfirmedViolation } from "@/lib/moderation/sanctions";
+import { checkDailyLimit, rateKey, checkQuickRate, suspiciousFactor } from "@/lib/security";
+import { isStaffRole } from "@/lib/admin";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -36,6 +38,47 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
         },
         { status: 403 }
       );
+    }
+
+    // ПРОМТ №1: проверка статуса аккаунта (banned) + лимиты для fresh-аккаунтов.
+    // < 24 ч → 30 сообщений/час; обычно → 60/час. Suspicious → /2. Staff-роли свободны.
+    if (!isStaffRole(user.role)) {
+      const fullUser = await db.user.findUnique({
+        where: { id: user.id },
+        select: { status: true, createdAt: true },
+      });
+      if (fullUser?.status === "banned") {
+        return NextResponse.json(
+          { error: "Аккаунт заблокирован. Подайте апелляцию, если считаете это ошибкой." },
+          { status: 403 }
+        );
+      }
+      if (fullUser) {
+        const factor = suspiciousFactor(fullUser.status);
+        const isFresh = Date.now() - fullUser.createdAt.getTime() < 24 * 60 * 60 * 1000;
+        const perHour = Math.floor((isFresh ? 30 : 60) * factor);
+        if (!checkQuickRate(rateKey("msg_h", user.id), perHour, 60 * 60 * 1000)) {
+          return NextResponse.json(
+            { error: "Слишком много сообщений за час. Попробуйте позже." },
+            { status: 429 }
+          );
+        }
+        // Лимит сообщений со ссылками для fresh-аккаунтов: 5/сутки.
+        if (isFresh && /https?:\/\//i.test(text)) {
+          const linksCheck = await checkDailyLimit(
+            user.id,
+            fullUser.createdAt,
+            "message_with_link",
+            { fresh: 5, normal: 100, windowMs: 24 * 60 * 60 * 1000 }
+          );
+          if (!linksCheck.allowed) {
+            return NextResponse.json(
+              { error: linksCheck.reason ?? "Слишком много сообщений со ссылками" },
+              { status: 429 }
+            );
+          }
+        }
+      }
     }
 
     const topic = await db.topic.findUnique({ where: { id: topicId } });

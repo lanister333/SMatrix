@@ -63,18 +63,37 @@ export async function POST(req: NextRequest) {
         source: "human",
         createdBy: admin.nickname,
       });
+      // ПРОМТ №1: при бане/длительной блокировке — завершаем все активные сессии.
+      // Токен забаненного пользователя НЕ должен продолжать работать.
+      let endedSessions = 0;
+      if (kind === "ban" || kind === "limit_3d" || kind === "limit_24h") {
+        try {
+          const result = await db.session.deleteMany({ where: { userId: target.id } });
+          endedSessions = result.count;
+          // Помечаем аккаунт как banned (для быстрых проверок в /api/auth/login).
+          if (kind === "ban") {
+            await db.user.update({
+              where: { id: target.id },
+              data: { status: "banned" },
+            }).catch(() => {});
+          }
+        } catch (e) {
+          console.error("[sanction] session invalidation error:", e);
+        }
+      }
       await logAdminAction({
         actor: admin.nickname,
         actorRole: admin.role,
         action: "sanction.apply",
         targetType: "user",
         targetLabel: `${target.nickname} (${ROLE_LABELS[target.role] ?? target.role})`,
-        details: `${SANCTION_LABELS[kind]}: ${reason}`,
+        details: `${SANCTION_LABELS[kind]}: ${reason}${endedSessions ? `. Завершено сессий: ${endedSessions}` : ""}`,
       });
       return NextResponse.json({
         ok: true,
-        note: `Санкция применена: ${SANCTION_LABELS[kind]} для ${target.nickname}`,
+        note: `Санкция применена: ${SANCTION_LABELS[kind]} для ${target.nickname}${endedSessions ? `, завершено сессий: ${endedSessions}` : ""}`,
         sanction,
+        endedSessions,
       });
     }
 
@@ -95,7 +114,7 @@ export async function POST(req: NextRequest) {
       }
       await db.user.update({
         where: { id: target.id },
-        data: { restrictedUntil: null },
+        data: { restrictedUntil: null, status: "active" },
       }).catch(() => {});
       await logAdminAction({
         actor: admin.nickname,

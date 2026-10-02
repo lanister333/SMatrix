@@ -5,3 +5,4 @@ dev.log
 server.log
 .tmp-rollback/
 tool-results/
+dev-server.log

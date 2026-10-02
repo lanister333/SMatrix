@@ -5,6 +5,7 @@ import { handleApiError } from "@/lib/api";
 import { moderateNewText, restrictionBlockMessage } from "@/lib/moderation";
 import { getActiveRestriction, handleConfirmedViolation } from "@/lib/moderation/sanctions";
 import { isStaffRole } from "@/lib/admin";
+import { checkDailyLimit, rateKey, checkQuickRate, suspiciousFactor } from "@/lib/security";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -189,6 +190,47 @@ export async function POST(req: NextRequest) {
         },
         { status: 403 }
       );
+    }
+
+    // ПРОМТ №1: проверка статуса аккаунта (banned/suspicious).
+    const fullUser = await db.user.findUnique({
+      where: { id: user.id },
+      select: { status: true, createdAt: true, role: true },
+    });
+    if (fullUser?.status === "banned") {
+      return NextResponse.json(
+        { error: "Аккаунт заблокирован. Подайте апелляцию, если считаете это ошибкой." },
+        { status: 403 }
+      );
+    }
+
+    // ПРОМТ №1: лимиты для fresh-аккаунтов (< 24 ч) и быстрая защита от флуда.
+    // Не распространяется на staff-роли.
+    if (!isStaffRole(user.role) && fullUser) {
+      // Быстрый in-memory лимит: 3 темы в час для fresh, 10 для обычных.
+      // Suspicious-аккаунт — лимит /2.
+      const factor = suspiciousFactor(fullUser.status);
+      const isFresh = Date.now() - fullUser.createdAt.getTime() < 24 * 60 * 60 * 1000;
+      const perHour = Math.floor((isFresh ? 3 : 10) * factor);
+      if (!checkQuickRate(rateKey("topic_h", user.id), perHour, 60 * 60 * 1000)) {
+        return NextResponse.json(
+          { error: "Слишком много тем за час. Попробуйте позже." },
+          { status: 429 }
+        );
+      }
+      // Суточный лимит: 3 темы/сутки для fresh, 30 для обычных.
+      const dayCheck = await checkDailyLimit(
+        user.id,
+        fullUser.createdAt,
+        "topic_create",
+        { fresh: 3, normal: 30, windowMs: 24 * 60 * 60 * 1000 }
+      );
+      if (!dayCheck.allowed) {
+        return NextResponse.json(
+          { error: dayCheck.reason ?? "Суточный лимит тем исчерпан" },
+          { status: 429 }
+        );
+      }
     }
 
     // ШАГ 12: создание тем может быть приостановлено в настройках сайта.

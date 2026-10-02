@@ -37,6 +37,14 @@ model User {
   bio           String    @default("")
   newsletterSubscribed Boolean @default(false)
   notificationsSubscribed Boolean @default(false)
+  /// ПРОМТ №1 (защита платформы): явный статус аккаунта.
+  /// active — обычный; suspicious — помечен ИИ как подозрительный (требует проверки);
+  /// banned — заблокирован (через Sanction с kind=ban, здесь дублируется для быстрых проверок).
+  status        String    @default("active")
+  /// Флаг, что телефон пользователя подтверждён (через SMS-код).
+  phoneVerified Boolean   @default(false)
+  /// Время последнего успешного входа — для аудита и выявления аномалий.
+  lastLoginAt   DateTime?
   gkhProblems   GkhProblem[]
   gkhUpdates    GkhUpdate[]
   datingPosts   DatingPost[]
@@ -46,6 +54,91 @@ model User {
   adListings    AdListing[]
   /// 29.09.2026: back-relation для WhereToBuyPost.author (покраска ника).
   wtbAuthored   WhereToBuyPost[] @relation("WtbAuthor")
+  /// ПРОМТ №1: устройства, IP, попытки входа — для отслеживания обхода блокировок.
+  devices       UserDevice[]
+  ips           UserIp[]
+  loginAttempts LoginAttempt[]
+  /// Связи этого пользователя с другими аккаунтами (одинаковый phone/device/IP).
+  linksA        AccountLink[] @relation("AccountLinkA")
+  linksB        AccountLink[] @relation("AccountLinkB")
+}
+
+/// ПРОМТ №1: журнал всех попыток входа (успешных и неуспешных).
+/// Источник данных для аудита брутфорса, обнаружения обхода блокировки.
+model LoginAttempt {
+  id         String   @id @default(cuid())
+  email      String   // email, по которому пытались войти (не userId — пользователь может не существовать)
+  userId     String?  // если успех — ID пользователя
+  ip         String   @default("")
+  userAgent  String   @default("")
+  success    Boolean
+  reason     String   @default("") // почему отказано (not_found|bad_password|locked|banned|...)
+  createdAt  DateTime @default(now())
+
+  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([email, createdAt])
+  @@index([ip, createdAt])
+  @@index([userId])
+}
+
+/// ПРОМТ №1: fingerprint устройств пользователя.
+/// Несколько устройств у одного пользователя — нормально, но если одно устройство
+/// используется разными аккаунтами, это сигнал для связи (AccountLink).
+model UserDevice {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// Хэш от User-Agent + screen + timezone + accept-language — простой fingerprint.
+  fingerprint String
+  userAgent   String   @default("")
+  ip          String   @default("")
+  firstSeenAt DateTime @default(now())
+  lastSeenAt  DateTime @default(now())
+  /// Счётчик сессий с этого устройства — для выявления активного устройства.
+  sessionCount Int    @default(1)
+
+  @@unique([userId, fingerprint])
+  @@index([fingerprint])
+}
+
+/// ПРОМТ №1: история IP-адресов пользователя.
+/// Один IP → несколько аккаунтов = сигнал связи (AccountLink).
+model UserIp {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ip          String
+  firstSeenAt DateTime @default(now())
+  lastSeenAt  DateTime @default(now())
+  hitCount    Int      @default(1)
+
+  @@unique([userId, ip])
+  @@index([ip])
+}
+
+/// ПРОМТ №1: автоматически обнаруженные связи аккаунтов.
+/// Создаётся, когда два разных аккаунта имеют общий phone/device/IP.
+/// Используется для:
+/// - обнаружения обхода блокировки (новый аккаунт забаненного);
+/// - выявления массовых жалоб от связанных аккаунтов (рейд-детектор);
+/// - объединения истории нарушений в админ-панели.
+model AccountLink {
+  id         String   @id @default(cuid())
+  userA      String
+  userB      String
+  userARef   User     @relation("AccountLinkA", fields: [userA], references: [id], onDelete: Cascade)
+  userBRef   User     @relation("AccountLinkB", fields: [userB], references: [id], onDelete: Cascade)
+  /// Причина: same_phone | same_device | same_ip | same_email_pattern
+  reason     String
+  /// Дополнительные сведения: конкретный fingerprint/ip/phone (хэшированный).
+  evidence   String   @default("")
+  weight     Float    @default(1.0)
+  createdAt  DateTime @default(now())
+
+  @@unique([userA, userB, reason])
+  @@index([userA])
+  @@index([userB])
 }
 
 model Session {
