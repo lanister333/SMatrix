@@ -6401,3 +6401,12 @@ div[style*="background-color: rgb(0, 74, 143)"] {
     max-width: 100% !important;
   }
 }
+
+/* 2026-10-02 (мобайл): страница «Нужна помощь» — удалить чёрный
+   заголовок «Нужна помощь» меньшего размера (.hp-title, под шапкой).
+   Он дублирует кнопку в .hp-nav-inline. */
+@media (max-width: 768px) {
+  .hp-title {
+    display: none !important;
+  }
+}
