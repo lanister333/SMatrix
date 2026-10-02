@@ -152,6 +152,25 @@ model AccountLink {
   @@index([userB])
 }
 
+/// ПРОМТ №2: кэш LLM-вердиктов по text-hash.
+/// Защита от спам-атак на бюджет модели: одинаковые тексты не дёргают
+/// LLM повторно. TTL 7 дней (см. ai-cache.ts).
+/// textHash — SHA-1 от проверенного текста, 40 символов.
+model AiVerdictCache {
+  id          String   @id @default(cuid())
+  textHash    String   @unique
+  /// Полный вердикт в JSON (AiModerationVerdict).
+  verdictJson String
+  /// Быстрые поля для выборок/сортировки без парсинга JSON.
+  level       Int
+  action      String
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime
+
+  @@index([expiresAt])
+  @@index([action])
+}
+
 model Session {
   id        String   @id @default(cuid())
   token     String   @unique

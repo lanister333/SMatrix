@@ -6,6 +6,7 @@ import { moderateNewText, restrictionBlockMessage } from "@/lib/moderation";
 import { getActiveRestriction, handleConfirmedViolation } from "@/lib/moderation/sanctions";
 import { checkDailyLimit, rateKey, checkQuickRate, suspiciousFactor } from "@/lib/security";
 import { isStaffRole } from "@/lib/admin";
+import { getAuthorHistory, getRecentMessages } from "@/lib/moderation/context";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -81,7 +82,10 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
       }
     }
 
-    const topic = await db.topic.findUnique({ where: { id: topicId } });
+    const topic = await db.topic.findUnique({
+      where: { id: topicId },
+      include: { rubric: { select: { name: true } } },
+    });
     if (!topic || topic.deletedAt) {
       return NextResponse.json({ error: "Тема не найдена" }, { status: 404 });
     }
@@ -134,7 +138,19 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     // включая цитируемые фрагменты. Нецензурная лексика → блокировка
     // отправки с точным сообщением; очевидные нарушения → скрытие;
     // спорные случаи → человек-модератор.
-    const outcome = await moderateNewText(text);
+    // ПРОМТ №2: передаём контекст — соседние сообщения, тему, раздел,
+    // историю нарушений автора. AI видит «что вокруг».
+    const [before, authorHistory] = await Promise.all([
+      getRecentMessages(topicId, 5),
+      getAuthorHistory(user.id),
+    ]);
+    const outcome = await moderateNewText(text, {
+      topicTitle: topic.title,
+      sectionName: topic.rubric?.name ?? undefined,
+      before,
+      reviewType: "new",
+      authorHistory,
+    });
     if (outcome.action === "block") {
       return NextResponse.json({ error: outcome.blockMessage }, { status: 400 });
     }

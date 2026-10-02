@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
       // ПРОМТ №1: при бане/длительной блокировке — завершаем все активные сессии.
       // Токен забаненного пользователя НЕ должен продолжать работать.
       let endedSessions = 0;
-      if (kind === "ban" || kind === "limit_3d" || kind === "limit_24h") {
+      if (kind === "ban" || kind === "limit_3d" || kind === "limit_7d" || kind === "limit_24h") {
         try {
           const result = await db.session.deleteMany({ where: { userId: target.id } });
           endedSessions = result.count;

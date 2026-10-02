@@ -14,10 +14,12 @@ import { useCallback, useEffect, useState } from "react";
 import { CATEGORY_LABELS, fmtDate, fmtDateTime, fmtNum, type ForumUser } from "@/lib/ui";
 
 const KIND_LABELS: Record<string, string> = {
-  warning: "Предупреждение",
+  warning: "Замечание",
   limit_1h: "Ограничение на 1 час",
+  limit_6h: "Ограничение на 6 часов",
   limit_24h: "Ограничение на 24 часа",
   limit_3d: "Ограничение на 3 дня",
+  limit_7d: "Ограничение на 7 дней",
   ban: "Постоянная блокировка",
 };
 

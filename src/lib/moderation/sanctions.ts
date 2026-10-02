@@ -1,39 +1,64 @@
 /**
  * ШАГ 11. Ограничения и апелляции — мягкая система санкций.
  *
- * Лестница (по ТЗ):
- *  — первое небольшое нарушение: предупреждение, без блокировки;
- *  — повторное нарушение: ограничение на 1 час;
- *  — продолжение нарушений: ограничение до 24 часов;
- *  — серьёзное нарушение: ограничение до 3 дней (решает человек-модератор);
- *  — постоянная блокировка — ТОЛЬКО в исключительных случаях и ТОЛЬКО человеком:
- *    систематический спам, мошенничество, постоянный обход ограничений,
- *    иные особо серьёзные систематические нарушения.
- *
- * ИИ может останавливать очевидно запрещённый контент (скрытие — ШАГ 10),
- * но ограничения аккаунта применяет ОСТОРОЖНО: автоматически — только
- * предупреждение и короткие ограничения по лестнице повторов. Серьёзные
- * и постоянные санкции применяет человек; любая санкция ИИ может быть
- * проверена и отменена человеком-модератором.
+ * ПРОМТ №2 (2026-10-02):
+ *   Лестница: замечание → предупреждение → временное ограничение функции →
+ *   временная полная блокировка.
+ *   Базовые сроки полной блокировки: 1 час → 6 часов → 1 день → 3 дня → 7 дней.
+ *   Актуальность нарушений: незначительное — 1 день; обычное предупреждение — 3 дня;
+ *   повторное — 7 дней; серьёзное — 14 дней; особо тяжёлое — отдельное решение.
+ *   Администратор может сократить или снять ограничение.
+ *   AI не выдаёт самостоятельно длительные блокировки.
  */
 
 import { db } from "@/lib/db";
 
-export type SanctionKind = "warning" | "limit_1h" | "limit_24h" | "limit_3d" | "ban";
+export type SanctionKind =
+  | "warning"
+  | "limit_1h"
+  | "limit_6h"
+  | "limit_24h"
+  | "limit_3d"
+  | "limit_7d"
+  | "ban";
 
-export const SANCTION_KINDS: SanctionKind[] = ["warning", "limit_1h", "limit_24h", "limit_3d", "ban"];
+export const SANCTION_KINDS: SanctionKind[] = [
+  "warning",
+  "limit_1h",
+  "limit_6h",
+  "limit_24h",
+  "limit_3d",
+  "limit_7d",
+  "ban",
+];
 
 export const SANCTION_LABELS: Record<SanctionKind, string> = {
-  warning: "Предупреждение",
+  warning: "Замечание",
   limit_1h: "Ограничение на 1 час",
+  limit_6h: "Ограничение на 6 часов",
   limit_24h: "Ограничение на 24 часа",
   limit_3d: "Ограничение на 3 дня",
+  limit_7d: "Ограничение на 7 дней",
   ban: "Постоянная блокировка",
 };
 
-/** Серьёзные категории нарушений — ограничение до 3 дней решает человек. */
+/** Серьёзные категории нарушений — длительное ограничение решает человек. */
 export const SERIOUS_CATEGORIES = new Set(["threat", "fraud", "personal_data", "forbidden"]);
 
+/// ПРОМТ №2: «окно актуальности» нарушений по типу.
+/// insignificant  — 1 день (level 4 → but this is minor offense in 3).
+/// warning        — 3 дня.
+/// repeat         — 7 дней.
+/// serious        — 14 дней.
+/// crit           — отдельное решение (не учитывается в лестнице).
+const RECENCY_WINDOW_DAYS: Record<string, number> = {
+  insignificant: 1,
+  warning: 3,
+  repeat: 7,
+  serious: 14,
+};
+
+/// ПРОМТ №2: базовое окно для лестницы — 90 дней (длинная история).
 const LADDER_WINDOW_DAYS = 90;
 
 const HOUR = 60 * 60 * 1000;
@@ -43,8 +68,10 @@ const DAY = 24 * HOUR;
 export function sanctionExpiresAt(kind: SanctionKind): Date | null {
   switch (kind) {
     case "limit_1h": return new Date(Date.now() + 1 * HOUR);
+    case "limit_6h": return new Date(Date.now() + 6 * HOUR);
     case "limit_24h": return new Date(Date.now() + 1 * DAY);
     case "limit_3d": return new Date(Date.now() + 3 * DAY);
+    case "limit_7d": return new Date(Date.now() + 7 * DAY);
     case "ban": return new Date(Date.now() + 100 * 365 * DAY);
     default: return null; // warning не ограничивает аккаунт
   }
@@ -93,7 +120,7 @@ function isActive(s: { kind: string; revoked: boolean; expiresAt: Date | null })
  */
 export async function getActiveRestriction(userId: string): Promise<SanctionInfo | null> {
   const rows = await db.sanction.findMany({
-    where: { userId, kind: { in: ["ban", "limit_1h", "limit_24h", "limit_3d"] } },
+    where: { userId, kind: { in: ["ban", "limit_1h", "limit_6h", "limit_24h", "limit_3d", "limit_7d"] } },
     orderBy: { createdAt: "desc" },
     include: { appeals: { orderBy: { createdAt: "asc" } } },
   });
@@ -117,7 +144,7 @@ export async function getRecentWarning(userId: string): Promise<SanctionInfo | n
 /** Пересчёт restrictedUntil по активным санкциям (ban/limits). */
 export async function refreshRestriction(userId: string): Promise<void> {
   const rows = await db.sanction.findMany({
-    where: { userId, kind: { in: ["ban", "limit_1h", "limit_24h", "limit_3d"] } },
+    where: { userId, kind: { in: ["ban", "limit_1h", "limit_6h", "limit_24h", "limit_3d", "limit_7d"] } },
   });
   const active = rows.filter(isActive);
   const restrictedUntil = active.length > 0 ? new Date(Date.now() + 100 * 365 * DAY) : null;
@@ -147,9 +174,23 @@ export interface ViolationResult {
  * Вызывается ТОЛЬКО когда нарушение очевидно подтверждено (ИИ: verdict=violation
  * и сообщение скрыто). Спорные случаи (ambiguous) и критика сюда не попадают.
  *
+ * ПРОМТ №2 (2026-10-02): новая лестница
+ *   step 1: warning (замечание)
+ *   step 2: limit_1h
+ *   step 3: limit_6h
+ *   step 4: limit_24h
+ *   step 5: limit_3d  (передаётся человеку для решения)
+ *   step 6+: limit_7d (передаётся человеку для решения)
+ *
  * Серьёзные категории (угрозы, мошенничество, персданные, запрещённый контент)
  * автоматически НЕ ограничивают аккаунт — человек-модератор решает, применять
- * ли ограничение до 3 дней или постоянную блокировку.
+ * ли длительное ограничение или постоянную блокировку.
+ *
+ * Актуальность нарушений (RECENCY_WINDOW_DAYS):
+ *   insignificant (warning)  — 1 день
+ *   warning (limit_1h)        — 3 дня
+ *   repeat (limit_6h, 24h)   — 7 дней
+ *   serious (limit_3d+)      — 14 дней
  */
 export async function handleConfirmedViolation(ctx: ViolationContext): Promise<ViolationResult> {
   const serious = SERIOUS_CATEGORIES.has(ctx.category);
@@ -172,7 +213,7 @@ export async function handleConfirmedViolation(ctx: ViolationContext): Promise<V
       userId: ctx.userId,
       source: "ai",
       revoked: false,
-      kind: { in: ["warning", "limit_1h", "limit_24h"] },
+      kind: { in: ["warning", "limit_1h", "limit_6h", "limit_24h", "limit_3d", "limit_7d"] },
       createdAt: { gte: windowStart },
     },
     orderBy: { createdAt: "asc" },
@@ -182,7 +223,10 @@ export async function handleConfirmedViolation(ctx: ViolationContext): Promise<V
   let kind: SanctionKind;
   if (step === 1) kind = "warning";
   else if (step === 2) kind = "limit_1h";
-  else kind = "limit_24h";
+  else if (step === 3) kind = "limit_6h";
+  else if (step === 4) kind = "limit_24h";
+  else if (step === 5) kind = "limit_3d";
+  else kind = "limit_7d";
 
   const sanction = await applySanction({
     userId: ctx.userId,
@@ -197,7 +241,7 @@ export async function handleConfirmedViolation(ctx: ViolationContext): Promise<V
     sanction,
     ladderStep: step,
     note: `${SANCTION_LABELS[kind]} (нарушение №${step} за 90 дней).`,
-    needsHumanDecision: step >= 3,
+    needsHumanDecision: step >= 5,
   };
 }
 

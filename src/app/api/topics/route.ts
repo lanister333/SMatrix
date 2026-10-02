@@ -6,6 +6,7 @@ import { moderateNewText, restrictionBlockMessage } from "@/lib/moderation";
 import { getActiveRestriction, handleConfirmedViolation } from "@/lib/moderation/sanctions";
 import { isStaffRole } from "@/lib/admin";
 import { checkDailyLimit, rateKey, checkQuickRate, suspiciousFactor } from "@/lib/security";
+import { getAuthorHistory } from "@/lib/moderation/context";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -268,7 +269,14 @@ export async function POST(req: NextRequest) {
     }
 
     // ШАГ 10: проверка всего текста (заголовок + сообщение, включая цитаты).
-    const outcome = await moderateNewText(`${title}\n${text}`);
+    // ПРОМТ №2: передаём контекст — раздел и история нарушений автора.
+    const authorHistory = await getAuthorHistory(user.id);
+    const outcome = await moderateNewText(`${title}\n${text}`, {
+      topicTitle: title,
+      sectionName: rubric.name,
+      reviewType: "new",
+      authorHistory,
+    });
     if (outcome.action === "block") {
       return NextResponse.json({ error: outcome.blockMessage }, { status: 400 });
     }
