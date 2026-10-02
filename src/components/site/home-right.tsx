@@ -308,21 +308,22 @@ export default function HomeRight() {
                         {row.name}
                         {row.unit ? <small title={row.unit}>{row.unit}</small> : null}
                       </th>
-                      {/* 2026-10-02: b (число) и i (банк) — display:block +
-                          text-align:right, чтобы все числа в столбце стояли
-                          ровно по одной вертикальной линии. inline-стиль
-                          обходит кэш CDN. */}
-                      <td className="bestcell">
-                        <b style={{ display: "block", textAlign: "right", lineHeight: 1.25 }}>
+                      {/* 2026-10-02: числа по ЛЕВОЙ стороне столбца, банк —
+                          в одну строку с числом. Число как inline-block с
+                          min-width:55px — все числа в столбце стоят ровно
+                          по одной вертикальной линии слева. Банк переносится
+                          по словам если длинный. Inline-стиль обходит кэш CDN. */}
+                      <td className="bestcell" style={{ textAlign: "left" }}>
+                        <b style={{ display: "inline-block", minWidth: "55px", textAlign: "left", lineHeight: 1.25 }}>
                           {fmtMoney(bb?.value ?? null)}
                         </b>
-                        <i style={{ display: "block", textAlign: "right" }}>{bb?.bank ?? "—"}</i>
+                        <i style={{ display: "inline", marginLeft: "4px" }}>{bb?.bank ?? "—"}</i>
                       </td>
-                      <td className="bestcell">
-                        <b style={{ display: "block", textAlign: "right", lineHeight: 1.25 }}>
+                      <td className="bestcell" style={{ textAlign: "left" }}>
+                        <b style={{ display: "inline-block", minWidth: "55px", textAlign: "left", lineHeight: 1.25 }}>
                           {fmtMoney(bs?.value ?? null)}
                         </b>
-                        <i style={{ display: "block", textAlign: "right" }}>{bs?.bank ?? "—"}</i>
+                        <i style={{ display: "inline", marginLeft: "4px" }}>{bs?.bank ?? "—"}</i>
                       </td>
                     </tr>
                   );
