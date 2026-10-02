@@ -451,9 +451,10 @@ export function MainNav(props: {
             Стили inline — обходим кэш CDN preview-сервера (CSS chunk не
             меняет хэш в dev-режиме Turbopack).
             2026-10-02: окно поиска стало меньше — padding 6/12 → 4/8,
-            font-size 14 → 13, flex-basis 1 → 0 1 auto (не растягивается
-            на всю свободную ширину, оставляет место по бокам). */}
-        <form className="sm-mobile-search" style={{ flex:"0 1 auto", minWidth:0, display:"flex", alignItems:"center", margin:"0 4px" }} onSubmit={(e) => { e.preventDefault(); const qv = q.trim(); if (qv.length >= 2) { if (props.onSearch) props.onSearch(qv); else window.location.href = `/?view=search&q=${encodeURIComponent(qv)}`; } }}>
+            font-size 14 → 13.
+            2026-10-02 (v2): flex 1 1 auto — поиск растягивается и встаёт
+            по центру между аватаром слева и вафлей справа. */}
+        <form className="sm-mobile-search" style={{ flex:"1 1 auto", minWidth:0, display:"flex", alignItems:"center", margin:"0 6px" }} onSubmit={(e) => { e.preventDefault(); const qv = q.trim(); if (qv.length >= 2) { if (props.onSearch) props.onSearch(qv); else window.location.href = `/?view=search&q=${encodeURIComponent(qv)}`; } }}>
           <input
             type="text"
             value={q}
