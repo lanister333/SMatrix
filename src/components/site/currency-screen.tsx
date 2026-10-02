@@ -240,16 +240,34 @@ export default function CurrencyScreen() {
                помещается при шрифте 11.5px).
                2026-10-01 (мобайл): контейнер получает класс .cur-table-wrap
                — на ≤480px CSS переключает overflow:hidden → overflow-x:auto,
-               таблица скроллится горизонтально на узких экранах. */
-            <div className="cur-table-wrap" style={{ border: "1px solid #1E3A5F", overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", fontFamily: "system-ui, sans-serif" }}>
+               таблица скроллится горизонтально на узких экранах.
+               2026-10-02 (вертикальный планшет 768-820px): INLАЙН-стили
+               включают overflow-x:auto на ВСЕХ размерах экрана (обход
+               CDN-кэша — globals.css кэшируется по хэшу). minWidth:720px
+               сохраняет читаемость 12 колонок, на узких — горизонтальный
+               скролл. Сужаем колонку «Банк» 136→120 на узких, но через
+               colgroup это фиксировано, оставляем 136. */
+            <div
+              className="cur-table-wrap"
+              style={{
+                border: "1px solid #1E3A5F",
+                overflowX: "auto",
+                overflowY: "hidden",
+                WebkitOverflowScrolling: "touch",
+                maxWidth: "100%",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+              }}
+            >
+              <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", fontFamily: "system-ui, sans-serif", minWidth: "720px" }}>
                 <colgroup>
-                  <col style={{ width: "136px" }} />
-                  {/* 6 валют × 2 (покупка/продажа) = 12 равных колонок по 80px */}
+                  <col style={{ width: "120px" }} />
+                  {/* 6 валют × 2 (покупка/продажа) = 12 равных колонок.
+                      На узких экранах таблица скроллится горизонтально,
+                      ширину 80px оставляем для читаемости чисел. */}
                   {CUR_COLS.map((c) => (
                     <Fragment key={c.key}>
-                      <col style={{ width: "80px" }} />
-                      <col style={{ width: "80px" }} />
+                      <col style={{ width: "70px" }} />
+                      <col style={{ width: "70px" }} />
                     </Fragment>
                   ))}
                 </colgroup>
@@ -340,6 +358,22 @@ export default function CurrencyScreen() {
                   ))}
                 </tbody>
               </table>
+              {/* Подсказка о горизонтальном скролле — только на узких экранах,
+                  inline media query через CSS (НЕ кэшируется CDN, т.к. это inline
+                  в JSX, а не отдельный CSS-файл). */}
+              <div
+                style={{
+                  width: "100%",
+                  padding: "4px 8px",
+                  fontSize: "11px",
+                  color: "#56657a",
+                  background: "#F1F5F9",
+                  borderTop: "1px solid #E2E8F0",
+                  textAlign: "center",
+                }}
+              >
+                ← Свайп для просмотра всех валют →
+              </div>
             </div>
           ) : (
             <div className="crt-empty">Курсы обновляются…</div>
