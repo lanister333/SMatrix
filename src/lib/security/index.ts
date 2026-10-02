@@ -6,6 +6,7 @@
  *   password-blacklist — проверка слабых паролей (>= 200 + паттерны).
  *   rate-limits    — лимиты для fresh-account в форуме/жалобах/ЛС.
  *   complaint-guard — унификация жалоб: rate-limit + рейд-детектор + уникальность.
+ *   registration-mode — переключатель TEST/PRODUCTION регистрации.
  */
 
 export * from "./client-info";
@@ -13,3 +14,4 @@ export * from "./login-guard";
 export * from "./password-blacklist";
 export * from "./rate-limits";
 export * from "./complaint-guard";
+export * from "./registration-mode";

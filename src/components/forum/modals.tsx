@@ -113,7 +113,16 @@ export function AuthModal(props: { onClose: () => void; onLogin: (token: string,
     gender: "male",
     question: SECRET_QUESTIONS[0],
     answer: "",
+    // ПРОМТ «Временная упрощённая регистрация»: phone + smsCode —
+    // только в PRODUCTION MODE. В TEST MODE поля скрыты.
+    phone: "",
+    smsCode: "",
   });
+  // ПРОМТ «Временная упрощённая регистрация»: загрузка режима с сервера.
+  // Клиент НЕ может изменить режим — только читает для UI.
+  const [prodMode, setProdMode] = useState(false);
+  const [smsSent, setSmsSent] = useState(false);
+  const [smsDevCode, setSmsDevCode] = useState(""); // только для TEST MODE
   const [captcha, setCaptcha] = useState<{ id: string; question: string } | null>(null);
   const [captchaAnswer, setCaptchaAnswer] = useState("");
   const [verifyPath, setVerifyPath] = useState("");
@@ -131,6 +140,46 @@ export function AuthModal(props: { onClose: () => void; onLogin: (token: string,
   useEffect(() => {
     if (tab === "register" && !captcha) loadCaptcha();
   }, [tab, captcha, loadCaptcha]);
+
+  // ПРОМТ «Временная упрощённая регистрация»: загрузка режима с сервера.
+  // prodMode = true → PRODUCTION MODE (нужны phone + smsCode).
+  useEffect(() => {
+    fetch("/api/auth/mode")
+      .then((r) => r.json())
+      .then((r) => setProdMode(r.mode === "production"))
+      .catch(() => setProdMode(false));
+  }, []);
+
+  // Отправка SMS-кода на телефон (только в PRODUCTION MODE).
+  const sendSmsCode = async () => {
+    if (!reg.phone.trim()) {
+      setError("Введите номер телефона.");
+      return;
+    }
+    setBusy(true);
+    setError("");
+    try {
+      const r = await fetch("/api/sms", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: reg.phone }),
+      });
+      const data = await r.json();
+      if (!r.ok) throw Error(data.error || "Не удалось отправить код");
+      setSmsSent(true);
+      // В TEST MODE /api/sms возвращает devCode (для разработки).
+      // В PRODUCTION MODE код отправлен реальным SMS — devCode не возвращается.
+      if (data.devCode) {
+        setSmsDevCode(data.devCode);
+      } else {
+        setSmsDevCode("");
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Ошибка");
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const doLogin = async () => {
     setBusy(true);
@@ -195,6 +244,11 @@ export function AuthModal(props: { onClose: () => void; onLogin: (token: string,
           answer: reg.answer,
           captchaId: captcha?.id || "",
           captchaAnswer,
+          // ПРОМТ «Временная упрощённая регистрация»: phone + smsCode
+          // отправляются всегда. Сервер в PRODUCTION MODE требует их,
+          // в TEST MODE — игнорирует.
+          phone: reg.phone,
+          smsCode: reg.smsCode,
         }),
       });
       const data = await r.json();
@@ -360,6 +414,53 @@ export function AuthModal(props: { onClose: () => void; onLogin: (token: string,
                   {/* ТЗ 2026-09-21: вариант «Не указан» удалён — при регистрации строго два пола */}
                 </div>
               </div>
+              {/* ПРОМТ «Временная упрощённая регистрация»: phone + smsCode
+                  только в PRODUCTION MODE. Сервер требует их, иначе
+                  регистрация отклоняется с 400. */}
+              {prodMode && (
+                <>
+                  <div className="sk-modal-row">
+                    <label>Телефон (для SMS-подтверждения):</label>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <input
+                        type="tel"
+                        value={reg.phone}
+                        onChange={setField("phone")}
+                        placeholder="+7 999 123-45-67"
+                        autoComplete="tel"
+                      />
+                      <button
+                        type="button"
+                        className="sk-btn-classic"
+                        style={{ flexShrink: 0, padding: "4px 10px", fontSize: 13 }}
+                        disabled={busy || !reg.phone.trim()}
+                        onClick={sendSmsCode}
+                      >
+                        {smsSent ? "Отправить ещё раз" : "Отправить код"}
+                      </button>
+                    </div>
+                    {smsDevCode && (
+                      <p className="sk-modal-hint" style={{ marginTop: 4, marginBottom: 0, color: "#7a5c10" }}>
+                        Демо-режим SMS: код <b>{smsDevCode}</b> (в production реальный SMS-код будет отправлен на телефон).
+                      </p>
+                    )}
+                  </div>
+                  {smsSent && (
+                    <div className="sk-modal-row">
+                      <label>Код подтверждения из SMS:</label>
+                      <input
+                        type="text"
+                        value={reg.smsCode}
+                        onChange={setField("smsCode")}
+                        placeholder="1234"
+                        inputMode="numeric"
+                        maxLength={6}
+                        autoComplete="one-time-code"
+                      />
+                    </div>
+                  )}
+                </>
+              )}
               <div className="sk-modal-row">
                 <label>
                   CAPTCHA: <b>{captcha?.question || "…"}</b>{" "}
@@ -384,7 +485,10 @@ export function AuthModal(props: { onClose: () => void; onLogin: (token: string,
                 className="sk-btn-classic"
                 style={{ marginTop: 0 }}
                 disabled={
-                  busy || !reg.nickname.trim() || !reg.email.trim() || !reg.password || !reg.password2 || !captchaAnswer.trim() || !reg.answer.trim()
+                  busy || !reg.nickname.trim() || !reg.email.trim() || !reg.password || !reg.password2 || !captchaAnswer.trim() || !reg.answer.trim() ||
+                  // ПРОМТ «Временная упрощённая регистрация»: в PRODUCTION MODE
+                  // требуем phone + smsCode. В TEST MODE — не требуем.
+                  (prodMode && (!reg.phone.trim() || !reg.smsCode.trim()))
                 }
                 onClick={doRegister}
               >

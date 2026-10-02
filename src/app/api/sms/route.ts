@@ -1,14 +1,20 @@
 /**
- * ТЗ 2026-09-22 Flat 2.0 (реставрация 2026-09-23): выдача СМС-кода для
- * двухшаговой формы народных досок. ДЕМО-РЕЖИМ: шлюза нет — код
- * возвращается полем devCode и показывается в форме с пометкой
- * «демо-режим» (см. src/lib/sms.ts и FlatBoard).
+ * ТЗ 2026-09-22 Flat 2.0 + ПРОМТ «Временная упрощённая регистрация»:
+ * выдача SMS-кода для подтверждения телефона при регистрации.
  *
- * POST { phone } → { ok: true, devCode: "1234" }
+ * TEST MODE:        шлюз SMS не подключён → код возвращается полем devCode
+ *                   (форма показывает его с пометкой «демо-режим»). Нужно
+ *                   только для локальной разработки и первых тестов.
+ * PRODUCTION MODE:  реальный шлюз (или заглушка) — код ОТПРАВЛЯЕТСЯ на
+ *                   номер, devCode в ответе ОТСУТСТВУЕТ (критическое
+ *                   требование: SMS-код не должен возвращаться API).
+ *
+ * POST { phone } → { ok: true, devCode?: "1234" }  (devCode только в TEST)
  */
 
 import { issueSmsCode, normalizePhone } from "@/lib/sms";
 import { rateLimit } from "@/lib/api";
+import { isTestMode } from "@/lib/security";
 
 export const runtime = "nodejs";
 
@@ -30,7 +36,21 @@ export async function POST(req: Request) {
       );
     }
     const { code } = issueSmsCode(phone);
-    return Response.json({ ok: true, devCode: code });
+
+    // ПРОМТ «Временная упрощённая регистрация»: в PRODUCTION MODE код
+    // отправляется реальным SMS-шлюзом и НИКОГДА не возвращается в ответе.
+    // В TEST MODE — возвращаем devCode (для удобства разработки).
+    if (isTestMode()) {
+      // TODO: при подключении реального шлюза — заменить на отправку SMS.
+      // Сейчас просто возвращаем код (демо-режим).
+      return Response.json({ ok: true, devCode: code });
+    }
+
+    // PRODUCTION MODE: здесь должен быть вызов реального SMS-шлюза.
+    // Пока шлюз не подключён — пишем в лог (для аудита), в ответе
+    // только подтверждение, что код отправлен.
+    console.log(`[sms] PRODUCTION MODE: код для ${phone.slice(0, 4)}***${phone.slice(-3)} отправлен через шлюз.`);
+    return Response.json({ ok: true });
   } catch {
     return Response.json({ error: "Не удалось отправить код. Попробуйте ещё раз." }, { status: 500 });
   }

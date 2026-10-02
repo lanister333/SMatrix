@@ -7,7 +7,9 @@ import {
   getClientIp,
   getClientAgent,
   getDeviceFingerprint,
+  isProductionMode,
 } from "@/lib/security";
+import { verifySmsCode, normalizePhone } from "@/lib/sms";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -41,7 +43,35 @@ export async function POST(req: NextRequest) {
     const gender = body.gender === "female" ? "female" : "male";
     const question = String(body.question ?? "").trim().slice(0, 200);
     const answer = String(body.answer ?? "").trim();
-    const phone = String(body.phone ?? "").trim().slice(0, 30);
+    const phoneRaw = String(body.phone ?? "").trim().slice(0, 30);
+    const smsCode = String(body.smsCode ?? "").trim();
+    const phone = normalizePhone(phoneRaw); // нормализованный номер (11 цифр, начинается с 7)
+
+    // ПРОМТ «Временная упрощённая регистрация»: в PRODUCTION MODE
+    // телефон и SMS-код обязательны. В TEST MODE — опциональны.
+    const productionMode = isProductionMode();
+    if (productionMode) {
+      if (phone.length !== 11 || !phone.startsWith("7")) {
+        return NextResponse.json(
+          { error: "Укажите корректный номер телефона — на него будет отправлен код подтверждения." },
+          { status: 400 }
+        );
+      }
+      if (!smsCode) {
+        return NextResponse.json(
+          { error: "Введите код подтверждения из SMS." },
+          { status: 400 }
+        );
+      }
+      // Проверка SMS-кода через sms.ts (защита от перебора — 5 попыток).
+      const smsOk = verifySmsCode(phone, smsCode);
+      if (!smsOk.ok) {
+        return NextResponse.json(
+          { error: smsOk.error ?? "Код подтверждения неверен." },
+          { status: 400 }
+        );
+      }
+    }
 
     if (nickname.length < 3 || nickname.length > 20) {
       return NextResponse.json({ error: "Ник должен быть от 3 до 20 символов" }, { status: 400 });
@@ -107,7 +137,10 @@ export async function POST(req: NextRequest) {
         emailVerified: false,
         status: initialStatus,
         phone: phone,
-        phoneVerified: false,
+        // ПРОМТ «Временная упрощённая регистрация»: phoneVerified=true
+        // только в PRODUCTION MODE (т.к. SMS-код проверен). В TEST MODE
+        // телефон опционален, проверка не выполняется — phoneVerified=false.
+        phoneVerified: productionMode,
       },
     });
 
