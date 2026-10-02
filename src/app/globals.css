@@ -5936,8 +5936,14 @@ div[style*="background-color: rgb(0, 74, 143)"] {
 
   /* 5. Списки — уменьшенные строки. */
   ul, ol { margin: 4px 0 !important; padding-left: 18px !important; }
+  /* 2026-10-02 (правка): используем padding-top/bottom, НЕ padding shorthand,
+     иначе padding:1px 0 обнуляет padding-left у li с кастомными bullet-маркерами
+     (::before с position:absolute;left:0) — текст наезжает на точки.
+     Пример: .mp-list li (блок «Исполнители» на главной), .transport-flights li.
+     padding-left остаётся как в оригинальном CSS (11px для mp-list). */
   ul li, ol li {
-    padding: 1px 0 !important;
+    padding-top: 1px !important;
+    padding-bottom: 1px !important;
     margin: 0 0 2px !important;
   }
   .forum-ruleslist li,
