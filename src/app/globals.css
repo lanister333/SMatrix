@@ -6147,3 +6147,28 @@ div[style*="background-color: rgb(0, 74, 143)"] {
     font-size: 12px !important;
   }
 }
+
+/* 2026-10-02 (мобайл, ≤768px): «└ ответ [имя]» (.sk-msg-parent) —
+   ограничить ширину и обрезать имя через ellipsis. Раньше из-за
+   white-space:nowrap и длинных ников parent вылезал за правый край
+   экрана, ломая flex-spacer, и кнопки «Ответить»/«Пожаловаться»
+   съезжали. Теперь parent занимает максимум 130px, лишнее обрезается
+   «…». Spacer flex:1 снова работает, sk-msg-actions прижимается к
+   правому краю, «Ответить» (последняя в DOM) становится первой справа. */
+@media (max-width: 768px) {
+  .sk-msg-parent {
+    max-width: 130px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    vertical-align: middle;
+  }
+  .sk-msg-parent b {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    max-width: 100px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+}
