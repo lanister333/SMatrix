@@ -6410,3 +6410,45 @@ div[style*="background-color: rgb(0, 74, 143)"] {
 .hp-nav-inline button.active {
   display: none !important;
 }
+
+/* 2026-10-02 (мобайл): страницы «Где купить» и «Где дешевле» —
+   кнопки «Последние вопросы», «Мои публикации», «Задать вопрос»
+   в одну строку. Заголовок раздела — отдельной строкой сверху,
+   а кнопки — в одном flex-ряду. */
+@media (max-width: 768px) {
+  .wb-head-bar,
+  .cd-head-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 4px !important;
+  }
+  .wb-head-right,
+  .cd-head-right {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 4px !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  .wb-nav-inline,
+  .cd-nav-inline {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 4px !important;
+    flex-wrap: nowrap !important;
+  }
+  .wb-nav-inline button,
+  .cd-nav-inline button,
+  .wb-addbtn,
+  .cd-addbtn {
+    padding: 2px 6px !important;
+    font-size: 10px !important;
+    white-space: nowrap !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+  }
+}
