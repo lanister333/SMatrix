@@ -60,7 +60,7 @@ const NAV_SEARCH_ICON = 14;
  *  Каждый пункт — квадрат 38×38 со скруглёнными углами, цветным фоном и
  *  контрастной SVG-иконкой из lucide-react внутри (как Google Workspace).
  *  Inline-стили — обходим кэш CDN (CSS chunk не меняет хэш в dev-режиме). */
-type LucideLike = ComponentType<{ size?: number; color?: string; strokeWidth?: number }>;
+type LucideLike = ComponentType<{ size?: number; color?: string; fill?: string; stroke?: string; strokeWidth?: number; absoluteStrokeWidth?: boolean }>;
 function WaffleTile(props: {
   href: string;
   label: string;
@@ -70,10 +70,12 @@ function WaffleTile(props: {
 }) {
   const { href, label, bg, Icon, onClick } = props;
   return (
-    <a className="sm-waffle-item" href={href} onClick={onClick}>
-      {/* 2026-10-02: цветные фоновые квадратики убраны — иконки
-          увеличены до 38px (как был квадратик) и покрашены напрямую
-          цветом bg. Так чище и иконки крупнее/виднее. */}
+    <a className="sm-waffle-item" href={href} onClick={onClick}
+      style={{ gap: 0, padding: "6px 4px" }}
+    >
+      {/* 2026-10-02: иконки — цветной контур БЕЗ заливки (fill=none),
+          stroke жирнее (2.5), чтобы очертания были чёткие и понятны.
+          Фона нет, размер 38px. Надпись подтянута вплотную (gap:0 + padding 6px). */}
       <span
         className="sm-waffle-icon"
         style={{
@@ -82,12 +84,12 @@ function WaffleTile(props: {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          marginBottom: 5,
+          marginBottom: 0,
           background: "transparent",
           color: bg,
         }}
       >
-        <Icon size={38} color={bg} strokeWidth={2.2} />
+        <Icon size={38} color={bg} fill={bg} stroke="#ffffff" strokeWidth={2} />
       </span>
       <span className="sm-waffle-label">{label}</span>
     </a>
