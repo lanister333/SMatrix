@@ -6237,3 +6237,88 @@ div[style*="background-color: rgb(0, 74, 143)"] {
     margin-bottom: 0 !important;
   }
 }
+
+/* 2026-10-02 (мобайл): карточки публикаций разделов —
+   .help-item-card, .oh-item, .wb-item, .cd-item, .gkf-card, .ep-card,
+   .ad-item, .ad-listing — сжаты по вертикали.
+   padding 10/8 → 4px, margin-bottom 10 → 4px, font-size уменьшен,
+   внутренние элементы тоже сжаты. */
+@media (max-width: 768px) {
+  .help-item-card,
+  .oh-item,
+  .wb-item,
+  .cd-item,
+  .gkf-card,
+  .ep-card,
+  .ad-item,
+  .ad-listing,
+  .flat-card,
+  .rec-card,
+  .emp-card {
+    padding: 4px 8px !important;
+    margin-bottom: 4px !important;
+    margin-top: 0 !important;
+    gap: 2px !important;
+  }
+  /* Внутренние элементы карточек — тексты, мета, кнопки, контакты */
+  .help-item-card > *,
+  .oh-item > *,
+  .wb-item > *,
+  .cd-item > *,
+  .gkf-card > *,
+  .ep-card > *,
+  .ad-item > *,
+  .ad-listing > *,
+  .flat-card > *,
+  .rec-card > *,
+  .emp-card > * {
+    margin-top: 2px !important;
+    margin-bottom: 2px !important;
+  }
+  /* Под-классы: rubric, title, text, meta, contact, foot, actrow */
+  .ad-item-rubric,
+  .ad-item-title,
+  .ad-item-text,
+  .ad-item-meta,
+  .ad-item-contact,
+  .ad-foot,
+  .ad-footinfo,
+  .ad-actrow,
+  .help-item-title,
+  .help-item-text,
+  .help-item-meta,
+  .help-item-contact,
+  .oh-title,
+  .oh-text,
+  .oh-meta,
+  .wb-question,
+  .wb-answer,
+  .wb-meta,
+  .cd-question,
+  .cd-answer,
+  .cd-meta,
+  .gkh-problem-title,
+  .gkh-update-title,
+  .gkh-text,
+  .gkh-meta,
+  .ep-title,
+  .ep-text,
+  .ep-meta,
+  .rec-title,
+  .rec-text,
+  .rec-meta {
+    margin-top: 2px !important;
+    margin-bottom: 2px !important;
+    line-height: 1.3 !important;
+  }
+  /* Контактные плашки, цена, кнопки — компактнее */
+  .ad-item-contact,
+  .help-item-contact,
+  .ad-price,
+  .ad-act,
+  .ad-report {
+    padding: 2px 6px !important;
+    font-size: 12px !important;
+    margin-top: 2px !important;
+  }
+}
