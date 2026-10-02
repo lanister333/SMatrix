@@ -5877,3 +5877,218 @@ div[style*="background-color: rgb(0, 74, 143)"] {
 .rc-votebtn.rc-vote-yes.is-on{background:#e7f6ef;border-color:#10b981;color:#0b7a56}
 .rc-votebtn.rc-vote-no.is-on{background:#fdeeee;border-color:#ef4444;color:#b91c1c}
 .rc-actrow .rc-votebtn{margin-right:0}
+
+/* ============================================================
+   ГЛОБАЛЬНОЕ СЖАТИЕ МОБИЛЬНОЙ ВЕРСИИ (2026-10-02)
+   Принцип: «плотно по структуре, читаемо по тексту».
+   Применяется ко ВСЕМ страницам на экранах ≤768px.
+   Цели:
+     1) line-height сжат (1.55 → 1.32): меньше пустого места
+        между строками текста;
+     2) padding внутри типовых блоков (5-8px вместо 15-20px);
+     3) margin между блоками (5px вместо 15-20px);
+     4) высота строк в списках/таблицах (3px padding вместо 8-10);
+     5) nowrap+ellipsis на заголовках, чтобы не переносились
+        на две строки там, где можно уместить в одну;
+     6) gap в grid/flex контейнерах сжат до 5-6px.
+   Не трогаем: кнопки (≥40px высоты для пальца), инпуты,
+   font-size форм.
+   ============================================================ */
+@media (max-width: 768px) {
+  /* 1. Базовая плотность текста. */
+  .sm-page { line-height: 1.32 !important; font-size: 15px !important; }
+  p, li, td, th, label, span { line-height: 1.32 !important; }
+  p { margin: 4px 0 !important; }
+
+  /* 2. Отступы внутри типовых блоков — сжаты. */
+  .sm-stub-home,
+  .sm-card, .sm-col-block, .ad-entry, .help-card, .emp-card,
+  .rec-card, .gkh-card, .wth-card, .ad-item, .help-item,
+  .wheretobuy-item, .cheap-item, .overheard-item, .dating-item,
+  .review-card, .info-card, .poleznoe-item, .transport-card,
+  .currency-card, .weather-card, .traffic-card, .outages-card,
+  .topic-card, .forum-thread, .forum-row, .flat-board,
+  .sm-tile, .sm-tile-row, .sm-hints-tile {
+    padding: 5px 8px !important;
+  }
+
+  /* 3. Расстояние между блоками — сжато. */
+  .sm-col-main > *,
+  .sm-col-main > div + div,
+  .sm-col-block + .sm-col-block,
+  .ad-entry + .ad-entry,
+  section + section {
+    margin-top: 5px !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* 4. Заголовки секций — компактнее + nowrap (без переноса). */
+  .sm-stub-home,
+  .sm-card-title,
+  .sm-section-title {
+    font-size: 12.5px !important;
+    padding: 4px 8px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+  }
+
+  /* 5. Списки — уменьшенные строки. */
+  ul, ol { margin: 4px 0 !important; padding-left: 18px !important; }
+  ul li, ol li {
+    padding: 1px 0 !important;
+    margin: 0 0 2px !important;
+  }
+  .forum-ruleslist li,
+  .ad-rules li,
+  .poleznoe-list li,
+  .info-list li {
+    margin-bottom: 2px !important;
+    padding-top: 1px !important;
+    padding-bottom: 1px !important;
+  }
+
+  /* 6. Таблицы — компактнее строки. */
+  table tbody td,
+  table tbody th { padding: 3px 4px !important; }
+  table thead th { padding: 3px 4px !important; }
+
+  /* 7. Карточки публикаций — сжаты по высоте. */
+  .ad-item,
+  .help-item,
+  .wheretobuy-item,
+  .cheap-item,
+  .overheard-item,
+  .dating-item,
+  .rec-card,
+  .emp-card,
+  .gkh-card,
+  .topic-card,
+  .review-card,
+  .info-card,
+  .poleznoe-item,
+  .transport-card {
+    padding: 5px 8px !important;
+    margin-bottom: 5px !important;
+  }
+  .ad-item > *,
+  .help-item > *,
+  .wheretobuy-item > *,
+  .cheap-item > *,
+  .overheard-item > *,
+  .rec-card > *,
+  .emp-card > *,
+  .gkh-card > *,
+  .topic-card > *,
+  .info-card > * {
+    margin-top: 3px !important;
+    margin-bottom: 3px !important;
+  }
+
+  /* 8. Запретить перенос длинных заголовков и названий. */
+  .topic-title,
+  .ad-rubric,
+  .ad-bank-name,
+  .nav-rubric-item,
+  .sm-nick-name,
+  .help-card-title,
+  .emp-name,
+  .rec-name,
+  .gkh-problem-title,
+  .wth-question,
+  .overheard-title,
+  .transport-route-name,
+  .outages-title,
+  .currency-bank,
+  .weather-loc {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+  }
+
+  /* 9. Gap в flex/grid контейнерах — сжат. */
+  .sm-col-block,
+  .sm-col-main,
+  .ad-rubrics-grid,
+  .ad-formphotos,
+  .complaint-reasons,
+  .poleznoe-grid,
+  .info-grid,
+  .transport-grid,
+  .currency-banks-grid,
+  .weather-grid,
+  .traffic-grid,
+  .outages-grid {
+    gap: 5px !important;
+  }
+
+  /* 10. Подзаголовки секций / разделители — компактнее. */
+  .sm-col-block > h2,
+  .sm-col-block > h3,
+  .sm-col-main > h2,
+  .sm-col-main > h3 {
+    margin-top: 4px !important;
+    margin-bottom: 2px !important;
+    font-size: 14px !important;
+  }
+
+  /* 11. Паддинги у модальных окон — компактнее. */
+  .ad-modal-body,
+  .ad-modal-head,
+  .ad-field,
+  .ad-complaint-reasons {
+    padding: 6px 8px !important;
+  }
+
+  /* 12. Шапка блоков (stub) — приплюснута. */
+  .sm-stub-home {
+    padding: 3px 8px !important;
+    line-height: 1.2 !important;
+    min-height: 0 !important;
+  }
+
+  /* 13. Список тем форума — компактнее строки. */
+  .forum-row,
+  .forum-thread,
+  .forum-list-row,
+  .topic-list-item {
+    padding: 4px 6px !important;
+    margin-bottom: 4px !important;
+  }
+  .forum-row > *,
+  .forum-thread > *,
+  .topic-list-item > * {
+    margin-top: 2px !important;
+    margin-bottom: 2px !important;
+  }
+
+  /* 14. Уведомления и alert-блоки — компактнее. */
+  .ad-hiddennote,
+  .ad-humannote,
+  .ad-spechint,
+  .ad-similarwarn,
+  .ad-formerror,
+  .forum-keyrule,
+  .forum-rulesnote {
+    padding: 4px 6px !important;
+    margin-top: 4px !important;
+    margin-bottom: 4px !important;
+  }
+
+  /* 15. Пагинация — компактнее. */
+  .ad-pagination,
+  .forum-pagination,
+  .topic-pagination {
+    padding: 4px 2px !important;
+    margin-top: 4px !important;
+    gap: 4px !important;
+  }
+  .ad-pagebtn,
+  .forum-pagebtn,
+  .topic-pagebtn {
+    padding: 4px 8px !important;
+    font-size: 12px !important;
+  }
+}
