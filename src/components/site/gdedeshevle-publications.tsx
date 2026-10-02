@@ -972,7 +972,8 @@ export function GdedeshevlePage(props: {
                   </button>
                 </div>
                 <button className="cd-addbtn" onClick={openNewForm}>
-                  ＋ Задать вопрос
+                  {/* 2026-10-02: знак «＋» убран по просьбе пользователя. */}
+                  Задать вопрос
                 </button>
               </div>
             </div>

@@ -1036,7 +1036,7 @@ export default function WeatherScreen() {
                 <div className="wth-empty">Прогноз обновляется…</div>
               )}
               <div className="mp-w-upd">
-                {wx.source === "live" ? `Почасовой прогноз · обновлено: ${wx.updated} | ${wx.via || "open-meteo.com"}` : ""}
+                {wx.source === "live" ? `Почасовой прогноз · обновлено: ${wx.updated}${wx.via ? ` | ${wx.via}` : ""}` : ""}
               </div>
               {/* ТЗ 2026-09-21 (обмен графиков): дневной график meteoblue —
                   под почасовым прогнозом. Директива «Интеграция Погоды»:
@@ -1111,9 +1111,8 @@ export default function WeatherScreen() {
                       </div>
                     </>
                   ) : null}
-                  <div className="mp-w-upd">
-                    {`Источник: ${tides.via || "open-meteo.com (marine)"} · обновлено: ${tides.updated}`}
-                  </div>
+                  {/* 2026-10-02: подпись «Источник: open-meteo.com (marine) ·
+                      обновлено: ...» удалена по просьбе пользователя. */}
                 </>
               ) : (
                 <div className="tides-empty">Данные приливов обновляются…</div>
@@ -1161,7 +1160,7 @@ export default function WeatherScreen() {
               ) : (
                 <div className="wth-empty">Температура по районам обновляется…</div>
               )}
-              <div className="mp-w-upd">{wx.cities.length > 0 ? `Текущая температура · ${wx.viaCities || wx.via || "open-meteo.com"}` : ""}</div>
+              <div className="mp-w-upd">{wx.cities.length > 0 ? `Текущая температура${wx.viaCities || wx.via ? ` · ${wx.viaCities || wx.via}` : ""}` : ""}</div>
             </div>
           </section>
 
