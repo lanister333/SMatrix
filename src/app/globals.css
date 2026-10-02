@@ -6490,3 +6490,13 @@ div[style*="background-color: rgb(0, 74, 143)"] {
     text-overflow: ellipsis !important;
   }
 }
+
+/* 2026-10-02 (мобайл): страницы «Где купить» и «Где дешевле» —
+   скрыть первую кнопку в .wb-nav-inline / .cd-nav-inline
+   («Последние вопросы»). Остаются «Мои публикации» + «Задать вопрос». */
+@media (max-width: 768px) {
+  .wb-nav-inline button:first-child,
+  .cd-nav-inline button:first-child {
+    display: none !important;
+  }
+}
