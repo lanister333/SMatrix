@@ -1333,7 +1333,8 @@ export function RecommendPage(props: {
                   </button>
                 </div>
                 <button className="rc-addbtn" onClick={openNewForm}>
-                  ＋ Поделиться опытом
+                  {/* 2026-10-02: знак «＋» убран по просьбе пользователя. */}
+                  Поделиться опытом
                 </button>
               </div>
             </div>

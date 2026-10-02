@@ -6479,9 +6479,9 @@ div[style*="background-color: rgb(0, 74, 143)"] {
   }
   .wb-addbtn,
   .cd-addbtn {
-    /* 2026-10-02: flex:0 0 auto — кнопка «Задать вопрос» НЕ растягивается,
-       занимает естественную ширину по содержимому. */
-    flex: 0 0 auto !important;
+    /* 2026-10-02 (v2): flex:1 — кнопка «Задать вопрос» растягивается
+       на всё свободное место по горизонтали. */
+    flex: 1 !important;
     text-align: center !important;
     padding: 4px 8px !important;
     font-size: 13px !important;
