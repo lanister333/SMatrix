@@ -3280,10 +3280,14 @@ a.pl-entry-detail:hover{color:#0a5caa}
      width:100% — одинаковая ширина на ВСЕХ страницах. */
   /* 2026-10-02: padding 16px 8px → 6px 8px — голубая шапка стала компактнее,
      не отнимает место у контента на маленьких экранах. Действует на всех
-     страницах (Форум, Главная, /currency.php, /transport.php и т.д.). */
-  .sk-topbar{min-height:0;padding:6px 8px;width:100% !important;max-width:100% !important}
-  .sk-topbar button{min-height:0;padding:2px 8px !important;line-height:1 !important}
-  .sk-topbar .tb-title{font-size:15px !important;line-height:1.3 !important;position:absolute !important;left:0 !important;right:0 !important;text-align:center !important;pointer-events:none !important}
+     страницах (Форум, Главная, /currency.php, /transport.php и т.д.).
+     2026-10-02 (v2): position:relative + min-height:34px — высота шапки
+     фиксированная, не зависит от наличия кнопки «☰ Категории».
+     2026-10-02 (v3): tb-title position:absolute — заголовок центрирован
+     по всей ширине шапки (не зависимо от кнопки слева). */
+  .sk-topbar{position:relative !important;min-height:34px !important;padding:6px 8px;width:100% !important;max-width:100% !important;display:flex !important;align-items:center !important}
+  .sk-topbar button{min-height:0;padding:2px 8px !important;line-height:1 !important;font-size:13px !important;position:relative;z-index:2}
+  .sk-topbar .tb-title{font-size:14px !important;line-height:1.2 !important;position:absolute !important;left:0 !important;right:0 !important;text-align:center !important;pointer-events:none !important;z-index:1}
   /* 2026-10-01 (только мобайл): кнопка ☰ ВНУТРИ бирюзовой шапки скрыта —
      вместо неё рисуется отдельная синяя полоса .sm-mh-mobile-bar ПОД
      шапкой (правило ниже). Десктоп не затронут — там .sm-mh-mobile-bar
