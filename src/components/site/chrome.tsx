@@ -387,7 +387,10 @@ export function MainNav(props: {
           @media (min-width:481px){.sm-mh-mobile-bar{display:none !important}}.
           Логика авторизации (useAuth, openAuth, handleLogin, handleLogout)
           общая с десктопной навигацией ниже — единственный источник правды. */}
-      <div className="sm-mh-mobile-bar">
+      {/* 2026-10-02 (мобайл): flex-direction:row-reverse — поменять местами
+          вафлю и кружок аватара. Был порядок: [вафля][поиск][аватар].
+          Стал: [аватар][поиск][вафля]. Inline-стиль обходит кэш CDN. */}
+      <div className="sm-mh-mobile-bar" style={{ flexDirection: "row-reverse" }}>
         {/* 2026-10-01 (мобайл): иконка-вафля (как у Google) вместо текста
             «☰ Разделы портала». Клик → выпадает меню с иконками разделов. */}
         <button
@@ -446,8 +449,11 @@ export function MainNav(props: {
         )}
         {/* 2026-10-01 (мобайл): белое окно поиска по центру синей полосы.
             Стили inline — обходим кэш CDN preview-сервера (CSS chunk не
-            меняет хэш в dev-режиме Turbopack). */}
-        <form className="sm-mobile-search" style={{ flex:"1 1 auto", minWidth:0, display:"flex", alignItems:"center", margin:"0 6px" }} onSubmit={(e) => { e.preventDefault(); const qv = q.trim(); if (qv.length >= 2) { if (props.onSearch) props.onSearch(qv); else window.location.href = `/?view=search&q=${encodeURIComponent(qv)}`; } }}>
+            меняет хэш в dev-режиме Turbopack).
+            2026-10-02: окно поиска стало меньше — padding 6/12 → 4/8,
+            font-size 14 → 13, flex-basis 1 → 0 1 auto (не растягивается
+            на всю свободную ширину, оставляет место по бокам). */}
+        <form className="sm-mobile-search" style={{ flex:"0 1 auto", minWidth:0, display:"flex", alignItems:"center", margin:"0 4px" }} onSubmit={(e) => { e.preventDefault(); const qv = q.trim(); if (qv.length >= 2) { if (props.onSearch) props.onSearch(qv); else window.location.href = `/?view=search&q=${encodeURIComponent(qv)}`; } }}>
           <input
             type="text"
             value={q}
@@ -455,7 +461,7 @@ export function MainNav(props: {
             placeholder="Поиск…"
             aria-label="Поиск"
             maxLength={120}
-            style={{ width:"100%", background:"#fff", border:"1px solid #33517a", borderRadius:"6px", padding:"6px 12px", fontFamily:"inherit", fontSize:"14px", color:"#1a2433", outline:"none" }}
+            style={{ width:"100%", background:"#fff", border:"1px solid #33517a", borderRadius:"5px", padding:"4px 8px", fontFamily:"inherit", fontSize:"13px", color:"#1a2433", outline:"none" }}
           />
         </form>
         <div className="sm-mh-mobile-auth">
