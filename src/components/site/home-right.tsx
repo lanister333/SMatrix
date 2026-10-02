@@ -217,19 +217,9 @@ export default function HomeRight() {
 
   const hasBankRows = rates.banks.length > 0;
 
-  /** Подвал панели: домены источников, давших значения свежайшей серии
-   *  (bankdep.ru · mainfin.ru · banktop.ru); если серия не свежая —
-   *  честная подпись «кэш последнего успеха». */
-  const sourcesLabel = (() => {
-    const doms = new Set<string>();
-    for (const b of rates.banks) {
-      for (const c of [b.usd, b.eur, b.cny, b.jpy, b.krw, b.thb]) {
-        if (c?.status === "ok" && c.src && SOURCE_DOMAINS[c.src]) doms.add(SOURCE_DOMAINS[c.src]);
-      }
-    }
-    if (doms.size > 0) return Array.from(doms).join(" · ");
-    return rates.source === "cache" ? "кэш последнего успеха" : "";
-  })();
+  // 2026-10-02: подпись «Наличные курсы касс · bankdep.ru · mainfin.ru»
+  // удалена по просьбе пользователя — на главной её больше нет.
+  // На отдельной странице /currency.php подпись остаётся (там нужна).
 
   return (
     <div className="mp-right right-column">
@@ -337,11 +327,6 @@ export default function HomeRight() {
               <span>Курсы обновляются…</span>
             </div>
           )}
-          <div className="mp-w-upd">
-            {hasBankRows
-              ? `Наличные курсы касс · обновлено: ${rates.updated}${sourcesLabel ? ` | ${sourcesLabel}` : ""}`
-              : ""}
-          </div>
         </div>
       </section>
 

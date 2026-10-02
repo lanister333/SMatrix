@@ -238,17 +238,14 @@ export default function TransportScheduleBlock() {
             <div className="transport-footer">
               {data.source === "stub" && (
                 <span className="transport-footer-note">
-                  ⚠ Демонстрационные данные. Подключение реального расписания — через Яндекс.Расписания API (нужна заявка на ключ).
+                  Демонстрационные данные
                 </span>
               )}
               {data.source === "yandex" && (
                 <span className="transport-footer-note transport-footer-note-real">
-                  ✓ Источник: Яндекс.Расписания. {data.note}
+                  Источник: Яндекс.Расписания
                 </span>
               )}
-              <a className="transport-footer-link" href="https://yandex.ru/dev/rasp/raspapi/" target="_blank" rel="noopener noreferrer">
-                Яндекс.Расписания API →
-              </a>
             </div>
           </>
         )}
