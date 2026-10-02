@@ -71,22 +71,23 @@ function WaffleTile(props: {
   const { href, label, bg, Icon, onClick } = props;
   return (
     <a className="sm-waffle-item" href={href} onClick={onClick}>
+      {/* 2026-10-02: цветные фоновые квадратики убраны — иконки
+          увеличены до 38px (как был квадратик) и покрашены напрямую
+          цветом bg. Так чище и иконки крупнее/виднее. */}
       <span
         className="sm-waffle-icon"
         style={{
           width: 38,
           height: 38,
-          borderRadius: 10,
-          background: bg,
-          color: "#fff",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           marginBottom: 5,
-          boxShadow: "0 1px 2px rgba(0,0,0,0.10)",
+          background: "transparent",
+          color: bg,
         }}
       >
-        <Icon size={20} color="#fff" strokeWidth={2.1} />
+        <Icon size={38} color={bg} strokeWidth={2.2} />
       </span>
       <span className="sm-waffle-label">{label}</span>
     </a>
