@@ -6416,15 +6416,28 @@ div[style*="background-color: rgb(0, 74, 143)"] {
    в одну строку. Заголовок раздела — отдельной строкой сверху,
    а кнопки — в одном flex-ряду. */
 @media (max-width: 768px) {
+  /* 2026-10-02 (v2): «Где купить» + «Мои публикации» + «Задать вопрос»
+     в один ряд. .wb-head-bar — flex-row, .wb-title не переноса на новую
+     строку. */
   .wb-head-bar,
   .cd-head-bar {
-    flex-direction: column !important;
-    align-items: stretch !important;
+    flex-direction: row !important;
+    align-items: center !important;
     gap: 4px !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  .wb-title,
+  .cd-title {
+    white-space: nowrap !important;
+    font-size: 13px !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
   }
   .wb-head-right,
   .cd-head-right {
-    width: 100% !important;
+    width: auto !important;
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: nowrap !important;

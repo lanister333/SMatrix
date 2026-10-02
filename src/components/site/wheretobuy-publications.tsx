@@ -985,7 +985,8 @@ export function WhereToBuyPage(props: {
                   </button>
                 </div>
                 <button className="wb-addbtn" onClick={openNewForm}>
-                  ＋ Задать вопрос
+                  {/* 2026-10-02: знак «＋» убран по просьбе пользователя. */}
+                  Задать вопрос
                 </button>
               </div>
             </div>
