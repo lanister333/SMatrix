@@ -6373,3 +6373,27 @@ div[style*="background-color: rgb(0, 74, 143)"] {
     margin-left: auto !important;
   }
 }
+
+/* 2026-10-02 (мобайл): на странице «О работодателях» тексты в карточках
+   должны быть на всю ширину. Раньше .ep-card-text в .ep-card-row (flex)
+   имел естественную ширину (~244px из 345px доступной) — не растягивался.
+   Теперь flex:1 + min-width:0 — текст занимает всё место после лейбла,
+   длинные строки нормально переносятся. */
+@media (max-width: 768px) {
+  .ep-card-row {
+    flex-wrap: wrap !important;
+  }
+  .ep-card-text {
+    flex: 1 1 100% !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  /* Также текст вне .ep-card-row (если есть) — на всю ширину */
+  .ep-card > .ep-card-text,
+  .ep-card .ep-card-period,
+  .ep-card .ep-card-disclaimer {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
