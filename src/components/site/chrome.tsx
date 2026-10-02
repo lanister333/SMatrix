@@ -408,7 +408,22 @@ export function MainNav(props: {
           <span className="sm-waffle-dot" />
         </button>
         {waffleOpen && (
-          <div className="sm-waffle-menu" onClick={(e) => e.stopPropagation()}>
+          <>
+            {/* 2026-10-02: backdrop — клик на свободное место закрывает меню.
+                Inline-стиль: position fixed, покрывает весь viewport, полупрозрачный
+                тёмный фон. z-index:200 — НИЖЕ меню (.sm-waffle-menu в globals.css
+                имеет z-index:300), иначе перекрыл бы само меню. */}
+            <div
+              onClick={() => setWaffleOpen(false)}
+              style={{
+                position: "fixed",
+                inset: 0,
+                background: "rgba(0, 0, 0, 0.35)",
+                zIndex: 200,
+              }}
+              aria-hidden="true"
+            />
+            <div className="sm-waffle-menu" onClick={(e) => e.stopPropagation()}>
             {/* 2026-10-02: иконки в стиле Google Workspace — каждая со своим
                 цветным тайлом и узнаваемой SVG-иконкой из lucide-react. */}
             <WaffleTile href="/" label="Форум" bg="#7c3aed" Icon={MessageCircle} onClick={(e) => { e.preventDefault(); setWaffleOpen(false); window.location.href = "/?view=forum"; }} />
@@ -426,7 +441,8 @@ export function MainNav(props: {
             <WaffleTile href="/disconnections.php" label="Отключения" bg="#eab308" Icon={Zap} onClick={() => setWaffleOpen(false)} />
             <WaffleTile href="/traffic.php" label="Пробки" bg="#c026d3" Icon={Car} onClick={() => setWaffleOpen(false)} />
             <WaffleTile href="/transport.php" label="Транспорт" bg="#f97316" Icon={Bus} onClick={() => setWaffleOpen(false)} />
-          </div>
+            </div>
+          </>
         )}
         {/* 2026-10-01 (мобайл): белое окно поиска по центру синей полосы.
             Стили inline — обходим кэш CDN preview-сервера (CSS chunk не
