@@ -779,8 +779,12 @@ export default function App() {
       <div className="sk" style={{ minHeight: 0, flex: "1 0 auto" }}>
         {/* 2026-10-01 (мобайл): голубая шапка (sk-topbar) — ВСЕГДА
             показывается (на всех SPA-видах), с названием страницы по
-            центру. На форуме также кнопка «☰ Категории форума» слева. */}
-        <div className="sk-topbar" style={{ position: "relative", padding: "8px 10px !important", minHeight: "0 !important" } as React.CSSProperties}>
+            центру. На форуме также кнопка «☰ Категории форума» слева.
+            2026-10-02: убран inline-стиль padding/min-height — теперь
+            используется стандартное мобильное правило из globals.css
+            (.sk-topbar{min-height:0;padding:16px 8px}) как на других
+            страницах сайта, высота голубой полосы одинаковая везде. */}
+        <div className="sk-topbar">
           {view === "forum" && !topicId && (
             <button aria-label="Открыть меню" onClick={() => setMobileMenu(true)}>
               ☰ Категории форума
