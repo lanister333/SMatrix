@@ -6117,3 +6117,33 @@ div[style*="background-color: rgb(0, 74, 143)"] {
 @media (max-width: 768px) {
   .sk-topbar + * { margin-top: 10px !important; }
 }
+
+/* 2026-10-02 (мобайл, ≤768px): бирюзовая плашка пагинации темы форума —
+   все элементы в один ряд + сжата по вертикали. Без этого flex-wrap:wrap
+   переносил «Ответы 1-35 из 100», «страницы: 1 2 3», «перейти к № [input] »»
+   на 2-3 строки, делая плашку высокой. */
+@media (max-width: 768px) {
+  .sk-pager {
+    flex-wrap: nowrap !important;
+    padding: 2px 6px !important;
+    gap: 4px !important;
+    font-size: 12px !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  .sk-pager .pg-pages,
+  .sk-pager .pg-goto {
+    flex-wrap: nowrap !important;
+    gap: 3px !important;
+    font-size: 12px !important;
+  }
+  .sk-pager .pg-num,
+  .sk-pager .pg-cur {
+    padding: 2px 4px !important;
+  }
+  .sk-pager .pg-goto input {
+    width: 40px !important;
+    padding: 1px 4px !important;
+    font-size: 12px !important;
+  }
+}
