@@ -61,6 +61,19 @@ const NAV_SEARCH_ICON = 14;
  *  контрастной SVG-иконкой из lucide-react внутри (как Google Workspace).
  *  Inline-стили — обходим кэш CDN (CSS chunk не меняет хэш в dev-режиме). */
 type LucideLike = ComponentType<{ size?: number; color?: string; fill?: string; stroke?: string; strokeWidth?: number; absoluteStrokeWidth?: boolean }>;
+
+/** 2026-10-02: конвертация hex → rgba с прозрачностью.
+ *  Возвращает пастельный оттенок того же цвета (для fill иконки,
+ *  близкий к цвету контура). По умолчанию alpha=0.18. */
+function hexToRgba(hex: string, alpha = 0.18): string {
+  const h = hex.replace("#", "");
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) return hex;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 function WaffleTile(props: {
   href: string;
   label: string;
@@ -73,9 +86,9 @@ function WaffleTile(props: {
     <a className="sm-waffle-item" href={href} onClick={onClick}
       style={{ gap: 0, padding: "6px 4px" }}
     >
-      {/* 2026-10-02: иконки — цветной контур БЕЗ заливки (fill=none),
-          stroke жирнее (2.5), чтобы очертания были чёткие и понятны.
-          Фона нет, размер 38px. Надпись подтянута вплотную (gap:0 + padding 6px). */}
+      {/* 2026-10-02: иконки — цветной контур (stroke=bg, width 2.5) +
+          мягкая пастельная заливка того же цвета (fill=hexToRgba(bg, 0.18)).
+          Очертания чёткие (контур), заливка близка к цвету контура. */}
       <span
         className="sm-waffle-icon"
         style={{
@@ -89,7 +102,7 @@ function WaffleTile(props: {
           color: bg,
         }}
       >
-        <Icon size={38} color={bg} fill={bg} stroke="#ffffff" strokeWidth={2} />
+        <Icon size={38} color={bg} fill={hexToRgba(bg, 0.18)} strokeWidth={2.5} absoluteStrokeWidth />
       </span>
       <span className="sm-waffle-label">{label}</span>
     </a>
