@@ -464,14 +464,20 @@ export function MainNav(props: {
             style={{ width:"100%", background:"#fff", border:"1px solid #33517a", borderRadius:"5px", padding:"4px 8px", fontFamily:"inherit", fontSize:"13px", color:"#1a2433", outline:"none" }}
           />
         </form>
-        <div className="sm-mh-mobile-auth">
+        {/* 2026-10-02 (мобайл): при row-reverse .sm-mh-mobile-auth margin-left:auto
+            из CSS создаёт автозаполнение, отталкивая аватар от левого края.
+            Inline marginLeft:0 — аватар стоит у левого края симметрично вафле. */}
+        <div className="sm-mh-mobile-auth" style={{ marginLeft: 0 }}>
           {/* 2026-10-01 (мобайл): кружок с буквой ника + выпадающее меню.
               Гость: кружок «?» → меню (Войти, Регистрация).
               Залогинен: кружок с первой буквой ника → меню (Профиль, Выйти).
               2026-10-01 (правка 2): кружок покрашен рандомным цветом
               (по хэшу ника — стабильно для каждого пользователя), с
               отступом от краёв шапки (margin:4px). */}
-          <div className="sm-avatar-circle-wrap" ref={avatarRef} style={{ margin: "4px" }}>
+          {/* 2026-10-02: margin 8px 10px — симметрично с вафлей справа
+              (.sm-waffle-btn padding:8px 10px). Аватар теперь на таком же
+              расстоянии от левого края, как вафля от правого. */}
+          <div className="sm-avatar-circle-wrap" ref={avatarRef} style={{ margin: "8px 10px" }}>
             <button
               type="button"
               className="sm-avatar-circle"
