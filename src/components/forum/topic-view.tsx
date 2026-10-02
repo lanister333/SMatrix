@@ -1084,11 +1084,10 @@ export default function TopicView(props: {
               <button className="sk-btn-classic" disabled={sending || !reply.trim()} onClick={sendReply}>
                 {sending ? "Проверка ИИ…" : "Отправить мнение"}
               </button>
-              {!props.user && (
-                <span style={{ fontSize: 12.5, color: "#AA3333", marginLeft: 10 }}>
-                  Чтобы писать на форуме, войдите или зарегистрируйтесь — ссылка в левой колонке.
-                </span>
-              )}
+              {/* 2026-10-02: текст «Чтобы писать на форуме, войдите или
+                  зарегистрируйтесь — ссылка в левой колонке» удалён по
+                  просьбе пользователя — кнопка всё равно требует входа
+                  (disabled если нет user). */}
             </div>
           </>
         )}

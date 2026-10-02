@@ -6188,3 +6188,37 @@ div[style*="background-color: rgb(0, 74, 143)"] {
     line-height: 1.15 !important;
   }
 }
+
+/* 2026-10-02 (мобайл): подтянуть кнопку «Отправить мнение» к textarea,
+   и ссылку «К списку тем» к кнопке. Уменьшены отступы и min-height. */
+@media (max-width: 768px) {
+  .sk-qr {
+    margin-top: 4px !important;
+    padding-top: 4px !important;
+  }
+  .sk-qr-label {
+    margin-bottom: 2px !important;
+    font-size: 11px !important;
+  }
+  .sk-qr textarea {
+    min-height: 60px !important;
+    padding: 4px 6px !important;
+    font-size: 13px !important;
+    line-height: 1.3 !important;
+    margin-bottom: 2px !important;
+  }
+  .sk-qr > div:last-child,
+  .sk-qr > div:has(> button.sk-btn-classic) {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+  .sk-qr button.sk-btn-classic {
+    padding: 4px 10px !important;
+    font-size: 12px !important;
+    margin-top: 0 !important;
+  }
+  .sk-backlink {
+    margin-top: 4px !important;
+    font-size: 12px !important;
+  }
+}
