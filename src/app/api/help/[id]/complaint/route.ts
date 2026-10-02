@@ -12,6 +12,7 @@ import { db } from "@/lib/db";
 import { handleApiError } from "@/lib/api";
 import { moderatePublishedHelpText, HELP_COMPLAINT_CATEGORIES } from "@/lib/moderation/help";
 import { handleConfirmedViolation } from "@/lib/moderation/sanctions";
+import { checkComplaintAllowed, hasAlreadyComplained, detectRaid } from "@/lib/security";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -23,6 +24,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     const category = String(body.category ?? "");
     const comment = String(body.comment ?? "").trim().slice(0, 1000);
     const reporterName = String(body.reporterName ?? "").trim().slice(0, 40);
+    const token = String(body.token ?? "");
 
     if (!HELP_COMPLAINT_CATEGORIES.includes(category as (typeof HELP_COMPLAINT_CATEGORIES)[number])) {
       return NextResponse.json({ error: "Выберите причину жалобы" }, { status: 400 });
@@ -30,6 +32,13 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     const publication = await db.helpPublication.findUnique({ where: { id } });
     if (!publication || publication.isDeleted) {
       return NextResponse.json({ error: "Публикация не найдена" }, { status: 404 });
+    }
+
+    // ПРОМТ №1: rate-limit + уникальность + рейд-детектор.
+    const guard = await checkComplaintAllowed(req, token || null, false);
+    if (!guard.allowed || guard.response) return guard.response!;
+    if (guard.reporterId && (await hasAlreadyComplained("helpComplaint", { publicationId: id, reporterId: guard.reporterId }))) {
+      return NextResponse.json({ error: "Вы уже жаловались на эту публикацию" }, { status: 409 });
     }
 
     // Жалоба создаётся всегда. Количество жалоб само по себе НЕ является
@@ -40,15 +49,23 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
         publicationId: id,
         category,
         comment,
-        reporterName,
+        reporterName: guard.reporterName ?? reporterName,
+        reporterId: guard.reporterId ?? null,
         aiVerdict: "",
         aiNote: "",
       },
     });
 
-    // ИИ-проверка выполняется в фоне: пользователь сразу получает подтверждение.
+    // ПРОМТ №1: рейд-детектор + ИИ-проверка выполняются в фоне.
     after(async () => {
       try {
+        const raid = await detectRaid("helpComplaint", "publicationId", id);
+        if (raid.isRaid) {
+          await db.helpComplaint.updateMany({
+            where: { publicationId: id },
+            data: { aiNote: "Внимание: возможно скоординированная травля (рейд)." },
+          }).catch(() => {});
+        }
         let verdict = "";
         let note = "";
 

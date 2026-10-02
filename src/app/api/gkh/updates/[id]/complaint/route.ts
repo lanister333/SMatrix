@@ -11,6 +11,7 @@ import { handleApiError } from "@/lib/api";
 import { isGkhComplaintCategory } from "@/lib/gkh";
 import { moderatePublishedGkhText, gkhSanctionCategory } from "@/lib/moderation/gkh";
 import { handleConfirmedViolation } from "@/lib/moderation/sanctions";
+import { checkComplaintAllowed, hasAlreadyComplained, detectRaid } from "@/lib/security";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -22,6 +23,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     const category = String(body.category ?? "");
     const comment = String(body.comment ?? "").trim().slice(0, 1000);
     const reporterName = String(body.reporterName ?? "").trim().slice(0, 40);
+    const token = String(body.token ?? "");
 
     if (!isGkhComplaintCategory(category)) {
       return NextResponse.json({ error: "Выберите причину жалобы" }, { status: 400 });
@@ -31,18 +33,34 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
       return NextResponse.json({ error: "Обновление не найдено" }, { status: 404 });
     }
 
+    // ПРОМТ №1: rate-limit + уникальность + рейд-детектор.
+    const guard = await checkComplaintAllowed(req, token || null, false);
+    if (!guard.allowed || guard.response) return guard.response!;
+    if (guard.reporterId && (await hasAlreadyComplained("gkhComplaint", { updateId: id, reporterId: guard.reporterId }))) {
+      return NextResponse.json({ error: "Вы уже жаловались на эту публикацию" }, { status: 409 });
+    }
+
     const complaint = await db.gkhComplaint.create({
       data: {
         updateId: id,
         problemId: update.problemId,
         category,
         comment,
-        reporterName,
+        reporterName: guard.reporterName ?? reporterName,
+        reporterId: guard.reporterId ?? null,
       },
     });
 
+    // ПРОМТ №1: рейд-детектор + ИИ-проверка выполняются в фоне.
     after(async () => {
       try {
+        const raid = await detectRaid("gkhComplaint", "updateId", id);
+        if (raid.isRaid) {
+          await db.gkhComplaint.updateMany({
+            where: { updateId: id },
+            data: { aiNote: "Внимание: возможно скоординированная травля (рейд)." },
+          }).catch(() => {});
+        }
         const outcome = await moderatePublishedGkhText("обновление жителя", "", update.text);
         const verdict =
           outcome.action === "hide" ? "violation" : outcome.action === "human" ? "ambiguous" : "ok";

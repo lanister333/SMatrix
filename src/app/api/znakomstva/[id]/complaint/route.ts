@@ -16,6 +16,7 @@ import { handleApiError } from "@/lib/api";
 import { moderatePublishedDatingText, datingAiSanctionCategory } from "@/lib/moderation/znakomstva";
 import { handleConfirmedViolation } from "@/lib/moderation/sanctions";
 import { isDatingComplaintReason, datingComplaintLabel } from "@/lib/znakomstva";
+import { checkComplaintAllowed, hasAlreadyComplained, detectRaid } from "@/lib/security";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -30,6 +31,7 @@ export async function POST(
     const category = String(body.category ?? "");
     const comment = String(body.comment ?? "").trim().slice(0, 1000);
     const reporterName = String(body.reporterName ?? "").trim().slice(0, 40);
+    const token = String(body.token ?? "");
 
     if (!isDatingComplaintReason(category)) {
       return NextResponse.json({ error: "Выберите причину жалобы" }, { status: 400 });
@@ -39,6 +41,13 @@ export async function POST(
       return NextResponse.json({ error: "Объявление не найдено" }, { status: 404 });
     }
 
+    // ПРОМТ №1: rate-limit + уникальность + рейд-детектор.
+    const guard = await checkComplaintAllowed(req, token || null, false);
+    if (!guard.allowed || guard.response) return guard.response!;
+    if (guard.reporterId && (await hasAlreadyComplained("datingComplaint", { postId: id, reporterId: guard.reporterId }))) {
+      return NextResponse.json({ error: "Вы уже жаловались на эту публикацию" }, { status: 409 });
+    }
+
     // Жалоба создаётся всегда. Количество жалоб само по себе НЕ является
     // нарушением, не показывается пользователям и не создаёт рейтинг.
     const complaint = await db.datingComplaint.create({
@@ -46,15 +55,23 @@ export async function POST(
         postId: id,
         category,
         comment,
-        reporterName,
+        reporterName: guard.reporterName ?? reporterName,
+        reporterId: guard.reporterId ?? null,
         aiVerdict: "",
         aiNote: "",
       },
     });
 
-    // ИИ-проверка выполняется в фоне: пользователь сразу получает подтверждение.
+    // ПРОМТ №1: рейд-детектор + ИИ-проверка выполняются в фоне.
     after(async () => {
       try {
+        const raid = await detectRaid("datingComplaint", "postId", id);
+        if (raid.isRaid) {
+          await db.datingComplaint.updateMany({
+            where: { postId: id },
+            data: { aiNote: "Внимание: возможно скоординированная травля (рейд)." },
+          }).catch(() => {});
+        }
         const outcome = await moderatePublishedDatingText(post.category, post.title, post.body);
         const verdict =
           outcome.action === "hide" ? "violation" : outcome.action === "human" ? "ambiguous" : "ok";

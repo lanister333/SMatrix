@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { handleApiError } from "@/lib/api";
 import { COMPLAINT_CONFIRM_MESSAGE, moderatePublishedText } from "@/lib/moderation";
 import { handleConfirmedViolation } from "@/lib/moderation/sanctions";
+import { checkComplaintAllowed, hasAlreadyComplained, detectRaid } from "@/lib/security";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -24,6 +25,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     const body = await req.json();
     const category = String(body.category ?? "");
     const comment = String(body.comment ?? "").trim().slice(0, 1000);
+    const token = String(body.token ?? "");
 
     if (!COMPLAINT_CATEGORIES.includes(category)) {
       return NextResponse.json({ error: "Выберите причину жалобы" }, { status: 400 });
@@ -31,6 +33,26 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     const message = await db.message.findUnique({ where: { id } });
     if (!message || message.isDeleted) {
       return NextResponse.json({ error: "Сообщение не найдено" }, { status: 404 });
+    }
+
+    // ПРОМТ №1: rate-limit + уникальность + рейд-детектор.
+    // Жалоба может быть анонимной (если модерация разрешит), но в форуме
+    // обычно требует авторизации.
+    const guard = await checkComplaintAllowed(req, token || null, false);
+    if (!guard.allowed || guard.response) {
+      return guard.response!;
+    }
+    if (
+      guard.reporterId &&
+      (await hasAlreadyComplained("complaint", {
+        messageId: id,
+        reporterId: guard.reporterId,
+      }))
+    ) {
+      return NextResponse.json(
+        { error: "Вы уже жаловались на это сообщение" },
+        { status: 409 }
+      );
     }
 
     // Жалоба создаётся всегда. Количество жалоб само по себе НЕ является
@@ -41,6 +63,8 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
         messageId: id,
         category,
         comment,
+        reporterName: guard.reporterName ?? "",
+        reporterId: guard.reporterId ?? null,
         aiVerdict: "",
         aiNote: "",
       },
@@ -51,6 +75,18 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
       try {
         let verdict = "";
         let note = "";
+
+        // ПРОМТ №1: рейд-детектор. Если ≥ 3 жалоб от связанных аккаунтов —
+        // помечаем как рейд, контент НЕ скрываем автоматически.
+        const raid = await detectRaid("complaint", "messageId", id);
+        if (raid.isRaid) {
+          await db.complaint
+            .updateMany({
+              where: { messageId: id },
+              data: { aiNote: "Внимание: возможно скоординированная травля (рейд)." },
+            })
+            .catch(() => {});
+        }
 
         if (message.isHiddenByAi) {
           // Сообщение уже скрыто ИИ ранее — повторная проверка не требуется.

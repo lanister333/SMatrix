@@ -61,6 +61,17 @@ model User {
   /// Связи этого пользователя с другими аккаунтами (одинаковый phone/device/IP).
   linksA        AccountLink[] @relation("AccountLinkA")
   linksB        AccountLink[] @relation("AccountLinkB")
+  /// ПРОМТ №1: жалобы, поданные этим пользователем (по всем разделам).
+  complaints         Complaint[]         @relation("UserComplaints")
+  helpComplaints     HelpComplaint[]     @relation("UserHelpComplaints")
+  overheardComplaints OverheardComplaint[] @relation("UserOverheardComplaints")
+  wheretobuyComplaints WhereToBuyComplaint[] @relation("UserWhereToBuyComplaints")
+  gkhComplaints      GkhComplaint[]      @relation("UserGkhComplaints")
+  cheapComplaints    CheapComplaint[]    @relation("UserCheapComplaints")
+  recComplaints      RecComplaint[]      @relation("UserRecComplaints")
+  empComplaints      EmpComplaint[]      @relation("UserEmpComplaints")
+  datingComplaints   DatingComplaint[]   @relation("UserDatingComplaints")
+  adComplaints       AdComplaint[]       @relation("UserAdComplaints")
 }
 
 /// ПРОМТ №1: журнал всех попыток входа (успешных и неуспешных).
@@ -259,10 +270,17 @@ model Complaint {
   category     String
   comment      String    @default("")
   reporterName String    @default("")
+  /// ПРОМТ №1: ID пользователя, подавшего жалобу. Опционально — для жалобщих от анонимов.
+  reporterId   String?
+  reporter     User?      @relation("UserComplaints", fields: [reporterId], references: [id], onDelete: SetNull)
   aiVerdict    String    @default("")
   aiNote       String    @default("")
   resolved     Boolean   @default(false)
   createdAt    DateTime  @default(now())
+
+  @@unique([messageId, reporterId])
+  @@index([reporterId])
+  @@index([createdAt])
 }
 
 model Appeal {
@@ -404,10 +422,15 @@ model HelpComplaint {
   category     String
   comment      String      @default("")
   reporterName String      @default("")
+  reporterId   String?
+  reporter     User?        @relation("UserHelpComplaints", fields: [reporterId], references: [id], onDelete: SetNull)
   aiVerdict    String      @default("")
   aiNote       String      @default("")
   resolved     Boolean     @default(false)
   createdAt    DateTime    @default(now())
+
+  @@unique([publicationId, reporterId])
+  @@index([reporterId])
 }
 
 /// ШАГ 17. «Подслушано Сахалин» — самостоятельная городская лента слухов,
@@ -448,10 +471,15 @@ model OverheardComplaint {
   category     String
   comment      String        @default("")
   reporterName String        @default("")
+  reporterId   String?
+  reporter     User?          @relation("UserOverheardComplaints", fields: [reporterId], references: [id], onDelete: SetNull)
   aiVerdict    String        @default("")
   aiNote       String        @default("")
   resolved     Boolean       @default(false)
   createdAt    DateTime      @default(now())
+
+  @@unique([postId, reporterId])
+  @@index([reporterId])
 }
 
 /// ШАГ 18. «Где купить» — самостоятельный раздел вопросов о КОНКРЕТНЫХ товарах
@@ -521,10 +549,15 @@ model WhereToBuyComplaint {
   category     String
   comment      String         @default("")
   reporterName String         @default("")
+  reporterId   String?
+  reporter     User?           @relation("UserWhereToBuyComplaints", fields: [reporterId], references: [id], onDelete: SetNull)
   aiVerdict    String         @default("")
   aiNote       String         @default("")
   resolved     Boolean        @default(false)
   createdAt    DateTime       @default(now())
+
+  @@unique([postId, reporterId])
+  @@index([reporterId])
 }
 
 /// ТЗ 2026-09-22. Быстрая подсказка «Где купить» с ГЛАВНОЙ страницы —
@@ -696,10 +729,18 @@ model GkhComplaint {
   category     String
   comment      String      @default("")
   reporterName String      @default("")
+  reporterId   String?
+  reporter     User?        @relation("UserGkhComplaints", fields: [reporterId], references: [id], onDelete: SetNull)
   aiVerdict    String      @default("")
   aiNote       String      @default("")
   resolved     Boolean     @default(false)
   createdAt    DateTime    @default(now())
+
+  // Жалоба привязана либо к problemId, либо к updateId — ID репортёра уникален
+  // в рамках одного объекта жалобы. SQLite unique treats NULL как разные значения,
+  // поэтому анонимные жалобы не подпадают под unique-констрейнт.
+  @@index([reporterId])
+  @@index([createdAt])
 }
 
 /// ШАГ 26. «Знакомства» (/znakomstva) — самостоятельный раздел, единственный
@@ -816,10 +857,15 @@ model CheapComplaint {
   category     String
   comment      String      @default("")
   reporterName String      @default("")
+  reporterId   String?
+  reporter     User?        @relation("UserCheapComplaints", fields: [reporterId], references: [id], onDelete: SetNull)
   aiVerdict    String      @default("")
   aiNote       String      @default("")
   resolved     Boolean     @default(false)
   createdAt    DateTime    @default(now())
+
+  @@unique([postId, reporterId])
+  @@index([reporterId])
 }
 
 /// ШАГ 20 (восстановление). «Рекомендую / Не рекомендую» — самостоятельная
@@ -898,10 +944,15 @@ model RecComplaint {
   category     String
   comment      String      @default("")
   reporterName String      @default("")
+  reporterId   String?
+  reporter     User?        @relation("UserRecComplaints", fields: [reporterId], references: [id], onDelete: SetNull)
   aiVerdict    String      @default("")
   aiNote       String      @default("")
   resolved     Boolean     @default(false)
   createdAt    DateTime    @default(now())
+
+  @@unique([postId, reporterId])
+  @@index([reporterId])
 }
 
 /// ТЗ 2026-09-23 «О работодателях» (Flat 2.0, Пункты 5/6/8/20 ТЗ №2).
@@ -961,10 +1012,15 @@ model EmpComplaint {
   category     String
   comment      String      @default("")
   reporterName String      @default("")
+  reporterId   String?
+  reporter     User?        @relation("UserEmpComplaints", fields: [reporterId], references: [id], onDelete: SetNull)
   aiVerdict    String      @default("")
   aiNote       String      @default("")
   resolved     Boolean     @default(false)
   createdAt    DateTime    @default(now())
+
+  @@unique([postId, reporterId])
+  @@index([reporterId])
 }
 
 /// ШАГ 26. Жалоба на объявление «Знакомства». Не голосование и не автоматическое
@@ -976,10 +1032,15 @@ model DatingComplaint {
   category     String
   comment      String      @default("")
   reporterName String      @default("")
+  reporterId   String?
+  reporter     User?        @relation("UserDatingComplaints", fields: [reporterId], references: [id], onDelete: SetNull)
   aiVerdict    String      @default("")
   aiNote       String      @default("")
   resolved     Boolean     @default(false)
   createdAt    DateTime    @default(now())
+
+  @@unique([postId, reporterId])
+  @@index([reporterId])
 }
 
 /// ШАГ 22 (восстановление). «Объявления» /obyavleniya — доска объявлений
@@ -1045,10 +1106,15 @@ model AdComplaint {
   category     String
   comment      String      @default("")
   reporterName String      @default("")
+  reporterId   String?
+  reporter     User?        @relation("UserAdComplaints", fields: [reporterId], references: [id], onDelete: SetNull)
   aiVerdict    String      @default("")
   aiNote       String      @default("")
   resolved     Boolean     @default(false)
   createdAt    DateTime    @default(now())
+
+  @@unique([postId, reporterId])
+  @@index([reporterId])
 }
 
 /// СТАДИЯ 2 (Шаг 6): реальные курсы покупки/продажи НАЛИЧНОЙ валюты
