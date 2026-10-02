@@ -277,9 +277,9 @@ export default function CurrencyScreen() {
                       увеличены 12.5→15px bold; вторая строка — только знак
                       и номинал («за 1000» у JPY/KRW; THB — за 1). */}
                   <tr>
-                    <th style={{ backgroundColor: "#D6E4ED", padding: "5px 8px", fontWeight: "bold", fontSize: "13px", color: "#333", borderRight: "1px solid #1E3A5F", textAlign: "center" }}>Банк</th>
+                    <th style={{ backgroundColor: "#D6E4ED", padding: "2px 8px", fontWeight: "bold", fontSize: "13px", color: "#333", borderRight: "1px solid #1E3A5F", textAlign: "center" }}>Банк</th>
                     {CUR_COLS.map((c) => (
-                      <th key={c.key} colSpan={2} style={{ backgroundColor: "#D6E4ED", padding: "5px 8px", fontWeight: "bold", fontSize: "15px", color: "#333", borderRight: c.key !== LAST_CUR_KEY ? "1px solid #1E3A5F" : "1px solid #D6E4ED", textAlign: "center" }}>
+                      <th key={c.key} colSpan={2} style={{ backgroundColor: "#D6E4ED", padding: "2px 8px", fontWeight: "bold", fontSize: "15px", color: "#333", borderRight: c.key !== LAST_CUR_KEY ? "1px solid #1E3A5F" : "1px solid #D6E4ED", textAlign: "center", lineHeight: "1.1" }}>
                         {c.code}<br />
                         <span style={{ fontSize: "10px", fontWeight: "normal", color: "#666" }}>
                           {c.sign}{c.unit ? ` (${c.unit})` : ""}
@@ -289,11 +289,11 @@ export default function CurrencyScreen() {
                   </tr>
                   {/* СТРОКА 2: КУПИМ / ПРОДАДИМ — компактный ряд */}
                   <tr>
-                    <th style={{ backgroundColor: "#D6E4ED", borderRight: "1px solid #1E3A5F", borderBottom: "1px solid #1E3A5F", padding: "3px 6px" }}></th>
+                    <th style={{ backgroundColor: "#D6E4ED", borderRight: "1px solid #1E3A5F", borderBottom: "1px solid #1E3A5F", padding: "1px 6px" }}></th>
                     {CUR_COLS.map((c) => (
                       <Fragment key={c.key}>
-                        <th style={{ backgroundColor: "#D6E4ED", color: "#2E7D32", fontSize: "9px", fontWeight: "bold", padding: "3px 6px", textAlign: "center", borderBottom: "1px solid #1E3A5F" }}>КУПИМ</th>
-                        <th style={{ backgroundColor: "#D6E4ED", color: "#C62828", fontSize: "9px", fontWeight: "bold", padding: "3px 6px", textAlign: "center", borderRight: c.key !== LAST_CUR_KEY ? "1px solid #1E3A5F" : "none", borderBottom: "1px solid #1E3A5F" }}>ПРОДАДИМ</th>
+                        <th style={{ backgroundColor: "#D6E4ED", color: "#2E7D32", fontSize: "9px", fontWeight: "bold", padding: "1px 6px", textAlign: "center", borderBottom: "1px solid #1E3A5F" }}>КУПИМ</th>
+                        <th style={{ backgroundColor: "#D6E4ED", color: "#C62828", fontSize: "9px", fontWeight: "bold", padding: "1px 6px", textAlign: "center", borderRight: c.key !== LAST_CUR_KEY ? "1px solid #1E3A5F" : "none", borderBottom: "1px solid #1E3A5F" }}>ПРОДАДИМ</th>
                       </Fragment>
                     ))}
                   </tr>
