@@ -3295,7 +3295,9 @@ a.pl-entry-detail:hover{color:#0a5caa}
      строке (было display:block → auth-блок уходит на новую строку). */
   .sm-mh-mobile-bar{
     display:flex !important;
-    align-items:stretch;
+    /* 2026-10-02: align-items:center — аватар, поиск и вафля выровнены
+       по вертикали в один ряд (был stretch, вафля казалась выше). */
+    align-items:center;
     background:var(--sm-navy);
     border-bottom:1px solid var(--sm-navy-deep);
     padding:0;
