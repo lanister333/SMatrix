@@ -820,16 +820,7 @@ function RecFormModal(props: {
               placeholder="Например: мастер Алексей вежливо объяснил причину задержки и сделал скидку"
             />
           </div>
-          <div className="sk-modal-row">
-            <label htmlFor="rc-f-place">Место — необязательно</label>
-            <input
-              id="rc-f-place"
-              value={place}
-              maxLength={80}
-              onChange={(e) => setPlace(e.target.value)}
-              placeholder="Южно-Сахалинск, Холмск, Корсаков, Долинск или конкретный район"
-            />
-          </div>
+          {/* 2026-10-03: блок «Место» удалён по просьбе пользователя. */}
           {similar && similar.length > 0 && (
             <div className="rc-similarwarn" role="alert">
               <b>Похожая публикация уже есть. Возможно, о вас уже писали.</b>
