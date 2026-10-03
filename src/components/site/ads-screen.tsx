@@ -171,7 +171,6 @@ export default function AdsScreen() {
                 controlledOpen
                 open={formOpen}
                 onOpenChange={setFormOpen}
-                hideAddButton
                 placeFilter={appliedCity}
               />
             </div>

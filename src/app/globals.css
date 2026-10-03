@@ -2655,7 +2655,8 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .ad-search-place{flex:0 1 190px;min-width:110px}
 .ad-search::placeholder{color:#93a1b2}
 .ad-searchreset{color:#8296ab;cursor:pointer;background:0 0;border:0;padding:6px 4px;font-family:inherit;font-size:12.5px;text-decoration:underline;white-space:nowrap}
-.ad-create-mobile{display:none}
+/* 2026-10-03: .ad-create-mobile показан на ВСЕХ экранах (был display:none). */
+.ad-create-mobile{display:inline-block;margin-top:9px}
 .ad-loading{color:#56657a;padding:14px 2px;font-size:13.5px}
 .ad-empty{color:#56657a;padding:14px 2px;font-size:13.5px}
 .ad-list{margin-top:10px}
@@ -4192,8 +4193,10 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
      Рекомендую, Где дешевле, Где купить, Подслушано. На десктопе обе
      кнопки на месте (правило живёт только здесь, ≤480px). */
   /* 2026-10-02: .gkf-newbtn убран из display:none — кнопка
-     «+ Зафиксировать проблему» на /gkh теперь видна на мобиле. */
-  .ad-create-mobile,.dk-newbtn,.gkh-newbtn,.hp-newbtn,
+     «+ Зафиксировать проблему» на /gkh теперь видна на мобиле.
+     2026-10-03: .ad-create-mobile убран — кнопка «＋ Создать объявление»
+     на /obyavleniya теперь видна на мобиле. */
+  .dk-newbtn,.gkh-newbtn,.hp-newbtn,
   .ep-newbtn,.oh-newbtn{display:none}
   /* «Пока нет объявлений…» плотно прижато к полям поиска
      (на месте скрытой нижней кнопки не остаётся пустоты) */
