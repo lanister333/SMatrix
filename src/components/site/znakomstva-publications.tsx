@@ -271,24 +271,22 @@ export default function LoveSakhPage(props: {
 
       {/* ================= ЦЕНТРАЛЬНАЯ КОЛОНКА (Flat 2.0) ================= */}
       <div className="center-column">
-        {/* 2026-10-03: кнопка «Разместить анкету» вверху центральной колонки
-            (раньше была только в левой, потом снята). Теперь видна в обеих
-            версиях (мобайл + десктоп). */}
-        <div style={{ marginBottom: 10 }}>
-          <button className="sk-btn-classic" onClick={openForm} style={{ borderRadius: 0 }}>
-            Разместить анкету
-          </button>
-        </div>
-        {guestHint && (
-          <div style={{ marginBottom: 10, fontSize: 13, color: "#475569" }}>
-            Размещать анкеты могут только зарегистрированные пользователи. Войдите или зарегистрируйтесь.
-          </div>
-        )}
         <div className="dk-head" data-ls-head="1">
           {/* Пункт 1: заголовок; пункт 2: подзаголовок одной строкой. */}
           <h1 className="dk-title" data-ls-title="1">
             Знакомства (Love Sakh)
           </h1>
+          {/* 2026-10-03: кнопка «Разместить анкету» ПОД заголовком страницы. */}
+          <div style={{ marginBottom: 10, marginTop: 8 }}>
+            <button className="sk-btn-classic" onClick={openForm} style={{ borderRadius: 0 }}>
+              Разместить анкету
+            </button>
+          </div>
+          {guestHint && (
+            <div style={{ marginBottom: 10, fontSize: 13, color: "#475569" }}>
+              Размещать анкеты могут только зарегистрированные пользователи. Войдите или зарегистрируйтесь.
+            </div>
+          )}
           {/* 2026-10-02: подзаголовок «Бесплатная народная доска знакомств
               Сахалина: текстовая анкета и открытые контакты — без фото,
               возраста и коммерции.» удалён по просьбе пользователя. */}
