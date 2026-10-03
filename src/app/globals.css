@@ -6348,7 +6348,7 @@ div[style*="background-color: rgb(0, 74, 143)"] {
     flex-wrap: nowrap !important;
     gap: 4px !important;
     align-items: center !important;
-    justify-content: flex-start !important;
+    justify-content: flex-end !important;
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch;
   }
