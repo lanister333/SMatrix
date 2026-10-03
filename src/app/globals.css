@@ -6540,3 +6540,18 @@ div[style*="background-color: rgb(0, 74, 143)"] {
     border-top: 0 !important;
   }
 }
+
+/* 2026-10-03 (мобайл): «Рекомендую / Не рекомендую» — кнопка
+   «Поделиться опытом» (.rc-addbtn) без заливки, только контур.
+   background:transparent, color:синий (видно на белом фоне),
+   border сохранён. */
+@media (max-width: 768px) {
+  .rc-addbtn {
+    background: transparent !important;
+    color: #0a5caa !important;
+    border: 1px solid #0a5caa !important;
+  }
+  .rc-addbtn:hover {
+    background: #eef6fb !important;
+  }
+}
