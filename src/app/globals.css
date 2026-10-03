@@ -6444,7 +6444,7 @@ div[style*="background-color: rgb(0, 74, 143)"] {
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: nowrap !important;
-    gap: 4px !important;
+    gap: 0 !important;
     align-items: center !important;
     justify-content: flex-start !important;
     overflow-x: auto !important;
@@ -6480,12 +6480,13 @@ div[style*="background-color: rgb(0, 74, 143)"] {
   }
   .wb-nav-inline,
   .cd-nav-inline {
-    flex: 1 !important;
+    /* 2026-10-03: flex:0 0 auto — не растягивается, кнопки рядом. */
+    flex: 0 0 auto !important;
     min-width: 0 !important;
   }
   .wb-nav-inline button,
   .cd-nav-inline button {
-    flex: 1 !important;
+    flex: 0 0 auto !important;
     min-width: 0 !important;
     text-align: center !important;
     padding: 4px 4px !important;
