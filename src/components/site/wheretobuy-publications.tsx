@@ -968,32 +968,28 @@ export function WhereToBuyPage(props: {
                 — Окно поиска города + «Показать» УБРАНЫ
                 В header-bar остались только nav-кнопки и кнопка «Задать вопрос». */}
             <div className="wb-head-bar">
-              {/* 28.09.2026 (аналог /gde-deshevle):
-                  — Восстановлен H1 «Где купить» (.wb-title, синий #0a5caa) — слева
-                  — Удалена первая nav-кнопка «Где купить» (active имела цвет
-                    #1a1a1a — почти чёрный, была «чёрной надписью»)
-                  — Nav-inline + кнопка «Задать вопрос» обёрнуты в .wb-head-right
-                    и прижаты к правому краю через justify-content: space-between */}
               <div className="wb-title">Где купить</div>
-              <div className="wb-head-right">
-                <div className="wb-nav-inline">
-                  <button className={activeNav === "latest" ? "active" : ""} onClick={() => mineTab("all", "latest")}>
-                    Последние вопросы
-                  </button>
-                  <button className={activeNav === "mine" ? "active" : ""} onClick={() => mineTab("mine", "mine")}>
-                    Мои публикации
-                  </button>
-                </div>
-                <button className="wb-addbtn" onClick={openNewForm}>
-                  {/* 2026-10-02: знак «＋» убран по просьбе пользователя. */}
-                  Задать вопрос
-                </button>
-              </div>
             </div>
             {/* 2026-10-02: надпись «Задавать вопросы могут только зарегистрированные
                 пользователи — войдите или зарегистрируйтесь. Гости могут читать.»
                 удалена по просьбе пользователя. */}
             <div className="wb-desc">Задайте вопрос о том, где на Сахалине купить конкретный товар.</div>
+            {/* 2026-10-03: строка с кнопками перенесена ПОД текст описания
+                (была в .wb-head-bar над описанием). */}
+            <div className="wb-head-right">
+              <div className="wb-nav-inline">
+                <button className={activeNav === "latest" ? "active" : ""} onClick={() => mineTab("all", "latest")}>
+                  Последние вопросы
+                </button>
+                <button className={activeNav === "mine" ? "active" : ""} onClick={() => mineTab("mine", "mine")}>
+                  Мои публикации
+                </button>
+              </div>
+              <button className="wb-addbtn" onClick={openNewForm}>
+                {/* 2026-10-02: знак «＋» убран по просьбе пользователя. */}
+                Задать вопрос
+              </button>
+            </div>
           </div>
 
           <div ref={listTopRef} />

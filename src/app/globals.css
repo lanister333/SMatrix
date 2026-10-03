@@ -6440,7 +6440,7 @@ div[style*="background-color: rgb(0, 74, 143)"] {
   }
   .wb-head-right,
   .cd-head-right {
-    width: auto !important;
+    width: 100% !important;
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: nowrap !important;
