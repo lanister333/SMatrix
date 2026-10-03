@@ -6558,3 +6558,12 @@ div[style*="background-color: rgb(0, 74, 143)"] {
     background: #eef6fb !important;
   }
 }
+
+/* 2026-10-03 (мобайл): «Где купить» и «Где дешевле» — отступ между
+   кнопками (.wb-head-right) и блоком публикаций снизу. */
+@media (max-width: 768px) {
+  .wb-head-right,
+  .cd-head-right {
+    margin-bottom: 8px !important;
+  }
+}
