@@ -339,6 +339,26 @@ export default function FlatBoard(props: FlatBoardProps) {
 
   return (
     <section data-flat-board={props.boardId} aria-label={props.heading} style={{ marginTop: 18 }}>
+      {/* 2026-10-03: кнопка «Добавить объявление» перемещена в ВЕРХ секции
+          (была внизу, после списка). Теперь первая в блоке. */}
+      {!props.hideAddButton && !formOpen && (
+        <div style={{ marginBottom: 10 }}>
+          <button
+            className="sk-btn-classic"
+            data-flat-add="1"
+            onClick={openForm}
+            style={{ borderRadius: 0 }}
+          >
+            Добавить объявление
+          </button>
+        </div>
+      )}
+      {!props.hideAddButton && guestHint && (
+        <div data-flat-guest="1" style={{ marginBottom: 10, fontSize: 13, color: "#475569" }}>
+          {props.guestHintText ??
+            "Добавлять объявления могут только зарегистрированные пользователи. Войдите или зарегистрируйтесь — ссылка в левой колонке форума."}
+        </div>
+      )}
       {/* Минималистичный заголовок блока (без панельной шапки — строгий флэт). */}
       <h2
         style={{
@@ -476,30 +496,8 @@ export default function FlatBoard(props: FlatBoardProps) {
         </button>
       )}
 
-      {/* Пункт 3 ТЗ: кнопка «Добавить объявление» открывает простую форму.
-          ТЗ 2026-09-23 «Объявления»: hideAddButton — кнопка живёт в ЛЕВОЙ
-          колонке страницы, внутренняя скрыта. */}
-      {!props.hideAddButton && !formOpen && (
-        <div style={{ marginTop: 12 }}>
-          <button
-            className="sk-btn-classic"
-            data-flat-add="1"
-            onClick={openForm}
-            style={{ borderRadius: 0 }}
-          >
-            Добавить объявление
-          </button>
-        </div>
-      )}
-
-      {!props.hideAddButton && guestHint && (
-        <div data-flat-guest="1" style={{ marginTop: 12, fontSize: 13, color: "#475569" }}>
-          {/* ТЗ 2026-09-23 «Знакомства»: дословная строка; блоку «Объявления»
-              остаётся прежний текст (проп по умолчанию). */}
-          {props.guestHintText ??
-            "Добавлять объявления могут только зарегистрированные пользователи. Войдите или зарегистрируйтесь — ссылка в левой колонке форума."}
-        </div>
-      )}
+      {/* 2026-10-03: дубликат кнопки «Добавить объявление» (был внизу) —
+          удалён, т.к. кнопка перенесена в верх секции. */}
 
       {formShown && (
         <div
