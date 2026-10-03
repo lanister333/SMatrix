@@ -6489,23 +6489,26 @@ div[style*="background-color: rgb(0, 74, 143)"] {
     flex: 0 0 auto !important;
     min-width: 0 !important;
     text-align: center !important;
-    padding: 4px 4px !important;
-    font-size: 13px !important;
+    /* 2026-10-03: 12px, padding 0 6px, line-height 1.5, min-height 24px —
+       как другие кнопки на странице. */
+    padding: 0 6px !important;
+    font-size: 12px !important;
+    line-height: 1.5 !important;
+    min-height: 24px !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
   }
   .wb-addbtn,
   .cd-addbtn {
-    /* 2026-10-02 (v4): ещё уже по вертикали — padding 1px, line-height:1,
-       height:auto, min-height:0, display:inline-block (не flex). */
+    /* 2026-10-03: height:24px + box-sizing:border-box — как кнопки
+       «Ответить» и «Обсудить» в карточках (24px высота). */
     flex: 0 0 auto !important;
-    display: inline-block !important;
-    height: auto !important;
-    min-height: 0 !important;
     text-align: center !important;
-    padding: 3px 6px !important;
-    font-size: 10px !important;
-    line-height: 1 !important;
+    padding: 0 6px !important;
+    font-size: 12px !important;
+    line-height: 1.5 !important;
+    height: 24px !important;
+    box-sizing: border-box !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
