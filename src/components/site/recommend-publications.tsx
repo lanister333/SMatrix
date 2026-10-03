@@ -1287,22 +1287,8 @@ export function RecommendPage(props: {
               <p className="rc-rulesnote">Отзывы о вашей организации и единственный официальный ответ на каждый из них.</p>
             </div>
           )}
-          <div className="rc-sideblock">
-            <div className="rc-blocktitle">Место</div>
-            <div className="rc-placefilter">
-              <input
-                aria-label="Фильтр по месту"
-                value={place}
-                maxLength={80}
-                onChange={(e) => setPlace(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") applySearch();
-                }}
-                placeholder="Южно-Сахалинск, Холмск…"
-              />
-              <button onClick={applySearch}>Показать</button>
-            </div>
-          </div>
+          {/* 2026-10-03: блок «Место» (rc-sideblock с фильтром по месту)
+              удалён по просьбе пользователя. */}
         </aside>
 
         {/* Центральная колонка — лента */}
