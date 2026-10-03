@@ -229,8 +229,8 @@ export default function CurrencyScreen() {
           <div className="sk-layout sk-layout-page main-grid-container">
           <ForumSideNav />
           <div className="sk-col-main center-column">
-          {/* Подробная компактная таблица курсов с маркерами банков */}
-          <div className="sm-stub-home crt-back">Курсы валют</div>
+          {/* Подробная компактная таблица курсов с маркерами банков
+              2026-10-02: надпись «Курсы валют» удалена по просьбе пользователя. */}
 
           {hasBankRows ? (
             /* ТЗ 2026-09-23 «Доработка»: table-layout:fixed + colgroup —
@@ -280,10 +280,10 @@ export default function CurrencyScreen() {
                     <th style={{ backgroundColor: "#D6E4ED", padding: "2px 8px", fontWeight: "bold", fontSize: "13px", color: "#333", borderRight: "1px solid #1E3A5F", textAlign: "center" }}>Банк</th>
                     {CUR_COLS.map((c) => (
                       <th key={c.key} colSpan={2} style={{ backgroundColor: "#D6E4ED", padding: "2px 8px", fontWeight: "bold", fontSize: "15px", color: "#333", borderRight: c.key !== LAST_CUR_KEY ? "1px solid #1E3A5F" : "1px solid #D6E4ED", textAlign: "center", lineHeight: "1.1" }}>
-                        {c.code}<br />
+                        {/* 2026-10-02: код валюты + символ в одну строку (был <br/>). */}
                         <span style={{ fontSize: "10px", fontWeight: "normal", color: "#666" }}>
                           {c.sign}{c.unit ? ` (${c.unit})` : ""}
-                        </span>
+                        </span>{" "}{c.code}
                       </th>
                     ))}
                   </tr>
