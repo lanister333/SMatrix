@@ -1,0 +1,21 @@
+const {PrismaClient} = require('@prisma/client');
+const p = new PrismaClient();
+(async () => {
+  const users = await p.user.findMany({select: {id: true, nickname: true, email: true, role: true, _count: {select: {topics: true, messages: true, sanctions: true}}}});
+  console.log('== USERS ==');
+  users.forEach(u => console.log(`${u.nickname} | ${u.email} | ${u.role} | topics:${u._count.topics} msgs:${u._count.messages} sanctions:${u._count.sanctions}`));
+  console.log('== TOPICS test ==');
+  const tt = await p.topic.findMany({where: {OR: [{id: {in: [43, 44]}}, {title: {contains: '[AT]'}}, {title: {contains: 'Приёмочная'}}]}, select: {id: true, title: true, deletedAt: true, _count: {select: {messages: true}}}});
+  tt.forEach(t => console.log(`#${t.id} ${t.title.slice(0,40)} | deleted:${!!t.deletedAt} | msgs:${t._count.messages}`));
+  console.log('== APPEALS ==');
+  const ap = await p.decisionAppeal.findMany({select: {id: true, userNick: true, status: true, messageId: true, sanctionId: true}});
+  console.log(JSON.stringify(ap));
+  console.log('== SANCTIONS ==');
+  const s = await p.sanction.findMany({include: {user: {select: {nickname: true}}}});
+  s.forEach(x => console.log(`${x.user.nickname} | ${x.kind} | revoked:${x.revoked}`));
+  console.log('== COMPLAINTS ==');
+  console.log('unresolved:', await p.complaint.count({where: {resolved: false}}), '| all:', await p.complaint.count());
+  console.log('== COUNTS ==');
+  console.log('topics total:', await p.topic.count(), '| messages:', await p.message.count(), '| users:', await p.user.count());
+  await p.$disconnect();
+})();

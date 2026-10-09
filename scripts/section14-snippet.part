@@ -1,0 +1,118 @@
+  // 14) ТЗ 2026-09-22 (раунд 2): присланный компонент SakhMatrixReviewCard —
+  // демо-записи sakh-001…003 в начале ленты, в порядке массива, до карточек БД.
+  // ЦВЕТА: Tailwind v4 отдаёт палитру в OKLCH/Lab, поэтому сравнение — с
+  // эталонным элементом, которому задан тот же класс-утилита (twProp).
+  const twProp = (cls, prop) =>
+    page.evaluate(({ c, p }) => {
+      const el = document.createElement("div");
+      el.className = c;
+      el.style.cssText = "position:fixed;left:-9999px;visibility:hidden";
+      document.body.appendChild(el);
+      const v = getComputedStyle(el)[p];
+      el.remove();
+      return v;
+    }, { c: cls, p: prop });
+  const demoBy = (nick) => page.locator(".rc-col-main .max-w-3xl", { hasText: nick });
+  const d1 = demoBy("IslandVibe_65");
+  const d2 = demoBy("Aniva_Drift");
+  const d3 = demoBy("Korsakov_Fish");
+  const demoAll = page.locator(".rc-col-main .max-w-3xl", { hasText: "SakhMatrix не формирует официальный список" });
+  ok("14. три карточки клиента, в порядке массива, до карточек БД",
+    (await d1.count()) === 1 && (await d2.count()) === 1 && (await d3.count()) === 1 &&
+    (await demoAll.count()) === 3 &&
+    await page.evaluate(() => {
+      const demo = document.querySelector(".rc-col-main .max-w-3xl");
+      const db = document.querySelector(".rc-col-main article.matrix-review-card");
+      return !!(demo && db && (demo.compareDocumentPosition(db) & Node.DOCUMENT_POSITION_FOLLOWING));
+    }));
+  // 14a) шапка sakh-001: крошки 10px uppercase tracking-widest zinc-400, строка автора
+  const d1cat = d1.locator("span").first();
+  ok("14a. sakh-001: крошки 1-в-1 (10px/uppercase/zinc-400/tracking-widest), «Автор • локация • дата» 14px/700/zinc-800",
+    norm(await d1cat.textContent()) === "Кулинарная книга ▸ Сахалинская кухня ▸ Где поесть" &&
+    (await st(d1cat, "fontSize")) === "10px" &&
+    (await st(d1cat, "textTransform")) === "uppercase" &&
+    (await st(d1cat, "letterSpacing")) === "1px" &&
+    (await st(d1cat, "color")) === (await twProp("text-zinc-400", "color")) &&
+    norm(await d1.locator("h4").textContent()).startsWith("IslandVibe_65 • Южно-Сахалинск, ул. Пуркаева • 21.09.2026") &&
+    (await st(d1.locator("h4"), "fontSize")) === "14px" &&
+    (await st(d1.locator("h4"), "fontWeight")) === "700" &&
+    (await st(d1.locator("h4"), "color")) === (await twProp("text-zinc-800", "color")));
+  const d1badge = d1.locator("span", { hasText: "Предупреждаю" });
+  ok("14b. sakh-001: бейдж «⚠️ Предупреждаю» (border-red-400, text-red-700, bg-red-50/30)",
+    norm(await d1badge.textContent()) === "⚠️ Предупреждаю" &&
+    (await st(d1badge, "borderTopColor")) === (await twProp("border border-red-400", "borderTopColor")) &&
+    (await st(d1badge, "color")) === (await twProp("text-red-700", "color")) &&
+    (await st(d1badge, "backgroundColor")) === (await twProp("bg-red-50/30", "backgroundColor")));
+  ok("14c. sakh-001: текст опыта 1-в-1 (14px zinc-700, whitespace-pre-line)",
+    norm(await d1.locator("p").first().textContent()).startsWith("Взяли пян-се на вынос в точке на Пуркаева") &&
+    (await st(d1.locator("p").first(), "fontSize")) === "14px" &&
+    (await st(d1.locator("p").first(), "color")) === (await twProp("text-zinc-700", "color")) &&
+    (await st(d1.locator("p").first(), "whiteSpace")) === "pre-line");
+  const d1hh = d1.locator("div", { hasText: "Особое упоминание сотрудника:" }).last();
+  ok("14d. sakh-001: «Особое упоминание сотрудника:» (bg-zinc-50, граница слева zinc-300, 12px) + Наталья",
+    norm(await d1hh.textContent()).includes("Особое упоминание сотрудника:") &&
+    norm(await d1hh.textContent()).includes("продавца Наталью") &&
+    (await st(d1hh, "backgroundColor")) === (await twProp("bg-zinc-50", "backgroundColor")) &&
+    (await st(d1hh, "borderLeftWidth")) === "1px" &&
+    (await st(d1hh, "borderLeftColor")) === (await twProp("border border-zinc-300", "borderLeftColor")) &&
+    (await st(d1hh, "fontSize")) === "12px");
+  const d1disc = d1.locator("p", { hasText: "SakhMatrix не формирует" });
+  ok("14e. sakh-001: глобальный дисклеймер [2] с ником автора (11px zinc-400)",
+    norm(await d1disc.textContent()).includes("Публикация отражает личный опыт автора") &&
+    norm(await d1disc.locator("span").textContent()) === "IslandVibe_65" &&
+    norm(await d1disc.textContent()).includes("SakhMatrix не формирует официальный список «плохих» или «хороших» организаций и не является автором данного утверждения. [2]") &&
+    (await st(d1disc, "fontSize")) === "11px" &&
+    (await st(d1disc, "color")) === (await twProp("text-zinc-400", "color")));
+  const d1label = d1.locator("span", { hasText: "Официальная позиция организации" });
+  const d1resp = d1.locator("div", { hasText: "«Провели проверку технологических карт" }).last();
+  ok("14f. sakh-001: «Официальная позиция организации» (10px uppercase teal-600) + ответ в «кавычках» (bg-teal-50/20, рейка 2px teal-600)",
+    norm(await d1label.textContent()) === "Официальная позиция организации" &&
+    (await st(d1label, "fontSize")) === "10px" &&
+    (await st(d1label, "textTransform")) === "uppercase" &&
+    (await st(d1label, "color")) === (await twProp("text-teal-600", "color")) &&
+    norm(await d1resp.locator("p").textContent()).startsWith("«Провели проверку технологических карт на точке Пуркаева за 21.09") &&
+    (await st(d1resp.locator("p"), "fontStyle")) === "italic" &&
+    (await st(d1resp, "borderLeftWidth")) === "2px" &&
+    (await st(d1resp, "borderLeftColor")) === (await twProp("border border-teal-600", "borderLeftColor")) &&
+    (await st(d1resp, "backgroundColor")) === (await twProp("bg-teal-50/20", "backgroundColor")));
+  ok("14g. sakh-002: бейдж «👍 Рекомендую» (border-emerald-500, text-emerald-700, bg-emerald-50/40) + ответ",
+    norm(await d2.locator("span", { hasText: "Рекомендую" }).textContent()) === "👍 Рекомендую" &&
+    (await st(d2.locator("span", { hasText: "Рекомендую" }), "borderTopColor")) === (await twProp("border border-emerald-500", "borderTopColor")) &&
+    (await st(d2.locator("span", { hasText: "Рекомендую" }), "color")) === (await twProp("text-emerald-700", "color")) &&
+    (await st(d2.locator("span", { hasText: "Рекомендую" }), "backgroundColor")) === (await twProp("bg-emerald-50/40", "backgroundColor")) &&
+    norm(await d2.locator("h4").textContent()).startsWith("Aniva_Drift • с. Стародубское / Корсаков • 18.09.2026") &&
+    norm(await d2.locator("p").last().textContent()).startsWith("«Благодарим за оценку нашего труда"));
+  ok("14h. sakh-003: warning, крошки с «Цены», блока выделения НЕТ (null), ответ 1-в-1",
+    (await d3.count()) === 1 &&
+    (await d3.locator("span", { hasText: "Предупреждаю" }).count()) === 1 &&
+    norm(await d3.locator("span").first().textContent()) === "Товары и услуги ▸ Цены ▸ Отзывы и рекомендации" &&
+    (await d3.locator("div", { hasText: "Особое упоминание сотрудника:" }).count()) === 0 &&
+    norm(await d3.locator("h4").textContent()).startsWith("Korsakov_Fish • Корсаков / Южно-Сахалинск • 20.09.2026") &&
+    norm(await d3.locator("p").last().textContent()).startsWith("«Мы дорожим репутацией нашего корсаковского цеха"));
+  ok("14i. карточки статичные по дизайну: без button/a/input; корень div.max-w-3xl.select-none, рамка zinc-200, p-6",
+    (await d1.locator("button,a,input,select,textarea").count()) === 0 &&
+    (await d2.locator("button,a,input,select,textarea").count()) === 0 &&
+    (await d3.locator("button,a,input,select,textarea").count()) === 0 &&
+    (await d1.evaluate((el) => !el.classList.contains("matrix-review-card") && el.classList.contains("select-none"))) &&
+    (await st(d1, "borderTopColor")) === (await twProp("border border-zinc-200", "borderTopColor")) &&
+    (await st(d1, "paddingTop")) === "24px");
+  await d1.screenshot({ path: `${SHOTS}/demo-sakh-001.png` });
+  await d2.screenshot({ path: `${SHOTS}/demo-sakh-002.png` });
+  await d3.screenshot({ path: `${SHOTS}/demo-sakh-003.png` });
+
+  // 14j/14k) демо-блок скрыт в «Моих публикациях» и при поиске
+  // (?mine=1 только пишется в URL при клике, при загрузке не читается —
+  // вкладку включаем кликом, как пользователь)
+  await pageAuthor.locator(".rc-navlist button", { hasText: "Мои публикации" }).click();
+  await pageAuthor.waitForTimeout(900);
+  ok("14j. «Мои публикации»: демо-карточек нет",
+    (await pageAuthor.locator(".rc-col-main .max-w-3xl", { hasText: "SakhMatrix не формирует" }).count()) === 0);
+  await page.locator('.rc-search input[aria-label="Поиск по публикациям"]').fill("пян-се");
+  await page.locator(".rc-search button", { hasText: "Найти" }).click();
+  await page.waitForTimeout(900);
+  ok("14k. поиск: демо-карточки скрыты",
+    (await demoAll.count()) === 0);
+  await page.locator(".rc-search-reset").click();
+  await page.waitForTimeout(700);
+  ok("14k-2. сброс поиска: демо-карточки вернулись",
+    (await demoAll.count()) === 3);
