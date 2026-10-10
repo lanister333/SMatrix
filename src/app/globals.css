@@ -7313,3 +7313,265 @@ div[style*="background-color: rgb(0, 74, 143)"] {
     line-height: 1.2 !important;
   }
 }
+
+/* ============================================================
+   Fix v4 2026-10-10: правильное расположение кнопок ЖКХ на мобильном.
+   
+   3 сценария:
+   1. Есть org-response → блок на всю ширину, кнопка «Обсудить» ниже
+   2. OrgRep без ответа → 2 кнопки в один ряд («Ответ организации» + «Обсудить»)
+   3. Обычный пользователь → только кнопка «Обсудить»
+   ============================================================ */
+
+@media (max-width: 768px) {
+  /* Контейнер — flex-wrap:wrap, чтобы дочерние переносились */
+  .gkf-card-foot {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: stretch !important;
+    align-items: stretch !important;
+    gap: 6px !important;
+    margin-top: 8px !important;
+    width: 100% !important;
+  }
+
+  /* Блок официального ответа — ВСЕГДА на всю ширину, отдельной строкой */
+  .gkf-org-response {
+    width: 100% !important;
+    flex: 1 1 100% !important;
+    max-width: 100% !important;
+    margin: 0 0 8px 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Когда org-response есть — кнопка «Обсудить» занимает всю ширину (отдельной строкой) */
+  .gkf-card-foot:has(.gkf-org-response) .gkf-btn-forum {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-top: 4px !important;
+  }
+
+  /* Когда org-response ЕЩЁ НЕТ (есть только кнопка «Ответ организации») — обе кнопки в один ряд */
+  .gkf-card-foot:not(:has(.gkf-org-response)) .gkf-btn-org-response,
+  .gkf-card-foot:not(:has(.gkf-org-response)) .gkf-btn-forum {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  /* Общие правила для кнопок */
+  .gkf-btn-forum,
+  .gkf-btn-org-response {
+    display: flex !important;
+    width: auto;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+    text-align: center !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 7px 8px !important;
+    font-size: 12px !important;
+    line-height: 1.3 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* Узкий мобильный (≤480px) */
+@media (max-width: 480px) {
+  .gkf-card-foot {
+    gap: 4px !important;
+    margin-top: 6px !important;
+  }
+  .gkf-btn-forum,
+  .gkf-btn-org-response {
+    padding: 7px 6px !important;
+    font-size: 11.5px !important;
+    line-height: 1.25 !important;
+  }
+  .gkf-org-response {
+    margin-bottom: 6px !important;
+  }
+}
+
+/* Очень узкий (≤360px) */
+@media (max-width: 360px) {
+  .gkf-btn-forum,
+  .gkf-btn-org-response {
+    padding: 6px 4px !important;
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+  }
+}
+
+/* ============================================================
+   Fix 2026-10-10: унификация цветов всех кнопок «Обсудить на форуме».
+   Все активные состояния (.is-none, .is-open) → БИРЮЗОВЫЕ.
+   Закрытые/архивные (.is-closed, .is-archived) → СЕРЫЕ (без изменений).
+   
+   Синие #0a5caa → Бирюзовые var(--sm-turquoise,#06cdbd) / #0d9488
+   ============================================================ */
+
+/* Подслушано Сахалин — was синяя #0a5caa */
+.oh-btn-forum.is-none {
+  background: var(--sm-turquoise, #06cdbd) !important;
+  color: #fff !important;
+}
+.oh-btn-forum.is-none:hover {
+  background: #05a79b !important;
+}
+
+/* ЖКХ — was синяя #0a5caa */
+.gkh-btn-forum.is-none {
+  background: var(--sm-turquoise, #06cdbd) !important;
+  color: #fff !important;
+}
+.gkh-btn-forum.is-none:hover {
+  background: #05a79b !important;
+}
+
+/* О работодателях — was синяя #0a5caa */
+.ep-btn-forum.is-none {
+  background: var(--sm-turquoise, #06cdbd) !important;
+  color: #fff !important;
+}
+.ep-btn-forum.is-none:hover {
+  background: #05a79b !important;
+}
+
+/* Гарантия — что is-open тоже бирюзовый (уже бирюзовый, фикс на будущее) */
+.oh-btn-forum.is-open,
+.gkh-btn-forum.is-open,
+.ep-btn-forum.is-open,
+.wb-btn-forum.is-open,
+.cd-btn-forum.is-open,
+.rc-btn-forum.is-open {
+  background: var(--sm-turquoise, #06cdbd) !important;
+  color: #fff !important;
+}
+.oh-btn-forum.is-open:hover,
+.gkh-btn-forum.is-open:hover,
+.ep-btn-forum.is-open:hover,
+.wb-btn-forum.is-open:hover,
+.cd-btn-forum.is-open:hover,
+.rc-btn-forum.is-open:hover {
+  background: #05a79b !important;
+}
+
+/* Серые (закрытые/архивные) — без изменений, для целостности */
+.oh-btn-forum.is-closed,
+.oh-btn-forum.is-archived,
+.gkh-btn-forum.is-closed,
+.gkh-btn-forum.is-archived,
+.ep-btn-forum.is-closed,
+.ep-btn-forum.is-archived,
+.wb-btn-forum.is-closed,
+.wb-btn-forum.is-archived,
+.cd-btn-forum.is-closed,
+.cd-btn-forum.is-archived,
+.rc-btn-forum.is-closed,
+.rc-btn-forum.is-archived {
+  background: #e2e6ea !important;
+  color: #55606c !important;
+  cursor: default !important;
+}
+
+/* ============================================================
+   Fix 2026-10-10: Подслушано — автор/дата/место в шапке над заголовком.
+   Кнопка «Обсудить на форуме» — справа внизу, бирюзовая.
+   ============================================================ */
+
+/* Шапка с метаданными — над заголовком */
+.oh-item .oh-item-meta-top {
+  font-size: 12px;
+  color: #56657a;
+  margin-bottom: 4px;
+  padding: 0 0 4px;
+  border-bottom: 1px solid #e4e8ee;
+  line-height: 1.4;
+}
+
+.oh-item .oh-item-meta-top b {
+  color: #334155;
+  font-weight: 700;
+}
+
+/* Стандартная мета (в футере) — скрываем, не нужна */
+.oh-foot .oh-footinfo .oh-item-meta {
+  display: none;
+}
+
+/* Футер: кнопки слева, «Обсудить» справа внизу */
+.oh-foot {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* Кнопка «Обсудить» — справа, бирюзовая (повторим для надёжности) */
+.oh-btn-forum.is-none,
+.oh-btn-forum.is-open {
+  background: var(--sm-turquoise, #06cdbd) !important;
+  color: #fff !important;
+  border: 0;
+  border-radius: 2px;
+  padding: 6px 12px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: auto;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.oh-btn-forum.is-none:hover,
+.oh-btn-forum.is-open:hover {
+  background: #05a79b !important;
+  color: #fff !important;
+}
+
+/* Закрытые/архивные — серые (без изменений) */
+.oh-btn-forum.is-closed,
+.oh-btn-forum.is-archived {
+  background: #e2e6ea !important;
+  color: #55606c !important;
+  cursor: default !important;
+}
+
+/* На мобильном — кнопка на всю ширину */
+@media (max-width: 480px) {
+  .oh-foot {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .oh-actrow {
+    justify-content: flex-start !important;
+  }
+  .oh-btn-forum.is-none,
+  .oh-btn-forum.is-open {
+    margin-left: 0 !important;
+    width: 100%;
+    text-align: center;
+    padding: 8px 12px;
+    font-size: 12.5px;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+  /* Шапка с метаданными — компактнее */
+  .oh-item .oh-item-meta-top {
+    font-size: 11.5px;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}

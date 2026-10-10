@@ -261,7 +261,7 @@ const REVIEW_FOOTER_FIXED_HTML = `<!-- ИСПРАВЛЕННЫЙ ПОДВАЛ К�
       // Выводим финальный зафиксированный ответ
       document.getElementById('fixed-final-viewport').innerHTML = \`
         <div class="official-final-rendered-answer" style="background: #e2e8f0; border-left: 4px solid #0f766e; padding: 14px; border-radius: 4px; margin-top: 12px;">
-          <strong style="font-size: 12px; color: #0f766e; text-transform: uppercase; display: block; margin-bottom: 4px;">Официальный ответ организации:</strong>
+          <strong style="font-size: 12px; color: #0f766e; text-transform: uppercase; display: block; margin-bottom: 4px;">Ответ организации:</strong>
           <p style="margin: 0; font-size: 13px; color: #1e293b; line-height: 1.5;">«\${answerText}»</p>
           <span style="font-size: 11px; color: #64748b; display: block; margin-top: 6px; font-weight: 600;">🔒 Ответ зафиксирован. Цепочка обсуждения закрыта по Манифесту SakhMatrix.</span>
         </div>
@@ -457,7 +457,7 @@ function RecRow(props: {
       {hasResponse && (
         <div className="rc-answer" data-rc-answer={item.id}>
           <div className="rc-answermeta">
-            <span className="rc-answerbadge">Официальный ответ организации</span>
+            <span className="rc-answerbadge">Ответ организации</span>
             <span className="rc-answerdate">{fmtResponseDate(item.orgResponseAt!)}</span>
           </div>
           <div className="rc-answertext">
@@ -635,7 +635,7 @@ function RecOrgResponseForm(props: {
 
   return (
     <div className="rc-orgform">
-      <div className="rc-orgform-title">Официальный ответ организации{props.orgName ? ` — ${props.orgName}` : ""}</div>
+      <div className="rc-orgform-title">Ответ организации{props.orgName ? ` — ${props.orgName}` : ""}</div>
       <p className="rc-orgform-note">
         Представитель может дать один официальный публичный ответ: позицию, пояснение обстоятельств или план решения.
         Бесконечная переписка внутри отзыва не ведётся.
@@ -645,7 +645,7 @@ function RecOrgResponseForm(props: {
         maxLength={4000}
         onChange={(e) => setText(e.target.value)}
         style={{ minHeight: 90 }}
-        placeholder="Официальный ответ организации…"
+        placeholder="Ответ организации…"
         disabled={busy || props.busy}
       />
       {err && <div className="sk-modal-err">{err}</div>}

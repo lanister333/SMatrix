@@ -647,7 +647,7 @@ export function GkhPage(props: {
                     {/* 29.09.2026: орг. ответ — ВО ВСЮ ШИРИНУ карточки. */}
                     {it.orgResponseText ? (
                       <div className="gkf-org-response" style={{ width: "100%", padding: "6px 8px", background: "#e0f2fe", border: "1px solid #0284c7", borderRadius: "2px", marginBottom: "6px", fontSize: "13px", boxSizing: "border-box" }}>
-                        <b style={{ color: "#075985" }}>🏢 Официальный ответ организации</b>
+                        <b style={{ color: "#075985" }}>🏢 Ответ организации</b>
                         {it.orgResponseByName ? <span style={{ color: "#56657a" }}> · {it.orgResponseByName}</span> : null}
                         <p style={{ margin: "4px 0 0", color: "#1a2433" }}>{it.orgResponseText}</p>
                       </div>

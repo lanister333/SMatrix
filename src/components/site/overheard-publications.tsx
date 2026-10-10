@@ -122,6 +122,17 @@ function OverheardRow(props: {
           {item.tag === "rumor" ? "⚠ Слухи и молва" : item.tag === "observation" ? "👁 Наблюдение жителя" : "ℹ Сообщение жителя"}
         </span>
       )}
+      {/* ШАПКА: автор + дата + место — СВЕРХУ над заголовком (Fix 2026-10-10) */}
+      <div className="oh-item-meta oh-item-meta-top">
+        <b>Автор:</b> <b className={nickGenderClass(item.authorName, item.authorGender)}>{item.authorName}</b> · {fmtDateTime(item.createdAt)}
+        {item.place && (
+          <>
+            {" "}
+            · <b>Место:</b> {item.place}
+          </>
+        )}
+        {item.editedAt && " · изменено автором"}
+      </div>
       <div className="oh-item-title">{item.title}</div>
       <div className="oh-item-text">{item.text}</div>
       {item.tag === "rumor" && (
@@ -137,40 +148,26 @@ function OverheardRow(props: {
         <div className="oh-humannote">Сообщение отправлено на дополнительную проверку человеку-модератору.</div>
       )}
       <div className="oh-foot">
-        <div className="oh-footinfo">
-          <div className="oh-item-meta">
-            <b>Автор:</b> <b className={nickGenderClass(item.authorName, item.authorGender)}>{item.authorName}</b> · {fmtDateTime(item.createdAt)}
-            {item.place && (
-              <>
-                {" "}
-                · <b>Место:</b> {item.place}
-              </>
-            )}
-            {item.editedAt && " · изменено автором"}
-          </div>
-          <div className="oh-actrow">
-            {own ? (
-              <>
-                <button className="oh-act" disabled={props.busy} onClick={() => props.onEdit(item)}>
-                  Редактировать
-                </button>
-                <button className="oh-act oh-del" disabled={props.busy} onClick={() => props.onDelete(item)}>
-                  Удалить
-                </button>
-              </>
-            ) : (
-              user && (
-                <button className="oh-report" onClick={() => props.onComplain(item)}>
-                  Пожаловаться
-                </button>
-              )
-            )}
-          </div>
+        <div className="oh-actrow">
+          {own ? (
+            <>
+              <button className="oh-act" disabled={props.busy} onClick={() => props.onEdit(item)}>
+                Редактировать
+              </button>
+              <button className="oh-act oh-del" disabled={props.busy} onClick={() => props.onDelete(item)}>
+                Удалить
+              </button>
+            </>
+          ) : (
+            user && (
+              <button className="oh-report" onClick={() => props.onComplain(item)}>
+                Пожаловаться
+              </button>
+            )
+          )}
         </div>
         {/*
-          Кнопка состояния форума — непосредственно под текстом публикации,
-          рядом с автором и датой (ТЗ п.5). Обсуждений внутри страницы нет:
-          это единственный путь к обсуждению (ТЗ п.13).
+          Кнопка состояния форума — справа внизу, бирюзовая (Fix 2026-10-10)
         */}
         {item.topicId ? (
           <button
