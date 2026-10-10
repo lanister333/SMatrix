@@ -372,15 +372,18 @@ function WhereToBuyRow(props: {
           </div>
         )}
 
-        {/* === СТРОКА 3: 📍 Ответить (на всю ширину) === */}
-        <div className="wb-row wb-row-3">
-          <button className="wb-act wb-answerbtn" disabled={props.busy || answerBusy} onClick={toggleAnswer}>
+        {/* === Fix 2026-10-11: «📍 Ответить» + «💬 Обсудить на форуме» в ОДНУ строку
+            (на мобильных и десктопе). Раньше были на двух разных строках
+            (wb-row-3 + wb-row-4), пользователь просил объединить — см. CSS
+            .wb-row-actions, которое кладёт две кнопки рядом 50/50. === */}
+        <div className="wb-row wb-row-actions" data-wb-row-actions={item.id}>
+          <button
+            className="wb-act wb-answerbtn"
+            disabled={props.busy || answerBusy}
+            onClick={toggleAnswer}
+          >
             {ANSWER_BUTTON_LABEL}
           </button>
-        </div>
-
-        {/* === СТРОКА 4: 💬 Обсудить на форуме (бирюзовая, на всю ширину) === */}
-        <div className="wb-row wb-row-4">
           <button
             className={`wb-act wb-btn-forum is-${item.topicId ? item.topicState ?? "open" : "none"}`}
             disabled={props.busy}
