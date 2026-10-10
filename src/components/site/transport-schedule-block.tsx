@@ -79,10 +79,6 @@ export default function TransportScheduleBlock() {
   const flights = expanded ? allFlights : allFlights.slice(0, 5);
   const hiddenCount = Math.max(0, allFlights.length - 5);
 
-  // Стиль блока «Время» (.sakh-clock) через inline:
-  // — белая карточка, border 1px solid #4A688C, тень, без скруглений
-  // — шапка: тёмно-синяя #1E3A5F, текст по центру, 13px bold
-  // — тело: белое, компактные отступы
   const cardStyle: React.CSSProperties = {
     backgroundColor: "#FFFFFF",
     border: "1px solid #4A688C",
@@ -128,14 +124,9 @@ export default function TransportScheduleBlock() {
 
   return (
     <section style={cardStyle} aria-label="Расписание транспорта">
-      {/* Шапка — в стиле блока «Время» */}
-      <div style={headStyle}>
-        🚍 Расписание транспорта
-      </div>
+      <div style={headStyle}>🚍 Расписание транспорта</div>
 
-      {/* Тело */}
       <div style={bodyStyle}>
-        {/* Вкладки */}
         <div style={tabsWrapStyle}>
           {TABS.map((t) => {
             const sec = data?.sections.find((s) => s.id === t.id);
@@ -185,15 +176,10 @@ export default function TransportScheduleBlock() {
           })}
         </div>
 
-        {/* Таблица в рамке */}
         <div style={tableStyle}>
-        {/* Заголовок колонок */}
         <div
+          className="ts-row ts-row-head"
           style={{
-            display: "grid",
-            gridTemplateColumns: "55px 70px 1fr 1.5fr 90px",
-            gap: "8px",
-            padding: "4px 6px",
             fontSize: "12px",
             fontWeight: 700,
             color: "#334155",
@@ -203,14 +189,13 @@ export default function TransportScheduleBlock() {
             backgroundColor: "#e8eef5",
           }}
         >
-          <span>Время</span>
-          <span>Тип</span>
-          <span>Рейс</span>
-          <span>Маршрут</span>
-          <span>Статус</span>
+          <span className="ts-col-time">Время</span>
+          <span className="ts-col-type">Тип</span>
+          <span className="ts-col-route">Рейс</span>
+          <span className="ts-col-direction">Маршрут</span>
+          <span className="ts-col-status">Статус</span>
         </div>
 
-        {/* Рейсы */}
         {flights.length === 0 ? (
           <div style={{ padding: "10px", textAlign: "center", color: "#56657a", fontSize: "12px" }}>
             Рейсов нет
@@ -222,12 +207,9 @@ export default function TransportScheduleBlock() {
               return (
                 <div
                   key={i}
+                  className="ts-row"
                   style={{
-                    display: "grid",
-                    gridTemplateColumns: "55px 70px 1fr 1.5fr 90px",
-                    gap: "8px",
                     alignItems: "center",
-                    padding: "4px 6px",
                     fontSize: "12px",
                     color: "#2A3B50",
                     borderBottom: i < flights.length - 1 ? "1px solid #eef2f6" : "none",
@@ -235,19 +217,19 @@ export default function TransportScheduleBlock() {
                     background: i % 2 === 0 ? "transparent" : "#f7f9fb",
                   }}
                 >
-                  <span style={{ fontWeight: 700, color: "#0a5caa", fontSize: "13px", fontVariantNumeric: "tabular-nums" }}>
+                  <span className="ts-col-time" style={{ fontWeight: 700, color: "#0a5caa", fontSize: "13px", fontVariantNumeric: "tabular-nums" }}>
                     {f.time}
                   </span>
-                  <span style={{ color: "#334155", fontSize: "12px", whiteSpace: "normal", wordBreak: "break-word" }}>
+                  <span className="ts-col-type" style={{ color: "#334155", fontSize: "12px", whiteSpace: "normal", wordBreak: "break-word" }}>
                     {abbreviate(f.type)}
                   </span>
-                  <span style={{ fontWeight: 600, fontSize: "12px", color: "#1E3A5F", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={f.route}>
+                  <span className="ts-col-route" style={{ fontWeight: 600, fontSize: "12px", color: "#1E3A5F", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={f.route}>
                     {abbreviate(f.route)}
                   </span>
-                  <span style={{ color: "#2A3B50", fontSize: "12.5px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={f.direction}>
+                  <span className="ts-col-direction" style={{ color: "#2A3B50", fontSize: "12.5px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={f.direction}>
                     {abbreviate(f.direction)}
                   </span>
-                  <span style={{ fontSize: "11px", color: "#334155" }}>
+                  <span className="ts-col-status" style={{ fontSize: "11px", color: "#334155" }}>
                     {si && (
                       <span style={{ display: "inline-flex", alignItems: "center", gap: "2px" }}>
                         <span>{si.icon}</span>
@@ -262,7 +244,6 @@ export default function TransportScheduleBlock() {
         )}
         </div>
 
-        {/* Показать ещё */}
         {hiddenCount > 0 && !expanded && (
           <button
             onClick={() => setExpanded(true)}
@@ -278,13 +259,13 @@ export default function TransportScheduleBlock() {
               fontSize: "11px",
               color: "#0a5caa",
               fontFamily: "inherit",
-              fontWeight: 600,
+              fontWeight: 700,
             }}
           >
-            Показать ещё {hiddenCount}
+            ▼ Показать ещё {hiddenCount}
           </button>
         )}
-        {expanded && allFlights.length > 5 && (
+        {expanded && (
           <button
             onClick={() => setExpanded(false)}
             style={{
@@ -297,12 +278,12 @@ export default function TransportScheduleBlock() {
               borderTop: "1px dashed #d0d9e6",
               cursor: "pointer",
               fontSize: "11px",
-              color: "#0a5caa",
+              color: "#56657a",
               fontFamily: "inherit",
-              fontWeight: 600,
+              fontWeight: 700,
             }}
           >
-            Свернуть ↑
+            ▲ Свернуть
           </button>
         )}
       </div>

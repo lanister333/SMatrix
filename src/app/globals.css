@@ -6948,3 +6948,114 @@ div[style*="background-color: rgb(0, 74, 143)"] {
 .oh-clock-block .oh-truthnote{color:#475569;font-size:12.5px;line-height:1.5;margin-bottom:7px}
 .oh-clock-block .oh-addbtn{display:block;width:100%;cursor:pointer;background:#0f766e;color:#fff;border:0;padding:8px 10px;font-family:inherit;font-size:13px;font-weight:700;text-align:center}
 .oh-clock-block .oh-addbtn:hover{background:#0d635b}
+
+/* ============================================================
+   Расписание транспорта — адаптивная таблица для мобильных
+   ============================================================ */
+
+/* Десктоп и планшет (>600px): 5 колонок как раньше */
+.ts-row {
+  display: grid;
+  grid-template-columns: 55px 70px minmax(0, 1fr) minmax(0, 1.5fr) 90px;
+  gap: 8px;
+  padding: 4px 6px;
+  box-sizing: border-box;
+}
+
+/* Средний экран (481-600px): 4 колонки — Тип скрыт */
+@media (max-width: 600px) {
+  .ts-row {
+    grid-template-columns: 48px minmax(0, 1fr) minmax(0, 1.3fr) 78px;
+    gap: 6px;
+    padding: 4px 5px;
+  }
+  .ts-col-type {
+    display: none;
+  }
+  .ts-row-head .ts-col-type {
+    display: none;
+  }
+}
+
+/* Узкий мобильный (≤480px): 3 колонки — Время / Рейс+Маршрут / Статус */
+@media (max-width: 480px) {
+  .ts-row {
+    grid-template-columns: 42px minmax(0, 1fr) 62px;
+    gap: 4px;
+    padding: 3px 4px;
+    font-size: 11px !important;
+  }
+  .ts-row-head {
+    font-size: 10px !important;
+  }
+  .ts-col-direction {
+    display: none;
+  }
+  .ts-row-head .ts-col-direction {
+    display: none;
+  }
+  .ts-col-time {
+    font-size: 12px !important;
+  }
+  .ts-col-status {
+    font-size: 10px !important;
+  }
+}
+
+/* Очень узкий (≤360px) — ультра-компактно */
+@media (max-width: 360px) {
+  .ts-row {
+    grid-template-columns: 38px minmax(0, 1fr) 56px;
+    gap: 3px;
+    padding: 2px 3px;
+  }
+  .ts-col-time {
+    font-size: 11px !important;
+  }
+}
+
+/* ============================================================
+   Fix 2026-10-10: кнопка «Обсудить на форуме» в карточках отзыва
+   на мобильном выходит за рамки (.rc-btn-forum white-space:nowrap).
+   Решение: на мобильном — normal + flex-shrink:1 + padding меньше.
+   ============================================================ */
+
+/* На мобильном (≤640px) — кнопка в democard не должна выходить за рамки */
+@media (max-width: 640px) {
+  .rc-democard .rc-demo-forumrow.rc-in {
+    flex-wrap: wrap;
+    justify-content: stretch;
+    margin: 8px 0 0;
+  }
+  .rc-democard .rc-demo-forumrow.rc-in .rc-btn-forum {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    white-space: normal !important;
+    text-align: center;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    padding: 6px 8px;
+    font-size: 12px;
+    line-height: 1.25;
+  }
+}
+
+/* На очень узком (≤360px) — ещё компактнее */
+@media (max-width: 360px) {
+  .rc-democard .rc-demo-forumrow.rc-in .rc-btn-forum {
+    padding: 5px 4px;
+    font-size: 11.5px;
+  }
+}
+
+/* Общее правило для всех .rc-btn-forum на мобильном — гибкая ширина */
+@media (max-width: 480px) {
+  .rc-btn-forum {
+    white-space: normal !important;
+    flex-shrink: 1;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}
