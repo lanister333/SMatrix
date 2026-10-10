@@ -9004,3 +9004,157 @@ div[style*="background-color: rgb(0, 74, 143)"] {
 .cd-row-actions-other .cd-btn-forum:hover {
   background: #05a79b !important;
 }
+
+/* === Fix mobile: равные отступы в шапке «Где купить» / «Где дешевле» === */
+@media (max-width: 768px) {
+  .wb-head-bar,
+  .cd-head-bar {
+    justify-content: space-between !important;
+    gap: 0 !important;
+  }
+  .wb-head-right,
+  .cd-head-right {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    gap: 0 !important;
+  }
+  .wb-nav-inline,
+  .cd-nav-inline {
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 0 !important;
+  }
+  .wb-nav-inline button,
+  .cd-nav-inline button {
+    padding: 0 6px !important;
+    margin: 0 !important;
+  }
+  .wb-addbtn,
+  .cd-addbtn {
+    margin-left: 0 !important;
+    padding: 4px 6px !important;
+  }
+}
+
+/* === Fix mobile: растянуть шапку по горизонтали === */
+@media (max-width: 768px) {
+  .wb-head-bar,
+  .cd-head-bar {
+    width: 100% !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+  }
+  .wb-title,
+  .cd-title {
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+  }
+  .wb-head-right,
+  .cd-head-right {
+    flex: 1 1 auto !important;
+    width: auto !important;
+    justify-content: flex-end !important;
+  }
+  .wb-nav-inline,
+  .cd-nav-inline {
+    flex: 0 0 auto !important;
+  }
+  .wb-addbtn,
+  .cd-addbtn {
+    flex: 0 0 auto !important;
+    margin-left: 12px !important;
+  }
+}
+
+/* === Fix mobile: равные отступы для «Мои публикации» === */
+@media (max-width: 768px) {
+  .wb-nav-inline,
+  .cd-nav-inline {
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  .wb-nav-inline button,
+  .cd-nav-inline button {
+    padding: 0 8px !important;
+    margin: 0 !important;
+  }
+}
+
+/* === Fix mobile: «Где купить» крупнее + равные отступы «Мои публикации» === */
+@media (max-width: 768px) {
+  .wb-title,
+  .cd-title {
+    font-size: 28px !important;
+    flex-shrink: 0 !important;
+  }
+  .wb-head-bar,
+  .cd-head-bar {
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+  .wb-head-right,
+  .cd-head-right {
+    flex: 1 1 auto !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+  }
+  .wb-nav-inline,
+  .cd-nav-inline {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    flex: 0 0 auto !important;
+  }
+  .wb-nav-inline button,
+  .cd-nav-inline button {
+    padding: 0 8px !important;
+    margin: 0 !important;
+  }
+  .wb-addbtn,
+  .cd-addbtn {
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+    padding: 4px 8px !important;
+  }
+}
+
+
+/* === Fix mobile: «Где купить» на отдельной строке === */
+@media (max-width: 768px) {
+  .wb-title,
+  .cd-title {
+    width: 100% !important;
+    flex: 1 1 100% !important;
+    margin-bottom: 4px !important;
+  }
+  .wb-head-right,
+  .cd-head-right {
+    width: 100% !important;
+    flex: 1 1 100% !important;
+    justify-content: space-between !important;
+  }
+}
+
+/* === Fix mobile v2: перебить white-space:nowrap и flex:none === */
+@media (max-width: 768px) {
+  .wb-title,
+  .cd-title {
+    width: 100% !important;
+    flex: 1 1 100% !important;
+    flex-basis: 100% !important;
+    flex-wrap: wrap !important;
+    white-space: normal !important;
+    margin-bottom: 4px !important;
+    display: block !important;
+  }
+}
+
+/* === Fix mobile v3: перебить flex-flow:row и overflow-x:auto === */
+@media (max-width: 768px) {
+  .wb-head-bar,
+  .cd-head-bar {
+    flex-flow: wrap !important;
+    flex-wrap: wrap !important;
+    overflow-x: visible !important;
+  }
+}
