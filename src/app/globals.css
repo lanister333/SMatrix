@@ -8361,3 +8361,507 @@ div[style*="background-color: rgb(0, 74, 143)"] {
     background: #05a79b !important;
   }
 }
+
+/* ============================================================
+   Fix 2026-10-10: /gde-kupit — кнопки в строки на мобильном.
+   Только через CSS order + flex-basis (JSX не трогаем).
+   Структура:
+   Строка 1: Статус + ✅Вопрос решён
+   Строка 2: Отметить Неактуально + Редактировать + Удалить
+   Строка 3: 📍 Ответить (вся ширина)
+   Строка 4: 💬 Обсудить (бирюзовая, вся ширина)
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .wb-actrow.wb-actrow-unified {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin-top: 8px !important;
+  }
+
+  /* === СТРОКА 1: Статус + ✅ Вопрос решён === */
+  .wb-actrow.wb-actrow-unified .wb-statusline {
+    order: 1;
+    flex: 0 0 auto !important;
+    margin-right: auto !important;
+    font-size: 12px !important;
+  }
+
+  .wb-actrow.wb-actrow-unified .wb-solvebtn,
+  .wb-actrow.wb-actrow-unified .wb-reopenbtn {
+    order: 2;
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+    font-size: 12px !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  /* === СТРОКА 2: Отметить Неактуально + Редактировать + Удалить === */
+  .wb-actrow.wb-actrow-unified .wb-statusbtn,
+  .wb-actrow.wb-actrow-unified .wb-act:not(.wb-solvebtn):not(.wb-reopenbtn):not(.wb-answerbtn):not(.wb-btn-forum):not(.wb-report):not(.wb-del) {
+    order: 3;
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    font-size: 11px !important;
+    padding: 4px 3px !important;
+    text-align: center !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+    line-height: 1.25 !important;
+  }
+
+  .wb-actrow.wb-actrow-unified .wb-del {
+    order: 4;
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    font-size: 11px !important;
+    padding: 4px 3px !important;
+    text-align: center !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+    line-height: 1.25 !important;
+  }
+
+  /* «Пожаловаться» — рядом со статусом */
+  .wb-actrow.wb-actrow-unified .wb-report {
+    order: 2;
+    flex: 0 0 auto !important;
+    font-size: 11px !important;
+    padding: 4px 0 !important;
+    margin-left: 8px !important;
+  }
+
+  /* === СТРОКА 3: 📍 Ответить === */
+  .wb-actrow.wb-actrow-unified .wb-answerbtn {
+    order: 6;
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    margin-top: 4px !important;
+    padding: 7px 10px !important;
+    font-size: 12px !important;
+    text-align: center !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+  }
+
+  /* === СТРОКА 4: 💬 Обсудить на форуме — бирюзовая, вся ширина === */
+  .wb-actrow.wb-actrow-unified .wb-btn-forum {
+    order: 7;
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 6px 0 0 !important;
+    padding: 8px 10px !important;
+    font-size: 12.5px !important;
+    text-align: center !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+    line-height: 1.3 !important;
+    background: var(--sm-turquoise, #06cdbd) !important;
+    color: #fff !important;
+    border: 0 !important;
+    border-radius: 2px !important;
+    box-sizing: border-box !important;
+    flex-shrink: 1 !important;
+  }
+  .wb-actrow.wb-actrow-unified .wb-btn-forum:hover {
+    background: #05a79b !important;
+  }
+}
+
+/* Аналогично для /gde-deshevle (.cd-actrow) */
+@media (max-width: 768px) {
+  .cd-actrow.cd-actrow-unified {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin-top: 8px !important;
+  }
+
+  .cd-actrow.cd-actrow-unified .cd-statusline {
+    order: 1;
+    flex: 0 0 auto !important;
+    margin-right: auto !important;
+    font-size: 12px !important;
+  }
+
+  .cd-actrow.cd-actrow-unified .cd-solvebtn,
+  .cd-actrow.cd-actrow-unified .cd-reopenbtn {
+    order: 2;
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+    font-size: 12px !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .cd-actrow.cd-actrow-unified .cd-statusbtn,
+  .cd-actrow.cd-actrow-unified .cd-act:not(.cd-solvebtn):not(.cd-reopenbtn):not(.cd-answerbtn):not(.cd-btn-forum):not(.cd-report):not(.cd-del) {
+    order: 3;
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    font-size: 11px !important;
+    padding: 4px 3px !important;
+    text-align: center !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+    line-height: 1.25 !important;
+  }
+
+  .cd-actrow.cd-actrow-unified .cd-del {
+    order: 4;
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    font-size: 11px !important;
+    padding: 4px 3px !important;
+    text-align: center !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+    line-height: 1.25 !important;
+  }
+
+  .cd-actrow.cd-actrow-unified .cd-report {
+    order: 2;
+    flex: 0 0 auto !important;
+    font-size: 11px !important;
+    padding: 4px 0 !important;
+    margin-left: 8px !important;
+  }
+
+  .cd-actrow.cd-actrow-unified .cd-answerbtn {
+    order: 6;
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    margin-top: 4px !important;
+    padding: 7px 10px !important;
+    font-size: 12px !important;
+    text-align: center !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+  }
+
+  .cd-actrow.cd-actrow-unified .cd-btn-forum {
+    order: 7;
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 6px 0 0 !important;
+    padding: 8px 10px !important;
+    font-size: 12.5px !important;
+    text-align: center !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+    line-height: 1.3 !important;
+    background: var(--sm-turquoise, #06cdbd) !important;
+    color: #fff !important;
+    border: 0 !important;
+    border-radius: 2px !important;
+    box-sizing: border-box !important;
+    flex-shrink: 1 !important;
+  }
+  .cd-actrow.cd-actrow-unified .cd-btn-forum:hover {
+    background: #05a79b !important;
+  }
+}
+
+/* ============================================================
+   Fix ГЛОБАЛЬНЫЙ 2026-10-10: wb/cd — кнопки в строки.
+   БЕЗ @media — работает на ВСЕХ экранах.
+   ============================================================ */
+
+.wb-actrow.wb-actrow-unified .wb-statusline {
+  order: 1 !important;
+  flex: 0 0 auto !important;
+  margin-right: auto !important;
+  font-size: 12px !important;
+}
+
+.wb-actrow.wb-actrow-unified .wb-solvebtn,
+.wb-actrow.wb-actrow-unified .wb-reopenbtn {
+  order: 2 !important;
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+  font-size: 12px !important;
+}
+
+.wb-actrow.wb-actrow-unified .wb-statusbtn {
+  order: 3 !important;
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  font-size: 11px !important;
+  padding: 4px 3px !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+  line-height: 1.25 !important;
+}
+
+.wb-actrow.wb-actrow-unified .wb-act:not(.wb-solvebtn):not(.wb-reopenbtn):not(.wb-statusbtn):not(.wb-answerbtn):not(.wb-btn-forum):not(.wb-report) {
+  order: 4 !important;
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  font-size: 11px !important;
+  padding: 4px 3px !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+  line-height: 1.25 !important;
+}
+
+.wb-actrow.wb-actrow-unified .wb-del {
+  order: 5 !important;
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  font-size: 11px !important;
+  padding: 4px 3px !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+  line-height: 1.25 !important;
+}
+
+.wb-actrow.wb-actrow-unified .wb-answerbtn {
+  order: 6 !important;
+  flex: 1 1 100% !important;
+  width: 100% !important;
+  margin-top: 4px !important;
+  padding: 7px 10px !important;
+  font-size: 12px !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+}
+
+.wb-actrow.wb-actrow-unified .wb-btn-forum {
+  order: 7 !important;
+  flex: 1 1 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 6px 0 0 !important;
+  padding: 8px 10px !important;
+  font-size: 12.5px !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+  line-height: 1.3 !important;
+  background: var(--sm-turquoise, #06cdbd) !important;
+  color: #fff !important;
+  border: 0 !important;
+  border-radius: 2px !important;
+  box-sizing: border-box !important;
+  flex-shrink: 1 !important;
+}
+.wb-actrow.wb-actrow-unified .wb-btn-forum:hover {
+  background: #05a79b !important;
+}
+
+/* Аналогично для cd (gde-deshevle) */
+.cd-actrow.cd-actrow-unified .cd-statusline {
+  order: 1 !important;
+  flex: 0 0 auto !important;
+  margin-right: auto !important;
+  font-size: 12px !important;
+}
+
+.cd-actrow.cd-actrow-unified .cd-solvebtn,
+.cd-actrow.cd-actrow-unified .cd-reopenbtn {
+  order: 2 !important;
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+  font-size: 12px !important;
+}
+
+.cd-actrow.cd-actrow-unified .cd-statusbtn {
+  order: 3 !important;
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  font-size: 11px !important;
+  padding: 4px 3px !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+  line-height: 1.25 !important;
+}
+
+.cd-actrow.cd-actrow-unified .cd-act:not(.cd-solvebtn):not(.cd-reopenbtn):not(.cd-statusbtn):not(.cd-answerbtn):not(.cd-btn-forum):not(.cd-report) {
+  order: 4 !important;
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  font-size: 11px !important;
+  padding: 4px 3px !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+  line-height: 1.25 !important;
+}
+
+.cd-actrow.cd-actrow-unified .cd-del {
+  order: 5 !important;
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  font-size: 11px !important;
+  padding: 4px 3px !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+  line-height: 1.25 !important;
+}
+
+.cd-actrow.cd-actrow-unified .cd-answerbtn {
+  order: 6 !important;
+  flex: 1 1 100% !important;
+  width: 100% !important;
+  margin-top: 4px !important;
+  padding: 7px 10px !important;
+  font-size: 12px !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+}
+
+.cd-actrow.cd-actrow-unified .cd-btn-forum {
+  order: 7 !important;
+  flex: 1 1 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 6px 0 0 !important;
+  padding: 8px 10px !important;
+  font-size: 12.5px !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+  line-height: 1.3 !important;
+  background: var(--sm-turquoise, #06cdbd) !important;
+  color: #fff !important;
+  border: 0 !important;
+  border-radius: 2px !important;
+  box-sizing: border-box !important;
+  flex-shrink: 1 !important;
+}
+.cd-actrow.cd-actrow-unified .cd-btn-forum:hover {
+  background: #05a79b !important;
+}
+
+/* Fix КРИТИЧЕСКИЙ 2026-10-11: wb/cd контейнер flex-wrap — без него order не работает */
+.wb-actrow.wb-actrow-unified {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin-top: 8px !important;
+}
+
+.cd-actrow.cd-actrow-unified {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin-top: 8px !important;
+}
+
+/* === wb-row — простая структура строк === */
+.wb-actrow-container {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  margin-top: 8px !important;
+  width: 100% !important;
+}
+.wb-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+.wb-row-1 {
+  justify-content: flex-start !important;
+}
+.wb-row-1 .wb-statusline {
+  margin-right: auto !important;
+  font-size: 12px !important;
+}
+.wb-row-2 {
+  justify-content: stretch !important;
+}
+.wb-row-2 .wb-act {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  font-size: 11px !important;
+  padding: 4px 3px !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+  line-height: 1.25 !important;
+}
+.wb-row-3, .wb-row-4 {
+  justify-content: stretch !important;
+}
+.wb-row-3 .wb-answerbtn,
+.wb-row-4 .wb-btn-forum {
+  flex: 1 1 100% !important;
+  width: 100% !important;
+  padding: 8px 10px !important;
+  font-size: 12.5px !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+  line-height: 1.3 !important;
+  box-sizing: border-box !important;
+}
+.wb-row-4 .wb-btn-forum {
+  background: var(--sm-turquoise, #06cdbd) !important;
+  color: #fff !important;
+  border: 0 !important;
+  border-radius: 2px !important;
+  flex-shrink: 1 !important;
+}
+.wb-row-4 .wb-btn-forum:hover {
+  background: #05a79b !important;
+}

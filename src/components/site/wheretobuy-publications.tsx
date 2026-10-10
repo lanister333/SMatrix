@@ -321,41 +321,46 @@ function WhereToBuyRow(props: {
             [Статус] [Пожаловаться (не владельцу) / авторские кнопки] [📍 Ответить] [💬 Обсудить на форуме]
           Статус — слева (margin-right:auto в CSS), кнопки — справа. */}
 
-      <div className="wb-actrow wb-actrow-unified" data-wb-actrow={item.id}>
-        {/* Статус вопроса — слева в общем ряду (margin-right:auto в CSS). */}
-        <span className={`wb-statusline is-${item.status}`} data-wb-statusline={item.id}>
-          {statusDone ? "✅ Статус: " : "Статус: "}
-          {statusLabel}
-        </span>
-        {/* Кнопки автора — видны только владельцу */}
+      <div className="wb-actrow-container" data-wb-actrow={item.id}>
+        {/* === СТРОКА 1: Статус + ✅ Вопрос решён === */}
+        <div className="wb-row wb-row-1">
+          <span className={`wb-statusline is-${item.status}`} data-wb-statusline={item.id}>
+            {statusDone ? "✅ Статус: " : "Статус: "}
+            {statusLabel}
+          </span>
+          {own && item.status === "seeking" && (
+            <button
+              className="wb-act wb-solvebtn"
+              data-wb-solve={item.id}
+              disabled={props.busy}
+              onClick={() => askSolve(item)}
+            >
+              {SOLVE_BUTTON_LABEL}
+            </button>
+          )}
+          {own && item.status !== "seeking" && (
+            <button
+              className="wb-act wb-reopenbtn"
+              data-wb-reopen={item.id}
+              disabled={props.busy}
+              onClick={() => props.onStatus(item, "seeking")}
+            >
+              {REOPEN_BUTTON_LABEL}
+            </button>
+          )}
+          {!own && user && (
+            <button className="wb-report" onClick={() => props.onComplain(item)}>
+              Пожаловаться
+            </button>
+          )}
+        </div>
+
+        {/* === СТРОКА 2: Отметить Неактуально + Редактировать + Удалить === */}
         {own && (
-          <>
-            {/* ТЗ 2026-09-24 «Вопрос решён»: в актуальном вопросе (Ищу) автор
-                видит «✅ Вопрос решён» — только после подтверждения статус
-                станет «Найдено» и карточка тускнеет; у решённого/неактуального
-                вместо неё — «↩️ Вернуть в актуальные». */}
-            {item.status === "seeking" ? (
-              <>
-                <button
-                  className="wb-act wb-solvebtn"
-                  data-wb-solve={item.id}
-                  disabled={props.busy}
-                  onClick={() => askSolve(item)}
-                >
-                  {SOLVE_BUTTON_LABEL}
-                </button>
-                <button className="wb-act wb-statusbtn" disabled={props.busy} onClick={() => props.onStatus(item, "irrelevant")}>
-                  Отметить «Неактуально»
-                </button>
-              </>
-            ) : (
-              <button
-                className="wb-act wb-reopenbtn"
-                data-wb-reopen={item.id}
-                disabled={props.busy}
-                onClick={() => props.onStatus(item, "seeking")}
-              >
-                {REOPEN_BUTTON_LABEL}
+          <div className="wb-row wb-row-2">
+            {item.status === "seeking" && (
+              <button className="wb-act wb-statusbtn" disabled={props.busy} onClick={() => props.onStatus(item, "irrelevant")}>
+                Отметить «Неактуально»
               </button>
             )}
             <button className="wb-act" disabled={props.busy} onClick={() => props.onEdit(item)}>
@@ -364,26 +369,27 @@ function WhereToBuyRow(props: {
             <button className="wb-act wb-del" disabled={props.busy} onClick={() => props.onDelete(item)}>
               Удалить
             </button>
-          </>
+          </div>
         )}
 
-        {/* Кнопка «Пожаловаться» — только НЕ автору отзыва */}
-        {!own && user && (
-          <button className="wb-report" onClick={() => props.onComplain(item)}>
-            Пожаловаться
+        {/* === СТРОКА 3: 📍 Ответить (на всю ширину) === */}
+        <div className="wb-row wb-row-3">
+          <button className="wb-act wb-answerbtn" disabled={props.busy || answerBusy} onClick={toggleAnswer}>
+            {ANSWER_BUTTON_LABEL}
           </button>
-        )}
-        <button className="wb-act wb-answerbtn" disabled={props.busy || answerBusy} onClick={toggleAnswer}>
-          {ANSWER_BUTTON_LABEL}
-        </button>
-        <button
-          className={`wb-act wb-btn-forum is-${item.topicId ? item.topicState ?? "open" : "none"}`}
-          disabled={props.busy}
-          onClick={() => props.onDiscuss(item)}
-          title={forumButtonTitle(item.topicId ? item.topicState : "none")}
-        >
-          {FORUM_BUTTON_LABEL}
-        </button>
+        </div>
+
+        {/* === СТРОКА 4: 💬 Обсудить на форуме (бирюзовая, на всю ширину) === */}
+        <div className="wb-row wb-row-4">
+          <button
+            className={`wb-act wb-btn-forum is-${item.topicId ? item.topicState ?? "open" : "none"}`}
+            disabled={props.busy}
+            onClick={() => props.onDiscuss(item)}
+            title={forumButtonTitle(item.topicId ? item.topicState : "none")}
+          >
+            {FORUM_BUTTON_LABEL}
+          </button>
+        </div>
       </div>
 
       {/* ТЗ: кнопка «📍 Ответить» открывает простое текстовое поле под
