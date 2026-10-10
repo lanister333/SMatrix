@@ -318,73 +318,46 @@ function CheapRow(props: {
             [Статус] [Пожаловаться (не владельцу) / авторские кнопки] [📍 Ответить] [💬 Обсудить на форуме]
           Статус — слева (margin-right:auto в CSS), кнопки — справа. */}
 
-      <div className="cd-actrow cd-actrow-unified" data-cd-actrow={item.id}>
-        {/* Статус вопроса — слева в общем ряду (margin-right:auto в CSS). */}
-        <span className={`cd-statusline is-${item.status}`} data-cd-statusline={item.id}>
-          {statusDone ? "✅ Статус: " : "Статус: "}
-          {statusLabel}
-        </span>
-        {/* Кнопки автора — видны только владельцу */}
+      <div className="cd-actrow-container" data-cd-actrow={item.id}>
+        <div className="cd-row cd-row-1">
+          <span className={`cd-statusline is-${item.status}`} data-cd-statusline={item.id}>
+            {statusDone ? "✅ Статус: " : "Статус: "}
+            {statusLabel}
+          </span>
+          {own && item.status === "comparing" && (
+            <button className="cd-act cd-solvebtn" data-cd-solve={item.id} disabled={props.busy} onClick={() => askSolve(item)}>
+              {SOLVE_BUTTON_LABEL}
+            </button>
+          )}
+          {own && item.status !== "comparing" && (
+            <button className="cd-act cd-reopenbtn" data-cd-reopen={item.id} disabled={props.busy} onClick={() => props.onStatus(item, "comparing")}>
+              {REOPEN_BUTTON_LABEL}
+            </button>
+          )}
+          {!own && user && (
+            <button className="cd-report" onClick={() => props.onComplain(item)}>Пожаловаться</button>
+          )}
+        </div>
         {own && (
-          <>
-            {/* ТЗ 2026-09-24 «Вопрос решён»: в актуальном вопросе (Сравниваю)
-                автор видит «✅ Вопрос решён» — только после подтверждения
-                статус станет «Цена зафиксирована» и карточка тускнеет;
-                у решённого/неактуального вместо неё — «↩️ Вернуть в
-                актуальные» (возврат в «Сравниваю»). */}
-            {item.status === "comparing" ? (
-              <>
-                <button
-                  className="cd-act cd-solvebtn"
-                  data-cd-solve={item.id}
-                  disabled={props.busy}
-                  onClick={() => askSolve(item)}
-                >
-                  {SOLVE_BUTTON_LABEL}
-                </button>
-                <button className="cd-act cd-statusbtn" disabled={props.busy} onClick={() => props.onStatus(item, "cheaper")}>
-                  Отметить «Нашёл дешевле»
-                </button>
-                <button className="cd-act cd-statusbtn" disabled={props.busy} onClick={() => props.onStatus(item, "irrelevant")}>
-                  Отметить «Неактуально»
-                </button>
-              </>
-            ) : (
-              <button
-                className="cd-act cd-reopenbtn"
-                data-cd-reopen={item.id}
-                disabled={props.busy}
-                onClick={() => props.onStatus(item, "comparing")}
-              >
-                {REOPEN_BUTTON_LABEL}
-              </button>
+          <div className="cd-row cd-row-2">
+            {item.status === "comparing" && (
+              <button className="cd-act cd-statusbtn" disabled={props.busy} onClick={() => props.onStatus(item, "irrelevant")}>Неактуально</button>
             )}
-            <button className="cd-act" disabled={props.busy} onClick={() => props.onEdit(item)}>
-              Редактировать
-            </button>
-            <button className="cd-act cd-del" disabled={props.busy} onClick={() => props.onDelete(item)}>
-              Удалить
-            </button>
-          </>
+            <button className="cd-act" disabled={props.busy} onClick={() => props.onEdit(item)}>Редактировать</button>
+            <button className="cd-act cd-del" disabled={props.busy} onClick={() => props.onDelete(item)}>Удалить</button>
+          </div>
         )}
-
-        {/* Кнопка «Пожаловаться» — только НЕ автору отзыва */}
-        {!own && user && (
-          <button className="cd-report" onClick={() => props.onComplain(item)}>
-            Пожаловаться
-          </button>
+        {!own && (
+          <div className="cd-row cd-row-actions-other">
+            <button className="cd-act cd-answerbtn" disabled={props.busy || answerBusy} onClick={toggleAnswer}>{ANSWER_BUTTON_LABEL}</button>
+            <button className={`cd-act cd-btn-forum is-${item.topicId ? item.topicState ?? "open" : "none"}`} disabled={props.busy} onClick={() => props.onDiscuss(item)} title={forumButtonTitle(item.topicId ? item.topicState : "none")}>{FORUM_BUTTON_LABEL}</button>
+          </div>
         )}
-        <button className="cd-act cd-answerbtn" disabled={props.busy || answerBusy} onClick={toggleAnswer}>
-          {ANSWER_BUTTON_LABEL}
-        </button>
-        <button
-          className={`cd-act cd-btn-forum is-${item.topicId ? item.topicState ?? "open" : "none"}`}
-          disabled={props.busy}
-          onClick={() => props.onDiscuss(item)}
-          title={forumButtonTitle(item.topicId ? item.topicState : "none")}
-        >
-          {FORUM_BUTTON_LABEL}
-        </button>
+        {own && (
+          <div className="cd-row cd-row-4">
+            <button className={`cd-act cd-btn-forum is-${item.topicId ? item.topicState ?? "open" : "none"}`} disabled={props.busy} onClick={() => props.onDiscuss(item)} title={forumButtonTitle(item.topicId ? item.topicState : "none")}>{FORUM_BUTTON_LABEL}</button>
+          </div>
+        )}
       </div>
 
       {/* ТЗ: кнопка «📍 Ответить» открывает простое текстовое поле под
