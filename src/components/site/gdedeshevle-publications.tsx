@@ -943,13 +943,10 @@ export function GdedeshevlePage(props: {
               {/* 28.09.2026: H1 «Где дешевле» прижат к левому краю,
                   nav + кнопка «Задать вопрос» — к правому. Группировка
                   через .cd-head-right + justify-content: space-between. */}
-                            <div className="cd-head-right" style={{ gap: "2px" }}>
+                            <div className="cd-head-right" style={{ gap: "2px", justifyContent: "flex-start" }}>
                 <div className="cd-nav-inline">
                   <button className={activeNav === "latest" ? "active" : ""} onClick={() => mineTab("all", "latest")}>
                     Последние вопросы
-                  </button>
-                  <button className={activeNav === "mine" ? "active" : ""} onClick={() => mineTab("mine", "mine")}>
-                    Мои публикации
                   </button>
                 </div>
                 <button className="cd-addbtn" onClick={openNewForm}>
