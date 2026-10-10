@@ -134,7 +134,7 @@ export function Masthead(props: { settings: SiteSettings }) {
          #0d8476 (L28%) → #0f9989 (L33%), #085951 (L19%) → #0a7066 (L24%). */
       style={{
         background:
-          "radial-gradient(130% 150% at 16% 0%,rgba(255,255,255,0.16) 0%,rgba(255,255,255,0) 44%),linear-gradient(150deg,#16c5b0 0%,#0f9989 46%,#0a7066 100%)",
+          "radial-gradient(130% 150% at 16% 0%,rgba(255,255,255,0.22) 0%,rgba(255,255,255,0) 44%),linear-gradient(150deg,#00ffd5 0%,#00d9b8 46%,#00ab94 100%)",
       }}
     >
       {/* ЗАДАЧА 14 (рестайл ПК), Шаг 1.2: слоган (.header-slogan) и правый
