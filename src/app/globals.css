@@ -9158,3 +9158,66 @@ div[style*="background-color: rgb(0, 74, 143)"] {
     overflow-x: visible !important;
   }
 }
+
+/* === Fix mobile: «Где купить» на самый верх === */
+@media (max-width: 768px) {
+  .wb-head {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .wb-title {
+    order: -1 !important;
+  }
+  .wb-desc {
+    order: 0 !important;
+  }
+  .wb-head-bar {
+    order: 1 !important;
+  }
+  /* Аналогично для cd */
+  .cd-head {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .cd-title {
+    order: -1 !important;
+  }
+  .cd-desc {
+    order: 0 !important;
+  }
+  .cd-head-bar {
+    order: 1 !important;
+  }
+}
+
+/* cache-bust-20261011 */
+
+/* === Fix: уменьшить отступ «Мои публикации» + «Задать вопрос» === */
+@media (max-width: 768px) {
+  .wb-nav-inline button,
+  .cd-nav-inline button {
+    padding: 0 4px !important;
+    margin: 0 !important;
+  }
+  .wb-addbtn,
+  .cd-addbtn {
+    padding: 3px 6px !important;
+    margin: 0 !important;
+  }
+  .wb-head-right,
+  .cd-head-right {
+    gap: 4px !important;
+  }
+}
+
+/* === Fix: отступ между «Мои публикации» и «Задать вопрос» === */
+@media (max-width: 768px) {
+  .wb-head-right,
+  .cd-head-right {
+    gap: 2px !important;
+  }
+  .wb-nav-inline,
+  .cd-nav-inline {
+    gap: 2px !important;
+  }
+}

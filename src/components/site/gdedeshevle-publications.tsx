@@ -943,8 +943,7 @@ export function GdedeshevlePage(props: {
               {/* 28.09.2026: H1 «Где дешевле» прижат к левому краю,
                   nav + кнопка «Задать вопрос» — к правому. Группировка
                   через .cd-head-right + justify-content: space-between. */}
-              <div className="cd-title">Где дешевле</div>
-              <div className="cd-head-right">
+                            <div className="cd-head-right" style={{ gap: "2px" }}>
                 <div className="cd-nav-inline">
                   <button className={activeNav === "latest" ? "active" : ""} onClick={() => mineTab("all", "latest")}>
                     Последние вопросы
@@ -962,6 +961,7 @@ export function GdedeshevlePage(props: {
             {/* 2026-10-02: надпись «Задавать вопросы могут только зарегистрированные
                 пользователи — войдите или зарегистрируйтесь. Гости могут читать.»
                 удалена по просьбе пользователя. */}
+            <div className="cd-title">Где дешевле</div>
             <div className="cd-desc">Сравнивайте цены на конкретный товар и находите, где его можно купить дешевле.</div>
 
             {/* 28.09.2026 (по запросу пользователя): блоки .cd-search

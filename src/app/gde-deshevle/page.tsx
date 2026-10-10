@@ -8,6 +8,8 @@ import GdedeshevleScreen from "@/components/site/gdedeshevle-screen";
  * площадка (ТЗ п.1/30). Сравнение цен жителей Сахалина на конкретные товары.
  */
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: "Где дешевле — SakhMatrix",
   description:

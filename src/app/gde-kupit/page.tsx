@@ -8,6 +8,8 @@ import WhereToBuyScreen from "@/components/site/wheretobuy-screen";
  * площадка (ТЗ п.1/27). Вопросы жителей о конкретных товарах Сахалина.
  */
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: "Где купить — SakhMatrix",
   description:
