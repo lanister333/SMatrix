@@ -1,3 +1,4 @@
+// VERSION_V8B 1791697778
 "use client";
 
 import { useState, useMemo, useRef, useEffect } from "react";
@@ -48,8 +49,8 @@ function pluralReplies(n: number): string {
 
 const TEAL = "#249790";
 const WIRE_LEFT = 12;     // X координата вертикального провода
-const WIRE_H_WIDTH = 14;   // длина горизонтального провода
-const WIRE_H_TOP = 14;     // Y координата горизонтального провода (у верха карточки)
+const WIRE_H_WIDTH = 16;   // длина горизонтального провода — заходит под рамку карточки
+const WIRE_H_TOP = 8;      // Y — касается верхней части рамки карточки
 
 function CommentNode({ node, level, renderMsg, quoteOfFor }: {
   node: TreeNode;
@@ -76,7 +77,7 @@ function CommentNode({ node, level, renderMsg, quoteOfFor }: {
             const last = children[children.length - 1];
             const rect = childrenRef.current.getBoundingClientRect();
             const lastRect = last.getBoundingClientRect();
-            const h = lastRect.top - rect.top + WIRE_H_TOP;
+            const h = lastRect.top - rect.top + WIRE_H_TOP + 2; // +2 чтобы зайти под рамку
             setWireHeight(h);
           }
         }
@@ -88,7 +89,7 @@ function CommentNode({ node, level, renderMsg, quoteOfFor }: {
   }, [expanded, replyCount]);
 
   return (
-    <div style={{ position: "relative", marginBottom: "8px", paddingLeft: indent + "px" }}>
+    <div style={{ position: "relative", marginBottom: "4px", paddingLeft: indent + "px" }}>
       {/* Карточка сообщения */}
       <div
         className="sakh-comment"
@@ -100,44 +101,43 @@ function CommentNode({ node, level, renderMsg, quoteOfFor }: {
         {renderMsg(node.msg, quoteOfFor(node.msg))}
       </div>
 
-      {/* Кнопка раскрытия */}
-      {replyCount > 0 && (
-        <button
-          onClick={() => setExpanded(!expanded)}
+      {/* Кнопка раскрытия — просто кликабельная строка */}
+      {replyCount > 0 && !expanded && (
+        <div
+          onClick={() => setExpanded(true)}
           style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "4px",
-            width: "100%",
-            padding: "5px 8px",
-            margin: "2px 0",
-            background: expanded ? "#e8f5f2" : "#f0f7f5",
-            border: "1px solid #b9d4cd",
-            borderLeft: "3px solid " + TEAL,
-            borderRadius: "3px",
             cursor: "pointer",
-            fontFamily: "inherit",
+            padding: "4px 0",
+            color: TEAL,
             fontSize: "12px",
             fontWeight: 600,
-            color: TEAL,
-            textAlign: "left",
-            boxSizing: "border-box",
             position: "relative",
             zIndex: 2,
           }}
         >
-          <span style={{ display: "inline-block", width: "12px", fontSize: "9px" }}>
-            {expanded ? "▼" : "▶"}
-          </span>
-          <span>
-            {expanded ? "Свернуть" : "↩ " + totalReplies + " " + pluralReplies(totalReplies)}
-          </span>
-        </button>
+          ▶ ↩ {totalReplies} {pluralReplies(totalReplies)}
+        </div>
+      )}
+      {expanded && replyCount > 0 && (
+        <div
+          onClick={() => setExpanded(false)}
+          style={{
+            cursor: "pointer",
+            padding: "4px 0",
+            color: TEAL,
+            fontSize: "12px",
+            fontWeight: 600,
+            position: "relative",
+            zIndex: 2,
+          }}
+        >
+          ▼ Свернуть
+        </div>
       )}
 
       {/* Раскрытые дети */}
       {expanded && replyCount > 0 && (
-        <div ref={childrenRef} style={{ position: "relative", marginTop: "4px" }}>
+        <div ref={childrenRef} style={{ position: "relative", marginTop: "0px" }}>
           {/* 
             Вертикальный провод — от верха первого ребёнка до верха последнего.
             КАСАЕТСЯ горизонтальных проводов, которые касаются карточек.
@@ -154,7 +154,7 @@ function CommentNode({ node, level, renderMsg, quoteOfFor }: {
           }} />
 
           {node.children.map((child, idx) => (
-            <div key={child.msg.id} style={{ position: "relative", paddingLeft: (WIRE_LEFT + WIRE_H_WIDTH) + "px", marginBottom: "8px" }}>
+            <div key={child.msg.id} style={{ position: "relative", paddingLeft: (WIRE_LEFT + WIRE_H_WIDTH) + "px", marginBottom: "4px" }}>
               {/* 
                 Горизонтальный провод — от вертикальной линии до ЛЕВОГО КРАЯ карточки.
                 КАСАЕТСЯ вертикальной (слева) и карточки (справа).
