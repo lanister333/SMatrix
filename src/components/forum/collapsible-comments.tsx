@@ -4,13 +4,15 @@ import { useState, useMemo } from "react";
 import type { Msg } from "@/lib/ui";
 
 /**
- * Сворачиваемые комментарии (как в Excel с +/-).
+ * Сворачиваемые комментарии (Excel-стиль с +/-).
  * 
  * По умолчанию — линейный список (без отступов).
  * Под комментарием с ответами — кнопка "↩ N ответов".
  * Клик — раскрывает лесенку с вложенными ответами.
  * Повторный клик — сворачивает.
  * Рекурсивно на любой глубине.
+ * 
+ * Вертикальные линии через CSS ::before — соединяют родителя с каждым ребёнком.
  */
 
 interface QuoteOf {
@@ -52,7 +54,6 @@ function buildTree(messages: Msg[]): TreeNode[] {
     };
   }
   
-  // Корневые сообщения (parentId = null)
   const roots = childrenMap.get(null) || [];
   return roots.map(buildNode);
 }
@@ -78,9 +79,12 @@ function CommentNode({
   const replyCount = node.children.length;
   const totalReplies = useMemo(() => countAllReplies(node), [node]);
   
+  // isLastChild — последний ребёнок в массиве (для CSS линий)
+  // передаём через пропс
+  
   return (
-    <div className="cc-node" data-level={level}>
-      {/* Карточка сообщения — линейная, без отступов */}
+    <div className={`cc-node${level === 0 ? " cc-root" : ""}`} data-level={level}>
+      {/* Карточка сообщения */}
       <div className="cc-card sakh-comment" data-level="1" data-id={node.msg.id} data-msgnum={node.msg.num}>
         {renderMsg(node.msg, quoteOfFor(node.msg))}
       </div>
@@ -102,14 +106,17 @@ function CommentNode({
       {/* Раскрытая лесенка с вложенными ответами */}
       {expanded && replyCount > 0 && (
         <div className="cc-children cc-anim-expand">
-          {node.children.map((child) => (
-            <CommentNode
-              key={child.msg.id}
-              node={child}
-              level={Math.min(level + 1, 4)}
-              renderMsg={renderMsg}
-              quoteOfFor={quoteOfFor}
-            />
+          {node.children.map((child, idx) => (
+            <div key={child.msg.id} className={`cc-child-wrapper${idx === node.children.length - 1 ? " cc-last-child" : ""}`}>
+              {/* Линия-connector от родителя к этому ребёнку */}
+              <div className="cc-connector-line" />
+              <CommentNode
+                node={child}
+                level={Math.min(level + 1, 4)}
+                renderMsg={renderMsg}
+                quoteOfFor={quoteOfFor}
+              />
+            </div>
           ))}
         </div>
       )}
