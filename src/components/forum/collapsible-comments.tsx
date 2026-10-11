@@ -84,41 +84,59 @@ function CommentNode({
   
   return (
     <div className={`cc-node${level === 0 ? " cc-root" : ""}`} data-level={level}>
-      {/* Карточка сообщения */}
-      <div className="cc-card sakh-comment" data-level="1" data-id={node.msg.id} data-msgnum={node.msg.num}>
-        {renderMsg(node.msg, quoteOfFor(node.msg))}
-      </div>
-      
-      {/* Кнопка "↩ N ответов" — если есть ответы */}
-      {replyCount > 0 && (
-        <button
-          className={`cc-toggle${expanded ? " cc-toggle-open" : ""}`}
-          onClick={() => setExpanded(!expanded)}
-          aria-expanded={expanded}
-        >
-          <span className="cc-toggle-icon">{expanded ? "▼" : "▶"}</span>
-          <span className="cc-toggle-text">
-            {expanded ? "Свернуть" : `↩ ${totalReplies} ${pluralReplies(totalReplies)}`}
-          </span>
-        </button>
-      )}
-      
-      {/* Раскрытая лесенка с вложенными ответами */}
-      {expanded && replyCount > 0 && (
-        <div className="cc-children cc-anim-expand">
-          {node.children.map((child, idx) => (
-            <div key={child.msg.id} className={`cc-child-wrapper${idx === node.children.length - 1 ? " cc-last-child" : ""}`}>
-              {/* Линия-connector от родителя к этому ребёнку */}
-              <div className="cc-connector-line" />
-              <CommentNode
-                node={child}
-                level={Math.min(level + 1, 4)}
-                renderMsg={renderMsg}
-                quoteOfFor={quoteOfFor}
-              />
-            </div>
-          ))}
+      {/* Если раскрыто и есть дети — общий контейнер .cc-branch */}
+      {expanded && replyCount > 0 ? (
+        <div className="cc-branch cc-anim-expand">
+          {/* Родительский комментарий — сверху */}
+          <div className="cc-card sakh-comment cc-parent-in-branch" data-level="1" data-id={node.msg.id} data-msgnum={node.msg.num}>
+            {renderMsg(node.msg, quoteOfFor(node.msg))}
+          </div>
+          
+          {/* Кнопка "Свернуть" */}
+          <button
+            className="cc-toggle cc-toggle-open"
+            onClick={() => setExpanded(false)}
+            aria-expanded={false}
+          >
+            <span className="cc-toggle-icon">▼</span>
+            <span className="cc-toggle-text">Свернуть</span>
+          </button>
+          
+          {/* Дочерние ответы — внутри общего контейнера */}
+          <div className="cc-children">
+            {node.children.map((child, idx) => (
+              <div key={child.msg.id} className={`cc-child-wrapper${idx === node.children.length - 1 ? " cc-last-child" : ""}`}>
+                <CommentNode
+                  node={child}
+                  level={Math.min(level + 1, 4)}
+                  renderMsg={renderMsg}
+                  quoteOfFor={quoteOfFor}
+                />
+              </div>
+            ))}
+          </div>
         </div>
+      ) : (
+        <>
+          {/* Свёрнуто — просто карточка */}
+          <div className="cc-card sakh-comment" data-level="1" data-id={node.msg.id} data-msgnum={node.msg.num}>
+            {renderMsg(node.msg, quoteOfFor(node.msg))}
+          </div>
+          
+          {/* Кнопка "↩ N ответов" */}
+          {replyCount > 0 && (
+            <button
+              className="cc-toggle"
+              onClick={() => setExpanded(true)}
+              aria-expanded={false}
+            >
+              <span className="cc-toggle-icon">▶</span>
+              <span className="cc-toggle-text">
+                ↩ {totalReplies} {pluralReplies(totalReplies)}
+              </span>
+            </button>
+          )}
+        </>
       )}
     </div>
   );

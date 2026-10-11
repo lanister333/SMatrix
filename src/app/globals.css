@@ -9500,3 +9500,58 @@ div[style*="background-color: rgb(0, 74, 143)"] {
 .cc-container .sakh-comment-connector {
   display: none !important;
 }
+
+/* ============================================================
+   cc-branch — общий контейнер для родителя + раскрытых детей
+   ============================================================ */
+
+/* Общий контейнер раскрытой ветки */
+.cc-branch {
+  background: #f8fbfa;
+  border: 1px solid #b9d4cd;
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+}
+
+/* Родительский комментарий внутри ветки — без рамки (рамка у ветки) */
+.cc-parent-in-branch {
+  border: 0 !important;
+  background: transparent !important;
+  margin-bottom: 0 !important;
+  padding: 4px 0 !important;
+}
+
+/* Кнопка внутри ветки */
+.cc-branch .cc-toggle {
+  margin: 4px 0;
+  background: #e8f5f2;
+  border: 1px solid #b9d4cd;
+}
+
+/* Дети внутри ветки */
+.cc-branch .cc-children {
+  margin-top: 4px;
+}
+
+/* Карточки детей внутри ветки — без рамки */
+.cc-branch .cc-children .cc-card {
+  border: 0 !important;
+  background: transparent !important;
+}
+
+/* Рекурсивно — вложенные ветки внутри ветки */
+.cc-branch .cc-branch {
+  background: #f0f7f5;
+  border: 1px solid #c9ded9;
+  margin-top: 8px;
+}
+
+/* На мобильном */
+@media (max-width: 767px) {
+  .cc-branch {
+    padding: 6px;
+    border-radius: 3px;
+  }
+}
