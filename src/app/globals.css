@@ -531,13 +531,13 @@ li.sk-rubric-row{display:block}
   .sakh-comment[data-level="2"]{
     margin-left:15px !important;
     padding-left:8px !important;
-    border-left:2px solid #e0e0e0 !important;
+    border-left:2px solid var(--sm-rail, #249790) !important;
   }
   /* Уровень 2 — сдвиг 30px */
   .sakh-comment[data-level="3"]{
     margin-left:30px !important;
     padding-left:8px !important;
-    border-left:2px solid #e0e0e0 !important;
+    border-left:2px solid var(--sm-rail, #249790) !important;
   }
   /* Уровни 3+ — фикс на 45px (не растёт бесконечно) */
   .sakh-comment[data-level="4"],
@@ -545,7 +545,7 @@ li.sk-rubric-row{display:block}
   .sakh-comment[data-level="6"]{
     margin-left:45px !important;
     padding-left:8px !important;
-    border-left:2px solid #e0e0e0 !important;
+    border-left:2px solid var(--sm-rail, #249790) !important;
   }
   /* Бирюзовые вертикальные линии — показываем */
   .sakh-comment-connector{
@@ -553,8 +553,9 @@ li.sk-rubric-row{display:block}
     width:2px !important;
     background-color:var(--sm-rail) !important;
   }
-  /* SVG-оверлей скрыт — слишком сложный для мобильного */
-  .sakh-reply-lines,.sakh-reply-tip{display:none}
+  /* SVG-оверлей линий — показываем (бирюзовые линии) */
+  .sakh-reply-lines{display:block !important;overflow:visible !important}
+  .sakh-reply-tip{display:none}
   /* Запрет горизонтальной прокрутки */
   .sakh-comments-container{overflow-x:hidden !important;max-width:100% !important}
 }
