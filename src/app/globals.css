@@ -9377,9 +9377,9 @@ div[style*="background-color: rgb(0, 74, 143)"] {
 }
 
 
+
 /* ============================================================
-   Сворачиваемые комментарии v3 — Г-образные линии (лесенка)
-   Вертикальная (::after) + Горизонтальная (::before) = уголок
+   Collapsible Comments v5 — непрерывные линии + общий контейнер
    ============================================================ */
 
 .cc-container {
@@ -9419,14 +9419,42 @@ div[style*="background-color: rgb(0, 74, 143)"] {
   position: relative;
   z-index: 1;
 }
-
 .cc-toggle:hover { background: #e0f0ec; border-color: #249790; }
 .cc-toggle-open { background: #e8f5f2; border-color: #249790; }
 .cc-toggle-icon { display: inline-block; width: 14px; font-size: 10px; text-align: center; }
 
-.cc-children { position: relative; }
+/* Общий контейнер раскрытой ветки */
+.cc-branch {
+  background: #f8fbfa;
+  border: 1px solid #b9d4cd;
+  border-left: 3px solid #249790;
+  border-radius: 4px;
+  padding: 8px 8px 8px 12px;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+  position: relative;
+}
 
-/* Wrapper для каждого ребёнка — содержит линии */
+/* Родитель внутри ветки — без рамки */
+.cc-parent-in-branch {
+  border: 0 !important;
+  background: transparent !important;
+  margin-bottom: 0 !important;
+  padding: 4px 0 !important;
+}
+
+.cc-branch .cc-toggle {
+  margin: 4px 0;
+  background: #e8f5f2;
+}
+
+/* Дети внутри ветки */
+.cc-children {
+  position: relative;
+  margin-top: 4px;
+}
+
+/* Каждый ребёнок — с непрерывной линией */
 .cc-child-wrapper {
   position: relative;
   padding-left: 22px;
@@ -9436,29 +9464,16 @@ div[style*="background-color: rgb(0, 74, 143)"] {
   .cc-child-wrapper { padding-left: 16px; }
 }
 
-/* Вертикальная линия (вся высота wrapper) */
+/* Вертикальная линия — НЕПРЕРЫВНАЯ, от верха до низа wrapper */
 .cc-child-wrapper::after {
   content: "";
   position: absolute;
   left: 0;
   top: 0;
+  bottom: 0;
   width: 2px;
   background: #249790;
   border-radius: 1px;
-}
-
-/* Для НЕ последнего ребёнка — линия до самого низа */
-.cc-child-wrapper:not(.cc-last-child)::after {
-  bottom: 0;
-}
-
-/* Для последнего ребёнка — линия только до горизонтальной */
-.cc-child-wrapper.cc-last-child::after {
-  height: 16px;
-}
-
-@media (max-width: 767px) {
-  .cc-child-wrapper.cc-last-child::after { height: 12px; }
 }
 
 /* Горизонтальная линия — от вертикальной к карточке */
@@ -9477,8 +9492,29 @@ div[style*="background-color: rgb(0, 74, 143)"] {
   .cc-child-wrapper::before { top: 12px; width: 16px; }
 }
 
-/* Убираем старый cc-connector-line (если остался) */
-.cc-connector-line { display: none !important; }
+/* Последний ребёнок — вертикальная только до горизонтальной */
+.cc-child-wrapper.cc-last-child::after {
+  bottom: auto;
+  height: 16px;
+}
+
+@media (max-width: 767px) {
+  .cc-child-wrapper.cc-last-child::after { height: 12px; }
+}
+
+/* Карточки детей внутри ветки — без рамки */
+.cc-branch .cc-children .cc-card {
+  border: 0 !important;
+  background: transparent !important;
+}
+
+/* Вложенные ветки */
+.cc-branch .cc-branch {
+  background: #f0f7f5;
+  border: 1px solid #c9ded9;
+  border-left: 3px solid #249790;
+  margin-top: 8px;
+}
 
 /* Максимальная глубина */
 .cc-node[data-level="4"] .cc-child-wrapper { padding-left: 16px; }
@@ -9495,10 +9531,13 @@ div[style*="background-color: rgb(0, 74, 143)"] {
   to { opacity: 1; max-height: 9999px; }
 }
 
-/* Скрыть старые SVG-линии */
 .cc-container .sakh-reply-lines,
 .cc-container .sakh-comment-connector {
   display: none !important;
+}
+
+@media (max-width: 767px) {
+  .cc-branch { padding: 6px 6px 6px 10px; border-radius: 3px; }
 }
 
 /* ============================================================
