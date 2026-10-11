@@ -121,6 +121,36 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, approved: scheduled.length, scheduled });
     }
 
+    if (action === "approve-batch-custom") {
+      // Approve all items in a batch with a SPECIFIC scheduledAt time (e.g. for the scheduler).
+      // All replies of the batch get the same scheduledAt — they appear in the topic together.
+      const batchId = body.batchId as string;
+      const scheduledAtStr = body.scheduledAt as string;
+      if (!batchId || !scheduledAtStr) {
+        return NextResponse.json({ error: "batchId и scheduledAt обязательны" }, { status: 400 });
+      }
+      const scheduledAt = new Date(scheduledAtStr);
+      if (isNaN(scheduledAt.getTime())) {
+        return NextResponse.json({ error: "scheduledAt не валидная дата" }, { status: 400 });
+      }
+      const batch = await db.botQueue.findMany({
+        where: { batchId, status: "pending" },
+        orderBy: { order: "asc" },
+      });
+      // All items get the SAME scheduledAt (they appear in the topic together)
+      // — but with a small random offset (1-5 min) between them so they don't appear at the exact same second.
+      const scheduled: { id: string; scheduledAt: Date }[] = [];
+      for (let i = 0; i < batch.length; i++) {
+        const item = batch[i];
+        // Each reply appears 1-5 min later than the previous
+        const offsetMin = i * (1 + Math.floor(Math.random() * 4));
+        const at = new Date(scheduledAt.getTime() + offsetMin * 60_000);
+        await db.botQueue.update({ where: { id: item.id }, data: { status: "approved", scheduledAt: at } });
+        scheduled.push({ id: item.id, scheduledAt: at });
+      }
+      return NextResponse.json({ ok: true, approved: scheduled.length, scheduled });
+    }
+
     if (action === "reject") {
       const id = body.id as string;
       if (!id) return NextResponse.json({ error: "id обязателен" }, { status: 400 });

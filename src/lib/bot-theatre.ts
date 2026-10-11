@@ -234,8 +234,46 @@ export function selectBots(bots: TheatreBot[], topicText: string, countRange: [n
 // 3. Rewriter — Z.ai рерайт темы в 3-6 реплик от лица ботов
 // ─────────────────────────────────────────────────────────────────────────
 
-const ZAI_API_URL = "https://api.z.ai/api/paas/v4/chat/completions";
-const ZAI_MODEL = "glm-5.3-flash";
+// 2026-10-12: используем internal-api.z.ai (sandbox config) — рабочий токен
+// лежит в /etc/.z-ai-config на VPS. Endpoint: internal-api.z.ai/v1/chat/completions
+// Headers: Authorization: Bearer Z.ai, X-Token: <jwt>, X-User-Id, X-Chat-Id, X-Z-AI-From: Z
+import fs from "fs";
+import os from "os";
+import path from "path";
+
+interface ZaiConfig {
+  baseUrl: string;
+  apiKey: string;
+  token?: string;
+  userId?: string;
+  chatId?: string;
+}
+
+let _zaiConfig: ZaiConfig | null = null;
+function loadZaiConfig(): ZaiConfig {
+  if (_zaiConfig) return _zaiConfig;
+  const homeDir = os.homedir();
+  const configPaths = [
+    path.join(process.cwd(), ".z-ai-config"),
+    path.join(homeDir, ".z-ai-config"),
+    "/etc/.z-ai-config",
+  ];
+  for (const filePath of configPaths) {
+    try {
+      const configStr = fs.readFileSync(filePath, "utf-8");
+      const config = JSON.parse(configStr);
+      if (config.baseUrl && config.apiKey) {
+        _zaiConfig = config;
+        return config;
+      }
+    } catch {
+      // try next path
+    }
+  }
+  throw new Error("Z.ai config not found in .z-ai-config (cwd, home, or /etc/)");
+}
+
+const ZAI_MODEL = "glm-4-plus";
 
 interface ZaiReply {
   username: string;
@@ -247,8 +285,8 @@ interface ZaiReply {
  * Возвращает массив { username, text }.
  */
 export async function rewriteTopicWithBots(topicText: string, bots: TheatreBot[]): Promise<ZaiReply[]> {
-  const apiKey = process.env.ZAI_API_KEY;
-  if (!apiKey) throw new Error("ZAI_API_KEY not set");
+  const config = loadZaiConfig();
+  const url = `${config.baseUrl}/chat/completions`;
 
   // Формируем описание персонажей для промпта
   const charDesc = bots
@@ -285,10 +323,15 @@ ${topicText}
 
 Перепиши эту тему в диалог от лица всех ${bots.length} персонажей выше. Верни JSON.`;
 
-  const headers = {
-    Authorization: `Bearer ${apiKey}`,
+  const headers: Record<string, string> = {
     "Content-Type": "application/json",
+    Authorization: `Bearer ${config.apiKey}`,
+    "X-Z-AI-From": "Z",
   };
+  if (config.token) headers["X-Token"] = config.token;
+  if (config.userId) headers["X-User-Id"] = config.userId;
+  if (config.chatId) headers["X-Chat-Id"] = config.chatId;
+
   const payload = {
     model: ZAI_MODEL,
     messages: [
@@ -297,9 +340,10 @@ ${topicText}
     ],
     temperature: 0.8,
     max_tokens: 1500,
+    thinking: { type: "disabled" },
   };
 
-  const resp = await fetch(ZAI_API_URL, {
+  const resp = await fetch(url, {
     method: "POST",
     headers,
     body: JSON.stringify(payload),
