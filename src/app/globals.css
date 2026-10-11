@@ -547,8 +547,13 @@ li.sk-rubric-row{display:block}
     padding-left:8px !important;
     border-left:2px solid #e0e0e0 !important;
   }
-  /* Линии-связки скрыты */
-  .sakh-comment-connector{display:none}
+  /* Бирюзовые вертикальные линии — показываем */
+  .sakh-comment-connector{
+    display:block !important;
+    width:2px !important;
+    background-color:var(--sm-rail) !important;
+  }
+  /* SVG-оверлей скрыт — слишком сложный для мобильного */
   .sakh-reply-lines,.sakh-reply-tip{display:none}
   /* Запрет горизонтальной прокрутки */
   .sakh-comments-container{overflow-x:hidden !important;max-width:100% !important}
