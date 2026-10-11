@@ -14,6 +14,7 @@ import {
 import { nickGenderClass } from "@/lib/nick-gender";
 import { AppealModal } from "@/components/forum/modals";
 import ForumThread from "@/components/forum/forum-thread";
+import CollapsibleComments from "@/components/forum/collapsible-comments";
 
 interface SendSanction {
   kind: string;
@@ -1072,19 +1073,10 @@ export default function TopicView(props: {
       {searchingInTopic ? (
         [...visible].sort((a, b) => a.num - b.num).map((m) => <div key={m.id}>{renderMsg(m)}</div>)
       ) : (
-        <ForumThread
-          /* УНИВЕРСАЛЬНЫЙ ForumThread (переиспользуется всеми местами, где
-             показываются посты): плоский список карточек + SVG-линии «кто кому
-             ответил» (хук useReplyLines + оверлей ReplyLinesOverlay). Смена
-             posts — пагинация, новый ответ (load() после POST), другая тема —
-             автоматически пересчитывает линии; никакого хардкода id. */
-          className="sakh-comments-container"
-          posts={flatMsgs}
-          renderPost={(m) => (
-            <div key={m.id} className="sakh-comment" data-level={String(lvlOf.get(m.id) ?? 1)} data-id={m.id} data-msgnum={m.num}>
-              {renderMsg(m, quoteOfFor(m))}
-            </div>
-          )}
+        <CollapsibleComments
+          messages={flatMsgs}
+          renderMsg={renderMsg}
+          quoteOfFor={quoteOfFor}
         />
       )}
 

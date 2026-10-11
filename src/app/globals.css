@@ -9250,3 +9250,128 @@ div[style*="background-color: rgb(0, 74, 143)"] {
     gap: 2px !important;
   }
 }
+
+/* ============================================================
+   Сворачиваемые комментарии (Excel-стиль с +/-)
+   ============================================================ */
+
+/* Контейнер */
+.cc-container {
+  position: relative;
+}
+
+/* Узел комментария */
+.cc-node {
+  position: relative;
+  margin-bottom: 8px;
+}
+
+/* Карточка сообщения — линейная, без отступов */
+.cc-card {
+  position: relative;
+  z-index: 1;
+}
+
+/* Кнопка "↩ N ответов" / "Свернуть" */
+.cc-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 10px;
+  margin: 2px 0 4px;
+  background: #f0f7f5;
+  border: 1px solid #b9d4cd;
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #249790;
+  text-align: left;
+  transition: background 0.2s, border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.cc-toggle:hover {
+  background: #e0f0ec;
+  border-color: #249790;
+}
+
+.cc-toggle-open {
+  background: #e8f5f2;
+  border-color: #249790;
+}
+
+.cc-toggle-icon {
+  display: inline-block;
+  width: 14px;
+  font-size: 10px;
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.cc-toggle-open .cc-toggle-icon {
+  transform: rotate(0deg);
+}
+
+/* Контейнер для вложенных ответов */
+.cc-children {
+  position: relative;
+  padding-left: 0;
+  margin-left: 0;
+}
+
+/* На мобильном — отступ для вложенных */
+@media (max-width: 767px) {
+  .cc-children {
+    padding-left: 12px !important;
+    margin-left: 8px !important;
+    border-left: 2px solid #249790 !important;
+  }
+}
+
+/* На десктопе — отступ больше */
+@media (min-width: 768px) {
+  .cc-children {
+    padding-left: 20px;
+    margin-left: 12px;
+    border-left: 2px solid #249790;
+  }
+}
+
+/* Максимальная глубина — фикс на 4 уровнях */
+.cc-node[data-level="4"] .cc-children {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+  border-left: 0 !important;
+}
+
+/* Анимация раскрытия */
+.cc-anim-expand {
+  animation: ccExpand 0.25s ease-out;
+  overflow: hidden;
+}
+
+@keyframes ccExpand {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 9999px;
+  }
+}
+
+/* Запрет горизонтальной прокрутки */
+.cc-container {
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+}
+
+/* Скрыть старые SVG-линии — не нужны в новом виде */
+.cc-container .sakh-reply-lines,
+.cc-container .sakh-comment-connector {
+  display: none !important;
+}
