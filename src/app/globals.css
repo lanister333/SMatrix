@@ -444,6 +444,48 @@ li.sk-rubric-row{display:block}
   white-space:nowrap;
   order:0 !important; /* сброс order — кнопки идут в естественном DOM порядке */
 }
+/* 2026-10-11: кнопка-переключатель вложенных ответов в .sk-msg-actions.
+   ▼ N (раскрыто) / ▶ N (свёрнуто). Компактная, как «sk-flood-btn», но
+   с акцентным цветом — бирюза var(--sm-rail), чтобы визуально отличаться
+   от «Пожаловаться»/«Не по делу» (это действие над структурой ветки, а не
+   жалоба). Touch-friendly: ≥32px высота, ≥40px ширина по тап-зоне. */
+.sk-msg-toggle{
+  flex-shrink:0;
+  white-space:nowrap;
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  cursor:pointer;
+  background:#fff;
+  border:1px solid var(--sm-rail, #249790);
+  color:var(--sm-rail, #249790);
+  padding:3px 8px;
+  font-size:12.5px;
+  font-weight:700;
+  border-radius:3px;
+  min-height:26px;
+  -webkit-tap-highlight-color:transparent;
+  transition:background 0.12s ease, color 0.12s ease;
+}
+.sk-msg-toggle:hover{
+  background:var(--sm-rail, #249790);
+  color:#fff;
+}
+.sk-msg-toggle:active{
+  filter:brightness(1.15);
+}
+.sk-msg-toggle .sk-msg-toggle-ico{
+  font-size:10px;
+  line-height:1;
+  transition:transform 0.18s ease;
+}
+.sk-msg-toggle[aria-expanded="false"] .sk-msg-toggle-ico{
+  transform:translateX(1px);
+}
+.sk-msg-toggle .sk-msg-toggle-cnt{
+  font-variant-numeric:tabular-nums;
+  letter-spacing:0.2px;
+}
 .sk-btn-reply{color:#fff;cursor:pointer;white-space:nowrap;background:#0a5caa;border:1px solid #084c8b;border-radius:2px;padding:3px 10px;font-family:inherit;font-size:12.5px;font-weight:700}
 .sk-btn-reply:hover{background:#084c8b}
 .sk-topicactions .sk-btn-answer{color:#fff;background:#0a5caa;border:1px solid #084c8b;border-radius:2px;margin-right:12px;padding:4px 14px;font-size:13px;text-decoration:none}

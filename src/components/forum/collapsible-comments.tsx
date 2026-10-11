@@ -1,15 +1,18 @@
-// VERSION_WIRES_1791701500 (2026-10-11 v2: extend rail up by 16px to bridge parent margin-bottom:8 + container marginTop:4)
+// VERSION_WIRES_1791703400 (2026-10-11 v4: collapsed-by-default for all forum, mobile+desktop)
 
 import { useState, useMemo } from "react";
 import type { Msg } from "@/lib/ui";
 
 /**
- * Сворачиваемые комментарии (как в Excel с +/-).
- * 
- * По умолчанию — линейный список (без отступов).
- * Под комментарием с ответами — кнопка "↩ N ответов".
- * Клик — раскрывает лесенку с вложенными ответами.
- * Повторный клик — сворачивает.
+ * Сворачиваемые комментарии с переключателем в шапке (2026-10-11).
+ *
+ * По умолчанию — ответы СВЁРНУТЫ (по требованию пользователя 2026-10-11 v2).
+ * Применимо ко всему форуму — мобайл и десктоп используют один и тот же
+ * компонент, состояние локальное в каждом узле.
+ * В верхней строке действий каждого сообщения с ответами стоит кнопка:
+ *   «▶ N» — когда ответы свёрнуты (по умолчанию; клик — раскрыть)
+ *   «▼ N» — когда раскрыты (клик — свернуть обратно)
+ * Кнопка не рисуется, если у сообщения 0 ответов.
  * Рекурсивно на любой глубине.
  */
 
@@ -22,7 +25,16 @@ interface QuoteOf {
 
 interface CollapsibleCommentsProps {
   messages: Msg[];
-  renderMsg: (m: Msg, quoteOf?: QuoteOf | null) => React.ReactNode;
+  // 2026-10-11: renderMsg теперь принимает opts с replyCount/isExpanded/
+  // onToggleReplies — чтобы MessageRow мог рисовать кнопку-переключатель
+  // вложенных ответов в верхней строке действий (рядом с «Пожаловаться»/
+  // «Не по делу»/«Ответить»). opts отсутствует для корневых постов без
+  // детей — кнопка не рисуется.
+  renderMsg: (
+    m: Msg,
+    quoteOf?: QuoteOf | null,
+    opts?: { replyCount?: number; isExpanded?: boolean; onToggleReplies?: () => void },
+  ) => React.ReactNode;
   quoteOfFor: (m: Msg) => QuoteOf | null;
 }
 
@@ -71,12 +83,19 @@ function CommentNode({
 }: {
   node: TreeNode;
   level: number;
-  renderMsg: (m: Msg, quoteOf?: QuoteOf | null) => React.ReactNode;
+  renderMsg: (
+    m: Msg,
+    quoteOf?: QuoteOf | null,
+    opts?: { replyCount?: number; isExpanded?: boolean; onToggleReplies?: () => void },
+  ) => React.ReactNode;
   quoteOfFor: (m: Msg) => QuoteOf | null;
 }) {
-  // expanded удалён — ответы всегда раскрыты
+  // 2026-10-11 v2: по умолчанию СВЁРНУТО (по требованию пользователя).
+  // Применимо ко всему форуму — мобайл и десктоп используют один и тот же
+  // компонент CommentNode, состояние локальное в каждом узле. Клик по
+  // кнопке-переключателю в .sk-msg-actions раскрывает ответы.
+  const [isExpanded, setIsExpanded] = useState(false);
   const replyCount = node.children.length;
-  // totalReplies удалён
   
   const TEAL = "#249790";
   const WIRE_X = 12;        // X вертикальной линии
@@ -94,11 +113,18 @@ function CommentNode({
         data-msgnum={node.msg.num}
         style={{ position: "relative", zIndex: 1 }}
       >
-        {renderMsg(node.msg, quoteOfFor(node.msg))}
+        {renderMsg(node.msg, quoteOfFor(node.msg), {
+          replyCount,
+          isExpanded,
+          onToggleReplies: replyCount > 0 ? () => setIsExpanded(v => !v) : undefined,
+        })}
       </div>
       
-      {/* Ответы всегда раскрыты — с линиями-проводами */}
-      {replyCount > 0 && (
+      {/* 2026-10-11: ответы раскрываются/сворачиваются кнопкой-переключателем
+          в .sk-msg-actions (передаётся через opts.renderMsg → MessageRow).
+          Когда isExpanded=false — дети не рендерятся вовсе (линии-рельсы
+          тоже пропадают, т.к. они рисуются относительно детей). */}
+      {replyCount > 0 && isExpanded && (
         <div style={{ position: "relative", marginTop: "4px" }}>
           {node.children.map((child, idx) => {
             const isLast = idx === node.children.length - 1;

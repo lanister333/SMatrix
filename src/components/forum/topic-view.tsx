@@ -146,6 +146,12 @@ function TopicPager(props: {
   );
 }
 
+function pluralReplies(n: number): string {
+  if (n === 1) return "ответ";
+  if (n >= 2 && n <= 4) return "ответа";
+  return "ответов";
+}
+
 function MessageRow(props: {
   m: Msg;
   user: ForumUser | null;
@@ -174,6 +180,12 @@ function MessageRow(props: {
   onDelete: () => void;
   onAppeal: () => void;
   appealSent: boolean;
+  /** 2026-10-11: кнопка-переключатель вложенных ответов в .sk-msg-actions.
+   *  replyCount > 0 → рисуется кнопка «▼ N» (раскрыто) или «▶ N» (свёрнуто).
+   *  replyCount = 0 или undefined → кнопка не рисуется. */
+  replyCount?: number;
+  isExpanded?: boolean;
+  onToggleReplies?: () => void;
 }) {
   const { m } = props;
   if (m.isDeleted) {
@@ -259,6 +271,23 @@ function MessageRow(props: {
         {own && (
           <button className="sk-flood-btn sk-msg-del" onClick={props.onDelete}>
             Удалить
+          </button>
+        )}
+        {/* 2026-10-11: переключатель вложенных ответов в верхней строке
+            действий (рядом с «Пожаловаться»/«Не по делу»/«Ответить»).
+            ▼ N — ответы раскрыты (клик — свернуть);
+            ▶ N — ответы свёрнуты (клик — раскрыть).
+            Кнопка не рисуется, если replyCount = 0 или undefined. */}
+        {typeof props.replyCount === "number" && props.replyCount > 0 && props.onToggleReplies && (
+          <button
+            className="sk-msg-toggle"
+            onClick={props.onToggleReplies}
+            title={`${props.replyCount} ${pluralReplies(props.replyCount)}`}
+            aria-expanded={props.isExpanded ?? true}
+            aria-label={`${props.replyCount} ${pluralReplies(props.replyCount)}`}
+          >
+            <span className="sk-msg-toggle-ico">{props.isExpanded ? "▼" : "▶"}</span>
+            <span className="sk-msg-toggle-cnt">{props.replyCount}</span>
           </button>
         )}
         <button
@@ -762,9 +791,16 @@ export default function TopicView(props: {
     </>
   );
 
-  const renderMsg = (m: Msg, quoteOf?: { author: string; num: number; body: string; onGo?: () => void } | null) => (
+  const renderMsg = (
+    m: Msg,
+    quoteOf?: { author: string; num: number; body: string; onGo?: () => void } | null,
+    opts?: { replyCount?: number; isExpanded?: boolean; onToggleReplies?: () => void },
+  ) => (
     <MessageRow
       m={m}
+      replyCount={opts?.replyCount}
+      isExpanded={opts?.isExpanded}
+      onToggleReplies={opts?.onToggleReplies}
       user={props.user}
       favDone={favorites.has(topicId)}
       isNew={firstNew > 0 && m.num >= firstNew}
