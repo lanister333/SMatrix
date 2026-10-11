@@ -9376,8 +9376,10 @@ div[style*="background-color: rgb(0, 74, 143)"] {
   display: none !important;
 }
 
+
 /* ============================================================
-   Сворачиваемые комментарии v2 — линии связи между сообщениями
+   Сворачиваемые комментарии v3 — Г-образные линии (лесенка)
+   Вертикальная (::after) + Горизонтальная (::before) = уголок
    ============================================================ */
 
 .cc-container {
@@ -9418,65 +9420,71 @@ div[style*="background-color: rgb(0, 74, 143)"] {
   z-index: 1;
 }
 
-.cc-toggle:hover {
-  background: #e0f0ec;
-  border-color: #249790;
-}
+.cc-toggle:hover { background: #e0f0ec; border-color: #249790; }
+.cc-toggle-open { background: #e8f5f2; border-color: #249790; }
+.cc-toggle-icon { display: inline-block; width: 14px; font-size: 10px; text-align: center; }
 
-.cc-toggle-open {
-  background: #e8f5f2;
-  border-color: #249790;
-}
+.cc-children { position: relative; }
 
-.cc-toggle-icon {
-  display: inline-block;
-  width: 14px;
-  font-size: 10px;
-  text-align: center;
-}
-
-.cc-children {
-  position: relative;
-}
-
+/* Wrapper для каждого ребёнка — содержит линии */
 .cc-child-wrapper {
   position: relative;
-  padding-left: 20px;
+  padding-left: 22px;
 }
 
 @media (max-width: 767px) {
-  .cc-child-wrapper {
-    padding-left: 14px;
-  }
+  .cc-child-wrapper { padding-left: 16px; }
 }
 
-/* Вертикальная бирюзовая линия от родителя к ребёнку */
-.cc-connector-line {
+/* Вертикальная линия (вся высота wrapper) */
+.cc-child-wrapper::after {
+  content: "";
   position: absolute;
   left: 0;
   top: 0;
-  bottom: 0;
   width: 2px;
   background: #249790;
   border-radius: 1px;
 }
 
-/* Для последнего ребёнка — линия только до карточки */
-.cc-last-child .cc-connector-line {
-  bottom: auto;
-  height: 14px;
+/* Для НЕ последнего ребёнка — линия до самого низа */
+.cc-child-wrapper:not(.cc-last-child)::after {
+  bottom: 0;
+}
+
+/* Для последнего ребёнка — линия только до горизонтальной */
+.cc-child-wrapper.cc-last-child::after {
+  height: 16px;
 }
 
 @media (max-width: 767px) {
-  .cc-last-child .cc-connector-line {
-    height: 10px;
-  }
+  .cc-child-wrapper.cc-last-child::after { height: 12px; }
 }
 
-.cc-node[data-level="4"] .cc-child-wrapper {
-  padding-left: 14px;
+/* Горизонтальная линия — от вертикальной к карточке */
+.cc-child-wrapper::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 16px;
+  width: 22px;
+  height: 2px;
+  background: #249790;
+  border-radius: 1px;
 }
 
+@media (max-width: 767px) {
+  .cc-child-wrapper::before { top: 12px; width: 16px; }
+}
+
+/* Убираем старый cc-connector-line (если остался) */
+.cc-connector-line { display: none !important; }
+
+/* Максимальная глубина */
+.cc-node[data-level="4"] .cc-child-wrapper { padding-left: 16px; }
+.cc-node[data-level="4"] .cc-child-wrapper::before { width: 16px; }
+
+/* Анимация */
 .cc-anim-expand {
   animation: ccExpand 0.25s ease-out;
   overflow: hidden;
@@ -9487,6 +9495,7 @@ div[style*="background-color: rgb(0, 74, 143)"] {
   to { opacity: 1; max-height: 9999px; }
 }
 
+/* Скрыть старые SVG-линии */
 .cc-container .sakh-reply-lines,
 .cc-container .sakh-comment-connector {
   display: none !important;
