@@ -527,7 +527,7 @@ li.sk-rubric-row{display:block}
     padding-left:10px !important;
     border-left:0 !important;
   }
-  /* Уровень 1 — ответ, сдвиг 15px + вертикальная линия */
+  /* Уровень 1 — ответ, сдвиг 15px + бирюзовая линия */
   .sakh-comment[data-level="2"]{
     margin-left:15px !important;
     padding-left:8px !important;
@@ -539,7 +539,7 @@ li.sk-rubric-row{display:block}
     padding-left:8px !important;
     border-left:2px solid var(--sm-rail, #249790) !important;
   }
-  /* Уровни 3+ — фикс на 45px (не растёт бесконечно) */
+  /* Уровни 3+ — фикс на 45px */
   .sakh-comment[data-level="4"],
   .sakh-comment[data-level="5"],
   .sakh-comment[data-level="6"]{
@@ -547,15 +547,9 @@ li.sk-rubric-row{display:block}
     padding-left:8px !important;
     border-left:2px solid var(--sm-rail, #249790) !important;
   }
-  /* Бирюзовые вертикальные линии — показываем */
-  .sakh-comment-connector{
-    display:block !important;
-    width:2px !important;
-    background-color:var(--sm-rail) !important;
-  }
-  /* SVG-оверлей линий — показываем (бирюзовые линии) */
+  /* Бирюзовые линии-связки ПОКАЗАНЫ на мобильном */
+  .sakh-comment-connector{display:block !important;background-color:var(--sm-rail, #249790) !important}
   .sakh-reply-lines{display:block !important;overflow:visible !important}
-  .sakh-reply-tip{display:none}
   /* Запрет горизонтальной прокрутки */
   .sakh-comments-container{overflow-x:hidden !important;max-width:100% !important}
 }
