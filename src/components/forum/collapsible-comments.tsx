@@ -1,8 +1,17 @@
-// VERSION_V8B 1791697778
 "use client";
 
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo } from "react";
 import type { Msg } from "@/lib/ui";
+
+/**
+ * Сворачиваемые комментарии (как в Excel с +/-).
+ * 
+ * По умолчанию — линейный список (без отступов).
+ * Под комментарием с ответами — кнопка "↩ N ответов".
+ * Клик — раскрывает лесенку с вложенными ответами.
+ * Повторный клик — сворачивает.
+ * Рекурсивно на любой глубине.
+ */
 
 interface QuoteOf {
   author: string;
@@ -22,74 +31,61 @@ interface TreeNode {
   children: TreeNode[];
 }
 
+/** Построить дерево из плоского массива по parentId */
 function buildTree(messages: Msg[]): TreeNode[] {
+  const byId = new Map(messages.map(m => [m.id, m]));
   const childrenMap = new Map<string | null, Msg[]>();
+  
   for (const m of messages) {
     const parentKey = m.parentId;
-    if (!childrenMap.has(parentKey)) childrenMap.set(parentKey, []);
+    if (!childrenMap.has(parentKey)) {
+      childrenMap.set(parentKey, []);
+    }
     childrenMap.get(parentKey)!.push(m);
   }
+  
   function buildNode(msg: Msg): TreeNode {
     const kids = childrenMap.get(msg.id) || [];
-    return { msg, children: kids.map(buildNode) };
+    return {
+      msg,
+      children: kids.map(buildNode),
+    };
   }
+  
+  // Корневые сообщения (parentId = null)
   const roots = childrenMap.get(null) || [];
   return roots.map(buildNode);
 }
 
+/** Подсчитать ВСЕ ответы (включая вложенные) */
 function countAllReplies(node: TreeNode): number {
   return node.children.reduce((sum, child) => sum + 1 + countAllReplies(child), 0);
 }
 
-function pluralReplies(n: number): string {
-  if (n === 1) return "ответ";
-  if (n >= 2 && n <= 4) return "ответа";
-  return "ответов";
-}
-
-const TEAL = "#249790";
-const WIRE_LEFT = 12;     // X координата вертикального провода
-const WIRE_H_WIDTH = 16;   // длина горизонтального провода — заходит под рамку карточки
-const WIRE_H_TOP = 8;      // Y — касается верхней части рамки карточки
-
-function CommentNode({ node, level, renderMsg, quoteOfFor }: {
+/** Рекурсивный компонент комментария */
+function CommentNode({
+  node,
+  level,
+  renderMsg,
+  quoteOfFor,
+}: {
   node: TreeNode;
   level: number;
   renderMsg: (m: Msg, quoteOf?: QuoteOf | null) => React.ReactNode;
   quoteOfFor: (m: Msg) => QuoteOf | null;
 }) {
-  const [expanded, setExpanded] = useState(false);
+  // expanded удалён — ответы всегда раскрыты
   const replyCount = node.children.length;
-  const totalReplies = useMemo(() => countAllReplies(node), [node]);
-  const indent = level === 0 ? 0 : WIRE_LEFT + WIRE_H_WIDTH;
-
-  // Реф на контейнер детей — для измерения высоты
-  const childrenRef = useRef<HTMLDivElement>(null);
-  const [wireHeight, setWireHeight] = useState(0);
-
-  useEffect(() => {
-    if (expanded && childrenRef.current) {
-      const update = () => {
-        if (childrenRef.current) {
-          // Высота = от верха до верха последнего ребёнка
-          const children = childrenRef.current.children;
-          if (children.length > 0) {
-            const last = children[children.length - 1];
-            const rect = childrenRef.current.getBoundingClientRect();
-            const lastRect = last.getBoundingClientRect();
-            const h = lastRect.top - rect.top + WIRE_H_TOP + 2; // +2 чтобы зайти под рамку
-            setWireHeight(h);
-          }
-        }
-      };
-      update();
-      // Повтор через 100мс — после рендера
-      setTimeout(update, 100);
-    }
-  }, [expanded, replyCount]);
-
+  // totalReplies удалён
+  
+  const TEAL = "#249790";
+  const WIRE_X = 12;        // X вертикальной линии
+  const WIRE_W = 18;        // ширина горизонтальной (до рамки карточки + 2px заход)
+  const PAD = WIRE_X + WIRE_W; // отступ детей = 30px
+  const H_TOP = 10;         // Y горизонтальной — касается верхней рамки
+  
   return (
-    <div style={{ position: "relative", marginBottom: "4px", paddingLeft: indent + "px" }}>
+    <div style={{ position: "relative", marginBottom: "8px" }} data-level={level}>
       {/* Карточка сообщения */}
       <div
         className="sakh-comment"
@@ -100,96 +96,65 @@ function CommentNode({ node, level, renderMsg, quoteOfFor }: {
       >
         {renderMsg(node.msg, quoteOfFor(node.msg))}
       </div>
-
-      {/* Кнопка раскрытия — просто кликабельная строка */}
-      {replyCount > 0 && !expanded && (
-        <div
-          onClick={() => setExpanded(true)}
-          style={{
-            cursor: "pointer",
-            padding: "4px 0",
-            color: TEAL,
-            fontSize: "12px",
-            fontWeight: 600,
-            position: "relative",
-            zIndex: 2,
-          }}
-        >
-          ▶ ↩ {totalReplies} {pluralReplies(totalReplies)}
-        </div>
-      )}
-      {expanded && replyCount > 0 && (
-        <div
-          onClick={() => setExpanded(false)}
-          style={{
-            cursor: "pointer",
-            padding: "4px 0",
-            color: TEAL,
-            fontSize: "12px",
-            fontWeight: 600,
-            position: "relative",
-            zIndex: 2,
-          }}
-        >
-          ▼ Свернуть
-        </div>
-      )}
-
-      {/* Раскрытые дети */}
-      {expanded && replyCount > 0 && (
-        <div ref={childrenRef} style={{ position: "relative", marginTop: "0px" }}>
-          {/* 
-            Вертикальный провод — от верха первого ребёнка до верха последнего.
-            КАСАЕТСЯ горизонтальных проводов, которые касаются карточек.
-            НЕ висит в воздухе.
-          */}
-          <div style={{
-            position: "absolute",
-            left: WIRE_LEFT + "px",
-            top: "0",
-            height: (wireHeight > 0 ? wireHeight : "100%") + "px",
-            width: "2px",
-            background: TEAL,
-            zIndex: 0,
-          }} />
-
-          {node.children.map((child, idx) => (
-            <div key={child.msg.id} style={{ position: "relative", paddingLeft: (WIRE_LEFT + WIRE_H_WIDTH) + "px", marginBottom: "4px" }}>
-              {/* 
-                Горизонтальный провод — от вертикальной линии до ЛЕВОГО КРАЯ карточки.
-                КАСАЕТСЯ вертикальной (слева) и карточки (справа).
-              */}
-              <div style={{
-                position: "absolute",
-                left: WIRE_LEFT + "px",
-                top: WIRE_H_TOP + "px",
-                width: WIRE_H_WIDTH + "px",
-                height: "2px",
-                background: TEAL,
-                zIndex: 0,
-              }} />
-              {/* Сам ребёнок */}
-              <CommentNode
-                node={child}
-                level={Math.min(level + 1, 4)}
-                renderMsg={renderMsg}
-                quoteOfFor={quoteOfFor}
-              />
-            </div>
-          ))}
+      
+      {/* Ответы всегда раскрыты — с линиями-проводами */}
+      {replyCount > 0 && (
+        <div style={{ position: "relative", marginTop: "4px" }}>
+          {node.children.map((child, idx) => {
+            const isLast = idx === node.children.length - 1;
+            return (
+              <div key={child.msg.id} style={{ position: "relative", paddingLeft: PAD + "px", marginBottom: "4px" }}>
+                {/* Вертикальная линия — от верха до низа (или до горизонт. последнего) */}
+                <div style={{
+                  position: "absolute",
+                  left: WIRE_X + "px",
+                  top: "0",
+                  height: isLast ? (H_TOP + 2) + "px" : "100%",
+                  width: "2px",
+                  background: TEAL,
+                  zIndex: 0,
+                }} />
+                {/* Горизонтальная линия — от вертикальной до рамки карточки (+2px заход) */}
+                <div style={{
+                  position: "absolute",
+                  left: WIRE_X + "px",
+                  top: H_TOP + "px",
+                  width: WIRE_W + "px",
+                  height: "2px",
+                  background: TEAL,
+                  zIndex: 0,
+                }} />
+                {/* Ребёнок */}
+                <CommentNode
+                  node={child}
+                  level={Math.min(level + 1, 4)}
+                  renderMsg={renderMsg}
+                  quoteOfFor={quoteOfFor}
+                />
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
   );
 }
 
-export default function CollapsibleComments({ messages, renderMsg, quoteOfFor }: CollapsibleCommentsProps) {
+function pluralReplies(n: number): string {
+  if (n === 1) return "ответ";
+  if (n >= 2 && n <= 4) return "ответа";
+  return "ответов";
+}
+
+export default function CollapsibleComments({
+  messages,
+  renderMsg,
+  quoteOfFor,
+}: CollapsibleCommentsProps) {
   const tree = useMemo(() => buildTree(messages), [messages]);
+  
   return (
-    <div
-      className="sakh-comments-container"
-      style={{ position: "relative", overflowX: "hidden", maxWidth: "100%" }}
-    >
+    <div className="sakh-comments-container cc-container">
       {tree.map((node) => (
         <CommentNode
           key={node.msg.id}
