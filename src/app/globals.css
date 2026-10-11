@@ -519,13 +519,39 @@ li.sk-rubric-row{display:block}
 .sakh-comments-container .sakh-comment > .sk-msg{background:transparent;border:0;margin:0;padding:0}
 .sakh-comments-container .sakh-comment > .sk-msg-deleted,
 .sakh-comments-container .sakh-comment > .sk-msg-aihidden{border:0;margin:0;background:transparent;padding:2px 0}
-/* Мобильная адаптация (строго по ТЗ Сахматрицы): на смартфонах все
-   карточки по одной линии (без сдвига), линии скрыты — связь идёт через
-   текстовое @имя и метку «└ ответ» */
+/* Мобильная адаптация: древовидная лесенка по ТЗ v1.2 */
 @media (max-width:768px){
-  .sakh-comment{margin-left:0 !important;padding-left:10px !important} /* На смартфонах все в одну линию */
-  .sakh-comment-connector{display:none} /* Нити ветвей скрыты */
-  .sakh-reply-lines,.sakh-reply-tip{display:none} /* SVG-оверлей линий скрыт */
+  /* Уровень 0 — корневое сообщение, 100% ширины */
+  .sakh-comment[data-level="1"]{
+    margin-left:0 !important;
+    padding-left:10px !important;
+    border-left:0 !important;
+  }
+  /* Уровень 1 — ответ, сдвиг 15px + вертикальная линия */
+  .sakh-comment[data-level="2"]{
+    margin-left:15px !important;
+    padding-left:8px !important;
+    border-left:2px solid #e0e0e0 !important;
+  }
+  /* Уровень 2 — сдвиг 30px */
+  .sakh-comment[data-level="3"]{
+    margin-left:30px !important;
+    padding-left:8px !important;
+    border-left:2px solid #e0e0e0 !important;
+  }
+  /* Уровни 3+ — фикс на 45px (не растёт бесконечно) */
+  .sakh-comment[data-level="4"],
+  .sakh-comment[data-level="5"],
+  .sakh-comment[data-level="6"]{
+    margin-left:45px !important;
+    padding-left:8px !important;
+    border-left:2px solid #e0e0e0 !important;
+  }
+  /* Линии-связки скрыты */
+  .sakh-comment-connector{display:none}
+  .sakh-reply-lines,.sakh-reply-tip{display:none}
+  /* Запрет горизонтальной прокрутки */
+  .sakh-comments-container{overflow-x:hidden !important;max-width:100% !important}
 }
 .sk-msg-collapsed{color:#55606b;cursor:pointer;background:#efefef;border:1px solid #b9c2cc;margin-bottom:7px;padding:5px 10px;font-size:12.5px}
 .sk-msg-aihidden{color:#5d4a75;cursor:pointer;background:#f7f3fb;border:1px dashed #b9a7c9;border-radius:3px;margin-bottom:7px;padding:7px 11px;font-size:12.5px}
