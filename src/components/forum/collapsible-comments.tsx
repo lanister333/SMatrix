@@ -1,4 +1,4 @@
-"use client";
+// VERSION_WIRES_1791701500 (2026-10-11 v2: extend rail up by 16px to bridge parent margin-bottom:8 + container marginTop:4)
 
 import { useState, useMemo } from "react";
 import type { Msg } from "@/lib/ui";
@@ -104,22 +104,40 @@ function CommentNode({
             const isLast = idx === node.children.length - 1;
             return (
               <div key={child.msg.id} style={{ position: "relative", paddingLeft: PAD + "px", marginBottom: "4px" }}>
-                {/* Вертикальная линия — от верха до низа (или до горизонт. последнего) */}
+                {/* 2026-10-11 FIX: вертикальная линия должна КОСАТЬСЯ окон ответов
+                    (родительской карточки сверху и следующей sibling-карточки снизу).
+                    Раньше top:0 + height:100% оставляли зазор 4px в каждом стыке
+                    (marginBottom:4 обрывал линию). Теперь:
+                    - top:-16 — линия поднимается на 16px вверх, перекрывая
+                      margin-bottom:8 родительской .sakh-comment + marginTop:4
+                      контейнера детей + 4px запаса (заход ПОД нижнюю рамку
+                      родителя, zIndex:0 за карточкой с zIndex:1 — видимого
+                      наложения нет, но гарантированное касание);
+                    - height: calc(100% + 20px) для НЕ-последнего — линия уходит
+                      на 16px вверх и на 4px вниз (перекрывая собственный
+                      marginBottom:4), смыкается с верхней частью линии след.
+                      sibling'а;
+                    - height: (H_TOP + 2 + 16)px = 28px для последнего —
+                      начинается от родительской рамки (-16) и доходит до
+                      горизонтального отвода (y=12), длина = 12 + 16 = 28. */}
                 <div style={{
                   position: "absolute",
                   left: WIRE_X + "px",
-                  top: "0",
-                  height: isLast ? (H_TOP + 2) + "px" : "100%",
+                  top: "-16px",
+                  height: isLast ? (H_TOP + 2 + 16) + "px" : "calc(100% + 20px)",
                   width: "2px",
                   background: TEAL,
                   zIndex: 0,
                 }} />
-                {/* Горизонтальная линия — от вертикальной до рамки карточки (+2px заход) */}
+                {/* Горизонтальная линия — от вертикальной до рамки карточки
+                    (+2px заводится ПОД рамку карточки: zIndex:0 за карточкой
+                    с zIndex:1, видимого наложения нет — но гарантированно
+                    касается левого края окна ответа без под-пиксельного зазора). */}
                 <div style={{
                   position: "absolute",
                   left: WIRE_X + "px",
                   top: H_TOP + "px",
-                  width: WIRE_W + "px",
+                  width: (WIRE_W + 2) + "px",
                   height: "2px",
                   background: TEAL,
                   zIndex: 0,
