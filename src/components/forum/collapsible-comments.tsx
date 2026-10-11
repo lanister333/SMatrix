@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import type { Msg } from "@/lib/ui";
 
 interface QuoteOf {
@@ -22,7 +22,6 @@ interface TreeNode {
 }
 
 function buildTree(messages: Msg[]): TreeNode[] {
-  const byId = new Map(messages.map(m => [m.id, m]));
   const childrenMap = new Map<string | null, Msg[]>();
   for (const m of messages) {
     const parentKey = m.parentId;
@@ -48,6 +47,9 @@ function pluralReplies(n: number): string {
 }
 
 const TEAL = "#249790";
+const WIRE_LEFT = 12;     // X координата вертикального провода
+const WIRE_H_WIDTH = 14;   // длина горизонтального провода
+const WIRE_H_TOP = 14;     // Y координата горизонтального провода (у верха карточки)
 
 function CommentNode({ node, level, renderMsg, quoteOfFor }: {
   node: TreeNode;
@@ -58,7 +60,32 @@ function CommentNode({ node, level, renderMsg, quoteOfFor }: {
   const [expanded, setExpanded] = useState(false);
   const replyCount = node.children.length;
   const totalReplies = useMemo(() => countAllReplies(node), [node]);
-  const indent = level === 0 ? 0 : 20;
+  const indent = level === 0 ? 0 : WIRE_LEFT + WIRE_H_WIDTH;
+
+  // Реф на контейнер детей — для измерения высоты
+  const childrenRef = useRef<HTMLDivElement>(null);
+  const [wireHeight, setWireHeight] = useState(0);
+
+  useEffect(() => {
+    if (expanded && childrenRef.current) {
+      const update = () => {
+        if (childrenRef.current) {
+          // Высота = от верха до верха последнего ребёнка
+          const children = childrenRef.current.children;
+          if (children.length > 0) {
+            const last = children[children.length - 1];
+            const rect = childrenRef.current.getBoundingClientRect();
+            const lastRect = last.getBoundingClientRect();
+            const h = lastRect.top - rect.top + WIRE_H_TOP;
+            setWireHeight(h);
+          }
+        }
+      };
+      update();
+      // Повтор через 100мс — после рендера
+      setTimeout(update, 100);
+    }
+  }, [expanded, replyCount]);
 
   return (
     <div style={{ position: "relative", marginBottom: "8px", paddingLeft: indent + "px" }}>
@@ -108,56 +135,48 @@ function CommentNode({ node, level, renderMsg, quoteOfFor }: {
         </button>
       )}
 
-      {/* Раскрытые дети — линии-провода соединяют окна */}
+      {/* Раскрытые дети */}
       {expanded && replyCount > 0 && (
-        <div style={{ position: "relative", marginTop: "4px" }}>
-          {/* Вертикальная линия-провод от кнопки вниз через всех детей */}
+        <div ref={childrenRef} style={{ position: "relative", marginTop: "4px" }}>
+          {/* 
+            Вертикальный провод — от верха первого ребёнка до верха последнего.
+            КАСАЕТСЯ горизонтальных проводов, которые касаются карточек.
+            НЕ висит в воздухе.
+          */}
           <div style={{
             position: "absolute",
-            left: "10px",
+            left: WIRE_LEFT + "px",
             top: "0",
-            bottom: "0",
+            height: (wireHeight > 0 ? wireHeight : "100%") + "px",
             width: "2px",
             background: TEAL,
             zIndex: 0,
           }} />
 
-          {node.children.map((child, idx) => {
-            const isLast = idx === node.children.length - 1;
-            return (
-              <div key={child.msg.id} style={{ position: "relative", paddingLeft: "24px", marginBottom: isLast ? "0" : "0" }}>
-                {/* Горизонтальный провод — от вертикальной к карточке ребёнка */}
-                <div style={{
-                  position: "absolute",
-                  left: "10px",
-                  top: "12px",
-                  width: "14px",
-                  height: "2px",
-                  background: TEAL,
-                  zIndex: 0,
-                }} />
-                {/* Если последний — обрезаем вертикальную ниже горизонтальной */}
-                {isLast && (
-                  <div style={{
-                    position: "absolute",
-                    left: "10px",
-                    top: "0",
-                    width: "2px",
-                    height: "13px",
-                    background: "#fff",
-                    zIndex: 0,
-                  }} />
-                )}
-                {/* Сам ребёнок */}
-                <CommentNode
-                  node={child}
-                  level={Math.min(level + 1, 4)}
-                  renderMsg={renderMsg}
-                  quoteOfFor={quoteOfFor}
-                />
-              </div>
-            );
-          })}
+          {node.children.map((child, idx) => (
+            <div key={child.msg.id} style={{ position: "relative", paddingLeft: (WIRE_LEFT + WIRE_H_WIDTH) + "px", marginBottom: "8px" }}>
+              {/* 
+                Горизонтальный провод — от вертикальной линии до ЛЕВОГО КРАЯ карточки.
+                КАСАЕТСЯ вертикальной (слева) и карточки (справа).
+              */}
+              <div style={{
+                position: "absolute",
+                left: WIRE_LEFT + "px",
+                top: WIRE_H_TOP + "px",
+                width: WIRE_H_WIDTH + "px",
+                height: "2px",
+                background: TEAL,
+                zIndex: 0,
+              }} />
+              {/* Сам ребёнок */}
+              <CommentNode
+                node={child}
+                level={Math.min(level + 1, 4)}
+                renderMsg={renderMsg}
+                quoteOfFor={quoteOfFor}
+              />
+            </div>
+          ))}
         </div>
       )}
     </div>
