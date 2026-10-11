@@ -60,6 +60,8 @@ model User {
   devices       UserDevice[]
   ips           UserIp[]
   loginAttempts LoginAttempt[]
+  /// 2026-10-12: очередь «Театра ботов» (этот юзер как бот)
+  botQueueItems  BotQueue[]  @relation("BotQueueBotUser")
   /// Связи этого пользователя с другими аккаунтами (одинаковый phone/device/IP).
   linksA        AccountLink[] @relation("AccountLinkA")
   linksB        AccountLink[] @relation("AccountLinkB")
@@ -227,6 +229,8 @@ model Topic {
   lastAuthorName String    @default("")
   deletedAt      DateTime?
   messages       Message[]
+  /// 2026-10-12: очередь «Театра ботов» для этой темы
+  botQueueItems  BotQueue[]
   /// ШАГ 17. Публикация «Подслушано», к которой привязана тема (0..1, у публикации уникально).
   overheardPost  OverheardPost?
   /// ШАГ 18. Вопрос «Где купить», к которому привязана тема (0..1, у вопроса уникально).
@@ -1157,4 +1161,36 @@ model CurrencyRate {
   createdAt   DateTime  @default(now())
 
   @@index([batch])
+}
+
+/// «ТЕАТР БОТОВ» (2026-10-12): очередь премодерации рерайченных постов.
+/// Источник поста — парсер (TG/biz65) ИЛИ админ (вводит тему вручную).
+/// Каждый пост — одна реплика одного бота в одной теме форума.
+/// Status flow: pending → approved → published (или rejected → regenerated).
+model BotQueue {
+  id                String    @id @default(cuid())
+  botUserId         String
+  botUser           User      @relation("BotQueueBotUser", fields: [botUserId], references: [id], onDelete: Cascade)
+  botNickname       String
+  text              String
+  sourceText        String    @default("")
+  topicId           Int?
+  topic             Topic?    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  parentMessageId   String?
+  rubricId          Int?
+  topicTitle        String?
+  scheduledAt       DateTime?
+  status            String    @default("pending")
+  publishedMessageId String?
+  rejectReason      String    @default("")
+  meta              String    @default("{}")
+  order             Int       @default(0)
+  batchId           String    @default("")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([status, scheduledAt])
+  @@index([botUserId])
+  @@index([topicId])
+  @@index([batchId])
 }

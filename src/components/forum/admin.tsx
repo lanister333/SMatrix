@@ -13,6 +13,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { CATEGORY_LABELS, fmtDate, fmtDateTime, fmtNum, type ForumUser } from "@/lib/ui";
 import { nickGenderClass } from "@/lib/nick-gender";
+import { BotTheatreSection } from "@/components/forum/admin-bot-theatre";
 
 const KIND_LABELS: Record<string, string> = {
   warning: "Замечание",
@@ -69,6 +70,7 @@ export type AdminSection =
   | "complaints"
   | "users"
   | "topics"
+  | "bots"
   | "ads"
   | "info"
   | "directory"
@@ -81,6 +83,7 @@ const MENU: { key: AdminSection; label: string; ownerOnly: boolean }[] = [
   { key: "complaints", label: "Жалобы", ownerOnly: false },
   { key: "users", label: "Пользователи", ownerOnly: false },
   { key: "topics", label: "Темы форума", ownerOnly: false },
+  { key: "bots", label: "Театр ботов", ownerOnly: false },
   { key: "ads", label: "Объявления", ownerOnly: true },
   { key: "info", label: "Практическая информация", ownerOnly: true },
   { key: "directory", label: "Справочник", ownerOnly: true },
@@ -94,6 +97,7 @@ const SECTION_TITLES: Record<AdminSection, string> = {
   complaints: "Жалобы",
   users: "Пользователи",
   topics: "Темы форума",
+  bots: "Театр ботов · очередь премодерации",
   ads: "Объявления",
   info: "Практическая информация",
   directory: "Справочник",
@@ -187,6 +191,7 @@ export function AdminPanel(props: {
           {section === "complaints" && <ComplaintsSection token={props.token} notify={props.notify} onOpenTopic={props.onOpenTopic} />}
           {section === "users" && <UsersSection token={props.token} isOwner={owner} notify={props.notify} onOpenProfile={props.onOpenProfile} />}
           {section === "topics" && <TopicsSection token={props.token} isOwner={owner} notify={props.notify} onOpenTopic={props.onOpenTopic} />}
+          {section === "bots" && <BotTheatreSection token={props.token} notify={props.notify} onOpenTopic={props.onOpenTopic} />}
           {(section === "ads" || section === "info" || section === "directory") && (
             <SectionManager token={props.token} section={section} notify={props.notify} />
           )}
