@@ -179,6 +179,68 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, topicId: r.topicId, messageId: r.messageId });
     }
 
+    if (action === "save-batch") {
+      // Принимает ГОТОВЫЕ реплики (уже рерайченные Z.ai на песочнице) и
+      // сохраняет их в BotQueue со status=approved + scheduledAt.
+      // Используется scheduler'ом на песочнице (т.к. Z.ai работает только оттуда).
+      const sourceText = (body.sourceText as string) || "";
+      const rubricId = typeof body.rubricId === "number" ? body.rubricId : null;
+      const topicTitle = (body.topicTitle as string) || null;
+      const scheduledAtStr = body.scheduledAt as string;
+      const replies = body.replies as Array<{ username: string; text: string }>;
+      if (!Array.isArray(replies) || replies.length === 0) {
+        return NextResponse.json({ error: "replies[] обязателен" }, { status: 400 });
+      }
+      if (!scheduledAtStr) {
+        return NextResponse.json({ error: "scheduledAt обязателен" }, { status: 400 });
+      }
+      const scheduledAt = new Date(scheduledAtStr);
+      if (isNaN(scheduledAt.getTime())) {
+        return NextResponse.json({ error: "scheduledAt не валидная дата" }, { status: 400 });
+      }
+
+      const crypto = await import("crypto");
+      const batchId = crypto.randomUUID();
+
+      // Загружаем всех ботов для матчинга по нику
+      const allBots = await db.user.findMany({
+        where: { email: { contains: "@theatre.local" } },
+        select: { id: true, nickname: true },
+      });
+      const botByNick = new Map(allBots.map((b) => [b.nickname, b]));
+
+      let saved = 0;
+      for (let i = 0; i < replies.length; i++) {
+        const r = replies[i];
+        const bot = botByNick.get(r.username);
+        if (!bot) {
+          console.warn(`[bot-theatre] save-batch: bot "${r.username}" not found in DB, skipping`);
+          continue;
+        }
+        // Each reply 1-5 min later than the previous (so they appear naturally in topic)
+        const offsetMin = i * (1 + Math.floor(Math.random() * 4));
+        const at = new Date(scheduledAt.getTime() + offsetMin * 60_000);
+        await db.botQueue.create({
+          data: {
+            botUserId: bot.id,
+            botNickname: bot.nickname,
+            text: r.text,
+            sourceText,
+            topicId: null,  // будет создана новая тема
+            rubricId,
+            topicTitle,
+            scheduledAt: at,
+            status: "approved",  // уже одобрен (админ сказал «запускай»)
+            order: i,
+            batchId,
+            meta: JSON.stringify({ savedBy: "sandbox-scheduler" }),
+          },
+        });
+        saved++;
+      }
+      return NextResponse.json({ ok: true, batchId, queuedCount: saved });
+    }
+
     return NextResponse.json({ error: `Unknown action: ${action}` }, { status: 400 });
   } catch (e) {
     console.error("[bot-theatre] queue POST error:", e);
