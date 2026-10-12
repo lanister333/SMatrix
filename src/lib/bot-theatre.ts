@@ -618,6 +618,7 @@ export async function publishApprovedQueueItem(queueId: string): Promise<{ topic
       data: {
         status: "published",
         publishedMessageId: message.id,
+        topicId,  // 2026-10-12: фикс — обновляем topicId у текущего item, чтобы админка показывала кликабельную ссылку
       },
     });
 

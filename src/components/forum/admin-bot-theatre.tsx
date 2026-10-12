@@ -291,7 +291,23 @@ export function BotTheatreSection(props: Props) {
                     {batch.sourceText.slice(0, 200)}{batch.sourceText.length > 200 ? "…" : ""}
                   </span>
                   {batch.topicTitle && (
-                    <span className="text-[10px] text-[#0a5caa] flex-shrink-0">📝 {batch.topicTitle.slice(0, 60)}{batch.topicTitle.length > 60 ? "…" : ""}</span>
+                    batch.items[0]?.topicId ? (
+                      <a
+                        href={`/?view=forum&topic=${batch.items[0].topicId}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          props.onOpenTopic(batch.items[0].topicId!);
+                        }}
+                        className="text-[10px] text-[#0a5caa] hover:text-[#c40000] hover:underline flex-shrink-0 cursor-pointer font-semibold"
+                        title="Открыть тему на форуме"
+                      >
+                        📝 {batch.topicTitle.slice(0, 60)}{batch.topicTitle.length > 60 ? "…" : ""}
+                      </a>
+                    ) : (
+                      <span className="text-[10px] text-[#0a5caa] flex-shrink-0">
+                        📝 {batch.topicTitle.slice(0, 60)}{batch.topicTitle.length > 60 ? "…" : ""}
+                      </span>
+                    )
                   )}
                   {allPending && (
                     <button
