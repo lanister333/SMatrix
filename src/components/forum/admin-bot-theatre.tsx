@@ -291,41 +291,137 @@ export function BotTheatreSection(props: Props) {
                     {batch.sourceText.slice(0, 200)}{batch.sourceText.length > 200 ? "…" : ""}
                   </span>
                   {batch.topicTitle && (
-                    batch.items[0]?.topicId ? (
-                      // topicId есть (тема уже создана) → кликабельная ссылка на тему форума
-                      <a
-                        href={`/?topic=${batch.items[0].topicId}`}
-                        className="text-[10px] text-[#0a5caa] hover:text-[#c40000] hover:underline flex-shrink-0 cursor-pointer font-semibold"
-                        title={`Открыть тему #${batch.items[0].topicId} на форуме`}
-                      >
-                        📝 {batch.topicTitle.slice(0, 60)}{batch.topicTitle.length > 60 ? "…" : ""}
-                      </a>
-                    ) : (
-                      // topicId нет → тема ещё не опубликована, заголовок НЕ кликабельный
-                      <span
-                        className="text-[10px] text-[#56657a] flex-shrink-0 italic"
-                        title="Тема ещё не опубликована — одобрите реплики, чтобы создать тему в форуме"
-                      >
-                        📝 {batch.topicTitle.slice(0, 60)}{batch.topicTitle.length > 60 ? "…" : ""}
-                      </span>
-                    )
+                    (() => {
+                      // Ищем topicId у любого item в батче (т.к. у ТЕМЫ может быть null, а у ответов уже есть)
+                      const itemWithTopic = batch.items.find((i) => i.topicId);
+                      const tid = itemWithTopic?.topicId;
+                      if (tid) {
+                        return (
+                          <a
+                            href={`/?topic=${tid}`}
+                            className="text-[10px] text-[#0a5caa] hover:text-[#c40000] hover:underline flex-shrink-0 cursor-pointer font-semibold"
+                            title={`Открыть тему #${tid} на форуме`}
+                          >
+                            📝 {batch.topicTitle.slice(0, 60)}{batch.topicTitle.length > 60 ? "…" : ""}
+                          </a>
+                        );
+                      }
+                      return (
+                        <span
+                          className="text-[10px] text-[#56657a] flex-shrink-0 italic"
+                          title="Тема ещё не опубликована — одобрите ТЕМУ, чтобы создать тему в форуме"
+                        >
+                          📝 {batch.topicTitle.slice(0, 60)}{batch.topicTitle.length > 60 ? "…" : ""}
+                        </span>
+                      );
+                    })()
+                  )}
+                  {/* Кнопка «🚀 Опубликовать тему» — публикует ВСЕ реплики батча + создаёт Topic немедленно */}
+                  {batch.items.some((i) => i.status === "pending") && (
+                    <button
+                      className="flex-shrink-0 px-2 py-0.5 bg-blue-600 text-white rounded text-[10px] font-semibold hover:bg-blue-700"
+                      onClick={async () => {
+                        if (!props.token) return;
+                        if (!confirm(`Опубликовать тему целиком? Создаст Topic + все ${batch.count} реплик в форуме немедленно.`)) return;
+                        try {
+                          const r = await fetch("/api/theatre-bots/queue", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                              token: props.token,
+                              action: "publish-topic-now",
+                              batchId: batch.batchId,
+                            }),
+                          });
+                          const d = await r.json();
+                          if (r.ok && d.ok) {
+                            props.notify(`🚀 Тема #${d.topicId} опубликована (${d.published} реплик)`);
+                            setTimeout(load, 300);
+                          } else {
+                            props.notify(d.error || "Не удалось опубликовать");
+                          }
+                        } catch (e) {
+                          props.notify("Сеть недоступна");
+                        }
+                      }}
+                      title="Опубликовать ТЕМУ целиком немедленно: создаст Topic + все реплики как сообщения"
+                    >
+                      🚀 Опубликовать тему
+                    </button>
                   )}
                   {allPending && (
                     <button
                       className="flex-shrink-0 px-2 py-0.5 bg-green-600 text-white rounded text-[10px] font-semibold hover:bg-green-700"
                       onClick={() => actionBatch(batch.batchId, "approve-batch")}
-                      title="Одобрить все реплики этого батча"
+                      title="Одобрить все реплики этого батча — опубликуются каскадом 15-60 мин"
                     >
                       ✓ Все ({batch.count})
                     </button>
                   )}
                 </div>
 
-                {/* Items list — компактно, но текст виден полностью */}
+                {/* Items list — ТЕМА отдельно, ОТВЕТЫ отдельно */}
                 <div className="divide-y divide-[#E5EBF2]">
-                  {batch.items.map((item, idx) => (
+                  {/* Сначала ТЕМА (order=-1) — с отдельной кнопкой одобрения */}
+                  {(() => {
+                    const topicItem = batch.items.find((i) => i.order === -1);
+                    if (!topicItem) return null;
+                    return (
+                      <div key={topicItem.id} className="px-2 py-1.5 bg-blue-50/50 hover:bg-blue-50 flex items-start gap-2">
+                        <div className="flex-shrink-0 w-[120px]">
+                          <div className="flex items-center gap-1">
+                            <span className="text-[10px] bg-blue-600 text-white px-1 rounded font-bold">ТЕМА</span>
+                            <span className="font-bold text-[12px] text-[#0a5caa]">{topicItem.botNickname}</span>
+                          </div>
+                          <div className="mt-0.5">
+                            <StatusBadge status={topicItem.status} />
+                          </div>
+                          <div className="flex gap-0.5 mt-1 flex-wrap">
+                            {editingId === topicItem.id ? (
+                              <>
+                                <button className="px-1.5 py-0.5 bg-[#1E3A5F] text-white rounded text-[10px] hover:bg-[#163050]" onClick={() => saveEdit(topicItem.id)} title="Сохранить">💾</button>
+                                <button className="px-1.5 py-0.5 bg-white border border-[#C9D4E2] text-[#1E3A5F] rounded text-[10px] hover:bg-gray-50" onClick={() => setEditingId(null)} title="Отмена">✕</button>
+                              </>
+                            ) : (
+                              <>
+                                {topicItem.status === "pending" && (
+                                  <>
+                                    <button className="px-1.5 py-0.5 bg-green-600 text-white rounded text-[10px] font-semibold hover:bg-green-700" onClick={() => action(topicItem.id, "approve")} title="Одобрить ТЕМУ">✓ Тема</button>
+                                    <button className="px-1.5 py-0.5 bg-white border border-[#C9D4E2] text-[#1E3A5F] rounded text-[10px] hover:bg-gray-50" onClick={() => startEdit(topicItem)} title="Редактировать">✏️</button>
+                                    <button className="px-1.5 py-0.5 bg-white border border-red-400 text-red-600 rounded text-[10px] hover:bg-red-50" onClick={() => action(topicItem.id, "reject")} title="Удалить ТЕМУ">✗ Тема</button>
+                                  </>
+                                )}
+                                {topicItem.status === "approved" && (
+                                  <button className="px-1.5 py-0.5 bg-blue-600 text-white rounded text-[10px] font-semibold hover:bg-blue-700" onClick={() => action(topicItem.id, "publish-now")} title="Опубликовать ТЕМУ немедленно">🚀 Сейчас</button>
+                                )}
+                                {topicItem.status === "published" && (
+                                  <>
+                                    <button className="px-1.5 py-0.5 bg-white border border-[#C9D4E2] text-[#1E3A5F] rounded text-[10px] hover:bg-gray-50" onClick={() => startEdit(topicItem)} title="Редактировать">✏️</button>
+                                    {topicItem.topicId && (
+                                      <a className="px-1.5 py-0.5 bg-white border border-[#0a5caa] text-[#0a5caa] rounded text-[10px] hover:bg-blue-50 inline-block" href={`/?topic=${topicItem.topicId}`} title="Открыть тему">🔗</a>
+                                    )}
+                                  </>
+                                )}
+                              </>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          {editingId === topicItem.id ? (
+                            <textarea value={editText} onChange={(e) => setEditText(e.target.value)} rows={2} className="w-full px-1.5 py-1 border border-[#0a5caa] rounded text-[12px] focus:outline-none" />
+                          ) : (
+                            <p className="text-[12px] text-[#1a1a1a] leading-snug whitespace-pre-wrap">
+                              {topicItem.text || <span className="italic text-[#999]">(пусто)</span>}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Затем ОТВЕТЫ (order >= 0) */}
+                  {batch.items.filter((i) => i.order >= 0).map((item, idx) => (
                     <div key={item.id} className="px-2 py-1.5 hover:bg-[#FAFBFC] flex items-start gap-2">
-                      {/* Левая колонка — ник + статус + время */}
                       <div className="flex-shrink-0 w-[120px]">
                         <div className="flex items-center gap-1">
                           <span className="text-[10px] text-[#999]">#{idx + 1}</span>
@@ -339,7 +435,6 @@ export function BotTheatreSection(props: Props) {
                             🕐 {new Date(item.scheduledAt).toLocaleString("ru-RU", {hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'})}
                           </div>
                         )}
-                        {/* Кнопки действий — под ником, мелкие, в столбик или в ряд */}
                         <div className="flex gap-0.5 mt-1 flex-wrap">
                           {editingId === item.id ? (
                             <>
@@ -350,9 +445,9 @@ export function BotTheatreSection(props: Props) {
                             <>
                               {item.status === "pending" && (
                                 <>
-                                  <button className="px-1.5 py-0.5 bg-green-600 text-white rounded text-[10px] font-semibold hover:bg-green-700" onClick={() => action(item.id, "approve")} title="Одобрить — публикация 15-120 мин">✓</button>
-                                  <button className="px-1.5 py-0.5 bg-white border border-[#C9D4E2] text-[#1E3A5F] rounded text-[10px] hover:bg-gray-50" onClick={() => startEdit(item)} title="Редактировать текст">✏️</button>
-                                  <button className="px-1.5 py-0.5 bg-white border border-red-400 text-red-600 rounded text-[10px] hover:bg-red-50" onClick={() => action(item.id, "reject")} title="Отклонить — бот регенерирует">✗</button>
+                                  <button className="px-1.5 py-0.5 bg-green-600 text-white rounded text-[10px] font-semibold hover:bg-green-700" onClick={() => action(item.id, "approve")} title="Одобрить ответ">✓</button>
+                                  <button className="px-1.5 py-0.5 bg-white border border-[#C9D4E2] text-[#1E3A5F] rounded text-[10px] hover:bg-gray-50" onClick={() => startEdit(item)} title="Редактировать ответ">✏️</button>
+                                  <button className="px-1.5 py-0.5 bg-white border border-red-400 text-red-600 rounded text-[10px] hover:bg-red-50" onClick={() => action(item.id, "reject")} title="Удалить ответ">✗</button>
                                 </>
                               )}
                               {item.status === "approved" && (
@@ -361,11 +456,11 @@ export function BotTheatreSection(props: Props) {
                               {item.status === "published" && (
                                 <>
                                   <button className="px-1.5 py-0.5 bg-white border border-[#C9D4E2] text-[#1E3A5F] rounded text-[10px] hover:bg-gray-50" onClick={() => startEdit(item)} title="Редактировать">✏️</button>
-                                  <button className="px-1.5 py-0.5 bg-[#1E3A5F] text-white rounded text-[10px] hover:bg-[#163050]" onClick={() => action(item.id, "update-published")} disabled={!editText || editingId !== item.id} title="Сохранить в форуме">💾</button>
+                                  <button className="px-1.5 py-0.5 bg-[#1E3A5F] text-white rounded text-[10px] hover:bg-[#163050]" onClick={() => action(item.id, "update-published")} disabled={!editText || editingId !== item.id} title="Обновить в форуме">💾</button>
                                   {item.topicId && (
-                                    <button className="px-1.5 py-0.5 bg-white border border-[#0a5caa] text-[#0a5caa] rounded text-[10px] hover:bg-blue-50" onClick={() => props.onOpenTopic(item.topicId!)} title="Открыть тему">🔗</button>
+                                    <a className="px-1.5 py-0.5 bg-white border border-[#0a5caa] text-[#0a5caa] rounded text-[10px] hover:bg-blue-50 inline-block" href={`/?topic=${item.topicId}`} title="Открыть тему">🔗</a>
                                   )}
-                                  <button className="px-1.5 py-0.5 bg-white border border-red-500 text-red-600 rounded text-[10px] hover:bg-red-50" onClick={() => { if (confirm("Удалить из форума? Тема удалится если это корневой пост.")) { action(item.id, "delete-published"); } }} title="Удалить из форума">🗑</button>
+                                  <button className="px-1.5 py-0.5 bg-white border border-red-500 text-red-600 rounded text-[10px] hover:bg-red-50" onClick={() => { if (confirm("Удалить из форума?")) { action(item.id, "delete-published"); } }} title="Удалить из форума">🗑</button>
                                 </>
                               )}
                               {item.status === "rejected" && (
@@ -376,24 +471,16 @@ export function BotTheatreSection(props: Props) {
                         </div>
                       </div>
 
-                      {/* Правая — текст реплики, виден полностью */}
                       <div className="flex-1 min-w-0">
                         {editingId === item.id ? (
-                          <textarea
-                            value={editText}
-                            onChange={(e) => setEditText(e.target.value)}
-                            rows={2}
-                            className="w-full px-1.5 py-1 border border-[#0a5caa] rounded text-[12px] focus:outline-none"
-                          />
+                          <textarea value={editText} onChange={(e) => setEditText(e.target.value)} rows={2} className="w-full px-1.5 py-1 border border-[#0a5caa] rounded text-[12px] focus:outline-none" />
                         ) : (
                           <p className="text-[12px] text-[#1a1a1a] leading-snug whitespace-pre-wrap">
                             {item.text || <span className="italic text-[#999]">(текст ещё не сгенерирован)</span>}
                           </p>
                         )}
                         {item.rejectReason && (
-                          <p className="text-[10px] text-[#c00] mt-0.5">
-                            Причина: {item.rejectReason}
-                          </p>
+                          <p className="text-[10px] text-[#c00] mt-0.5">Причина: {item.rejectReason}</p>
                         )}
                       </div>
                     </div>

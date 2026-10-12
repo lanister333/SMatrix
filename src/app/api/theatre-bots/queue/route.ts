@@ -136,6 +136,103 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, approved: scheduled.length, scheduled });
     }
 
+    if (action === "publish-topic-now") {
+      // 2026-10-12: Опубликовать ТЕМУ целиком немедленно.
+      // Создаёт Topic (если topicId нет) + публикует все реплики батча как сообщения.
+      // Используется кнопкой «🚀 Опубликовать тему» в шапке батча в админке.
+      const batchId = body.batchId as string;
+      if (!batchId) return NextResponse.json({ error: "batchId обязателен" }, { status: 400 });
+      const batch = await db.botQueue.findMany({
+        where: { batchId },
+        orderBy: { order: "asc" },
+      });
+      if (batch.length === 0) {
+        return NextResponse.json({ error: "Батч пуст" }, { status: 404 });
+      }
+      const first = batch[0];
+      if (!first.rubricId) {
+        return NextResponse.json({ error: "У батча нет rubricId — невозможно создать тему" }, { status: 400 });
+      }
+
+      // Запускаем публикацию всех реплик в одной транзакции
+      const result = await db.$transaction(async (tx) => {
+        let topicId = first.topicId;
+
+        // Если topicId нет — создаём новую тему
+        if (!topicId) {
+          const title = first.topicTitle || first.text.slice(0, 70).replace(/\s+/g, " ").trim() + (first.text.length > 70 ? "…" : "");
+          const lastTopic = await tx.topic.findFirst({ orderBy: { number: "desc" }, select: { number: true } });
+          const newTopicNumber = (lastTopic?.number ?? 0) + 1;
+          const newTopic = await tx.topic.create({
+            data: {
+              number: newTopicNumber,
+              title,
+              source: "theatre-bots",
+              authorName: first.botNickname,
+              authorId: first.botUserId,
+              rubricId: first.rubricId!,
+              lastAuthorName: first.botNickname,
+              lastActivityAt: new Date(),
+            },
+          });
+          topicId = newTopic.id;
+          // Обновляем все items батча с новым topicId
+          await tx.botQueue.updateMany({
+            where: { batchId },
+            data: { topicId: newTopic.id },
+          });
+        }
+
+        // Публикуем все реплики батча как сообщения в тему
+        let published = 0;
+        let lastMsgNum = 0;
+        for (const item of batch) {
+          if (item.status === "published") continue;  // уже опубликовано
+          lastMsgNum += 1;
+          const message = await tx.message.create({
+            data: {
+              topicId,
+              num: lastMsgNum,
+              depth: 0,
+              authorName: item.botNickname,
+              authorId: item.botUserId,
+              body: item.text,
+              kind: "news",
+              aiStatus: "ok",
+              modLevel: 4,
+              aiAction: "WATCH",
+              aiConfidence: 1.0,
+              aiSignal: "theatre-bot",
+            },
+          });
+          await tx.botQueue.update({
+            where: { id: item.id },
+            data: {
+              status: "published",
+              publishedMessageId: message.id,
+              topicId,
+              scheduledAt: new Date(),
+            },
+          });
+          published++;
+        }
+
+        // Обновляем тему: lastActivityAt
+        await tx.topic.update({
+          where: { id: topicId },
+          data: {
+            lastActivityAt: new Date(),
+            lastAuthorName: batch[batch.length - 1].botNickname,
+          },
+        });
+
+        return { topicId, published };
+      });
+
+      console.log(`[bot-theatre] publish-topic-now: batch=${batchId} topic=${result.topicId} published=${result.published}`);
+      return NextResponse.json({ ok: true, topicId: result.topicId, published: result.published });
+    }
+
     if (action === "approve-batch-custom") {
       // Approve all items in a batch with a SPECIFIC scheduledAt time (e.g. for the scheduler).
       // All replies of the batch get the same scheduledAt — they appear in the topic together.
@@ -395,17 +492,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, topicId: newTopic.id, created: true });
     }
 
-    if (action === "save-batch") {
-      // Принимает ГОТОВЫЕ реплики (уже рерайченные Z.ai на песочнице) и
-      // сохраняет их в BotQueue со status=approved + scheduledAt.
-      // Используется scheduler'ом на песочнице (т.к. Z.ai работает только оттуда).
+    if (action === "save-batch-with-topic") {
+      // 2026-10-12 v3: Тема и Ответы — РАЗНЫЕ сущности в модерации.
+      // Создаёт:
+      //   1. Тема (Topic) — order=-1, текст = topicText (корневое сообщение)
+      //      Админ может одобрить/удалить ТЕМУ отдельно от ответов.
+      //   2. Ответы — order=0..N, текст = replies[i].text
+      // Тема может быть без ответов (если replies=[]).
       const sourceText = (body.sourceText as string) || "";
       const rubricId = typeof body.rubricId === "number" ? body.rubricId : null;
       const topicTitle = (body.topicTitle as string) || null;
+      const topicText = (body.topicText as string) || "";
+      const topicAuthorBot = (body.topicAuthorBot as string) || "";
       const scheduledAtStr = body.scheduledAt as string;
       const replies = body.replies as Array<{ username: string; text: string }>;
-      if (!Array.isArray(replies) || replies.length === 0) {
-        return NextResponse.json({ error: "replies[] обязателен" }, { status: 400 });
+      if (!topicText || !topicAuthorBot) {
+        return NextResponse.json({ error: "topicText и topicAuthorBot обязательны" }, { status: 400 });
       }
       if (!scheduledAtStr) {
         return NextResponse.json({ error: "scheduledAt обязателен" }, { status: 400 });
@@ -418,23 +520,45 @@ export async function POST(req: NextRequest) {
       const crypto = await import("crypto");
       const batchId = crypto.randomUUID();
 
-      // Загружаем всех ботов для матчинга по нику
+      // Загружаем всех ботов
       const allBots = await db.user.findMany({
         where: { email: { contains: "@theatre.local" } },
         select: { id: true, nickname: true },
       });
       const botByNick = new Map(allBots.map((b) => [b.nickname, b]));
 
-      let saved = 0;
-      for (let i = 0; i < replies.length; i++) {
+      // 1. Создаём ТЕМУ (order = -1) — корневое сообщение
+      const topicBot = botByNick.get(topicAuthorBot);
+      if (!topicBot) {
+        return NextResponse.json({ error: `Бот "${topicAuthorBot}" не найден` }, { status: 400 });
+      }
+      await db.botQueue.create({
+        data: {
+          botUserId: topicBot.id,
+          botNickname: topicBot.nickname,
+          text: topicText,
+          sourceText,
+          topicId: null,
+          rubricId,
+          topicTitle,
+          scheduledAt,
+          status: "pending",  // ждёт модерации
+          order: -1,  // -1 = ТЕМА (корневое сообщение), отличается от ответов
+          batchId,
+          meta: JSON.stringify({ type: "topic", savedBy: "sandbox-scheduler" }),
+        },
+      });
+
+      // 2. Создаём ОТВЕТЫ (order = 0..N)
+      let saved = 1;  // 1 = тема уже создана
+      for (let i = 0; i < (replies?.length || 0); i++) {
         const r = replies[i];
         const bot = botByNick.get(r.username);
         if (!bot) {
-          console.warn(`[bot-theatre] save-batch: bot "${r.username}" not found in DB, skipping`);
+          console.warn(`[bot-theatre] save-batch-with-topic: bot "${r.username}" not found, skipping`);
           continue;
         }
-        // Each reply 1-5 min later than the previous (so they appear naturally in topic)
-        const offsetMin = i * (1 + Math.floor(Math.random() * 4));
+        const offsetMin = (i + 1) * (1 + Math.floor(Math.random() * 4));
         const at = new Date(scheduledAt.getTime() + offsetMin * 60_000);
         await db.botQueue.create({
           data: {
@@ -442,14 +566,14 @@ export async function POST(req: NextRequest) {
             botNickname: bot.nickname,
             text: r.text,
             sourceText,
-            topicId: null,  // будет создана новая тема
+            topicId: null,
             rubricId,
             topicTitle,
             scheduledAt: at,
-            status: "pending",  // 2026-10-12 v2: ждёт модерации админом (не approved!)
+            status: "pending",
             order: i,
             batchId,
-            meta: JSON.stringify({ savedBy: "sandbox-scheduler" }),
+            meta: JSON.stringify({ type: "reply", savedBy: "sandbox-scheduler" }),
           },
         });
         saved++;
