@@ -88,12 +88,14 @@ export function BotTheatreSection(props: Props) {
   const [submitting, setSubmitting] = useState(false);
 
   const load = useCallback(async () => {
-    if (!props.token) return;
+    // 2026-10-13: fallback — если props.token null, читаем напрямую из localStorage
+    const token = props.token || (typeof window !== 'undefined' ? (() => { try { return JSON.parse(localStorage.getItem('sm_auth') || '{}')?.token; } catch { return null; } })() : null);
+    if (!token) return;
     setLoading(true);
     try {
       // Token передаём в query (queue route теперь принимает и shared secret, и session token)
       const r = await fetch(
-        `/api/theatre-bots/queue?token=${encodeURIComponent(props.token)}&status=${encodeURIComponent(statusFilter)}&limit=200`
+        `/api/theatre-bots/queue?token=${encodeURIComponent(token)}&status=${encodeURIComponent(statusFilter)}&limit=200`
       );
       const d = await r.json();
       if (d.batches) setBatches(d.batches);
@@ -108,7 +110,7 @@ export function BotTheatreSection(props: Props) {
   useEffect(() => { load(); }, [load]);
 
   async function processTopic() {
-    if (!props.token || topicText.trim().length < 10) {
+    if (!token || topicText.trim().length < 10) {
       props.notify("Текст темы слишком короткий");
       return;
     }
@@ -118,7 +120,7 @@ export function BotTheatreSection(props: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          token: props.token,
+          token: token,
           text: topicText.trim(),
           rubricId,
           topicTitle: topicTitle.trim() || null,
@@ -143,12 +145,13 @@ export function BotTheatreSection(props: Props) {
   }
 
   async function action(id: string, action: string, extra: Record<string, unknown> = {}) {
-    if (!props.token) return;
+    const token = props.token || (typeof window !== 'undefined' ? (() => { try { return JSON.parse(localStorage.getItem('sm_auth') || '{}')?.token; } catch { return null; } })() : null);
+    if (!token) return;
     try {
       const r = await fetch("/api/theatre-bots/queue", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: props.token, action, id, ...extra }),
+        body: JSON.stringify({ token, action, id, ...extra }),
       });
       const d = await r.json();
       if (!r.ok) {
@@ -171,12 +174,12 @@ export function BotTheatreSection(props: Props) {
   }
 
   async function actionBatch(batchId: string, action: string) {
-    if (!props.token) return;
+    const token = props.token || (typeof window !== 'undefined' ? (() => { try { return JSON.parse(localStorage.getItem('sm_auth') || '{}')?.token; } catch { return null; } })() : null); if (!token) return;
     try {
       const r = await fetch("/api/theatre-bots/queue", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: props.token, action, batchId }),
+        body: JSON.stringify({ token: token, action, batchId }),
       });
       const d = await r.json();
       if (!r.ok) {
@@ -321,14 +324,14 @@ export function BotTheatreSection(props: Props) {
                     <button
                       className="flex-shrink-0 px-2 py-0.5 bg-blue-600 text-white rounded text-[10px] font-semibold hover:bg-blue-700"
                       onClick={async () => {
-                        if (!props.token) return;
+                        const token = props.token || (typeof window !== 'undefined' ? (() => { try { return JSON.parse(localStorage.getItem('sm_auth') || '{}')?.token; } catch { return null; } })() : null); if (!token) return;
                         if (!confirm(`Опубликовать тему целиком? Создаст Topic + все ${batch.count} реплик в форуме немедленно.`)) return;
                         try {
                           const r = await fetch("/api/theatre-bots/queue", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
-                              token: props.token,
+                              token: token,
                               action: "publish-topic-now",
                               batchId: batch.batchId,
                             }),
