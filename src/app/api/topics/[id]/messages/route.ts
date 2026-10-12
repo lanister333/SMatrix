@@ -207,6 +207,27 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
       data: { lastActivityAt: new Date(), lastAuthorName: user.nickname },
     });
 
+    // 2026-10-12: «Театр ботов» — авто-ответы ботов на сообщение (fire-and-forget)
+    if (!outcome.action || outcome.action === "ok" || outcome.action === "human") {
+      try {
+        const hookBody = JSON.stringify({
+          token: process.env.THEATRE_BOTS_TOKEN || process.env.SAKHMATRIX_API_TOKEN || "sakhmatrix-theatre-2026",
+          topicId,
+          parentMessageId: message.id,
+          triggerText: text,
+          triggerAuthorRole: user.role,
+          isTopicStarter: false,
+        });
+        fetch(`${process.env.SELF_URL || "http://127.0.0.1:3001"}/api/theatre-bots/auto-reply`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: hookBody,
+        }).catch(() => { /* silent fail */ });
+      } catch {
+        // hook error не должен ломать основной flow
+      }
+    }
+
     return NextResponse.json({
       message: {
         id: message.id,

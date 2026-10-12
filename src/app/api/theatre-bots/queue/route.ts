@@ -179,6 +179,104 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, topicId: r.topicId, messageId: r.messageId });
     }
 
+    if (action === "update-published") {
+      // Обновляет текст уже ОПУБЛИКОВАННОГО сообщения в форуме.
+      // Принимает { id, text } — находит Message по publishedMessageId и обновляет body.
+      const id = body.id as string;
+      const text = (body.text as string)?.trim();
+      if (!id || !text || text.length < 5) {
+        return NextResponse.json({ error: "id и text (≥5 символов) обязательны" }, { status: 400 });
+      }
+      const item = await db.botQueue.findUnique({ where: { id } });
+      if (!item) return NextResponse.json({ error: "Не найдено" }, { status: 404 });
+      if (item.status !== "published" || !item.publishedMessageId) {
+        return NextResponse.json({ error: "Реплика ещё не опубликована" }, { status: 400 });
+      }
+      // Update Message body
+      await db.message.update({
+        where: { id: item.publishedMessageId },
+        data: {
+          body: text,
+          editedAt: new Date(),
+        },
+      });
+      // Update BotQueue text too (для консистентности)
+      await db.botQueue.update({ where: { id }, data: { text } });
+      return NextResponse.json({ ok: true, messageId: item.publishedMessageId });
+    }
+
+    if (action === "delete-published") {
+      // Удаляет уже ОПУБЛИКОВАННОЕ сообщение из форума.
+      // Если это было корневое сообщение темы (num=1) — удаляет ВСЮ тему и её сообщения.
+      const id = body.id as string;
+      if (!id) return NextResponse.json({ error: "id обязателен" }, { status: 400 });
+      const item = await db.botQueue.findUnique({ where: { id } });
+      if (!item) return NextResponse.json({ error: "Не найдено" }, { status: 404 });
+      if (item.status !== "published" || !item.publishedMessageId) {
+        return NextResponse.json({ error: "Реплика ещё не опубликована" }, { status: 400 });
+      }
+      // Находим Message
+      const msg = await db.message.findUnique({
+        where: { id: item.publishedMessageId },
+        select: { id: true, topicId: true, num: true },
+      });
+      if (!msg) {
+        // Message уже удалён — просто помечаем BotQueue
+        await db.botQueue.update({ where: { id }, data: { status: "rejected", rejectReason: "Message already deleted" } });
+        return NextResponse.json({ ok: true, message: "Message already deleted" });
+      }
+      const topicId = msg.topicId;
+      const isRoot = msg.num === 1;
+      if (isRoot) {
+        // Удаляем всю тему со всеми сообщениями
+        await db.message.deleteMany({ where: { topicId } });
+        await db.topic.delete({ where: { id: topicId } });
+        // Помечаем все BotQueue items этого батча как rejected (т.к. тема удалена)
+        await db.botQueue.updateMany({
+          where: { batchId: item.batchId },
+          data: { status: "rejected", rejectReason: "Topic deleted by admin" },
+        });
+        return NextResponse.json({ ok: true, deleted: "topic+all-messages", topicId });
+      } else {
+        // Удаляем только это сообщение
+        await db.message.delete({ where: { id: msg.id } });
+        await db.botQueue.update({
+          where: { id },
+          data: { status: "rejected", rejectReason: "Message deleted by admin" },
+        });
+        return NextResponse.json({ ok: true, deleted: "message", messageId: msg.id });
+      }
+    }
+
+    if (action === "regenerate") {
+      // Регенерация уже отклонённой реплики — бот сделает НОВЫЙ текст через Z.ai.
+      // Находит item, берёт sourceText, вызывает rejectQueueItem с regenerate=true.
+      const id = body.id as string;
+      if (!id) return NextResponse.json({ error: "id обязателен" }, { status: 400 });
+      const r = await rejectQueueItem(id, "regenerate requested by admin", true);
+      return NextResponse.json({ ok: true, regenerated: r.regenerated, newQueueId: r.newQueueId });
+    }
+
+    if (action === "update-and-approve") {
+      // Принимает текст от sandbox-rewriter'а для auto-reply items (status=pending_rewrite).
+      // Обновляет text + меняет status на 'approved' (готов к публикации publisher cron'ом).
+      const id = body.id as string;
+      const text = (body.text as string)?.trim();
+      if (!id || !text || text.length < 5) {
+        return NextResponse.json({ error: "id и text (≥5 символов) обязательны" }, { status: 400 });
+      }
+      const item = await db.botQueue.findUnique({ where: { id } });
+      if (!item) return NextResponse.json({ error: "Не найдено" }, { status: 404 });
+      if (item.status !== "pending_rewrite") {
+        return NextResponse.json({ error: `Item status ${item.status}, expected pending_rewrite` }, { status: 400 });
+      }
+      await db.botQueue.update({
+        where: { id },
+        data: { text, status: "approved" },
+      });
+      return NextResponse.json({ ok: true, botNickname: item.botNickname, scheduledAt: item.scheduledAt });
+    }
+
     if (action === "save-batch") {
       // Принимает ГОТОВЫЕ реплики (уже рерайченные Z.ai на песочнице) и
       // сохраняет их в BotQueue со status=approved + scheduledAt.

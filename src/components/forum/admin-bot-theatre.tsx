@@ -171,7 +171,10 @@ export function BotTheatreSection(props: Props) {
     setEditText(item.text);
   }
   async function saveEdit(id: string) {
-    await action(id, "edit", { text: editText });
+    // Determine action based on item status
+    const item = batches.flatMap(b => b.items).find(i => i.id === id);
+    const actionName = item?.status === "published" ? "update-published" : "edit";
+    await action(id, actionName, { text: editText });
     setEditingId(null);
   }
 
@@ -336,9 +339,39 @@ export function BotTheatreSection(props: Props) {
                               🚀 Опубликовать сейчас
                             </button>
                           )}
-                          <button className="sm-btn text-[12px] px-2 py-1" onClick={() => startEdit(item)}>✏️ Редактировать</button>
+                          {(item.status === "pending" || item.status === "approved") && (
+                            <button className="sm-btn text-[12px] px-2 py-1" onClick={() => startEdit(item)}>✏️ Редактировать</button>
+                          )}
+                          {item.status === "published" && (
+                            <>
+                              <button className="sm-btn text-[12px] px-2 py-1" onClick={() => startEdit(item)}>✏️ Редактировать текст</button>
+                              <button
+                                className="sm-btn sm-btn-primary text-[12px] px-2 py-1"
+                                onClick={() => action(item.id, "update-published")}
+                                disabled={editingId !== null && editingId !== item.id}
+                                title="Обновить текст уже опубликованного сообщения в форуме"
+                              >
+                                💾 Обновить в форуме
+                              </button>
+                              <button
+                                className="sm-btn text-[12px] px-2 py-1"
+                                onClick={() => {
+                                  if (confirm("Удалить это сообщение из форума? Тема тоже будет удалена, если это был корневой пост.")) {
+                                    action(item.id, "delete-published");
+                                  }
+                                }}
+                                title="Удалить сообщение из форума (тема удалится если это был корневой пост)"
+                                style={{ color: "#c00", borderColor: "#c00" }}
+                              >
+                                🗑 Удалить из форума
+                              </button>
+                            </>
+                          )}
                           {item.status !== "rejected" && item.status !== "published" && (
                             <button className="sm-btn text-[12px] px-2 py-1" onClick={() => action(item.id, "reject")}>❌ Отклонить</button>
+                          )}
+                          {item.status === "rejected" && (
+                            <button className="sm-btn text-[12px] px-2 py-1" onClick={() => action(item.id, "regenerate")}>🔄 Регенерировать</button>
                           )}
                         </>
                       )}
