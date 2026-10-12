@@ -16,22 +16,37 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { approveAndScheduleQueueItem, publishApprovedQueueItem, rejectQueueItem } from "@/lib/bot-theatre";
+import { userByToken } from "@/lib/auth";
+import { isStaffRole } from "@/lib/admin";
 
 export const runtime = "nodejs";
 
 const THEATRE_BOTS_TOKEN = process.env.THEATRE_BOTS_TOKEN || process.env.SAKHMATRIX_API_TOKEN || "sakhmatrix-theatre-2026";
 
-function auth(req: NextRequest, bodyToken?: string): boolean {
+/**
+ * Авторизация: принимает 2 типа токенов:
+ *   1. THEATRE_BOTS_TOKEN (shared secret для парсеров/scheduler'а)
+ *   2. Session token админа/модератора (через userByToken — как в других admin API)
+ */
+async function authRequest(req: NextRequest, bodyToken?: string): Promise<boolean> {
   const authHeader = req.headers.get("authorization") || "";
   const headerToken = authHeader.replace(/^Bearer\s+/i, "").trim();
-  return (
-    (!!headerToken && headerToken === THEATRE_BOTS_TOKEN) ||
-    (!!bodyToken && bodyToken === THEATRE_BOTS_TOKEN)
-  );
+  const queryToken = req.nextUrl.searchParams.get("token");
+  const token = bodyToken || headerToken || queryToken;
+  if (!token) return false;
+
+  // 1. Проверяем shared secret (для scheduler/rewriter на песочнице)
+  if (token === THEATRE_BOTS_TOKEN) return true;
+
+  // 2. Проверяем session token (админ/модератор через userByToken)
+  const user = await userByToken(token);
+  if (user && isStaffRole(user.role)) return true;
+
+  return false;
 }
 
 export async function GET(req: NextRequest) {
-  if (!auth(req)) {
+  if (!(await authRequest(req))) {
     return NextResponse.json({ error: "Неверный токен" }, { status: 401 });
   }
   const status = req.nextUrl.searchParams.get("status") || "pending";
@@ -86,7 +101,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    if (!auth(req, body.token)) {
+    if (!(await authRequest(req, body.token))) {
       return NextResponse.json({ error: "Неверный токен" }, { status: 401 });
     }
     const action = body.action as string;
@@ -260,6 +275,7 @@ export async function POST(req: NextRequest) {
     if (action === "update-and-approve") {
       // Принимает текст от sandbox-rewriter'а для auto-reply items (status=pending_rewrite).
       // Обновляет text + меняет status на 'approved' (готов к публикации publisher cron'ом).
+      // 2026-10-12 v2: НЕ ИСПОЛЬЗУЕТСЯ — заменено на update-to-pending (для модерации).
       const id = body.id as string;
       const text = (body.text as string)?.trim();
       if (!id || !text || text.length < 5) {
@@ -275,6 +291,26 @@ export async function POST(req: NextRequest) {
         data: { text, status: "approved" },
       });
       return NextResponse.json({ ok: true, botNickname: item.botNickname, scheduledAt: item.scheduledAt });
+    }
+
+    if (action === "update-to-pending") {
+      // 2026-10-12 v2: правильный flow для auto-reply — текст заполнен, статус → 'pending'
+      // (ждёт модерации админом). Админ видит в /admin?section=bots, одобряет/редактирует/удаляет.
+      const id = body.id as string;
+      const text = (body.text as string)?.trim();
+      if (!id || !text || text.length < 5) {
+        return NextResponse.json({ error: "id и text (≥5 символов) обязательны" }, { status: 400 });
+      }
+      const item = await db.botQueue.findUnique({ where: { id } });
+      if (!item) return NextResponse.json({ error: "Не найдено" }, { status: 404 });
+      if (item.status !== "pending_rewrite") {
+        return NextResponse.json({ error: `Item status ${item.status}, expected pending_rewrite` }, { status: 400 });
+      }
+      await db.botQueue.update({
+        where: { id },
+        data: { text, status: "pending" },  // ждёт модерации админом
+      });
+      return NextResponse.json({ ok: true, botNickname: item.botNickname });
     }
 
     if (action === "save-batch") {
@@ -328,7 +364,7 @@ export async function POST(req: NextRequest) {
             rubricId,
             topicTitle,
             scheduledAt: at,
-            status: "pending",  // 2026-10-12 v2: ждёт модерации админом (не approved!)
+            status: "approved",  // уже одобрен (админ сказал «запускай»)
             order: i,
             batchId,
             meta: JSON.stringify({ savedBy: "sandbox-scheduler" }),

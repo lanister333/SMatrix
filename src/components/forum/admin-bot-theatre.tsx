@@ -1,11 +1,8 @@
 // src/components/forum/admin-bot-theatre.tsx
 // Секция админки «Театр ботов»: очередь премодерации рерайтов.
-// 2026-10-12: список реплик из /api/theatre-bots/queue, действия:
-//   - одобрить (одну или весь батч) → публикация с задержкой 15мин-2ч
-//   - редактировать текст
-//   - отклонить (→ бот регенерирует новый текст)
-//   - опубликовать немедленно
-// Также: форма ввода новой темы для рерайта → POST /api/theatre-bots/process-topic
+// 2026-10-12 v3: полностью переработан UI для максимальной наглядности.
+//                Большие карточки, явные блоки действий, предпросмотр темы-источника,
+//                понятные подписи + счетчики + подсказки.
 
 "use client";
 
@@ -44,16 +41,37 @@ interface Props {
 }
 
 const RUBRICS = [
-  { id: 130, name: "Обсуждение сообщений из «Подслушано»" },
-  { id: 117, name: "Товары и услуги" },
-  { id: 119, name: "Услуги и специалисты" },
+  { id: 98, name: "Где поесть" },
+  { id: 138, name: "Клубы по интересам" },
+  { id: 67, name: "Здоровье" },
   { id: 71, name: "Стоматология" },
-  { id: 73, name: "Другое (здоровье)" },
-  { id: 75, name: "Спорт и здоровье" },
+  { id: 68, name: "Общие вопросы здоровья" },
+  { id: 70, name: "Лекарства и аптеки" },
+  { id: 85, name: "Красота" },
+  { id: 86, name: "Косметология" },
+  { id: 87, name: "Парикмахерские и салоны" },
+  { id: 89, name: "Косметика" },
+  { id: 90, name: "Отзывы о специалистах и салонах" },
+  { id: 99, name: "Недвижимость" },
+  { id: 102, name: "Строительство, ремонт" },
+  { id: 104, name: "ЖКХ и управляющие компании" },
+  { id: 117, name: "Товары и услуги" },
+  { id: 118, name: "Где купить" },
+  { id: 119, name: "Услуги и специалисты" },
   { id: 120, name: "Цены" },
+  { id: 121, name: "Отзывы и рекомендации" },
+  { id: 62, name: "Трудовые отношения" },
+  { id: 77, name: "Работа" },
+  { id: 49, name: "Животные" },
+  { id: 56, name: "Пристройство животных" },
   { id: 122, name: "Туризм, отдых" },
-  { id: 88, name: "Уход за собой" },
 ];
+
+function rubricName(id: number | null): string {
+  if (!id) return "—";
+  const r = RUBRICS.find((x) => x.id === id);
+  return r ? r.name : `#${id}`;
+}
 
 export function BotTheatreSection(props: Props) {
   const [tab, setTab] = useState<"queue" | "add">("queue");
@@ -66,14 +84,17 @@ export function BotTheatreSection(props: Props) {
   // Form for new topic
   const [topicText, setTopicText] = useState("");
   const [topicTitle, setTopicTitle] = useState("");
-  const [rubricId, setRubricId] = useState<number>(130);
+  const [rubricId, setRubricId] = useState<number>(98);
   const [submitting, setSubmitting] = useState(false);
 
   const load = useCallback(async () => {
     if (!props.token) return;
     setLoading(true);
     try {
-      const r = await fetch(`/api/theatre-bots/queue?token=${encodeURIComponent(props.token)}&status=${encodeURIComponent(statusFilter)}&limit=200`);
+      // Token передаём в query (queue route теперь принимает и shared secret, и session token)
+      const r = await fetch(
+        `/api/theatre-bots/queue?token=${encodeURIComponent(props.token)}&status=${encodeURIComponent(statusFilter)}&limit=200`
+      );
       const d = await r.json();
       if (d.batches) setBatches(d.batches);
       else setBatches([]);
@@ -134,10 +155,14 @@ export function BotTheatreSection(props: Props) {
         props.notify(d.error || `Ошибка действия ${action}`);
         return;
       }
-      const msg = action === "approve" ? "Одобрено — публикация запланирована" :
-                  action === "reject" ? (d.regenerated ? "Отклонено — бот сгенерирует заново" : "Отклонено") :
-                  action === "edit" ? "Текст обновлён" :
-                  action === "publish-now" ? `Опубликовано: тема #${d.topicId}` : "OK";
+      const msg = action === "approve" ? "✓ Одобрено — публикация запланирована (15-120 мин)" :
+                  action === "reject" ? (d.regenerated ? "✗ Отклонено — бот сгенерирует новый текст" : "✗ Отклонено") :
+                  action === "edit" ? "✓ Текст обновлён" :
+                  action === "update-published" ? "✓ Текст в форуме обновлён" :
+                  action === "publish-now" ? `🚀 Опубликовано: тема #${d.topicId}` :
+                  action === "delete-published" ? "🗑 Удалено из форума" :
+                  action === "update-to-pending" ? "✓ Текст обновлён (статус: ожидает)" :
+                  "OK";
       props.notify(msg);
       setTimeout(load, 200);
     } catch (e) {
@@ -158,7 +183,7 @@ export function BotTheatreSection(props: Props) {
         props.notify(d.error || `Ошибка действия ${action}`);
         return;
       }
-      const msg = action === "approve-batch" ? `Одобрено: ${d.approved} реплик, публикации каскадом 15-60мин` : "OK";
+      const msg = action === "approve-batch" ? `✓ Одобрено: ${d.approved} реплик` : "OK";
       props.notify(msg);
       setTimeout(load, 200);
     } catch (e) {
@@ -171,216 +196,193 @@ export function BotTheatreSection(props: Props) {
     setEditText(item.text);
   }
   async function saveEdit(id: string) {
-    // Determine action based on item status
     const item = batches.flatMap(b => b.items).find(i => i.id === id);
     const actionName = item?.status === "published" ? "update-published" : "edit";
     await action(id, actionName, { text: editText });
     setEditingId(null);
   }
 
+  // Stats: count items per status
+  const allItems = batches.flatMap(b => b.items);
+  const pendingCount = allItems.filter(i => i.status === "pending").length;
+  const approvedCount = allItems.filter(i => i.status === "approved").length;
+  const publishedCount = allItems.filter(i => i.status === "published").length;
+  const rejectedCount = allItems.filter(i => i.status === "rejected").length;
+
   return (
-    <div className="p-4 space-y-4">
-      {/* Tabs */}
-      <div className="flex gap-2 border-b border-[#C9D4E2] pb-2">
-        <button className={`sm-btn ${tab === "queue" ? "sm-btn-primary" : ""}`} onClick={() => setTab("queue")}>
-          Очередь премодерации
-        </button>
-        <button className={`sm-btn ${tab === "add" ? "sm-btn-primary" : ""}`} onClick={() => setTab("add")}>
-          + Новая тема для рерайта
-        </button>
+    <div className="p-2 space-y-2 max-w-[1400px] mx-auto">
+      {/* Заголовок — ОДНА строка */}
+      <div className="bg-gradient-to-r from-[#1E3A5F] to-[#2A5278] text-white p-2 rounded-lg flex items-center gap-2 flex-wrap">
+        <h2 className="text-[13px] font-bold flex-shrink-0">🎭 Театр ботов</h2>
+        <div className="flex gap-1 text-[10px] flex-wrap">
+          <button onClick={() => { setTab("queue"); setStatusFilter('pending'); }} className={`px-1.5 py-0.5 rounded-full ${statusFilter === 'pending' && tab === 'queue' ? 'bg-yellow-400 text-black' : 'bg-white/20 hover:bg-white/30'}`}>⏳ {pendingCount}</button>
+          <button onClick={() => { setTab("queue"); setStatusFilter('approved'); }} className={`px-1.5 py-0.5 rounded-full ${statusFilter === 'approved' && tab === 'queue' ? 'bg-blue-400 text-black' : 'bg-white/20 hover:bg-white/30'}`}>✓ {approvedCount}</button>
+          <button onClick={() => { setTab("queue"); setStatusFilter('published'); }} className={`px-1.5 py-0.5 rounded-full ${statusFilter === 'published' && tab === 'queue' ? 'bg-green-400 text-black' : 'bg-white/20 hover:bg-white/30'}`}>📤 {publishedCount}</button>
+          <button onClick={() => { setTab("queue"); setStatusFilter('rejected'); }} className={`px-1.5 py-0.5 rounded-full ${statusFilter === 'rejected' && tab === 'queue' ? 'bg-red-400 text-black' : 'bg-white/20 hover:bg-white/30'}`}>✗ {rejectedCount}</button>
+        </div>
+        <div className="ml-auto flex gap-1">
+          <button className={`px-2 py-0.5 rounded text-[10px] font-semibold ${tab === "queue" ? "bg-white text-[#1E3A5F]" : "bg-white/20 hover:bg-white/30"}`} onClick={() => setTab("queue")} title="Очередь модерации">📋 Очередь</button>
+          <button className={`px-2 py-0.5 rounded text-[10px] font-semibold ${tab === "add" ? "bg-white text-[#1E3A5F]" : "bg-white/20 hover:bg-white/30"}`} onClick={() => setTab("add")} title="Создать новую тему">➕ Новая</button>
+          <button className="px-2 py-0.5 rounded text-[10px] bg-white/20 hover:bg-white/30" onClick={load} disabled={loading} title="Обновить">{loading ? "⏳" : "🔄"}</button>
+        </div>
       </div>
 
-      {/* Add new topic */}
+      {/* === TAB: ADD NEW TOPIC === */}
       {tab === "add" && (
-        <div className="space-y-3 p-4 bg-[#F8FAFC] rounded border border-[#C9D4E2]">
-          <h3 className="font-bold text-[15px] text-[#1E3A5F]">Ввести тему для рерайта</h3>
-          <p className="text-[13px] text-[#56657a]">
-            Вставь текст темы (можно с форума biz65 или придумать). Selector подберёт 3-6 ботов,
-            Z.ai сделает рерайт в диалог, каждая реплика попадёт в очередь премодерации.
-          </p>
-          <div>
-            <label className="block text-[12px] text-[#56657a] mb-1">Заголовок темы (необязательно — если пусто, сгенерируется из текста)</label>
-            <input
-              type="text"
-              value={topicTitle}
-              onChange={(e) => setTopicTitle(e.target.value)}
-              placeholder="Например: Где вкусно покушать в городе?"
-              className="w-full px-3 py-2 border border-[#C9D4E2] rounded text-[14px]"
-            />
-          </div>
-          <div>
-            <label className="block text-[12px] text-[#56657a] mb-1">Текст темы *</label>
-            <textarea
-              value={topicText}
-              onChange={(e) => setTopicText(e.target.value)}
-              placeholder="Форумчане, подскажите: где у нас в городе можно вкусно покушать?"
-              rows={6}
-              className="w-full px-3 py-2 border border-[#C9D4E2] rounded text-[14px]"
-            />
-          </div>
-          <div>
-            <label className="block text-[12px] text-[#56657a] mb-1">Рубрика для публикации</label>
+        <div className="bg-white p-3 rounded-lg border border-[#C9D4E2] space-y-2">
+          <h3 className="font-bold text-[14px] text-[#1E3A5F]">Создать тему для ботов</h3>
+          <input
+            type="text"
+            value={topicTitle}
+            onChange={(e) => setTopicTitle(e.target.value)}
+            placeholder="Заголовок темы (необязательно)"
+            className="w-full px-2 py-1.5 border border-[#C9D4E2] rounded text-[13px] focus:border-[#1E3A5F] outline-none"
+          />
+          <textarea
+            value={topicText}
+            onChange={(e) => setTopicText(e.target.value)}
+            placeholder="Текст темы..."
+            rows={4}
+            className="w-full px-2 py-1.5 border border-[#C9D4E2] rounded text-[13px] focus:border-[#1E3A5F] outline-none"
+          />
+          <div className="flex gap-2">
             <select
               value={rubricId}
               onChange={(e) => setRubricId(parseInt(e.target.value, 10))}
-              className="w-full px-3 py-2 border border-[#C9D4E2] rounded text-[14px]"
+              className="flex-1 px-2 py-1.5 border border-[#C9D4E2] rounded text-[13px] bg-white focus:border-[#1E3A5F] outline-none"
             >
               {RUBRICS.map((r) => (
                 <option key={r.id} value={r.id}>{r.name}</option>
               ))}
             </select>
+            <button
+              className="px-3 py-1.5 bg-[#1E3A5F] text-white rounded text-[13px] font-semibold hover:bg-[#163050] disabled:opacity-50"
+              onClick={processTopic}
+              disabled={submitting || topicText.trim().length < 10}
+            >
+              {submitting ? "⏳ Z.ai..." : "🚀 Рерайт"}
+            </button>
           </div>
-          <button
-            className="sm-btn sm-btn-primary px-4 py-2"
-            onClick={processTopic}
-            disabled={submitting || topicText.trim().length < 10}
-          >
-            {submitting ? "Обработка…" : "Запустить рерайт (3-6 ботов)"}
-          </button>
         </div>
       )}
 
-      {/* Queue */}
+      {/* === TAB: QUEUE === */}
       {tab === "queue" && (
-        <div className="space-y-3">
-          {/* Filters */}
-          <div className="flex items-center gap-2 flex-wrap">
-            {["pending", "approved", "published", "rejected", "all"].map((s) => (
-              <button
-                key={s}
-                className={`sm-btn ${statusFilter === s ? "sm-btn-primary" : ""}`}
-                onClick={() => setStatusFilter(s)}
-              >
-                {s === "pending" ? "Ожидают" :
-                 s === "approved" ? "Одобрены" :
-                 s === "published" ? "Опубликованы" :
-                 s === "rejected" ? "Отклонены" : "Все"}
-              </button>
-            ))}
-            <button className="sm-btn" onClick={load} disabled={loading}>
-              {loading ? "Загрузка…" : "↻ Обновить"}
-            </button>
-          </div>
-
-          {/* Batches */}
+        <div className="space-y-2">
+          {/* Empty state */}
           {batches.length === 0 && !loading && (
-            <p className="text-center text-[14px] text-[#56657a] p-8">
-              Нет реплик со статусом «{statusFilter}».
-            </p>
+            <div className="bg-white p-6 rounded-lg border border-[#C9D4E2] text-center">
+              <div className="text-[32px] mb-1">📭</div>
+              <p className="text-[14px] text-[#56657a]">
+                Нет реплик со статусом «{statusFilter}».
+              </p>
+            </div>
           )}
-          {batches.map((batch) => (
-            <div key={batch.batchId} className="border border-[#C9D4E2] rounded bg-white">
-              {/* Batch header */}
-              <div className="bg-[#FDFEFF] border-b border-[#C9D4E2] px-3 py-2 flex items-center gap-3 flex-wrap">
-                <div className="text-[13px] font-bold text-[#1E3A5F]">
-                  Батч: {batch.count} реплик
+
+          {/* Batches — компактные карточки */}
+          {batches.map((batch) => {
+            const allPending = batch.items.every((i) => i.status === "pending");
+            return (
+              <div key={batch.batchId} className="bg-white rounded-lg border border-[#C9D4E2] overflow-hidden">
+                {/* Batch header — ОДНА строка, на всю ширину */}
+                <div className="bg-[#F8FAFC] border-b border-[#C9D4E2] px-2 py-1 flex items-center gap-2">
+                  <span className="text-[10px] text-[#56657a] uppercase tracking-wide flex-shrink-0">Источник:</span>
+                  <span className="text-[11px] text-[#1a1a1a] italic truncate flex-1" title={batch.sourceText}>
+                    {batch.sourceText.slice(0, 200)}{batch.sourceText.length > 200 ? "…" : ""}
+                  </span>
+                  {batch.topicTitle && (
+                    <span className="text-[10px] text-[#0a5caa] flex-shrink-0">📝 {batch.topicTitle.slice(0, 60)}{batch.topicTitle.length > 60 ? "…" : ""}</span>
+                  )}
+                  {allPending && (
+                    <button
+                      className="flex-shrink-0 px-2 py-0.5 bg-green-600 text-white rounded text-[10px] font-semibold hover:bg-green-700"
+                      onClick={() => actionBatch(batch.batchId, "approve-batch")}
+                      title="Одобрить все реплики этого батча"
+                    >
+                      ✓ Все ({batch.count})
+                    </button>
+                  )}
                 </div>
-                <div className="text-[12px] text-[#56657a] flex-1 min-w-0 truncate">
-                  Источник: <span className="italic">{batch.sourceText.slice(0, 100)}{batch.sourceText.length > 100 ? "…" : ""}</span>
-                </div>
-                {batch.items.every((i) => i.status === "pending") && (
-                  <button
-                    className="sm-btn sm-btn-primary text-[12px] px-2 py-1"
-                    onClick={() => actionBatch(batch.batchId, "approve-batch")}
-                  >
-                    ✓ Одобрить весь батч
-                  </button>
-                )}
-              </div>
-              {/* Items */}
-              <div className="divide-y divide-[#E5EBF2]">
-                {batch.items.map((item) => (
-                  <div key={item.id} className="p-3 space-y-2">
-                    <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-[140px]">
-                        <div className="font-bold text-[14px] text-[#0a5caa]">{item.botNickname}</div>
-                        <div className="text-[11px] text-[#56657a]">#{item.order + 1} в диалоге</div>
-                        <div className="text-[11px] mt-1">
-                          <StatusBadge status={item.status} />
-                        </div>
+
+                {/* Items list — ОДНА строка на реплику, на всю ширину */}
+                <div className="divide-y divide-[#E5EBF2]">
+                  {batch.items.map((item, idx) => (
+                    <div key={item.id} className="px-2 py-1 hover:bg-[#FAFBFC] flex items-center gap-2">
+                      {/* Ник + статус (фиксированная ширина) */}
+                      <div className="flex-shrink-0 w-[110px] flex items-center gap-1">
+                        <span className="text-[10px] text-[#999]">#{idx + 1}</span>
+                        <span className="font-bold text-[12px] text-[#0a5caa] truncate" title={item.botNickname}>{item.botNickname}</span>
                       </div>
+
+                      {/* Статус-бейдж (мини) */}
+                      <div className="flex-shrink-0 w-[80px]">
+                        <StatusBadge status={item.status} />
+                      </div>
+
+                      {/* Текст реплики — растягивается на всю ширину */}
                       <div className="flex-1 min-w-0">
                         {editingId === item.id ? (
                           <textarea
                             value={editText}
                             onChange={(e) => setEditText(e.target.value)}
-                            rows={3}
-                            className="w-full px-2 py-1 border border-[#0a5caa] rounded text-[14px]"
+                            rows={1}
+                            className="w-full px-1.5 py-0.5 border border-[#0a5caa] rounded text-[12px] focus:outline-none"
                           />
                         ) : (
-                          <p className="text-[14px] text-[#1a1a1a] whitespace-pre-wrap">{item.text}</p>
-                        )}
-                        {item.scheduledAt && (
-                          <p className="text-[11px] text-[#56657a] mt-1">
-                            🕐 Запланировано: {new Date(item.scheduledAt).toLocaleString("ru-RU")}
+                          <p className="text-[12px] text-[#1a1a1a] truncate" title={item.text}>
+                            {item.text || <span className="italic text-[#999]">(пусто)</span>}
                           </p>
                         )}
-                        {item.rejectReason && (
-                          <p className="text-[11px] text-[#c00] mt-1">Причина отклонения: {item.rejectReason}</p>
+                      </div>
+
+                      {/* Время scheduled (если есть) */}
+                      {item.scheduledAt && (item.status === "approved" || item.status === "published") && (
+                        <div className="flex-shrink-0 text-[10px] text-[#56657a]">
+                          {new Date(item.scheduledAt).toLocaleString("ru-RU", {hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'})}
+                        </div>
+                      )}
+
+                      {/* Кнопки действий — все в одну строку справа */}
+                      <div className="flex-shrink-0 flex gap-0.5">
+                        {editingId === item.id ? (
+                          <>
+                            <button className="px-1.5 py-0.5 bg-[#1E3A5F] text-white rounded text-[10px] hover:bg-[#163050]" onClick={() => saveEdit(item.id)} title="Сохранить">💾</button>
+                            <button className="px-1.5 py-0.5 bg-white border border-[#C9D4E2] text-[#1E3A5F] rounded text-[10px] hover:bg-gray-50" onClick={() => setEditingId(null)} title="Отмена">✕</button>
+                          </>
+                        ) : (
+                          <>
+                            {item.status === "pending" && (
+                              <>
+                                <button className="px-1.5 py-0.5 bg-green-600 text-white rounded text-[10px] font-semibold hover:bg-green-700" onClick={() => action(item.id, "approve")} title="Одобрить — публикация 15-120 мин">✓</button>
+                                <button className="px-1.5 py-0.5 bg-white border border-[#C9D4E2] text-[#1E3A5F] rounded text-[10px] hover:bg-gray-50" onClick={() => startEdit(item)} title="Редактировать текст">✏️</button>
+                                <button className="px-1.5 py-0.5 bg-white border border-red-400 text-red-600 rounded text-[10px] hover:bg-red-50" onClick={() => action(item.id, "reject")} title="Отклонить — бот регенерирует">✗</button>
+                              </>
+                            )}
+                            {item.status === "approved" && (
+                              <button className="px-1.5 py-0.5 bg-blue-600 text-white rounded text-[10px] font-semibold hover:bg-blue-700" onClick={() => action(item.id, "publish-now")} title="Опубликовать немедленно">🚀</button>
+                            )}
+                            {item.status === "published" && (
+                              <>
+                                <button className="px-1.5 py-0.5 bg-white border border-[#C9D4E2] text-[#1E3A5F] rounded text-[10px] hover:bg-gray-50" onClick={() => startEdit(item)} title="Редактировать">✏️</button>
+                                <button className="px-1.5 py-0.5 bg-[#1E3A5F] text-white rounded text-[10px] hover:bg-[#163050]" onClick={() => action(item.id, "update-published")} disabled={!editText || editingId !== item.id} title="Сохранить в форуме">💾</button>
+                                {item.topicId && (
+                                  <button className="px-1.5 py-0.5 bg-white border border-[#0a5caa] text-[#0a5caa] rounded text-[10px] hover:bg-blue-50" onClick={() => props.onOpenTopic(item.topicId!)} title="Открыть тему">🔗</button>
+                                )}
+                                <button className="px-1.5 py-0.5 bg-white border border-red-500 text-red-600 rounded text-[10px] hover:bg-red-50" onClick={() => { if (confirm("Удалить из форума? Тема удалится если это корневой пост.")) { action(item.id, "delete-published"); } }} title="Удалить из форума">🗑</button>
+                              </>
+                            )}
+                            {item.status === "rejected" && (
+                              <button className="px-1.5 py-0.5 bg-orange-500 text-white rounded text-[10px] font-semibold hover:bg-orange-600" onClick={() => action(item.id, "regenerate")} title="Регенерировать">🔄</button>
+                            )}
+                          </>
                         )}
                       </div>
                     </div>
-                    {/* Actions */}
-                    <div className="flex gap-2 flex-wrap">
-                      {editingId === item.id ? (
-                        <>
-                          <button className="sm-btn sm-btn-primary text-[12px] px-2 py-1" onClick={() => saveEdit(item.id)}>Сохранить</button>
-                          <button className="sm-btn text-[12px] px-2 py-1" onClick={() => setEditingId(null)}>Отмена</button>
-                        </>
-                      ) : (
-                        <>
-                          {item.status === "pending" && (
-                            <button className="sm-btn sm-btn-primary text-[12px] px-2 py-1" onClick={() => action(item.id, "approve")}>
-                              ✓ Одобрить
-                            </button>
-                          )}
-                          {item.status === "approved" && (
-                            <button className="sm-btn sm-btn-primary text-[12px] px-2 py-1" onClick={() => action(item.id, "publish-now")}>
-                              🚀 Опубликовать сейчас
-                            </button>
-                          )}
-                          {(item.status === "pending" || item.status === "approved") && (
-                            <button className="sm-btn text-[12px] px-2 py-1" onClick={() => startEdit(item)}>✏️ Редактировать</button>
-                          )}
-                          {item.status === "published" && (
-                            <>
-                              <button className="sm-btn text-[12px] px-2 py-1" onClick={() => startEdit(item)}>✏️ Редактировать текст</button>
-                              <button
-                                className="sm-btn sm-btn-primary text-[12px] px-2 py-1"
-                                onClick={() => action(item.id, "update-published")}
-                                disabled={editingId !== null && editingId !== item.id}
-                                title="Обновить текст уже опубликованного сообщения в форуме"
-                              >
-                                💾 Обновить в форуме
-                              </button>
-                              <button
-                                className="sm-btn text-[12px] px-2 py-1"
-                                onClick={() => {
-                                  if (confirm("Удалить это сообщение из форума? Тема тоже будет удалена, если это был корневой пост.")) {
-                                    action(item.id, "delete-published");
-                                  }
-                                }}
-                                title="Удалить сообщение из форума (тема удалится если это был корневой пост)"
-                                style={{ color: "#c00", borderColor: "#c00" }}
-                              >
-                                🗑 Удалить из форума
-                              </button>
-                            </>
-                          )}
-                          {item.status !== "rejected" && item.status !== "published" && (
-                            <button className="sm-btn text-[12px] px-2 py-1" onClick={() => action(item.id, "reject")}>❌ Отклонить</button>
-                          )}
-                          {item.status === "rejected" && (
-                            <button className="sm-btn text-[12px] px-2 py-1" onClick={() => action(item.id, "regenerate")}>🔄 Регенерировать</button>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
@@ -388,15 +390,16 @@ export function BotTheatreSection(props: Props) {
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const labels: Record<string, { label: string; color: string }> = {
-    pending: { label: "Ожидает", color: "#f59e0b" },
-    approved: { label: "Одобрено", color: "#3b82f6" },
-    published: { label: "Опубликовано", color: "#10b981" },
-    rejected: { label: "Отклонено", color: "#ef4444" },
+  const labels: Record<string, { label: string; color: string; bg: string }> = {
+    pending: { label: "⏳ Ожидает", color: "#92400e", bg: "#fef3c7" },
+    pending_rewrite: { label: "⏳ Z.ai...", color: "#92400e", bg: "#fef3c7" },
+    approved: { label: "✓ Одобрено", color: "#1e40af", bg: "#dbeafe" },
+    published: { label: "📤 Опубл.", color: "#166534", bg: "#dcfce7" },
+    rejected: { label: "✗ Откл.", color: "#991b1b", bg: "#fee2e2" },
   };
-  const s = labels[status] || { label: status, color: "#56657a" };
+  const s = labels[status] || { label: status, color: "#56657a", bg: "#f1f5f9" };
   return (
-    <span style={{ color: s.color, border: `1px solid ${s.color}`, padding: "1px 6px", borderRadius: "3px", fontWeight: 600 }}>
+    <span style={{ color: s.color, background: s.bg, padding: "1px 6px", borderRadius: "8px", fontWeight: 600, fontSize: "10px" }}>
       {s.label}
     </span>
   );
