@@ -335,6 +335,66 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, botNickname: item.botNickname });
     }
 
+    if (action === "publish-batch-by-title") {
+      // 2026-10-12: Если у батча нет topicId (тема не создана), но есть rubricId и topicTitle —
+      // создаём Topic по этим данным (без публикации реплик), возвращаем topicId.
+      // Используется когда админ кликает на заголовок темы в админке, чтобы посмотреть тему.
+      // Если topicId уже есть — просто возвращаем его.
+      const batchId = body.batchId as string;
+      if (!batchId) return NextResponse.json({ error: "batchId обязателен" }, { status: 400 });
+
+      const items = await db.botQueue.findMany({
+        where: { batchId },
+        orderBy: { order: "asc" },
+        take: 1,
+      });
+      if (items.length === 0) {
+        return NextResponse.json({ error: "Батч пуст" }, { status: 404 });
+      }
+      const first = items[0];
+
+      // Если topicId уже есть — возвращаем
+      if (first.topicId) {
+        return NextResponse.json({ ok: true, topicId: first.topicId });
+      }
+
+      // Нужно создать тему — но для этого нужен rubricId
+      if (!first.rubricId) {
+        return NextResponse.json({ error: "У батча нет rubricId — невозможно создать тему" }, { status: 400 });
+      }
+
+      // Заголовок темы
+      const title = first.topicTitle || first.text.slice(0, 70).replace(/\s+/g, " ").trim() + (first.text.length > 70 ? "…" : "");
+      if (!title) {
+        return NextResponse.json({ error: "Нет заголовка для темы" }, { status: 400 });
+      }
+
+      // Создаём Topic
+      const lastTopic = await db.topic.findFirst({ orderBy: { number: "desc" }, select: { number: true } });
+      const newTopicNumber = (lastTopic?.number ?? 0) + 1;
+      const newTopic = await db.topic.create({
+        data: {
+          number: newTopicNumber,
+          title,
+          source: "theatre-bots",
+          authorName: first.botNickname,
+          authorId: first.botUserId,
+          rubricId: first.rubricId,
+          lastAuthorName: first.botNickname,
+          lastActivityAt: new Date(),
+        },
+      });
+
+      // Обновляем все items батча — проставляем topicId
+      await db.botQueue.updateMany({
+        where: { batchId },
+        data: { topicId: newTopic.id },
+      });
+
+      console.log(`[bot-theatre] publish-batch-by-title: created topic #${newTopic.id} for batch ${batchId}`);
+      return NextResponse.json({ ok: true, topicId: newTopic.id, created: true });
+    }
+
     if (action === "save-batch") {
       // Принимает ГОТОВЫЕ реплики (уже рерайченные Z.ai на песочнице) и
       // сохраняет их в BotQueue со status=approved + scheduledAt.
@@ -386,7 +446,7 @@ export async function POST(req: NextRequest) {
             rubricId,
             topicTitle,
             scheduledAt: at,
-            status: "approved",  // уже одобрен (админ сказал «запускай»)
+            status: "pending",  // 2026-10-12 v2: ждёт модерации админом (не approved!)
             order: i,
             batchId,
             meta: JSON.stringify({ savedBy: "sandbox-scheduler" }),

@@ -292,19 +292,20 @@ export function BotTheatreSection(props: Props) {
                   </span>
                   {batch.topicTitle && (
                     batch.items[0]?.topicId ? (
+                      // topicId есть (тема уже создана) → кликабельная ссылка на тему форума
                       <a
-                        href={`/?view=forum&topic=${batch.items[0].topicId}`}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          props.onOpenTopic(batch.items[0].topicId!);
-                        }}
+                        href={`/?topic=${batch.items[0].topicId}`}
                         className="text-[10px] text-[#0a5caa] hover:text-[#c40000] hover:underline flex-shrink-0 cursor-pointer font-semibold"
-                        title="Открыть тему на форуме"
+                        title={`Открыть тему #${batch.items[0].topicId} на форуме`}
                       >
                         📝 {batch.topicTitle.slice(0, 60)}{batch.topicTitle.length > 60 ? "…" : ""}
                       </a>
                     ) : (
-                      <span className="text-[10px] text-[#0a5caa] flex-shrink-0">
+                      // topicId нет → тема ещё не опубликована, заголовок НЕ кликабельный
+                      <span
+                        className="text-[10px] text-[#56657a] flex-shrink-0 italic"
+                        title="Тема ещё не опубликована — одобрите реплики, чтобы создать тему в форуме"
+                      >
                         📝 {batch.topicTitle.slice(0, 60)}{batch.topicTitle.length > 60 ? "…" : ""}
                       </span>
                     )
