@@ -170,8 +170,20 @@ export async function POST(req: NextRequest) {
       const id = body.id as string;
       if (!id) return NextResponse.json({ error: "id обязателен" }, { status: 400 });
       const reason = (body.reason as string) || "";
-      const regenerate = body.regenerate !== false; // default true
-      const r = await rejectQueueItem(id, reason, regenerate);
+      // 2026-10-12: regenerate=true вызывает Z.ai, который не работает с VPS.
+      // По умолчанию НЕ регенерируем — просто помечаем как rejected.
+      // Регенерация возможна отдельно через action="regenerate" (когда sandbox-rewriter активен).
+      const r = await rejectQueueItem(id, reason, false);
+      return NextResponse.json({ ok: true, regenerated: r.regenerated, newQueueId: r.newQueueId });
+    }
+
+    if (action === "reject-and-regenerate") {
+      // Опциональная регенерация (если sandbox-rewriter может подхватить pending_rewrite).
+      // НЕ вызывается по умолчанию — Z.ai endpoint не работает с VPS.
+      const id = body.id as string;
+      if (!id) return NextResponse.json({ error: "id обязателен" }, { status: 400 });
+      const reason = (body.reason as string) || "";
+      const r = await rejectQueueItem(id, reason, true);
       return NextResponse.json({ ok: true, regenerated: r.regenerated, newQueueId: r.newQueueId });
     }
 
@@ -264,12 +276,22 @@ export async function POST(req: NextRequest) {
     }
 
     if (action === "regenerate") {
-      // Регенерация уже отклонённой реплики — бот сделает НОВЫЙ текст через Z.ai.
-      // Находит item, берёт sourceText, вызывает rejectQueueItem с regenerate=true.
+      // 2026-10-12 v2: НЕ вызываем Z.ai с VPS (не работает).
+      // Просто помечаем как pending_rewrite — sandbox-rewriter подхватит и сделает новый текст.
       const id = body.id as string;
       if (!id) return NextResponse.json({ error: "id обязателен" }, { status: 400 });
-      const r = await rejectQueueItem(id, "regenerate requested by admin", true);
-      return NextResponse.json({ ok: true, regenerated: r.regenerated, newQueueId: r.newQueueId });
+      const item = await db.botQueue.findUnique({ where: { id } });
+      if (!item) return NextResponse.json({ error: "Не найдено" }, { status: 404 });
+      // Помечаем как pending_rewrite + очищаем text — sandbox-rewriter сгенерирует новый
+      await db.botQueue.update({
+        where: { id },
+        data: {
+          status: "pending_rewrite",
+          text: "",
+          rejectReason: "regenerate requested by admin",
+        },
+      });
+      return NextResponse.json({ ok: true, message: "Помечено как pending_rewrite — sandbox-rewriter сгенерирует новый текст" });
     }
 
     if (action === "update-and-approve") {

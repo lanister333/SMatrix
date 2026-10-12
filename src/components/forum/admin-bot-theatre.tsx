@@ -304,77 +304,79 @@ export function BotTheatreSection(props: Props) {
                   )}
                 </div>
 
-                {/* Items list — ОДНА строка на реплику, на всю ширину */}
+                {/* Items list — компактно, но текст виден полностью */}
                 <div className="divide-y divide-[#E5EBF2]">
                   {batch.items.map((item, idx) => (
-                    <div key={item.id} className="px-2 py-1 hover:bg-[#FAFBFC] flex items-center gap-2">
-                      {/* Ник + статус (фиксированная ширина) */}
-                      <div className="flex-shrink-0 w-[110px] flex items-center gap-1">
-                        <span className="text-[10px] text-[#999]">#{idx + 1}</span>
-                        <span className="font-bold text-[12px] text-[#0a5caa] truncate" title={item.botNickname}>{item.botNickname}</span>
+                    <div key={item.id} className="px-2 py-1.5 hover:bg-[#FAFBFC] flex items-start gap-2">
+                      {/* Левая колонка — ник + статус + время */}
+                      <div className="flex-shrink-0 w-[120px]">
+                        <div className="flex items-center gap-1">
+                          <span className="text-[10px] text-[#999]">#{idx + 1}</span>
+                          <span className="font-bold text-[12px] text-[#0a5caa]">{item.botNickname}</span>
+                        </div>
+                        <div className="mt-0.5">
+                          <StatusBadge status={item.status} />
+                        </div>
+                        {item.scheduledAt && (item.status === "approved" || item.status === "published") && (
+                          <div className="text-[9px] text-[#56657a] mt-0.5">
+                            🕐 {new Date(item.scheduledAt).toLocaleString("ru-RU", {hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'})}
+                          </div>
+                        )}
+                        {/* Кнопки действий — под ником, мелкие, в столбик или в ряд */}
+                        <div className="flex gap-0.5 mt-1 flex-wrap">
+                          {editingId === item.id ? (
+                            <>
+                              <button className="px-1.5 py-0.5 bg-[#1E3A5F] text-white rounded text-[10px] hover:bg-[#163050]" onClick={() => saveEdit(item.id)} title="Сохранить">💾</button>
+                              <button className="px-1.5 py-0.5 bg-white border border-[#C9D4E2] text-[#1E3A5F] rounded text-[10px] hover:bg-gray-50" onClick={() => setEditingId(null)} title="Отмена">✕</button>
+                            </>
+                          ) : (
+                            <>
+                              {item.status === "pending" && (
+                                <>
+                                  <button className="px-1.5 py-0.5 bg-green-600 text-white rounded text-[10px] font-semibold hover:bg-green-700" onClick={() => action(item.id, "approve")} title="Одобрить — публикация 15-120 мин">✓</button>
+                                  <button className="px-1.5 py-0.5 bg-white border border-[#C9D4E2] text-[#1E3A5F] rounded text-[10px] hover:bg-gray-50" onClick={() => startEdit(item)} title="Редактировать текст">✏️</button>
+                                  <button className="px-1.5 py-0.5 bg-white border border-red-400 text-red-600 rounded text-[10px] hover:bg-red-50" onClick={() => action(item.id, "reject")} title="Отклонить — бот регенерирует">✗</button>
+                                </>
+                              )}
+                              {item.status === "approved" && (
+                                <button className="px-1.5 py-0.5 bg-blue-600 text-white rounded text-[10px] font-semibold hover:bg-blue-700" onClick={() => action(item.id, "publish-now")} title="Опубликовать немедленно">🚀 Сейчас</button>
+                              )}
+                              {item.status === "published" && (
+                                <>
+                                  <button className="px-1.5 py-0.5 bg-white border border-[#C9D4E2] text-[#1E3A5F] rounded text-[10px] hover:bg-gray-50" onClick={() => startEdit(item)} title="Редактировать">✏️</button>
+                                  <button className="px-1.5 py-0.5 bg-[#1E3A5F] text-white rounded text-[10px] hover:bg-[#163050]" onClick={() => action(item.id, "update-published")} disabled={!editText || editingId !== item.id} title="Сохранить в форуме">💾</button>
+                                  {item.topicId && (
+                                    <button className="px-1.5 py-0.5 bg-white border border-[#0a5caa] text-[#0a5caa] rounded text-[10px] hover:bg-blue-50" onClick={() => props.onOpenTopic(item.topicId!)} title="Открыть тему">🔗</button>
+                                  )}
+                                  <button className="px-1.5 py-0.5 bg-white border border-red-500 text-red-600 rounded text-[10px] hover:bg-red-50" onClick={() => { if (confirm("Удалить из форума? Тема удалится если это корневой пост.")) { action(item.id, "delete-published"); } }} title="Удалить из форума">🗑</button>
+                                </>
+                              )}
+                              {item.status === "rejected" && (
+                                <button className="px-1.5 py-0.5 bg-orange-500 text-white rounded text-[10px] font-semibold hover:bg-orange-600" onClick={() => action(item.id, "regenerate")} title="Регенерировать">🔄</button>
+                              )}
+                            </>
+                          )}
+                        </div>
                       </div>
 
-                      {/* Статус-бейдж (мини) */}
-                      <div className="flex-shrink-0 w-[80px]">
-                        <StatusBadge status={item.status} />
-                      </div>
-
-                      {/* Текст реплики — растягивается на всю ширину */}
+                      {/* Правая — текст реплики, виден полностью */}
                       <div className="flex-1 min-w-0">
                         {editingId === item.id ? (
                           <textarea
                             value={editText}
                             onChange={(e) => setEditText(e.target.value)}
-                            rows={1}
-                            className="w-full px-1.5 py-0.5 border border-[#0a5caa] rounded text-[12px] focus:outline-none"
+                            rows={2}
+                            className="w-full px-1.5 py-1 border border-[#0a5caa] rounded text-[12px] focus:outline-none"
                           />
                         ) : (
-                          <p className="text-[12px] text-[#1a1a1a] truncate" title={item.text}>
-                            {item.text || <span className="italic text-[#999]">(пусто)</span>}
+                          <p className="text-[12px] text-[#1a1a1a] leading-snug whitespace-pre-wrap">
+                            {item.text || <span className="italic text-[#999]">(текст ещё не сгенерирован)</span>}
                           </p>
                         )}
-                      </div>
-
-                      {/* Время scheduled (если есть) */}
-                      {item.scheduledAt && (item.status === "approved" || item.status === "published") && (
-                        <div className="flex-shrink-0 text-[10px] text-[#56657a]">
-                          {new Date(item.scheduledAt).toLocaleString("ru-RU", {hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'})}
-                        </div>
-                      )}
-
-                      {/* Кнопки действий — все в одну строку справа */}
-                      <div className="flex-shrink-0 flex gap-0.5">
-                        {editingId === item.id ? (
-                          <>
-                            <button className="px-1.5 py-0.5 bg-[#1E3A5F] text-white rounded text-[10px] hover:bg-[#163050]" onClick={() => saveEdit(item.id)} title="Сохранить">💾</button>
-                            <button className="px-1.5 py-0.5 bg-white border border-[#C9D4E2] text-[#1E3A5F] rounded text-[10px] hover:bg-gray-50" onClick={() => setEditingId(null)} title="Отмена">✕</button>
-                          </>
-                        ) : (
-                          <>
-                            {item.status === "pending" && (
-                              <>
-                                <button className="px-1.5 py-0.5 bg-green-600 text-white rounded text-[10px] font-semibold hover:bg-green-700" onClick={() => action(item.id, "approve")} title="Одобрить — публикация 15-120 мин">✓</button>
-                                <button className="px-1.5 py-0.5 bg-white border border-[#C9D4E2] text-[#1E3A5F] rounded text-[10px] hover:bg-gray-50" onClick={() => startEdit(item)} title="Редактировать текст">✏️</button>
-                                <button className="px-1.5 py-0.5 bg-white border border-red-400 text-red-600 rounded text-[10px] hover:bg-red-50" onClick={() => action(item.id, "reject")} title="Отклонить — бот регенерирует">✗</button>
-                              </>
-                            )}
-                            {item.status === "approved" && (
-                              <button className="px-1.5 py-0.5 bg-blue-600 text-white rounded text-[10px] font-semibold hover:bg-blue-700" onClick={() => action(item.id, "publish-now")} title="Опубликовать немедленно">🚀</button>
-                            )}
-                            {item.status === "published" && (
-                              <>
-                                <button className="px-1.5 py-0.5 bg-white border border-[#C9D4E2] text-[#1E3A5F] rounded text-[10px] hover:bg-gray-50" onClick={() => startEdit(item)} title="Редактировать">✏️</button>
-                                <button className="px-1.5 py-0.5 bg-[#1E3A5F] text-white rounded text-[10px] hover:bg-[#163050]" onClick={() => action(item.id, "update-published")} disabled={!editText || editingId !== item.id} title="Сохранить в форуме">💾</button>
-                                {item.topicId && (
-                                  <button className="px-1.5 py-0.5 bg-white border border-[#0a5caa] text-[#0a5caa] rounded text-[10px] hover:bg-blue-50" onClick={() => props.onOpenTopic(item.topicId!)} title="Открыть тему">🔗</button>
-                                )}
-                                <button className="px-1.5 py-0.5 bg-white border border-red-500 text-red-600 rounded text-[10px] hover:bg-red-50" onClick={() => { if (confirm("Удалить из форума? Тема удалится если это корневой пост.")) { action(item.id, "delete-published"); } }} title="Удалить из форума">🗑</button>
-                              </>
-                            )}
-                            {item.status === "rejected" && (
-                              <button className="px-1.5 py-0.5 bg-orange-500 text-white rounded text-[10px] font-semibold hover:bg-orange-600" onClick={() => action(item.id, "regenerate")} title="Регенерировать">🔄</button>
-                            )}
-                          </>
+                        {item.rejectReason && (
+                          <p className="text-[10px] text-[#c00] mt-0.5">
+                            Причина: {item.rejectReason}
+                          </p>
                         )}
                       </div>
                     </div>

@@ -82,13 +82,13 @@ const MENU: { key: AdminSection; label: string; ownerOnly: boolean }[] = [
   { key: "ai", label: "Авто-модерация", ownerOnly: false },
   { key: "complaints", label: "Жалобы", ownerOnly: false },
   { key: "users", label: "Пользователи", ownerOnly: false },
-  { key: "topics", label: "Темы форума", ownerOnly: false },
+  { key: "topics", label: "Темы", ownerOnly: false },
   { key: "bots", label: "Театр ботов", ownerOnly: false },
   { key: "ads", label: "Объявления", ownerOnly: true },
-  { key: "info", label: "Практическая информация", ownerOnly: true },
+  { key: "info", label: "Практ. инфо", ownerOnly: true },
   { key: "directory", label: "Справочник", ownerOnly: true },
-  { key: "settings", label: "Настройки сайта", ownerOnly: true },
-  { key: "log", label: "Журнал действий", ownerOnly: false },
+  { key: "settings", label: "Настройки", ownerOnly: true },
+  { key: "log", label: "Журнал", ownerOnly: false },
 ];
 
 const SECTION_TITLES: Record<AdminSection, string> = {
@@ -151,7 +151,7 @@ export function AdminPanel(props: {
     : "home";
 
   return (
-    <div className="sm-frame-2 mx-auto max-w-[1120px]">
+    <div className="sm-frame-2 mx-auto max-w-[1480px]">
       <div className="sm-frame-title flex flex-wrap items-center justify-between gap-2">
         <span>Административная панель</span>
         <span className="text-[12px] font-normal opacity-85">
@@ -160,12 +160,12 @@ export function AdminPanel(props: {
       </div>
       <div className="flex flex-col md:flex-row">
         {/* Меню разделов */}
-        <nav className="shrink-0 border-b-2 border-r-0 border-[#C9D4E2] bg-[#F7FAFD] p-2 md:w-[228px] md:border-b-0 md:border-r-2" aria-label="Меню админ-панели">
+        <nav className="shrink-0 border-b-2 border-r-0 border-[#C9D4E2] bg-[#F7FAFD] p-2 md:w-[160px] md:border-b-0 md:border-r-2" aria-label="Меню админ-панели">
           <ul className="flex flex-wrap gap-1 md:flex-col md:flex-nowrap">
             {menu.map((m) => (
               <li key={m.key} className="md:w-full">
                 <button
-                  className={`w-full border border-transparent px-2.5 py-1.5 text-left text-[13.5px] font-semibold text-[#1E3A5F] hover:bg-white ${section === m.key ? "border-[#1E3A5F] bg-white shadow-inner" : ""}`}
+                  className={`w-full border border-transparent px-2 py-1.5 text-left text-[12px] font-semibold text-[#1E3A5F] hover:bg-white ${section === m.key ? "border-[#1E3A5F] bg-white shadow-inner" : ""}`}
                   aria-current={section === m.key ? "page" : undefined}
                   onClick={() => props.onSection(m.key)}
                 >
