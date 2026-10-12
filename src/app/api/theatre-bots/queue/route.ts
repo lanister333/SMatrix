@@ -328,7 +328,7 @@ export async function POST(req: NextRequest) {
             rubricId,
             topicTitle,
             scheduledAt: at,
-            status: "approved",  // уже одобрен (админ сказал «запускай»)
+            status: "pending",  // 2026-10-12 v2: ждёт модерации админом (не approved!)
             order: i,
             batchId,
             meta: JSON.stringify({ savedBy: "sandbox-scheduler" }),

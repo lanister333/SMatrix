@@ -210,8 +210,32 @@ export function Masthead(props: { settings: SiteSettings }) {
           <div className="text-[12px] font-bold uppercase leading-tight tracking-wide text-white md:text-[13.5px] xl:text-[15px]">
             {props.settings?.siteSubtitle ?? DEFAULT_SETTINGS.siteSubtitle}
           </div>
+          {/* 2026-10-12: слово «форум» в описании — кликабельная ссылка на /?view=forum.
+              Используем indexOf (не regex с \b — word boundary не работает для кириллицы). */}
           <p className="mt-0.5 text-[11.5px] font-medium leading-snug text-white md:mt-0.5 md:text-[12.5px] max-[640px]:hidden">
-            {props.settings?.siteDescription ?? DEFAULT_SETTINGS.siteDescription}
+            {(() => {
+              const desc = props.settings?.siteDescription ?? DEFAULT_SETTINGS.siteDescription;
+              const lower = desc.toLowerCase();
+              const idx = lower.indexOf("форум");
+              if (idx < 0) return desc;
+              const before = desc.substring(0, idx);
+              const word = desc.substring(idx, idx + 5);  // exact case as in source
+              const after = desc.substring(idx + 5);
+              return (
+                <>
+                  {before}
+                  <a
+                    href="/?view=forum"
+                    className="text-white"
+                    style={{ fontWeight: 700, textDecoration: "underline", textDecorationColor: "rgba(255,255,255,0.85)", textDecorationThickness: "2px", textUnderlineOffset: "2px" }}
+                    title="Перейти на главную страницу форума"
+                  >
+                    {word}
+                  </a>
+                  {after}
+                </>
+              );
+            })()}
           </p>
         </div>
       </div>
