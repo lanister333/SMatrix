@@ -674,6 +674,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, topicId: result.topicId, messageId: result.messageId });
     }
 
+    // 2026-10-13: удалить весь батч полностью из BotQueue (все items, включая тему и ответы).
+    if (action === "delete-batch") {
+      const batchId = body.batchId as string;
+      if (!batchId) return NextResponse.json({ error: "batchId обязателен" }, { status: 400 });
+      const result = await db.botQueue.deleteMany({ where: { batchId } });
+      console.log(`[bot-theatre] delete-batch: ${batchId} → deleted ${result.count} items`);
+      return NextResponse.json({ ok: true, deleted: result.count });
+    }
+
     return NextResponse.json({ error: `Unknown action: ${action}` }, { status: 400 });
   } catch (e) {
     console.error("[bot-theatre] queue POST error:", e);

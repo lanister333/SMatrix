@@ -415,6 +415,21 @@ export function MainNav(props: {
           вафлю и кружок аватара. Был порядок: [вафля][поиск][аватар].
           Стал: [аватар][поиск][вафля]. Inline-стиль обходит кэш CDN. */}
       <div className="sm-mh-mobile-bar" style={{ flexDirection: "row-reverse" }}>
+        {/* 2026-10-13: иконка щита 🛡️ — быстрый доступ к админ-панели (только для staff).
+            В бирюзовой шапке, для мобайла. */}
+        {isAdmin && (
+          <a
+            href="/?view=admin"
+            className="sm-mobile-shield"
+            title="Админ-панель"
+            aria-label="Админ-панель"
+            style={{ display: "inline-flex", alignItems: "center", padding: "0 8px", color: "#FFD700" }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+            </svg>
+          </a>
+        )}
         {/* 2026-10-01 (мобайл): иконка-вафля (как у Google) вместо текста
             «☰ Разделы портала». Клик → выпадает меню с иконками разделов. */}
         <button
@@ -615,6 +630,20 @@ export function MainNav(props: {
           )}
         </div>
         <div className="sm-nav-right">
+          {/* 2026-10-13: иконка щита 🛡️ — быстрый доступ к админ-панели (только для staff). */}
+          {isAdmin && (
+            <a
+              href="/?view=admin"
+              className="sm-mainnav-link sm-nav-shield"
+              title="Админ-панель"
+              aria-label="Админ-панель"
+              style={{ padding: "0 10px", display: "inline-flex", alignItems: "center", color: "#FFD700" }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+              </svg>
+            </a>
+          )}
           <form
             className="sm-nav-search"
             role="search"

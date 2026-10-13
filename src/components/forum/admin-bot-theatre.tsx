@@ -296,21 +296,20 @@ export function BotTheatreSection(props: Props) {
                   <span className="text-[11px] text-[#1a1a1a] italic truncate flex-1 min-w-0 max-w-[400px]" title={batch.sourceText}>
                     {batch.sourceText.slice(0, 120)}{batch.sourceText.length > 120 ? "…" : ""}
                   </span>
-                  {batch.sourceText.length > 120 && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const next = new Set(expandedBatches);
-                        if (next.has(batch.batchId)) next.delete(batch.batchId);
-                        else next.add(batch.batchId);
-                        setExpandedBatches(next);
-                      }}
-                      className="flex-shrink-0 px-1.5 py-0.5 text-[10px] bg-white border border-[#C9D4E2] text-[#1E3A5F] rounded hover:bg-[#F8FAFC] cursor-pointer"
-                      title={expandedBatches.has(batch.batchId) ? "Свернуть полный текст источника" : "Раскрыть полный текст источника"}
-                    >
-                      {expandedBatches.has(batch.batchId) ? "▲ Свернуть" : "📄 Весь текст"}
-                    </button>
-                  )}
+                  {/* 2026-10-13: кнопка «📄 Весь текст» — ВСЕГДА (для всех батчей). */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = new Set(expandedBatches);
+                      if (next.has(batch.batchId)) next.delete(batch.batchId);
+                      else next.add(batch.batchId);
+                      setExpandedBatches(next);
+                    }}
+                    className="flex-shrink-0 px-1.5 py-0.5 text-[10px] bg-white border border-[#C9D4E2] text-[#1E3A5F] rounded hover:bg-[#F8FAFC] cursor-pointer"
+                    title={expandedBatches.has(batch.batchId) ? "Свернуть полный текст источника" : "Раскрыть полный текст источника"}
+                  >
+                    {expandedBatches.has(batch.batchId) ? "▲ Свернуть" : "📄 Весь текст"}
+                  </button>
                   {batch.topicTitle && (
                     (() => {
                       // Ищем topicId у любого item в батче (т.к. у ТЕМЫ может быть null, а у ответов уже есть)
@@ -385,6 +384,34 @@ export function BotTheatreSection(props: Props) {
                       ✓ Все ({batch.count})
                     </button>
                   )}
+                  {/* 2026-10-13: красная кнопка «🗑 Удалить» — полностью удалить батч из очереди. */}
+                  <button
+                    className="flex-shrink-0 px-2 py-0.5 bg-red-600 text-white rounded text-[10px] font-semibold hover:bg-red-700"
+                    onClick={async () => {
+                      const token = props.token || (typeof window !== 'undefined' ? (() => { try { return JSON.parse(localStorage.getItem('sm_auth') || '{}')?.token; } catch { return null; } })() : null);
+                      if (!token) return;
+                      if (!confirm(`Удалить весь батч? Будут удалены тема + все ${batch.count} реплик из очереди модерации. На форум ничего не попадёт.`)) return;
+                      try {
+                        const r = await fetch("/api/theatre-bots/queue", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ token, action: "delete-batch", batchId: batch.batchId }),
+                        });
+                        const d = await r.json();
+                        if (r.ok && d.ok) {
+                          props.notify(`🗑 Батч удалён (${d.deleted} items)`);
+                          setTimeout(load, 300);
+                        } else {
+                          props.notify(d.error || "Не удалось удалить батч");
+                        }
+                      } catch (e) {
+                        props.notify("Сеть недоступна");
+                      }
+                    }}
+                    title="Удалить весь батч (тема + все ответы) из очереди модерации"
+                  >
+                    🗑 Удалить
+                  </button>
                 </div>
 
                 {/* 2026-10-13: раскрывающийся блок с полным текстом источника */}
