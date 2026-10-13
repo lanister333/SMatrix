@@ -64,8 +64,12 @@ function buildTree(messages: Msg[]): TreeNode[] {
     };
   }
   
-  // Корневые сообщения (parentId = null)
-  const roots = childrenMap.get(null) || [];
+  // Корневые сообщения (parentId = null).
+  // 2026-10-13: первое сообщение темы (num===1) НЕ показываем в ленте —
+  // оно отображается в шапке темы. Но оставляем его в byId (выше),
+  // чтобы его дети (Boss, Серёга) могли найти своего родителя.
+  const allRoots = childrenMap.get(null) || [];
+  const roots = allRoots.filter((m) => m.num !== 1);
   return roots.map(buildNode);
 }
 

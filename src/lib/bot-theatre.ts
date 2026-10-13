@@ -574,15 +574,8 @@ export async function publishApprovedQueueItem(queueId: string): Promise<{ topic
     });
     const newMsgNum = (lastMsg?.num ?? 0) + 1;
 
-    // Если это не первый пост темы и нет parentMessageId — отвечаем на первое сообщение темы
-    if (newMsgNum > 1 && !parentMessageId && lastMsg) {
-      // Находим первое сообщение темы (num=1)
-      const firstMsg = await tx.message.findFirst({
-        where: { topicId, num: 1 },
-        select: { id: true },
-      });
-      parentMessageId = firstMsg?.id ?? null;
-    }
+    // 2026-10-13: НЕ привязываем новые ответы ботов к msg#1 — ответы создаются
+    // как корневые узлы (parentId=null). msg#1 скрыт из ленты, его текст в шапке темы.
 
     // Создаём сообщение
     const message = await tx.message.create({

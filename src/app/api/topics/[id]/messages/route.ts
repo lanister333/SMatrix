@@ -133,16 +133,9 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
       parent = await db.message.findUnique({ where: { id: parentId } });
       if (!parent || parent.topicId !== topicId) parent = null;
     }
-    // 2026-10-13: если parentId не указан (пользователь ответил в общую форму) —
-    // устанавливаем parentId на первое сообщение темы (num=1), чтобы SVG-линия
-    // связи «ответ → корневое сообщение» рисовалась корректно.
-    if (!parent) {
-      const firstMsg = await db.message.findFirst({
-        where: { topicId, num: 1 },
-        select: { id: true, depth: true, topicId: true },
-      });
-      if (firstMsg) parent = firstMsg as { topicId: number; id: string; depth: number };
-    }
+    // 2026-10-13: НЕ устанавливаем parentId на msg#1 при отсутствии явного parentId —
+    // новые ответы создаются как корневые узлы (parentId=null), отвязка от msg#1
+    // (текст темы теперь в шапке, msg#1 скрыт из ленты).
 
     // ШАГ 10: ИИ-модерация — первая инстанция. Проверяется весь текст,
     // включая цитируемые фрагменты. Нецензурная лексика → блокировка
