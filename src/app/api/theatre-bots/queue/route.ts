@@ -581,6 +581,99 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, batchId, queuedCount: saved });
     }
 
+    // ─────────────────────────────────────────────────────────────────────
+    // 2026-10-13: РАЗДЕЛЬНАЯ МОДЕРАЦИЯ — публикует ТОЛЬКО тему (message #1).
+    // Ответы (order>=0) НЕ публикуются — остаются в pending, ждут отдельного одобрения.
+    // Проставляет topicId всем ответам батча (чтобы при их публикации попасть в эту тему).
+    // ─────────────────────────────────────────────────────────────────────
+    if (action === "approve-topic-only") {
+      const id = body.id as string;
+      if (!id) return NextResponse.json({ error: "id обязателен" }, { status: 400 });
+      const item = await db.botQueue.findUnique({ where: { id } });
+      if (!item) return NextResponse.json({ error: "Не найдено" }, { status: 404 });
+      if (item.order !== -1) {
+        return NextResponse.json({ error: "Это не тема (order должно быть -1)" }, { status: 400 });
+      }
+      if (item.status === "published") {
+        return NextResponse.json({ error: "Тема уже опубликована" }, { status: 400 });
+      }
+      if (!item.rubricId) {
+        return NextResponse.json({ error: "У темы нет rubricId — невозможно создать Topic" }, { status: 400 });
+      }
+
+      const result = await db.$transaction(async (tx) => {
+        // Создаём Topic (если ещё не создан)
+        let topicId = item.topicId;
+        if (!topicId) {
+          const title = item.topicTitle || item.text.slice(0, 70).replace(/\s+/g, " ").trim() + (item.text.length > 70 ? "…" : "");
+          const lastTopic = await tx.topic.findFirst({ orderBy: { number: "desc" }, select: { number: true } });
+          const newTopicNumber = (lastTopic?.number ?? 0) + 1;
+          const newTopic = await tx.topic.create({
+            data: {
+              number: newTopicNumber,
+              title,
+              source: "theatre-bots",
+              authorName: item.botNickname,
+              authorId: item.botUserId,
+              rubricId: item.rubricId!,
+              lastAuthorName: item.botNickname,
+              lastActivityAt: new Date(),
+            },
+          });
+          topicId = newTopic.id;
+
+          // Проставляем topicId всем ответам этого батча (но не трогаем их status)
+          await tx.botQueue.updateMany({
+            where: { batchId: item.batchId, id: { not: item.id } },
+            data: { topicId: newTopic.id },
+          });
+        }
+
+        // Создаём message #1 (текст темы)
+        const message = await tx.message.create({
+          data: {
+            topicId,
+            num: 1,
+            depth: 0,
+            authorName: item.botNickname,
+            authorId: item.botUserId,
+            body: item.text,
+            kind: "news",
+            aiStatus: "ok",
+            modLevel: 4,
+            aiAction: "WATCH",
+            aiConfidence: 1.0,
+            aiSignal: "theatre-bot",
+          },
+        });
+
+        // Помечаем topic-item как опубликованный
+        await tx.botQueue.update({
+          where: { id: item.id },
+          data: {
+            status: "published",
+            publishedMessageId: message.id,
+            topicId,
+            scheduledAt: new Date(),
+          },
+        });
+
+        // Обновляем тему
+        await tx.topic.update({
+          where: { id: topicId },
+          data: {
+            lastActivityAt: new Date(),
+            lastAuthorName: item.botNickname,
+          },
+        });
+
+        return { topicId, messageId: message.id };
+      });
+
+      console.log(`[bot-theatre] approve-topic-only: topic=${result.topicId} msg=${result.messageId}`);
+      return NextResponse.json({ ok: true, topicId: result.topicId, messageId: result.messageId });
+    }
+
     return NextResponse.json({ error: `Unknown action: ${action}` }, { status: 400 });
   } catch (e) {
     console.error("[bot-theatre] queue POST error:", e);

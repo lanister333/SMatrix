@@ -319,39 +319,45 @@ export function BotTheatreSection(props: Props) {
                       );
                     })()
                   )}
-                  {/* Кнопка «🚀 Опубликовать тему» — публикует ВСЕ реплики батча + создаёт Topic немедленно */}
-                  {batch.items.some((i) => i.status === "pending") && (
-                    <button
-                      className="flex-shrink-0 px-2 py-0.5 bg-blue-600 text-white rounded text-[10px] font-semibold hover:bg-blue-700"
-                      onClick={async () => {
-                        const token = props.token || (typeof window !== 'undefined' ? (() => { try { return JSON.parse(localStorage.getItem('sm_auth') || '{}')?.token; } catch { return null; } })() : null); if (!token) return;
-                        if (!confirm(`Опубликовать тему целиком? Создаст Topic + все ${batch.count} реплик в форуме немедленно.`)) return;
-                        try {
-                          const r = await fetch("/api/theatre-bots/queue", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                              token: token,
-                              action: "publish-topic-now",
-                              batchId: batch.batchId,
-                            }),
-                          });
-                          const d = await r.json();
-                          if (r.ok && d.ok) {
-                            props.notify(`🚀 Тема #${d.topicId} опубликована (${d.published} реплик)`);
-                            setTimeout(load, 300);
-                          } else {
-                            props.notify(d.error || "Не удалось опубликовать");
+                  {/* 2026-10-13: Раздельная модерация — публикует ТОЛЬКО тему (без ответов).
+                      Ответы остаются в очереди, их нужно отдельно одобрять. */}
+                  {batch.items.some((i) => i.order === -1 && i.status === "pending") && (() => {
+                    const topicItem = batch.items.find((i) => i.order === -1);
+                    if (!topicItem) return null;
+                    return (
+                      <button
+                        className="flex-shrink-0 px-2 py-0.5 bg-blue-600 text-white rounded text-[10px] font-semibold hover:bg-blue-700"
+                        onClick={async () => {
+                          const token = props.token || (typeof window !== 'undefined' ? (() => { try { return JSON.parse(localStorage.getItem('sm_auth') || '{}')?.token; } catch { return null; } })() : null);
+                          if (!token || !topicItem) return;
+                          if (!confirm(`Опубликовать ТОЛЬКО тему?\nОтветы (${batch.items.filter(i => i.order >= 0).length} шт.) останутся в очереди модерации и потребуют отдельного одобрения.`)) return;
+                          try {
+                            const r = await fetch("/api/theatre-bots/queue", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({
+                                token,
+                                action: "approve-topic-only",
+                                id: topicItem.id,
+                              }),
+                            });
+                            const d = await r.json();
+                            if (r.ok && d.ok) {
+                              props.notify(`🚀 Тема #${d.topicId} опубликована. Ответы ждут отдельного одобрения.`);
+                              setTimeout(load, 300);
+                            } else {
+                              props.notify(d.error || "Не удалось опубликовать");
+                            }
+                          } catch (e) {
+                            props.notify("Сеть недоступна");
                           }
-                        } catch (e) {
-                          props.notify("Сеть недоступна");
-                        }
-                      }}
-                      title="Опубликовать ТЕМУ целиком немедленно: создаст Topic + все реплики как сообщения"
-                    >
-                      🚀 Опубликовать тему
-                    </button>
-                  )}
+                        }}
+                        title="Опубликовать ТОЛЬКО тему (без ответов). Ответы останутся в очереди модерации."
+                      >
+                        🚀 Опубликовать тему
+                      </button>
+                    );
+                  })()}
                   {allPending && (
                     <button
                       className="flex-shrink-0 px-2 py-0.5 bg-green-600 text-white rounded text-[10px] font-semibold hover:bg-green-700"
