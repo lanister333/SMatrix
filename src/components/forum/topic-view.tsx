@@ -989,8 +989,13 @@ export default function TopicView(props: {
             и синяя кнопка «Ответить». Применимо ко всем темам форума
             (существующим и будущим) — единый шаблон .t-title. */}
         <div className="t-title">
+          {/* 2026-10-13: заголовок topic.title удалён — вместо него показываем
+              ТЕКСТ ТЕМЫ (body первого сообщения msg#1). Применяется ко всем темам
+              (старым, новым, будущим) ретроактивно. */}
           <span className="t-title-text">
-            {topic.title as string}
+            <strong style={{ fontWeight: 700, display: "block", fontSize: "1em", lineHeight: 1.4 }}>
+              {messages.find((m) => m.num === 1)?.body || (topic.title as string)}
+            </strong>
             {topic.isPinned && <span className="sk-tstatus pinned">Закреплена</span>}
             {topic.isArchived ? (
               <span className="sk-tstatus archived">В архиве</span>
