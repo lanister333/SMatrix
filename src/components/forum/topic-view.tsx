@@ -327,7 +327,15 @@ function MessageRow(props: {
         {/* 2026-10-07: цитата (серый блок с текстом родителя) убрана
             полностью — текст уже есть выше в теме, дублировать его не нужно.
             SVG-линии «кто кому ответил» показывают связь графически. */}
-        {renderMentions(m.body, props.mentionAuthors, props.onOpenProfile)}
+        {/* 2026-10-13: первое сообщение темы (num===1) — весь body жирным.
+            Применяется ко всем темам (старым, новым, будущим). */}
+        {m.num === 1 ? (
+          <strong className="sk-msg-body-first" style={{ fontWeight: 700 }}>
+            {renderMentions(m.body, props.mentionAuthors, props.onOpenProfile)}
+          </strong>
+        ) : (
+          renderMentions(m.body, props.mentionAuthors, props.onOpenProfile)
+        )}
       </div>
     </div>
   );
