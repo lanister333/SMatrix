@@ -287,11 +287,12 @@ export function BotTheatreSection(props: Props) {
             const allPending = batch.items.every((i) => i.status === "pending");
             return (
               <div key={batch.batchId} className="bg-white rounded-lg border border-[#C9D4E2] overflow-hidden">
-                {/* Batch header — flex с переносом, чтобы кнопки не вылезали за рамку */}
-                <div className="bg-[#F8FAFC] border-b border-[#C9D4E2] px-2 py-1 flex items-center gap-2 flex-wrap">
+                {/* Batch header — 2026-10-13: flex-wrap + min-w-0 + max-w на источнике,
+                    чтобы кнопки не вылезали за правый край рамки. */}
+                <div className="bg-[#F8FAFC] border-b border-[#C9D4E2] px-2 py-1 flex items-center gap-2 flex-wrap min-w-0">
                   <span className="text-[10px] text-[#56657a] uppercase tracking-wide flex-shrink-0">Источник:</span>
-                  <span className="text-[11px] text-[#1a1a1a] italic truncate flex-1" title={batch.sourceText}>
-                    {batch.sourceText.slice(0, 200)}{batch.sourceText.length > 200 ? "…" : ""}
+                  <span className="text-[11px] text-[#1a1a1a] italic truncate flex-1 min-w-0 max-w-[400px]" title={batch.sourceText}>
+                    {batch.sourceText.slice(0, 120)}{batch.sourceText.length > 120 ? "…" : ""}
                   </span>
                   {batch.topicTitle && (
                     (() => {
