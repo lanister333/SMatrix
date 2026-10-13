@@ -164,14 +164,31 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     });
     const num = (agg._max.num ?? 0) + 1;
 
+    // 2026-10-13: «Вариант 2» — ответы от Админа публикуются от имени рандомного бота.
+    // botAuthor (ник бота) передаётся из UI формы ответа. Если задан — используем бота как автора.
+    let authorName = user.nickname;
+    let authorId = user.id;
+    const botAuthorNick = body.botAuthor ? String(body.botAuthor).trim() : null;
+    if (botAuthorNick) {
+      const botUser = await db.user.findUnique({
+        where: { nickname: botAuthorNick },
+        select: { id: true, nickname: true, email: true },
+      });
+      // Проверяем что это действительно theatre-bot
+      if (botUser && botUser.email && botUser.email.includes("@theatre.local")) {
+        authorName = botUser.nickname;
+        authorId = botUser.id;
+      }
+    }
+
     const message = await db.message.create({
       data: {
         topicId,
         parentId: parent ? parent.id : null,
         depth: parent ? Math.min(6, parent.depth + 1) : 0,
         num,
-        authorName: user.nickname,
-        authorId: user.id,
+        authorName,
+        authorId,
         body: text,
         aiStatus: outcome.action === "hide" ? "hidden" : outcome.action === "human" ? "human" : "ok",
         aiNote: outcome.aiNote ?? "",

@@ -495,6 +495,9 @@ export default function TopicView(props: {
   const [loading, setLoading] = useState(true);
   const [reply, setReply] = useState("");
   const [replyTo, setReplyTo] = useState<Msg | null>(null);
+  // 2026-10-13: «Вариант 2» — ответ от рандомного бота (со сменой по кнопке)
+  const [replyBotAuthor, setReplyBotAuthor] = useState<string>("");
+  const [availableBots, setAvailableBots] = useState<string[]>([]);
   const [sending, setSending] = useState(false);
   const [inTopicSearch, setInTopicSearch] = useState(false);
   const [topicQ, setTopicQ] = useState("");
@@ -668,7 +671,7 @@ export default function TopicView(props: {
       const r = await fetch(`/api/topics/${topicId}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ body: bodyWithMention, parentId: replyTo?.id, token }),
+        body: JSON.stringify({ body: bodyWithMention, parentId: replyTo?.id, token, botAuthor: replyBotAuthor || undefined }),
       });
       const data = await r.json();
       if (!r.ok) throw Error(data.error || "Ошибка отправки");
@@ -1142,6 +1145,18 @@ export default function TopicView(props: {
           <div className="sk-note">Тема закрыта для новых сообщений.</div>
         ) : (
           <>
+            {/* 2026-10-13: бейдж выбора бота для ответа */}
+            {replyBotAuthor && (
+              <div className="sk-qr-bot-author" style={{ display: "flex", alignItems: "center", gap: "8px", padding: "4px 0", fontSize: "12px", color: "#1E3A5F" }}>
+                <span>🤖 Пишете как: <b style={{ color: "#0a5caa" }}>{replyBotAuthor}</b></span>
+                <button
+                  type="button"
+                  onClick={pickRandomBot}
+                  title="Сменить бота на другого рандомного"
+                  style={{ padding: "2px 8px", fontSize: "11px", background: "#f1f5f9", border: "1px solid #C9D4E2", borderRadius: "4px", cursor: "pointer", color: "#1E3A5F" }}
+                >🔄 Сменить</button>
+              </div>
+            )}
             {replyTo && (
               <div className="sk-qr-target">
                 Ответ для {replyTo.author} (№{replyTo.num}){" "}

@@ -79,6 +79,8 @@ export function BotTheatreSection(props: Props) {
   const [batches, setBatches] = useState<BotBatch[]>([]);
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  // 2026-10-13: раскрытые батчи — для показа полного текста источника
+  const [expandedBatches, setExpandedBatches] = useState<Set<string>>(new Set());
   const [editText, setEditText] = useState<string>("");
 
   // Form for new topic
@@ -287,13 +289,28 @@ export function BotTheatreSection(props: Props) {
             const allPending = batch.items.every((i) => i.status === "pending");
             return (
               <div key={batch.batchId} className="bg-white rounded-lg border border-[#C9D4E2] overflow-hidden">
-                {/* Batch header — 2026-10-13: flex-wrap + min-w-0 + max-w на источнике,
-                    чтобы кнопки не вылезали за правый край рамки. */}
+                {/* Batch header — 2026-10-13: flex-wrap + min-w-0 + max-w на источнике.
+                    Добавлена кнопка "📄 Весь текст" для раскрытия полного источника. */}
                 <div className="bg-[#F8FAFC] border-b border-[#C9D4E2] px-2 py-1 flex items-center gap-2 flex-wrap min-w-0">
                   <span className="text-[10px] text-[#56657a] uppercase tracking-wide flex-shrink-0">Источник:</span>
                   <span className="text-[11px] text-[#1a1a1a] italic truncate flex-1 min-w-0 max-w-[400px]" title={batch.sourceText}>
                     {batch.sourceText.slice(0, 120)}{batch.sourceText.length > 120 ? "…" : ""}
                   </span>
+                  {batch.sourceText.length > 120 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const next = new Set(expandedBatches);
+                        if (next.has(batch.batchId)) next.delete(batch.batchId);
+                        else next.add(batch.batchId);
+                        setExpandedBatches(next);
+                      }}
+                      className="flex-shrink-0 px-1.5 py-0.5 text-[10px] bg-white border border-[#C9D4E2] text-[#1E3A5F] rounded hover:bg-[#F8FAFC] cursor-pointer"
+                      title={expandedBatches.has(batch.batchId) ? "Свернуть полный текст источника" : "Раскрыть полный текст источника"}
+                    >
+                      {expandedBatches.has(batch.batchId) ? "▲ Свернуть" : "📄 Весь текст"}
+                    </button>
+                  )}
                   {batch.topicTitle && (
                     (() => {
                       // Ищем topicId у любого item в батче (т.к. у ТЕМЫ может быть null, а у ответов уже есть)
@@ -369,6 +386,16 @@ export function BotTheatreSection(props: Props) {
                     </button>
                   )}
                 </div>
+
+                {/* 2026-10-13: раскрывающийся блок с полным текстом источника */}
+                {expandedBatches.has(batch.batchId) && (
+                  <div className="bg-[#FFFEF7] border-b border-[#E5D99C] px-3 py-2">
+                    <div className="text-[9px] text-[#92760c] uppercase tracking-wide font-bold mb-1">ПОЛНЫЙ ТЕКСТ ИСТОЧНИКА</div>
+                    <div className="text-[12px] text-[#1a1a1a] whitespace-pre-wrap leading-relaxed">
+                      {batch.sourceText}
+                    </div>
+                  </div>
+                )}
 
                 {/* Items list — ТЕМА отдельно, ОТВЕТЫ отдельно */}
                 <div className="divide-y divide-[#E5EBF2]">
