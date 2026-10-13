@@ -287,8 +287,8 @@ export function BotTheatreSection(props: Props) {
             const allPending = batch.items.every((i) => i.status === "pending");
             return (
               <div key={batch.batchId} className="bg-white rounded-lg border border-[#C9D4E2] overflow-hidden">
-                {/* Batch header — ОДНА строка, на всю ширину */}
-                <div className="bg-[#F8FAFC] border-b border-[#C9D4E2] px-2 py-1 flex items-center gap-2">
+                {/* Batch header — flex с переносом, чтобы кнопки не вылезали за рамку */}
+                <div className="bg-[#F8FAFC] border-b border-[#C9D4E2] px-2 py-1 flex items-center gap-2 flex-wrap">
                   <span className="text-[10px] text-[#56657a] uppercase tracking-wide flex-shrink-0">Источник:</span>
                   <span className="text-[11px] text-[#1a1a1a] italic truncate flex-1" title={batch.sourceText}>
                     {batch.sourceText.slice(0, 200)}{batch.sourceText.length > 200 ? "…" : ""}
@@ -302,19 +302,19 @@ export function BotTheatreSection(props: Props) {
                         return (
                           <a
                             href={`/?topic=${tid}`}
-                            className="text-[10px] text-[#0a5caa] hover:text-[#c40000] hover:underline flex-shrink-0 cursor-pointer font-semibold"
-                            title={`Открыть тему #${tid} на форуме`}
+                            className="text-[10px] text-[#0a5caa] hover:text-[#c40000] hover:underline flex-shrink min-w-0 cursor-pointer font-semibold truncate max-w-[200px]"
+                            title={`Открыть тему #${tid} на форуме: ${batch.topicTitle}`}
                           >
-                            📝 {batch.topicTitle.slice(0, 60)}{batch.topicTitle.length > 60 ? "…" : ""}
+                            📝 {batch.topicTitle.slice(0, 40)}{batch.topicTitle.length > 40 ? "…" : ""}
                           </a>
                         );
                       }
                       return (
                         <span
-                          className="text-[10px] text-[#56657a] flex-shrink-0 italic"
-                          title="Тема ещё не опубликована — одобрите ТЕМУ, чтобы создать тему в форуме"
+                          className="text-[10px] text-[#56657a] flex-shrink min-w-0 italic truncate max-w-[200px]"
+                          title={`Тема ещё не опубликована: ${batch.topicTitle}`}
                         >
-                          📝 {batch.topicTitle.slice(0, 60)}{batch.topicTitle.length > 60 ? "…" : ""}
+                          📝 {batch.topicTitle.slice(0, 40)}{batch.topicTitle.length > 40 ? "…" : ""}
                         </span>
                       );
                     })()
