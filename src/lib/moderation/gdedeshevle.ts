@@ -91,7 +91,7 @@ export async function aiModerateGdedeshevle(title: string, text: string, place?:
       ],
       thinking: { type: "disabled" },
     }),
-    new Promise<never>((_, reject) => setTimeout(() => reject(new Error("AI timeout")), 45000)),
+    new Promise<never>((_, reject) => setTimeout(() => reject(new Error("AI timeout")), 3000)),
   ]);
 
   const { extractJson } = await import("./ai");

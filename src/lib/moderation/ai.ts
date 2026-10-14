@@ -251,7 +251,7 @@ export async function aiModerate(text: string, ctx?: AiModerationContext): Promi
       thinking: { type: "disabled" },
     }),
     new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error("AI timeout")), 45000)
+      setTimeout(() => reject(new Error("AI timeout")), 3000)
     ),
   ]);
 

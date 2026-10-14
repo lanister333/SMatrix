@@ -233,9 +233,10 @@ function MessageRow(props: {
             изменено
           </span>
         )}
-        {m.aiNote && (
-          <span className="sk-ai-badge" title={m.aiNote}>
-            🛡 {m.aiNote}
+        {/* 2026-10-14: иконка 🛡 видна только staff (admin/owner/moderator). Обычные пользователи её не видят. */}
+        {m.aiNote && props.user && (props.user.role === "admin" || props.user.role === "owner" || props.user.role === "moderator") && (
+          <span className="sk-ai-badge" title={m.aiNote} style={{ maxWidth: "none", padding: "0 4px" }}>
+            🛡
           </span>
         )}
         <span className="sk-msg-spacer" />
@@ -580,6 +581,36 @@ export default function TopicView(props: {
     const t = window.setTimeout(load, 0);
     return () => window.clearTimeout(t);
   }, [load]);
+
+  // 2026-10-14: загрузка ботов «Театра ботов» для выбора автора ответа.
+  useEffect(() => {
+    const loadBots = async () => {
+      try {
+        const token = props.token || (typeof window !== 'undefined' ? (() => { try { return JSON.parse(localStorage.getItem('sm_auth') || '{}')?.token; } catch { return null; } })() : null);
+        if (!token) return;
+        const r = await fetch(`/api/theatre-bots/list?token=${encodeURIComponent(token)}`);
+        const d = await r.json();
+        if (d.bots && Array.isArray(d.bots)) {
+          const nicks = d.bots.map((b: any) => b.nickname).filter(Boolean);
+          setAvailableBots(nicks);
+          if (nicks.length > 0) {
+            setReplyBotAuthor(nicks[Math.floor(Math.random() * nicks.length)]);
+          }
+        }
+      } catch (e) {}
+    };
+    loadBots();
+  }, [props.token]);
+
+  const pickRandomBot = () => {
+    if (availableBots.length === 0) return;
+    if (availableBots.length === 1) return;
+    let next = replyBotAuthor;
+    while (next === replyBotAuthor) {
+      next = availableBots[Math.floor(Math.random() * availableBots.length)];
+    }
+    setReplyBotAuthor(next);
+  };
 
   // ТЗ 2026-09-22 «Быстрые подсказки "Где купить"» и «Быстрые подсказки
   // "Где дешевле"» (ТЕХНИЧЕСКИЙ UX-РЕЖИМ, дословно: «При клике на кнопку
@@ -1147,14 +1178,14 @@ export default function TopicView(props: {
           <>
             {/* 2026-10-13: бейдж выбора бота для ответа */}
             {replyBotAuthor && (
-              <div className="sk-qr-bot-author" style={{ display: "flex", alignItems: "center", gap: "8px", padding: "4px 0", fontSize: "12px", color: "#1E3A5F" }}>
-                <span>🤖 Пишете как: <b style={{ color: "#0a5caa" }}>{replyBotAuthor}</b></span>
+              <div className="sk-qr-bot-author" style={{ display: "flex", alignItems: "center", gap: "6px", padding: "3px 0", fontSize: "12px", color: "#1E3A5F", flexWrap: "wrap", minWidth: 0 }}>
+                <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>🤖 <b style={{ color: "#0a5caa" }}>{replyBotAuthor}</b></span>
                 <button
                   type="button"
                   onClick={pickRandomBot}
                   title="Сменить бота на другого рандомного"
-                  style={{ padding: "2px 8px", fontSize: "11px", background: "#f1f5f9", border: "1px solid #C9D4E2", borderRadius: "4px", cursor: "pointer", color: "#1E3A5F" }}
-                >🔄 Сменить</button>
+                  style={{ padding: "1px 6px", fontSize: "11px", background: "#f1f5f9", border: "1px solid #C9D4E2", borderRadius: "4px", cursor: "pointer", color: "#1E3A5F", flexShrink: 0 }}
+                >🔄</button>
               </div>
             )}
             {replyTo && (

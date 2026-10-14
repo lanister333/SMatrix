@@ -98,7 +98,7 @@ export async function aiModerateOverheard(title: string, text: string, place?: s
       ],
       thinking: { type: "disabled" },
     }),
-    new Promise<never>((_, reject) => setTimeout(() => reject(new Error("AI timeout")), 45000)),
+    new Promise<never>((_, reject) => setTimeout(() => reject(new Error("AI timeout")), 3000)),
   ]);
 
   const { extractJson } = await import("./ai");

@@ -150,7 +150,7 @@ export async function aiModerateHelp(title: string, text: string, contactData?: 
       ],
       thinking: { type: "disabled" },
     }),
-    new Promise<never>((_, reject) => setTimeout(() => reject(new Error("AI timeout")), 45000)),
+    new Promise<never>((_, reject) => setTimeout(() => reject(new Error("AI timeout")), 3000)),
   ]);
 
   const { extractJson } = await import("./ai");
