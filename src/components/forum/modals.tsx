@@ -489,7 +489,7 @@ export function AuthModal(props: { onClose: () => void; onLogin: (token: string,
                     [обновить]
                   </a>
                 </label>
-                <input value={captchaAnswer} onChange={(e) => setCaptchaAnswer(e.target.value)} placeholder="Ответ числом" inputMode="numeric" />
+                <input value={captchaAnswer} onChange={(e) => setCaptchaAnswer(e.target.value)} placeholder="Введите слово" inputMode="text" autoComplete="off" />
               </div>
               <div className="sk-modal-row">
                 <label>Контрольный вопрос (для защиты аккаунта):</label>
