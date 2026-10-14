@@ -577,6 +577,19 @@ export async function publishApprovedQueueItem(queueId: string): Promise<{ topic
     // 2026-10-13: НЕ привязываем новые ответы ботов к msg#1 — ответы создаются
     // как корневые узлы (parentId=null). msg#1 скрыт из ленты, его текст в шапке темы.
 
+    // 2026-10-13: фильтр текста — удалить слово «ой» во всех формах (ой, Ой, ОЙ, ой-ой).
+    // Регулярка: [Оо]й — граница слова + регистр О или о + "й" + граница слова.
+    // Также удаляем "ой," в начале реплики (например "Ой, девочки..." → "девочки...").
+    // Также схлопываем двойные пробелы после удаления.
+    let cleanText = item.text
+      .replace(/^\s*[Оо]й[Оо]й[Оо]й[Оо]й[Оо]й[,\s]*/g, "")  // "ой-ой-ой, " в начале
+      .replace(/^\s*[Оо]й-?[Оо]й[,\s]*/g, "")               // "ой-ой, " в начале
+      .replace(/^\s*[Оо]й[,\s]+/g, "")                       // "ой, " в начале
+      .replace(/\b[Оо]й\b\.?/g, "")                          // отдельное "ой" везде
+      .replace(/\s{2,}/g, " ")                                // схлопнуть двойные пробелы
+      .trim();
+    if (!cleanText) cleanText = item.text; // если после фильтра пусто — вернуть оригинал
+
     // Создаём сообщение
     const message = await tx.message.create({
       data: {
@@ -585,7 +598,7 @@ export async function publishApprovedQueueItem(queueId: string): Promise<{ topic
         depth: parentMessageId ? 1 : 0,
         authorName: item.botNickname,
         authorId: item.botUserId,
-        body: item.text,
+        body: cleanText,
         kind: "news",
         aiStatus: "ok",
         modLevel: 4,

@@ -45,6 +45,11 @@ export type NickGender = "male" | "female" | "neutral";
 const MANUAL_OVERRIDES: Record<string, NickGender> = {
   "ОтзывчикПроба1790038809403": "male",
   "Новости Сахалина": "male",
+  // 2026-10-13: ники с нестандартным окончанием для эвристики — фиксируем пол вручную.
+  "Kate_Sakh": "female",       // эвристика даёт male (заканчивается на "h" — согласная)
+  "kate_sakh": "female",       // на всякий случай — lowercase вариант
+  "SnowQueen": "female",       // эвристика даёт male (заканчивается на "n" — согласная)
+  "snowqueen": "female",       // lowercase вариант
 };
 
 /** Согласные (кириллица; «й» — согласный) + латинские согласные.
