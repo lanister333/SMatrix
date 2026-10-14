@@ -93,13 +93,34 @@ export class AuthError extends Error {
   }
 }
 
-/** Простая арифметическая CAPTCHA. */
+/**
+ * Текстовая CAPTCHA — нужно написать N-ное слово из списка.
+ * 2026-10-14: заменена простая арифметика (легко брутилась скриптом) на
+ * текстовый вопрос: "Напишите третье слово: небо солнце море дождь".
+ * Ответ проверяется case-insensitive с trim().
+ */
+const CAPTCHA_WORDS = [
+  "небо", "солнце", "море", "дождь", "снег", "ветер", "облако", "звезда",
+  "сахалин", "южный", "корсаков", "холмск", "остров", "сопки", "туман",
+  "корабль", "маяк", "прибой", "волна", "берег", "рыбак", "сеть",
+  "зима", "лето", "весна", "осень", "утро", "вечер", "ночь", "день",
+  "дом", "улица", "дорога", "мост", "парк", "сад", "лес", "поле",
+];
+
+const CAPTCHA_ORDINALS = ["первое", "второе", "третье", "четвёртое", "пятое", "шестое"];
+
 export async function createCaptcha(): Promise<{ id: string; question: string }> {
-  const a = 2 + Math.floor(Math.random() * 9);
-  const b = 2 + Math.floor(Math.random() * 9);
-  const question = `Сколько будет ${a} + ${b}?`;
+  // Выбираем 4-6 случайных слов (без повторов)
+  const count = 4 + Math.floor(Math.random() * 3); // 4..6
+  const shuffled = [...CAPTCHA_WORDS].sort(() => Math.random() - 0.5);
+  const words = shuffled.slice(0, count);
+  // Выбираем случайный индекс (0..count-1)
+  const idx = Math.floor(Math.random() * count);
+  const ordinal = CAPTCHA_ORDINALS[idx];
+  const question = `Напишите ${ordinal} слово: ${words.join(" ")}`;
+  const answer = words[idx];
   const row = await db.captcha.create({
-    data: { answer: String(a + b), expiresAt: new Date(Date.now() + 10 * 60 * 1000) },
+    data: { answer: answer.toLowerCase(), expiresAt: new Date(Date.now() + 10 * 60 * 1000) },
   });
   return { id: row.id, question };
 }
@@ -110,7 +131,8 @@ export async function checkCaptcha(id: string, answer: string): Promise<boolean>
   if (!row) return false;
   await db.captcha.delete({ where: { id } }).catch(() => {});
   if (row.expiresAt.getTime() < Date.now()) return false;
-  return row.answer === answer.trim();
+  // 2026-10-14: case-insensitive сравнение (toLowerCase + trim)
+  return row.answer.toLowerCase() === answer.trim().toLowerCase();
 }
 
 /** Токены email-подтверждения / сброса пароля (демо-режим без почтового шлюза). */

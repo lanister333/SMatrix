@@ -128,6 +128,9 @@ export function AuthModal(props: { onClose: () => void; onLogin: (token: string,
   const [verifyPath, setVerifyPath] = useState("");
   const [recEmail, setRecEmail] = useState("");
   const [resetPath, setResetPath] = useState("");
+  // 2026-10-14: 2-шаговый flow восстановления — секретный вопрос + ответ
+  const [secretQuestion, setSecretQuestion] = useState("");
+  const [recAnswer, setRecAnswer] = useState("");
 
   const loadCaptcha = useCallback(() => {
     setCaptchaAnswer("");
@@ -261,19 +264,39 @@ export function AuthModal(props: { onClose: () => void; onLogin: (token: string,
     }
   };
 
+  // 2026-10-14: 2-шаговый flow восстановления пароля.
+  // Шаг 1: ввод email → получить секретный вопрос
+  // Шаг 2: ввод ответа → получить resetPath
   const doRecover = async () => {
     setBusy(true);
     setError("");
-    setResetPath("");
     try {
-      const r = await fetch("/api/auth/recover", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: recEmail.trim() }),
-      });
-      const data = await r.json();
-      if (!r.ok) throw Error(data.error || "Ошибка");
-      setResetPath(data.resetPath || "ok");
+      // Если секретный вопрос ещё не получен — Шаг 1
+      if (!secretQuestion) {
+        const r = await fetch("/api/auth/recover", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: recEmail.trim() }),
+        });
+        const data = await r.json();
+        if (!r.ok) throw Error(data.error || "Ошибка");
+        if (data.step === "question" && data.secretQuestion) {
+          setSecretQuestion(data.secretQuestion);
+        } else if (data.resetPath) {
+          // Для staff (admin/owner/moderator) — сразу resetPath без вопроса
+          setResetPath(data.resetPath || "ok");
+        }
+      } else {
+        // Шаг 2 — отправляем ответ на секретный вопрос
+        const r = await fetch("/api/auth/recover", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: recEmail.trim(), secretAnswer: recAnswer.trim() }),
+        });
+        const data = await r.json();
+        if (!r.ok) throw Error(data.error || "Ошибка");
+        setResetPath(data.resetPath || "ok");
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ошибка");
     } finally {
@@ -525,16 +548,58 @@ export function AuthModal(props: { onClose: () => void; onLogin: (token: string,
 
           {tab === "recover" && !resetPath && (
             <>
-              <p className="sk-modal-hint" style={{ marginTop: 0 }}>
-                Введите email, указанный при регистрации — пришлём ссылку для смены пароля.
-              </p>
-              <div className="sk-modal-row">
-                <label>Email:</label>
-                <input type="email" value={recEmail} onChange={(e) => setRecEmail(e.target.value)} placeholder="you@example.ru" />
-              </div>
-              <button className="sk-btn-classic" style={{ marginTop: 0 }} disabled={busy || !recEmail.trim()} onClick={doRecover}>
-                {busy ? "Отправка…" : "Отправить ссылку восстановления"}
-              </button>
+              {!secretQuestion ? (
+                <>
+                  <p className="sk-modal-hint" style={{ marginTop: 0 }}>
+                    Введите email, указанный при регистрации — покажем ваш секретный вопрос.
+                  </p>
+                  <div className="sk-modal-row">
+                    <label>Email:</label>
+                    <input type="email" value={recEmail} onChange={(e) => setRecEmail(e.target.value)} placeholder="you@example.ru" />
+                  </div>
+                  <button className="sk-btn-classic" style={{ marginTop: 0 }} disabled={busy || !recEmail.trim()} onClick={doRecover}>
+                    {busy ? "Проверка…" : "Показать секретный вопрос"}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="sk-modal-hint" style={{ marginTop: 0 }}>
+                    Ответьте на секретный вопрос, чтобы получить ссылку для смены пароля.
+                  </p>
+                  <div className="sk-modal-row">
+                    <label>Email:</label>
+                    <input type="email" value={recEmail} disabled style={{ opacity: 0.6 }} />
+                  </div>
+                  <div className="sk-modal-row">
+                    <label>Секретный вопрос:</label>
+                    <div style={{ fontWeight: 600, color: "#1E3A5F" }}>{secretQuestion}</div>
+                  </div>
+                  <div className="sk-modal-row">
+                    <label>Ответ:</label>
+                    <input
+                      type="text"
+                      value={recAnswer}
+                      onChange={(e) => setRecAnswer(e.target.value)}
+                      placeholder="Введите ответ"
+                      onKeyDown={(e) => { if (e.key === "Enter" && recAnswer.trim()) doRecover(); }}
+                    />
+                  </div>
+                  <button className="sk-btn-classic" style={{ marginTop: 0 }} disabled={busy || !recAnswer.trim()} onClick={doRecover}>
+                    {busy ? "Проверка…" : "Проверить ответ"}
+                  </button>
+                  <button
+                    className="sk-btn-classic"
+                    style={{ marginTop: 8, background: "#f1f5f9", color: "#1E3A5F" }}
+                    onClick={() => {
+                      setSecretQuestion("");
+                      setRecAnswer("");
+                      setError("");
+                    }}
+                  >
+                    ← Назад (сменить email)
+                  </button>
+                </>
+              )}
             </>
           )}
 

@@ -510,7 +510,6 @@ export function BotTheatreSection(props: Props) {
                               {item.status === "pending" && (
                                 <>
                                   <button className="px-1.5 py-0.5 bg-green-600 text-white rounded text-[10px] font-semibold hover:bg-green-700" onClick={() => action(item.id, "approve")} title="Одобрить ответ — запланировать публикацию через 15-120 мин (через publisher cron)">✓</button>
-                                  <button className="px-1.5 py-0.5 bg-blue-600 text-white rounded text-[10px] font-semibold hover:bg-blue-700" onClick={() => action(item.id, "publish-now")} title="Опубликовать ответ немедленно (для тестирования)">🚀 Сейчас</button>
                                   <button className="px-1.5 py-0.5 bg-white border border-[#C9D4E2] text-[#1E3A5F] rounded text-[10px] hover:bg-gray-50" onClick={() => startEdit(item)} title="Редактировать ответ">✏️</button>
                                   <button className="px-1.5 py-0.5 bg-white border border-red-400 text-red-600 rounded text-[10px] hover:bg-red-50" onClick={() => action(item.id, "reject")} title="Удалить ответ">✗</button>
                                 </>

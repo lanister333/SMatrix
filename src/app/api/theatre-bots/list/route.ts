@@ -5,6 +5,8 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { userByToken } from "@/lib/auth";
+import { isStaffRole } from "@/lib/admin";
 
 export const runtime = "nodejs";
 
@@ -14,11 +16,18 @@ export async function GET(req: NextRequest) {
   const auth = req.headers.get("authorization") || "";
   const headerToken = auth.replace(/^Bearer\s+/i, "").trim();
   const qToken = req.nextUrl.searchParams.get("token");
-  if (
-    (!headerToken || headerToken !== THEATRE_BOTS_TOKEN) &&
-    (!qToken || qToken !== THEATRE_BOTS_TOKEN)
-  ) {
-    return NextResponse.json({ error: "Неверный токен" }, { status: 401 });
+  const token = headerToken || qToken;
+  
+  // 2026-10-14: принимаем 2 типа токенов — shared secret или session token staff-пользователя.
+  // 1. Проверяем shared secret (для scheduler/rewriter)
+  if (token === THEATRE_BOTS_TOKEN) {
+    // OK — proceed to bots list
+  } else {
+    // 2. Проверяем session token (админ/модератор)
+    const user = await userByToken(token);
+    if (!user || !isStaffRole(user.role)) {
+      return NextResponse.json({ error: "Неверный токен" }, { status: 401 });
+    }
   }
 
   const users = await db.user.findMany({
