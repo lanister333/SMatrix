@@ -24,6 +24,7 @@ import { restrictionBlockMessage } from "@/lib/moderation";
 import { getActiveRestriction, handleConfirmedViolation } from "@/lib/moderation/sanctions";
 import { moderateNewAdListingText } from "@/lib/moderation/obyavleniya";
 import { verifySmsCode } from "@/lib/sms";
+import { isProductionMode } from "@/lib/security/registration-mode";
 import {
   AD_ONE_HINT,
   AD_RUBRIC_KEYS,
