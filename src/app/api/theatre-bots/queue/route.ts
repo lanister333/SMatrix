@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
 
   const items = await db.botQueue.findMany({
     where,
-    orderBy: [{ batchId: "desc" }, { order: "asc" }],
+    orderBy: [{ createdAt: "desc" }, { order: "asc" }],  // 2026-10-14: свежие батчи сверху
     take: limit,
     select: {
       id: true,
