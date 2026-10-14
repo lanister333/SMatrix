@@ -10,6 +10,7 @@ import {
   isProductionMode,
 } from "@/lib/security";
 import { verifySmsCode, normalizePhone } from "@/lib/sms";
+import { sendVerificationEmail } from "@/lib/email";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -166,10 +167,12 @@ export async function POST(req: NextRequest) {
     }
 
     const token = await createAuthToken(user.id, "verify");
-    // Демо-режим: почтовый шлюз не подключён — отдаём ссылку подтверждения напрямую.
+    // 2026-10-14: отправляем письмо через Resend. verifyPath — fallback (демо-режим).
+    const verifyPath = `/api/auth/verify?token=${encodeURIComponent(token)}`;
+    const emailSent = await sendVerificationEmail(email, verifyPath);
     return NextResponse.json({
       ok: true,
-      verifyPath: `/api/auth/verify?token=${encodeURIComponent(token)}`,
+      verifyPath: emailSent ? undefined : verifyPath,
       // Подсказка пользователю — не раскрываем детали безопасности.
       notice:
         initialStatus === "suspicious"

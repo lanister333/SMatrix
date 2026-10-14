@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { createAuthToken } from "@/lib/auth";
+import { sendPasswordResetEmail } from "@/lib/email";
 import { handleApiError } from "@/lib/api";
 
 /**
@@ -50,14 +51,22 @@ export async function POST(req: NextRequest) {
 
     // Ответ верный — создаём токен для сброса пароля
     const token = await createAuthToken(user.id, "reset");
-    // Демо-режим без почтового шлюза: ссылка возвращается напрямую (кроме сотрудников).
+    const resetPath = `/?reset=${encodeURIComponent(token)}`;
+    const isStaff = user.role === "owner" || user.role === "admin" || user.role === "moderator";
+    
+    // Отправляем письмо через Resend (кроме staff — им сразу показываем ссылку)
+    if (!isStaff) {
+      const emailSent = await sendPasswordResetEmail(email, resetPath);
+      return NextResponse.json({
+        ok: true,
+        step: "reset",
+        resetPath: emailSent ? undefined : resetPath,
+      });
+    }
     return NextResponse.json({
       ok: true,
       step: "reset",
-      resetPath:
-        user.role === "owner" || user.role === "admin" || user.role === "moderator"
-          ? "ok"
-          : `/?reset=${encodeURIComponent(token)}`,
+      resetPath: "ok",
     });
   } catch (e) {
     return handleApiError(e);
