@@ -132,7 +132,6 @@ export async function GET(req: NextRequest) {
         where: { authorId: user.id, isDeleted: false },
         orderBy: [{ createdAt: "desc" }, { id: "desc" }],
         take: 300,
-        include: { author: { select: { nickname: true, gender: true } } },
       });
       rows.sort(feedOrder);
       const topicIds = [...new Set(rows.map((r) => r.topicId).filter((v): v is number => v != null))];
@@ -249,9 +248,8 @@ export async function POST(req: NextRequest) {
     // Защита от повторной публикации одной и той же карточки.
     const myPosts = await db.empPost.findMany({
       where: { authorId: user.id, isDeleted: false },
-      select: { id: true, experience: true },
+      select: { id: true, experience: true, author: { select: { nickname: true, gender: true } } },
       take: 200,
-        include: { author: { select: { nickname: true, gender: true } } },
     });
     const norm = normalizedExperience(experience);
     const exactDup = myPosts.find((p) => normalizedExperience(p.experience) === norm);

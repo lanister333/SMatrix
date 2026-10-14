@@ -169,7 +169,6 @@ export async function GET(req: NextRequest) {
         where: { authorId: viewer.id, isDeleted: false },
         orderBy: [{ createdAt: "desc" }, { id: "desc" }],
         take: 300,
-        include: { author: { select: { nickname: true, gender: true } } },
       });
       rows.sort(feedOrder);
       const out = await withMeta(rows, viewer.id);
@@ -288,9 +287,8 @@ export async function POST(req: NextRequest) {
     // Защита от повторной публикации одного и того же объявления.
     const myPosts = await db.datingPost.findMany({
       where: { authorId: user.id, isDeleted: false },
-      select: { id: true, title: true },
+      select: { id: true, title: true, author: { select: { nickname: true, gender: true } } },
       take: 200,
-        include: { author: { select: { nickname: true, gender: true } } },
     });
     const norm = normalizedDatingTitle(title);
     const exactDup = myPosts.find((p) => normalizedDatingTitle(p.title) === norm);
