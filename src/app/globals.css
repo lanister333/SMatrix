@@ -9500,3 +9500,43 @@ div[style*="background-color: rgb(0, 74, 143)"] {
   }
 }
 
+
+/* 2026-10-15: Эксперимент — цветные блоки на главной уменьшены по вертикали (110px),
+   насыщенность цветов снижена на 25% (volunteers-carousel.tsx — bg colors desaturated,
+   .mp-cell — высота compact + filter:saturate(0.75) на CTA-кнопки). */
+
+/* Action-панели .mp-cell — компактнее */
+.mp-panel.mp-cell {
+  height: auto !important;
+  min-height: 140px !important;
+  padding: 12px 14px !important;
+}
+.mp-panel.mp-cell > button {
+  height: 100px !important;
+  padding: 8px 10px !important;
+  font-size: 13.5px !important;
+  line-height: 1.35 !important;
+  filter: saturate(0.75) !important;
+}
+.mp-panel.mp-cell > button > div:first-child {
+  font-size: 15px !important;
+  margin-bottom: 4px !important;
+}
+.mp-panel.mp-cell > button > div:nth-child(2) {
+  font-size: 12px !important;
+}
+
+/* Уменьшить насыщенность иконок внутри .mp-cell */
+.mp-cell svg {
+  filter: saturate(0.75) !important;
+}
+/* Уменьшить насыщенность всех цветных плиток в .mp-cell SVG иконках */
+.mp-cell svg {
+  filter: saturate(0.75) !important;
+}
+
+/* Уменьшить насыщенность volunteers-carousel */
+.mp-vol-tile, a[href*="pso-sova"], a[href*="lizaalert"], a[href*="ecosakhalin"] {
+  filter: saturate(0.75) !important;
+}
+
