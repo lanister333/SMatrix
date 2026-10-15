@@ -34,11 +34,11 @@ export default function VolunteersCarousel() {
   // Данные наших сочных сахалинских карточек
   const partners = [
     { name: "ПСО СОВА", sub: "Поисково-спасательный отряд", bg: "#1A1A1A", text: "#FFFFFF", subColor: "#FFD600", url: "https://pso-sova.ru" },
-    { name: "ЛизаAlert", sub: "Поиск пропавших людей", bg: "#DF7220", text: "#FFFFFF", subColor: "#FFFFFF", url: "https://lizaalert.org" },
-    { name: "Помощь животным", sub: "Добрые сердца Сахалина", bg: "#0F6A5F", text: "#FFFFFF", subColor: "#B2DFDB", url: "#" },
-    { name: "ЭкоСахалин", sub: "Защита природы острова", bg: "#58A35B", text: "#FFFFFF", subColor: "#E8F5E9", url: "#" },
-    { name: "Я Донор Сахалин", sub: "Служба сдачи крови", bg: "#B23C3C", text: "#FFFFFF", subColor: "#FFCDD2", url: "#" },
-    { name: "Красный Крест", sub: "Сахалинское отделение", bg: "#BE4343", text: "#FFFFFF", subColor: "#FFFFFF", url: "#" }
+    { name: "ЛизаAlert", sub: "Поиск пропавших людей", bg: "#FF6D00", text: "#FFFFFF", subColor: "#FFFFFF", url: "https://lizaalert.org" },
+    { name: "Помощь животным", sub: "Добрые сердца Сахалина", bg: "#00796B", text: "#FFFFFF", subColor: "#B2DFDB", url: "#" },
+    { name: "ЭкоСахалин", sub: "Защита природы острова", bg: "#4CAF50", text: "#FFFFFF", subColor: "#E8F5E9", url: "#" },
+    { name: "Я Донор Сахалин", sub: "Служба сдачи крови", bg: "#C62828", text: "#FFFFFF", subColor: "#FFCDD2", url: "#" },
+    { name: "Красный Крест", sub: "Сахалинское отделение", bg: "#D32F2F", text: "#FFFFFF", subColor: "#FFFFFF", url: "#" }
   ];
 
   return (
@@ -85,7 +85,7 @@ export default function VolunteersCarousel() {
               flex: '0 0 240px',
               width: '240px',
               minWidth: '240px',
-              height: '110px',
+              height: '150px',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',

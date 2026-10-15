@@ -227,244 +227,6 @@ body{background:#E8EAEB}
 .sk-addtopic{color:#c40000;margin-bottom:10px;font-size:14px;font-weight:700;display:inline-block}
 .sk-addtopic:hover,.sk a.sk-addtopic:hover{color:#8f0000}
 
-/* 2026-10-15: «+ Новая тема» на форуме — СИНЯЯ кнопка (ярче navy, как «Ответить»).
-   Важно: !important — чтобы перекрыть дефолт .sk-btn-classic (светло-серый фон). */
-.sk-newtopic-btn{
-  cursor:pointer !important;
-  background:#0a5caa !important;
-  color:#fff !important;
-  border:1px solid #084c8b !important;
-  font-weight:700 !important;
-  padding:6px 15px !important;
-  border-radius:3px !important;
-  font-family:Arial,Helvetica,sans-serif !important;
-  font-size:14px !important;
-  display:inline-block !important;
-  white-space:nowrap !important;
-}
-.sk-newtopic-btn:hover{background:#084c8b !important;color:#fff !important}
-.sk-newtopic-btn:active{background:#06407a !important}
-.sk-newtopic-btn:disabled{background:#8296ab !important;border-color:#a9b6c4 !important;cursor:default !important}
-
-/* 2026-10-15: «Добавить тему» в левой колонке — больше НЕ красная текст-ссылка,
-   а полноценная СИНЯЯ кнопка (как на форуме). Перекрывает дефолт .sk-addtopic. */
-a.sk-addtopic.sk-addtopic-btn,
-.sk a.sk-addtopic.sk-addtopic-btn{
-  background:#0a5caa !important;
-  color:#fff !important;
-  border:1px solid #084c8b !important;
-  padding:8px 18px !important;
-  border-radius:3px !important;
-  font-weight:700 !important;
-  font-size:14px !important;
-  display:inline-block !important;
-  text-decoration:none !important;
-  margin:0 !important;
-  cursor:pointer !important;
-}
-a.sk-addtopic.sk-addtopic-btn:hover,
-.sk a.sk-addtopic.sk-addtopic-btn:hover{
-  background:#084c8b !important;
-  color:#fff !important;
-}
-
-.sk-userline{color:#4a5b6d;margin-bottom:8px;font-size:12.5px;line-height:1.5}
-.sk-userline input{border:1px solid #1E3A5F;width:110px;padding:3px 6px;font-family:inherit;font-size:13px}
-
-/* Заголовки блоков: плоский тёмно-синий, без глянца */
-.sk-blocktitle{color:#fff;cursor:default;background:var(--sm-navy);border-bottom:1px solid var(--sm-navy-deep);margin-bottom:6px;padding:5px 9px;font-size:13px;font-weight:700}
-.sk-blocktitle .tri{vertical-align:1px;margin-right:5px;font-size:9px;display:inline-block}
-
-.sk-navlist{margin:0 0 10px;padding:0 0 0 6px;list-style:none}
-.sk-navlist li{margin:0;padding:0;line-height:1.6}
-.sk-navlist a{font-size:13.5px;display:inline-block;padding:1px 0}
-.sk-navlist a.active{color:#1a1a1a;font-weight:700;text-decoration:none}
-
-/* ФИКС вертикальной раскладки рубрик сайдбара (2026-09-19):
-   1) li.sk-rubric-row — обычный блок: строка 1 = заголовок, строка 2+ =
-   ul.sk-sublist ПОД заголовком (раньше li был flex-строкой sk-navico-row
-   и sublist раскрывался СПРАВА от названия).
-   2) .sk-rubric-header — flex-строка «иконка + название + стрелка» В ОДНОЙ
-   строке. align-items:flex-start: при переносе длинного названия («Горные
-   лыжи и сноуборд») иконка остаётся на первой строке слева, текст
-   переносится ПРАВЕЕ иконки. Tailwind-preflight даёт svg{display:block} —
-   во flex-контейнере это не страшно: иконка становится flex-элементом
-   той же строки. */
-.sk-rubric-row{padding-left:6px;line-height:1.6}
-li.sk-rubric-row{display:block}
-.sk-rubric-header{display:flex;align-items:flex-start;gap:5px;min-width:0}
-.sk-rubric-header .sk-navico{flex:none;width:13px;height:13px}
-.sk-rubric-header .sk-rubric-name{flex:0 1 auto;min-width:0}
-.sk-rubric-header .sk-rubric-arr{flex:none}
-.sk-rubric-name{color:#0a5caa;cursor:pointer;text-align:left;background:0 0;border:0;padding:1px 0;font-family:inherit;font-size:13.5px;text-decoration:underline}
-.sk-rubric-name:hover{color:#c40000}
-.sk-rubric-name .arr{color:#7d98b4;margin-left:4px;font-size:10px;text-decoration:none;transition:transform .15s;display:inline-block}
-.sk-rubric-name .arr.open{transform:rotate(90deg)}
-.sk-rubric-name.active{color:#1a1a1a;font-weight:700;text-decoration:none}
-.sk-sublist{margin:1px 0 6px 14px;padding:0;list-style:none;overflow:hidden}
-.sk-sublist li{line-height:1.55}
-.sk-sublist button{color:#0a5caa;cursor:pointer;text-align:left;background:0 0;border:0;padding:1px 0;font-family:inherit;font-size:12.5px;text-decoration:underline}
-.sk-sublist button:hover{color:#c40000}
-.sk-sublist button.active{color:#1a1a1a;font-weight:700;text-decoration:none}
-/* ЗАДАЧА 14, Шаг №4: подсписок подрубрик левой колонки внутренних страниц
-   (ссылки вместо кнопок — переход на Главную с фильтром рубрики) */
-.sk-sublist a{color:#0a5caa;cursor:pointer;text-align:left;padding:1px 0;font-size:12.5px;text-decoration:underline}
-.sk-sublist a:hover{color:#c40000}
-/* ▶-стрелка раскрытия подрубрик — кнопка рядом с именем рубрики */
-.sk-rubric-arr{color:#7d98b4;cursor:pointer;background:0 0;border:0;padding:1px 3px;margin-left:2px;font-family:inherit;line-height:1}
-.sk-rubric-arr .arr{color:#7d98b4;font-size:10px;text-decoration:none;transition:transform .15s;display:inline-block}
-.sk-rubric-arr .arr.open{transform:rotate(90deg)}
-
-.sk-mainheader{color:#0a5caa;white-space:nowrap;text-overflow:ellipsis;border-bottom:2px solid #6e93bd;margin-bottom:8px;padding:0 0 3px 2px;font-size:15.5px;font-weight:700;overflow:hidden}
-
-/* Тема-карточка (мобильный стиль списка) */
-.sk-topicbox{background:#fff;border:1px solid var(--sm-navy);box-shadow:0 1px 3px rgba(0,0,0,0.05),0 1px 2px rgba(0,0,0,0.03);margin-bottom:7px;padding:7px 10px}
-.sk-topicbox .t-title{color:#0a5caa;word-break:break-word;overflow-wrap:anywhere;margin-bottom:4px;font-size:15px;font-weight:700;line-height:1.35;text-decoration:underline;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-/* ТЗ 2026-09-28: .t-title теперь flex-строка — слева текст заголовка,
-   справа синяя кнопка «Ответить». Текст не подчёркивается внутри
-   обёртки .t-title-text (чтобы клик шёл по кнопке, а не по ссылке). */
-.sk-topicbox .t-title .t-title-text{text-decoration:underline;flex:1 1 auto;min-width:0}
-.sk-topicbox .t-title .sk-btn-answer-in-title{
-  flex:0 0 auto;
-  color:#fff !important;
-  background:#0a5caa !important;
-  border:1px solid #084c8b !important;
-  border-radius:2px !important;
-  padding:5px 16px !important;
-  font-size:13px !important;
-  font-weight:700 !important;
-  text-decoration:none !important;
-  cursor:pointer !important;
-  white-space:nowrap !important;
-  align-self:flex-start;
-  margin-top:1px;
-}
-.sk-topicbox .t-title .sk-btn-answer-in-title:hover{background:#084c8b !important}
-
-/* 28.09.2026 (правка п.б.4, п.г): «☆ Добавить в избранное» в шапке темы
-   рядом с «Ответить» — БЕЗ рамки (п.г), цвет — бирюзово-синий, как у
-   других вторичных действий шапки; в выбранном виде — золотой. */
-.sk-topicbox .t-title .sk-fav-btn-in-title{
-  flex:0 0 auto;
-  background:0 0 !important;
-  border:0 !important;
-  padding:5px 8px !important;
-  margin:1px 6px 0 0;
-  font-size:12.5px !important;
-  font-weight:600 !important;
-  color:#0a5caa !important;
-  text-decoration:none !important;
-  cursor:pointer !important;
-  white-space:nowrap !important;
-  align-self:flex-start;
-}
-.sk-topicbox .t-title .sk-fav-btn-in-title:hover{color:#084c8b !important;text-decoration:underline !important}
-.sk-topicbox .t-title .sk-fav-btn-in-title.done{color:#b8860b !important}
-
-/* 28.09.2026 (правка п.ж): синяя кнопка «Ответить» в каждой рамке
-   сообщения. Та же палитра, что у «Ответить» в шапке темы — #0a5caa.
-   Безусловный шаблон: рисуется во всех сообщениях форума, текущих
-   и будущих, единым CSS-правилом. */
-.sk-msg .sk-btn-answer-in-msg{
-  flex:0 0 auto;
-  color:#fff !important;
-  background:#0a5caa !important;
-  border:1px solid #084c8b !important;
-  border-radius:2px !important;
-  padding:3px 12px !important;
-  font-size:12.5px !important;
-  font-weight:700 !important;
-  text-decoration:none !important;
-  cursor:pointer !important;
-  white-space:nowrap !important;
-  margin-left:6px;
-}
-.sk-msg .sk-btn-answer-in-msg:hover{background:#084c8b !important}
-.sk-topicbox .t-meta{color:#4a5b6d;font-size:12.5px;line-height:1.5}
-.sk-topicbox .t-meta b{color:#2f3b49;font-weight:700}
-
-.sk-topicactions{color:#56657a;margin:2px 0 10px 2px;font-size:12.5px}
-.sk-topicactions a,.sk-topicactions button{color:#0a5caa;cursor:pointer;background:0 0;border:0;margin-right:12px;padding:3px 0;font-family:inherit;font-size:12.5px;text-decoration:underline}
-.sk-topicactions a:hover,.sk-topicactions button:hover{color:#c40000}
-.sk-topicactions .done{color:#2e7d32}
-
-/* Постраничная навигация (бирюзовая лента) */
-.sk-pager{color:#123;background:#5fe6d0;border-top:1px solid #43cdb7;border-bottom:1px solid #43cdb7;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;margin:6px 0;padding:4px 9px;font-size:13px;display:flex}
-.sk-pager b{font-weight:700}
-.sk-pager .pg-pages{flex-wrap:wrap;align-items:center;gap:6px;font-size:13px;display:flex}
-.sk-pager .pg-num{color:#0a5caa;cursor:pointer;font-weight:700;text-decoration:underline;padding:3px 2px;display:inline-block}
-.sk-pager .pg-num:hover{color:#c40000}
-.sk-pager .pg-cur{color:#111;font-weight:700;text-decoration:none;padding:3px 2px;display:inline-block}
-
-/* Тулбар списка тем */
-.sk-toolbar{background:#f4f7fb;border:1px solid var(--sm-navy);flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:7px;padding:5px 8px;display:flex}
-.sk-toolbar input[type=text]{background:#fff;border:1px solid #1E3A5F;width:220px;padding:4px 7px;font-family:inherit;font-size:14px}
-.sk-toolbar-form{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.sk-toolbar-form .sk-btn-classic{white-space:nowrap;margin-top:0}
-
-.sk-tabs{color:#56657a;flex-wrap:wrap;align-items:center;gap:4px;font-size:13px;display:flex}
-.sk-tabs button{color:#0a5caa;cursor:pointer;background:0 0;border:0;padding:3px 0;font-family:inherit;font-size:13px;text-decoration:underline}
-.sk-tabs button:hover{color:#c40000}
-.sk-tabs button.active{color:#1a1a1a;cursor:default;font-weight:700;text-decoration:none}
-.sk-tabs .sep{color:#a9b6c4}
-
-/* Шапка списка тем: заголовки заметнее метаданных */
-.sk-listhead{color:#123;background:#5fe6d0;border-top:1px solid #43cdb7;border-bottom:1px solid #43cdb7;grid-template-columns:minmax(0,1fr) 92px 62px 74px 108px;gap:8px;padding:4px 9px;font-size:12px;font-weight:700;display:grid}
-.sk-listhead .num{text-align:right}
-.sk-row{border-bottom:1px solid #dfe6ee;grid-template-columns:minmax(0,1fr) 92px 62px 74px 108px;align-items:baseline;gap:8px;padding:7px 9px;display:grid}
-.sk-row:hover{background:#f5f9fd}
-.sk-row.pinned{background:#fbf7ea}
-.sk-row.pinned:hover{background:#f7f1de}
-.sk-row .r-title{font-size:15px;line-height:1.4}
-.sk-row .r-title a{font-weight:700;color:#0a5caa;overflow-wrap:anywhere}
-.sk-row.pinned .r-title a{font-weight:700}
-.sk-row .r-sub{color:#56657a;margin-top:2px;font-size:12px;display:block;line-height:1.45}
-.sk-row .r-author,.sk-row .r-last{color:#3d4a5c;font-size:12.5px;line-height:1.4;overflow-wrap:anywhere}
-.sk-row .r-author a,.sk-row .r-last a{font-size:12.5px}
-.sk-row .r-num{color:#33415a;text-align:right;font-size:12.5px;font-weight:600}
-.sk-row .r-last .r-time{color:#56657a;font-size:12px;display:block;margin-top:1px}
-/* ШАГ 4 ТЗ №1 (директива заказчика): строки таблицы «Форум» — от 1024px
-   переводятся на Flexbox (display:flex; justify-content:space-between;
-   align-items:center) — убирает пустоты в строках. Название темы занимает
-   всё основное пространство и уходит в троеточие (ellipsis), ник автора —
-   фиксировано 140px, дата последнего сообщения — фиксировано 110px,
-   прижата к правому краю. Ответы/Просмотры сохраняют прежние ширины
-   62px/74px из grid-шаблона (шапка .sk-listhead — те же ширины).
-   Ниже 1024px строки остаются на прежней grid-сетке — мобильная
-   адаптивность (≤900px) и планшетный диапазон (901-1023px) не тронуты. */
-@media (min-width:1024px){
-  .sk-listhead{display:flex;justify-content:space-between;align-items:center;gap:8px}
-  .sk-listhead > div:first-child{flex:1 1 auto;min-width:0}
-  .sk-listhead .col-author{flex:0 0 140px}
-  .sk-listhead .num{flex:0 0 62px}
-  .sk-listhead .num.col-views{flex:0 0 74px}
-  .sk-listhead > div:last-child{flex:0 0 110px;text-align:right}
-  .sk-row{display:flex;justify-content:space-between;align-items:center;gap:8px}
-  .sk-row .r-title{flex:1 1 auto;min-width:0}
-  .sk-row .r-title a{display:inline-block;max-width:100%;vertical-align:bottom;overflow-wrap:normal;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .sk-row .r-author{flex:0 0 140px}
-  .sk-row .r-num{flex:0 0 62px}
-  .sk-row .r-num.r-views{flex:0 0 74px}
-  .sk-row .r-last{flex:0 0 110px;text-align:right}
-}
-
-.sk-status-badge{white-space:nowrap;margin-left:6px;font-size:11.5px;font-weight:700;display:inline-block}
-.sk-status-badge.solved{color:#1e7e34}
-.sk-status-badge.closed{color:#5a6470}
-.sk-status-badge.newmsg{color:#c40000}
-.sk-status-badge.pin{color:#8a6d1a;background:#f5ead0;border:1px solid #e2d3a4;border-radius:2px;padding:0 5px}
-.sk-newbadge{vertical-align:1px;color:#fff;letter-spacing:.3px;white-space:nowrap;cursor:default;background:#3e9b4f;border:1px solid #337f41;border-radius:2px;margin-left:6px;padding:1px 7px 2px;font-size:11.5px;font-weight:700;display:inline-block}
-
-/* Сообщения: плоская светлая шапка, крупный читаемый текст */
-/* ШАГ 15: сообщения компактнее; текст ответов = размеру шрифта темы (15px) */
-.sk-msg{background:#fbfdff;border:1px solid var(--sm-navy);margin-bottom:8px}
-/* ТЗ 2026-09-21: подсветка шапки сообщения темнее (#eaf1f9→#d3e2f2),
-   разделитель приглушён в тон, чтобы линия осталась видимой */
-.sk-msg-head{background:#d3e2f2;border-bottom:1px solid #b9cde2;flex-wrap:wrap;align-items:center;gap:2px 8px;min-height:20px;padding:3px 8px;display:flex;margin-top:2px !important}
-.sk-msg-new{vertical-align:1px;color:#1e7b34;white-space:nowrap;cursor:default;background:#e6f4ea;border:1px solid #9ccfa8;border-radius:2px;padding:0 6px 1px;font-size:11.5px;font-weight:700;display:inline-block}
-.sk-msg-author{color:#0a5caa;font-size:13.5px;font-weight:700}
-.sk-msg-time{color:#56657a;font-size:12.5px}
-.sk-msg-spacer{flex:1}
 /* 2026-10-01: контейнер для кнопок сообщения (Пожаловаться / Не по делу /
    Редактировать / Удалить / Ответить) — все в ОДНУ строку без переносов.
    Раньше кнопки были прямыми flex-детьми .sk-msg (или .sk-msg-head) с
@@ -9242,7 +9004,6 @@ div[style*="background-color: rgb(0, 74, 143)"] {
   }
 }
 
-
 /* === Fix mobile: «Где купить» на отдельной строке === */
 @media (max-width: 768px) {
   .wb-title,
@@ -9471,6 +9232,7 @@ div[style*="background-color: rgb(0, 74, 143)"] {
   display: none !important;
 }
 
+
 /* 2026-10-15: фикс горизонтального скролла на мобиле.
    Слово "SakhMatrix" при font-size 31px = ~540px шире viewport 375px.
    Решение: ограничить ширину + scale + word-break. */
@@ -9485,7 +9247,6 @@ div[style*="background-color: rgb(0, 74, 143)"] {
     line-height: 1 !important;
     transform-origin: 50% 100% !important;
   }
-  /* Если родитель тоже шире вьюпорта — сжать */
   .sm-masthead .header-logo {
     max-width: 100% !important;
     overflow: hidden !important;
@@ -9501,42 +9262,96 @@ div[style*="background-color: rgb(0, 74, 143)"] {
 }
 
 
-/* 2026-10-15: Эксперимент — цветные блоки на главной уменьшены по вертикали (110px),
-   насыщенность цветов снижена на 25% (volunteers-carousel.tsx — bg colors desaturated,
-   .mp-cell — высота compact + filter:saturate(0.75) на CTA-кнопки). */
+/* 2026-10-15: применить компактный размер ко ВСЕМ блокам нижней сетки .mp-grid .mp-cell.
+   Высота ячейки 140px, кнопка/контент 96px, padding 0 (без белых полос).
+   Ширина (горизонталь) не трогается. */
 
-/* Action-панели .mp-cell — компактнее */
-.mp-panel.mp-cell {
+/* 1. Ячейка — обнулить вертикальный padding (убирает белые полоски) */
+.mp-grid .mp-cell {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* 2. Кнопка-слайд — 96px высота */
+.mp-grid .mp-cell .biz-rot-slide,
+.mp-grid .mp-cell .biz-rot {
+  min-height: 96px !important;
+  height: 96px !important;
+}
+.mp-grid .mp-cell .biz-rot-slide {
+  padding: 8px 12px !important;
+}
+
+/* 3. Иконка — 56x56 */
+.mp-grid .mp-cell .biz-rot-ico {
+  width: 56px !important;
+  height: 56px !important;
+}
+.mp-grid .mp-cell .biz-rot-ico svg {
+  width: 56px !important;
+  height: 56px !important;
+}
+
+/* 4. Текст рядом с иконкой — компактнее */
+.mp-grid .mp-cell .biz-rot-h {
   height: auto !important;
-  min-height: 140px !important;
-  padding: 12px 14px !important;
+  margin-top: 2px !important;
+  font-size: 14px !important;
 }
-.mp-panel.mp-cell > button {
-  height: 100px !important;
-  padding: 8px 10px !important;
-  font-size: 13.5px !important;
-  line-height: 1.35 !important;
-  filter: saturate(0.75) !important;
-}
-.mp-panel.mp-cell > button > div:first-child {
-  font-size: 15px !important;
-  margin-bottom: 4px !important;
-}
-.mp-panel.mp-cell > button > div:nth-child(2) {
-  font-size: 12px !important;
+.mp-grid .mp-cell .biz-rot-sub {
+  height: auto !important;
+  margin-top: 2px !important;
+  font-size: 11.5px !important;
+  line-height: 1.3 !important;
 }
 
-/* Уменьшить насыщенность иконок внутри .mp-cell */
-.mp-cell svg {
-  filter: saturate(0.75) !important;
+/* 2026-10-15: синие шапки .mp-celltitle — компактнее по вертикали.
+   padding 9px → 5px, font-size 14px → 13px, line-height 1.3.
+   Применяется ко всем 10 блокам .mp-grid .mp-cell. */
+.mp-grid .mp-cell .mp-celltitle {
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  font-size: 13px !important;
+  line-height: 1.3 !important;
 }
-/* Уменьшить насыщенность всех цветных плиток в .mp-cell SVG иконках */
-.mp-cell svg {
-  filter: saturate(0.75) !important;
+.mp-grid .mp-cell .mp-celltitle svg {
+  width: 12px !important;
+  height: 12px !important;
 }
 
-/* Уменьшить насыщенность volunteers-carousel */
-.mp-vol-tile, a[href*="pso-sova"], a[href*="lizaalert"], a[href*="ecosakhalin"] {
-  filter: saturate(0.75) !important;
+
+/* 2026-10-15: железно зафиксировать высоту 10 блоков — все одинаковые.
+   Контент обрезается overflow:hidden, никаких динамических изменений. */
+.mp-grid .mp-cell {
+  height: 127px !important;
+  max-height: 127px !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
+.mp-grid .mp-cell .mp-celltitle {
+  height: 29px !important;
+  max-height: 29px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+}
+.mp-grid .mp-cell .mp-celltitle span {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+.mp-grid .mp-cell .biz-rot,
+.mp-grid .mp-cell .biz-rot-slide {
+  height: 96px !important;
+  max-height: 96px !important;
+  overflow: hidden !important;
+  flex: 1 1 auto !important;
+}
+
 
