@@ -9727,7 +9727,7 @@ div[style*="background-color: rgb(0, 74, 143)"] {
 .mp-grid .mp-cell .biz-rot {
   background: #f8fafc !important;
   background-image: none !important;
-  border-left: 3px solid #cbd5e1 !important;
+  border: 0 !important;
 }
 .mp-grid .mp-cell .biz-rot:hover {
   background: #f1f5f9 !important;
@@ -9738,4 +9738,52 @@ div[style*="background-color: rgb(0, 74, 143)"] {
 .mp-grid .mp-cell .biz-rot-sub {
   color: #4a5b6d !important;
 }
+
+
+/* 2026-10-15: Покрасить иконки SVG в цвета блоков (раньше они были белыми на цветном фоне).
+   Теперь фон серый — белые иконки невидимы. Меняем fill на цвет блока. */
+.mp-cell[aria-label="Исполнители"] .biz-rot-ico svg path { fill: #65a310 !important; stroke: #65a310 !important; }
+.mp-cell[aria-label="Исполнители"] .biz-rot-ico svg circle,
+.mp-cell[aria-label="Исполнители"] .biz-rot-ico svg ellipse,
+.mp-cell[aria-label="Исполнители"] .biz-rot-ico svg rect { fill: transparent !important; }
+
+.mp-cell[aria-label="Нужна помощь"] .biz-rot-ico svg path { fill: #3b82f6 !important; stroke: #3b82f6 !important; }
+.mp-cell[aria-label="Нужна помощь"] .biz-rot-ico svg circle,
+.mp-cell[aria-label="Нужна помощь"] .biz-rot-ico svg ellipse,
+.mp-cell[aria-label="Нужна помощь"] .biz-rot-ico svg rect { fill: transparent !important; }
+
+.mp-cell[aria-label="Рекомендую / Не рекомендую"] .biz-rot-ico svg path { fill: #65a310 !important; stroke: #65a310 !important; }
+.mp-cell[aria-label="Рекомендую / Не рекомендую"] .biz-rot-ico svg circle,
+.mp-cell[aria-label="Рекомендую / Не рекомендую"] .biz-rot-ico svg ellipse,
+.mp-cell[aria-label="Рекомендую / Не рекомендую"] .biz-rot-ico svg rect { fill: transparent !important; }
+
+.mp-cell[aria-label="Где дешевле"] .biz-rot-ico svg path { fill: #65a310 !important; stroke: #65a310 !important; }
+.mp-cell[aria-label="Где дешевле"] .biz-rot-ico svg circle,
+.mp-cell[aria-label="Где дешевле"] .biz-rot-ico svg ellipse,
+.mp-cell[aria-label="Где дешевле"] .biz-rot-ico svg rect { fill: transparent !important; }
+
+.mp-cell[aria-label="Где купить"] .biz-rot-ico svg path { fill: #1d4ed8 !important; stroke: #1d4ed8 !important; }
+.mp-cell[aria-label="Где купить"] .biz-rot-ico svg circle,
+.mp-cell[aria-label="Где купить"] .biz-rot-ico svg ellipse,
+.mp-cell[aria-label="Где купить"] .biz-rot-ico svg rect { fill: transparent !important; }
+
+.mp-cell[aria-label="О работодателях"] .biz-rot-ico svg path { fill: #3b82f6 !important; stroke: #3b82f6 !important; }
+.mp-cell[aria-label="О работодателях"] .biz-rot-ico svg circle,
+.mp-cell[aria-label="О работодателях"] .biz-rot-ico svg ellipse,
+.mp-cell[aria-label="О работодателях"] .biz-rot-ico svg rect { fill: transparent !important; }
+
+.mp-cell[aria-label="ЖКХ и городские проблемы"] .biz-rot-ico svg path { fill: #3b82f6 !important; stroke: #3b82f6 !important; }
+.mp-cell[aria-label="ЖКХ и городские проблемы"] .biz-rot-ico svg circle,
+.mp-cell[aria-label="ЖКХ и городские проблемы"] .biz-rot-ico svg ellipse,
+.mp-cell[aria-label="ЖКХ и городские проблемы"] .biz-rot-ico svg rect { fill: transparent !important; }
+
+.mp-cell[aria-label="Объявления"] .biz-rot-ico svg path { fill: #d97706 !important; stroke: #d97706 !important; }
+.mp-cell[aria-label="Объявления"] .biz-rot-ico svg circle,
+.mp-cell[aria-label="Объявления"] .biz-rot-ico svg ellipse,
+.mp-cell[aria-label="Объявления"] .biz-rot-ico svg rect { fill: transparent !important; }
+
+.mp-cell[aria-label="Знакомства"] .biz-rot-ico svg path { fill: #ec4899 !important; stroke: #ec4899 !important; }
+.mp-cell[aria-label="Знакомства"] .biz-rot-ico svg circle,
+.mp-cell[aria-label="Знакомства"] .biz-rot-ico svg ellipse,
+.mp-cell[aria-label="Знакомства"] .biz-rot-ico svg rect { fill: transparent !important; }
 
