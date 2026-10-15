@@ -26,6 +26,7 @@ import { restrictionBlockMessage } from "@/lib/moderation";
 import { getActiveRestriction, handleConfirmedViolation } from "@/lib/moderation/sanctions";
 import { moderateNewWhereToBuyText } from "@/lib/moderation/wheretobuy";
 import { safeAuthorGender } from "@/lib/nick-gender";
+import { pickRandomBot, scheduleBotReplies } from "@/lib/auto-bots";
 import {
   WTB_SPECIFIC_HINT,
   WTB_SIMILAR_HINT,
@@ -313,14 +314,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: outcome.blockMessage }, { status: 400 });
     }
 
+    // 2026-10-15: AUTO-BOTS — подменяем автора на рандомного бота
+    // (если у юзера есть право публикации — публиковать от его имени,
+    // но отображаться будет рандомный бот из Theatre Bots)
+    const autoBot = await pickRandomBot();
+    const finalAuthorId = autoBot ? autoBot.id : user.id;
+    const finalAuthorName = autoBot ? autoBot.nickname : user.nickname;
+
     const created = await db.whereToBuyPost.create({
       data: {
         title,
         text,
         place,
         status: "seeking",
-        authorId: user.id,
-        authorName: user.nickname,
+        authorId: finalAuthorId,
+        authorName: finalAuthorName,
         aiStatus: outcome.action === "hide" ? "hidden" : outcome.action === "human" ? "human" : "ok",
         aiNote: outcome.aiNote ?? "",
         isHiddenByAi: outcome.action === "hide",
@@ -328,6 +336,22 @@ export async function POST(req: NextRequest) {
         needHuman: outcome.needHuman,
       },
     });
+
+    // 2026-10-15: AUTO-BOTS — запланировать 1-2 авто-ответа от других ботов
+    if (autoBot) {
+      try {
+        await scheduleBotReplies({
+          section: "wheretobuy",
+          postId: created.id,
+          topicTitle: title,
+          topicText: text,
+          authorId: finalAuthorId,
+          authorNickname: finalAuthorName,
+        });
+      } catch (e) {
+        console.error("[auto-bots] scheduleBotReplies failed:", e);
+      }
+    }
 
     // Очевидное нарушение скрыто — мягкая лестница санкций (общий механизм сайта).
     // Подозрение само по себе пользователя не блокирует (ТЗ п.16).

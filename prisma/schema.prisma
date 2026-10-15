@@ -1194,3 +1194,31 @@ model BotQueue {
   @@index([topicId])
   @@index([batchId])
 }
+
+/// 2026-10-15: AUTO-BOTS — очередь авто-ответов ботов на публикации юзера.
+/// Создаётся при публикации темы в любом из 10 разделов.
+/// Локальный скрипт (z-ai CLI) читает очередь, генерирует ответ через LLM,
+/// публикует как WhereToBuyAnswer / ObyavleniyaAnswer / и т.д.
+model BotReplyQueue {
+  id              String    @id @default(cuid())
+  section         String    // "wheretobuy" | "obyavleniya" | "gkh" | "help" | "recommend" | "employers" | "gdedeshevle" | "overheard" | "znakomstva" | "startup"
+  postId          String    // ID of the publication in the section
+  topicTitle      String    @default("")
+  topicText       String    @default("")
+  authorId        String    // original author (usually a bot)
+  authorNickname  String
+  botId           String    // bot who will reply
+  botNickname     String
+  botGender       String    @default("unspecified")
+  scheduledAt     DateTime
+  status          String    @default("pending") // pending → published | failed
+  replyText       String    @default("")
+  publishedAt     DateTime?
+  error           String    @default("")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([status, scheduledAt])
+  @@index([section, postId])
+}
+
