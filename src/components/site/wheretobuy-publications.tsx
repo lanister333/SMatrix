@@ -234,13 +234,8 @@ function WhereToBuyRow(props: {
       return;
     }
     setAnswerErr("");
-    // Проверка ДО отправки: тот же движок, что на сервере и на Главной.
-    const phones = findPhoneNumbers(t);
-    const labels = findEmotionalLabels(t);
-    if (phones.length > 0 || labels.length > 0) {
-      setAnswerBlocked(phones.length > 0 ? "phones" : "labels");
-      return; // без fetch: ничего не отправляется и не стирается
-    }
+    // 2026-10-15: убрана блокировка телефонов — ответы могут содержать
+    // номера телефонов (темы часто спрашивают контакты мастеров).
     setAnswerBlocked(null);
     setAnswerBusy(true);
     try {

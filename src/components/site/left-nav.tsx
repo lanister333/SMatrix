@@ -138,12 +138,12 @@ export const DISCUSS_RUBRICS: {
     break: true,
   },
   {
-    name: "О работодателях",
+    name: "Работодатели",
     href: "/forum/category/employers-discuss",
     title: "Ветка форума: обсуждения раздела «О работодателях»",
   },
   {
-    name: "ЖКХ и городские проблемы",
+    name: "ЖКХ/городские проблемы",
     href: "/forum/category/gkh-discuss",
     title: "Ветка форума: обсуждения раздела «ЖКХ и городские проблемы»",
     break: true,

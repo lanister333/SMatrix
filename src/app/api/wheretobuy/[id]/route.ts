@@ -114,21 +114,8 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
           { status: 400 }
         );
       }
-      // ИИ-ФИЛЬТР (обязательно): телефоны (89…/+79…) и слова «барыги, хамы,
-      // мошенники, уроды, вор, обдираловка, спекулянты» блокируют публикацию —
-      // тот же движок, что на клиенте и на Главной. Текст НЕ сохраняется.
-      const phones = findPhoneNumbers(answerText);
-      const labels = findEmotionalLabels(answerText);
-      if (phones.length > 0 || labels.length > 0) {
-        return NextResponse.json(
-          {
-            error: FILTER_PLAQUE_TEXT,
-            filtered: true,
-            forumHref: `/forum/topic/${FALLBACK_TRANSFER_TOPIC_ID}?prefilled_text=${encodeURIComponent(answerText)}`,
-          },
-          { status: 400 }
-        );
-      }
+      // 2026-10-15: убрана серверная блокировка телефонов/эмоциональных слов —
+      // ответы с номерами телефонов разрешены (темы часто спрашивают контакты мастеров).
       const hadAnswers = (await db.whereToBuyAnswer.count({ where: { postId: id } })) > 0;
       await db.whereToBuyAnswer.create({
         data: { postId: id, text: answerText, authorName: user.nickname },
