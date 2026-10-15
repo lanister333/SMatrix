@@ -9470,3 +9470,33 @@ div[style*="background-color: rgb(0, 74, 143)"] {
 .cc-container .sakh-comment-connector {
   display: none !important;
 }
+
+/* 2026-10-15: фикс горизонтального скролла на мобиле.
+   Слово "SakhMatrix" при font-size 31px = ~540px шире viewport 375px.
+   Решение: ограничить ширину + scale + word-break. */
+@media (max-width: 480px) {
+  .sm-masthead-title {
+    font-size: 28px !important;
+    letter-spacing: -0.02em !important;
+    max-width: calc(100vw - 24px) !important;
+    overflow: hidden !important;
+    text-overflow: clip !important;
+    white-space: nowrap !important;
+    line-height: 1 !important;
+    transform-origin: 50% 100% !important;
+  }
+  /* Если родитель тоже шире вьюпорта — сжать */
+  .sm-masthead .header-logo {
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+  .sm-masthead .sm-mh-wrap {
+    overflow: hidden !important;
+  }
+}
+@media (max-width: 360px) {
+  .sm-masthead-title {
+    font-size: 24px !important;
+  }
+}
+
