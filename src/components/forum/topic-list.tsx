@@ -204,7 +204,7 @@ export default function TopicList(props: {
           <button className="sk-btn-classic" style={{ margin: 0 }} type="submit">
             Найти
           </button>
-          <button className="sk-btn-classic" style={{ margin: 0, background: "#1E3A5F", color: "#fff" }} type="button" onClick={props.onAddTopic}>
+          <button className="sk-btn-classic sk-newtopic-btn" style={{ margin: 0 }} type="button" onClick={props.onAddTopic}>
             + Новая тема
           </button>
         </form>

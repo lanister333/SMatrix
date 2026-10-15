@@ -140,7 +140,7 @@ function Sidebar(props: {
           по горизонтали и вертикали (класс .sk-sideblock-addtopic в globals.css) */}
       {!props.homeMode && (
         <div className="sk-sideblock sk-sideblock-addtopic">
-          <a className="sk-addtopic" onClick={props.onAddTopic}>
+          <a className="sk-addtopic sk-addtopic-btn" onClick={props.onAddTopic}>
             Добавить тему
           </a>
         </div>

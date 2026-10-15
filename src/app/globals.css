@@ -226,6 +226,48 @@ body{background:#E8EAEB}
 
 .sk-addtopic{color:#c40000;margin-bottom:10px;font-size:14px;font-weight:700;display:inline-block}
 .sk-addtopic:hover,.sk a.sk-addtopic:hover{color:#8f0000}
+
+/* 2026-10-15: «+ Новая тема» на форуме — СИНЯЯ кнопка (ярче navy, как «Ответить»).
+   Важно: !important — чтобы перекрыть дефолт .sk-btn-classic (светло-серый фон). */
+.sk-newtopic-btn{
+  cursor:pointer !important;
+  background:#0a5caa !important;
+  color:#fff !important;
+  border:1px solid #084c8b !important;
+  font-weight:700 !important;
+  padding:6px 15px !important;
+  border-radius:3px !important;
+  font-family:Arial,Helvetica,sans-serif !important;
+  font-size:14px !important;
+  display:inline-block !important;
+  white-space:nowrap !important;
+}
+.sk-newtopic-btn:hover{background:#084c8b !important;color:#fff !important}
+.sk-newtopic-btn:active{background:#06407a !important}
+.sk-newtopic-btn:disabled{background:#8296ab !important;border-color:#a9b6c4 !important;cursor:default !important}
+
+/* 2026-10-15: «Добавить тему» в левой колонке — больше НЕ красная текст-ссылка,
+   а полноценная СИНЯЯ кнопка (как на форуме). Перекрывает дефолт .sk-addtopic. */
+a.sk-addtopic.sk-addtopic-btn,
+.sk a.sk-addtopic.sk-addtopic-btn{
+  background:#0a5caa !important;
+  color:#fff !important;
+  border:1px solid #084c8b !important;
+  padding:8px 18px !important;
+  border-radius:3px !important;
+  font-weight:700 !important;
+  font-size:14px !important;
+  display:inline-block !important;
+  text-decoration:none !important;
+  margin:0 !important;
+  cursor:pointer !important;
+}
+a.sk-addtopic.sk-addtopic-btn:hover,
+.sk a.sk-addtopic.sk-addtopic-btn:hover{
+  background:#084c8b !important;
+  color:#fff !important;
+}
+
 .sk-userline{color:#4a5b6d;margin-bottom:8px;font-size:12.5px;line-height:1.5}
 .sk-userline input{border:1px solid #1E3A5F;width:110px;padding:3px 6px;font-family:inherit;font-size:13px}
 
