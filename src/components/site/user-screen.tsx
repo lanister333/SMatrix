@@ -88,7 +88,7 @@ export default function UserScreen() {
   const nick = typeof window !== "undefined"
     ? decodeURIComponent(window.location.pathname.split("/user/")[1] || "")
     : "";
-  const { user, token } = useAuth();
+  const { user, token, ready } = useAuth();
   const [settings, setSettings] = useState<SiteSettings>(DEFAULT_SETTINGS);
   const [data, setData] = useState<ProfileData | null>(null);
   const [error, setError] = useState("");
@@ -109,7 +109,9 @@ export default function UserScreen() {
   const [pwOld, setPwOld] = useState("");
   const [pwNew, setPwNew] = useState("");
 
+  // 2026-10-15: wait for localStorage user to load before showing owner-only message
   const isOwn = !!(user && data && data.user.id === user.id);
+  const loading = !ready || !data;
 
   useEffect(() => {
     fetch("/api/bootstrap")
@@ -143,7 +145,7 @@ export default function UserScreen() {
         setError(e instanceof Error ? e.message : "Ошибка загрузки");
         setData(null);
       });
-  }, [nick]);
+  }, [nick, token]);
 
   const goNav = useCallback((k: string) => {
     window.location.href = NAV_ROUTES[k] ?? "/";
@@ -241,7 +243,7 @@ export default function UserScreen() {
 
               {error ? (
                 <div className="sk-loading">{error}</div>
-              ) : !data ? (
+              ) : loading ? (
                 <div className="sk-loading">Загрузка профиля…</div>
               ) : !isOwn ? (
                 /* 2026-10-01: профиль может смотреть только собственник.

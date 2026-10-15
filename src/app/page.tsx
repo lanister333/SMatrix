@@ -740,7 +740,7 @@ export default function App() {
   const isHome = view === "home" && !profileNick && !topicId;
 
   return (
-    <div className="sm-page flex min-h-screen flex-col">
+    <div className={`sm-page flex min-h-screen flex-col ${isStaffRole(user?.role) ? "is-admin" : ""}`}>
       <Masthead settings={settings} />
       {/* ШАГ 27: в навигации — единственный поиск сайта и вход/регистрация; состояние
           входа синхронизируется с экраном через onLogin/onLogout */}

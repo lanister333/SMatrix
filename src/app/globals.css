@@ -10203,3 +10203,11 @@ div[style*="background-color: rgb(0, 74, 143)"] {
 }
 
 
+
+/* 2026-10-15: Скрыть блоки «Поддержка молодого бизнеса» и «Исполнители»
+   от обычных пользователей. Админ видит (если есть класс is-admin на родителе). */
+.sm-page:not(.is-admin) .mp-cell[aria-label="Поддержка молодого бизнеса"],
+.sm-page:not(.is-admin) .mp-cell[aria-label="Исполнители"] {
+  display: none !important;
+}
+
