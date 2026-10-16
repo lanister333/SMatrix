@@ -10212,3 +10212,252 @@ div[style*="background-color: rgb(0, 74, 143)"] {
 }
 
 
+
+/* 2026-10-15: Вкладки Рекомендую/Не рекомендую */
+.rc-stance-tab-rec.active {
+  background: #16a34a !important;
+  color: #fff !important;
+  border-color: #15803d !important;
+}
+.rc-stance-tab-norec.active {
+  background: #dc2626 !important;
+  color: #fff !important;
+  border-color: #b91c1c !important;
+}
+.rc-stance-tab-rec, .rc-stance-tab-norec {
+  font-weight: 600 !important;
+}
+
+
+/* 2026-10-15: Вкладки Рекомендую/Не рекомендую — адаптив для мобильных.
+   На мобильном вкладки wrap-ятся и занимают всю ширину. */
+.rc-stance-tab-rec,
+.rc-stance-tab-norec,
+.rc-navlist button[class*="rc-stance-tab"] {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  padding: 6px 10px !important;
+  font-size: 13px !important;
+}
+
+/* На мобильном (≤480px) вкладки — каждая на отдельной строке или по 2 в ряд */
+@media (max-width: 480px) {
+  .rc-navlist {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+  .rc-stance-tab-rec,
+  .rc-stance-tab-norec,
+  .rc-navlist button[class*="rc-stance-tab"] {
+    flex: 1 1 calc(50% - 3px) !important;
+    font-size: 12.5px !important;
+    padding: 6px 8px !important;
+  }
+  /* "Все" — на всю ширину сверху */
+  .rc-navlist button.active:not(.rc-stance-tab-rec):not(.rc-stance-tab-norec) {
+    flex: 1 1 100% !important;
+  }
+}
+
+
+/* 2026-10-15: Вкладки на мобиле — wrap-ятся вместо горизонтального скролла. */
+@media (max-width: 480px) {
+  .rc-nav-inline {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    overflow: visible !important;
+    overflow-x: visible !important;
+  }
+  .rc-head-right {
+    overflow: visible !important;
+    overflow-x: visible !important;
+  }
+  .rc-nav-inline button {
+    flex: 1 1 calc(50% - 3px) !important;
+    min-width: 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    font-size: 12px !important;
+    padding: 6px 8px !important;
+  }
+}
+
+
+/* 2026-10-15: Разнести вкладки на 2 строки:
+   1-я строка: Все / Рекомендую / Не рекомендую (stance filter)
+   2-я строка: Последние публикации / Мои публикации / Поделиться опытом
+   Работает на всех экранах. */
+.rc-nav-inline {
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+  overflow: visible !important;
+  overflow-x: visible !important;
+}
+.rc-nav-inline button {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-size: 13px !important;
+  padding: 6px 10px !important;
+}
+/* Force stance tabs to wrap after "Не рекомендую" — span с flex-basis: 100% */
+.rc-nav-inline .rc-stance-separator {
+  flex-basis: 100% !important;
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+@media (max-width: 480px) {
+  .rc-nav-inline button {
+    flex: 1 1 calc(33.333% - 4px) !important;
+    font-size: 11.5px !important;
+    padding: 5px 6px !important;
+  }
+}
+
+
+/* 2026-10-15: Inline "Поделиться опытом" в ряд с другими вкладками */
+.rc-addbtn-inline {
+  background: #0a5caa !important;
+  color: #fff !important;
+  border: 1px solid #084c8b !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+}
+.rc-addbtn-inline:hover {
+  background: #084c8b !important;
+}
+
+
+/* 2026-10-15: скрыть оригинальную кнопку 'Поделиться опытом' в .rc-head-right
+   (она перенесена в общий ряд вкладок как .rc-addbtn-inline). */
+.rc-head-right .rc-addbtn {
+  display: none !important;
+}
+
+
+/* 2026-10-15: Компактные вкладки — меньше padding, gap, font. */
+.rc-nav-inline {
+  gap: 3px !important;
+  margin-top: 4px !important;
+  margin-bottom: 4px !important;
+}
+.rc-nav-inline button {
+  padding: 4px 6px !important;
+  font-size: 11.5px !important;
+  line-height: 1.2 !important;
+}
+.rc-stance-tab-rec,
+.rc-stance-tab-norec,
+.rc-addbtn-inline {
+  padding: 4px 6px !important;
+  font-size: 11.5px !important;
+}
+
+@media (max-width: 480px) {
+  .rc-nav-inline button {
+    padding: 3px 4px !important;
+    font-size: 10.5px !important;
+  }
+  .rc-nav-inline {
+    gap: 2px !important;
+  }
+}
+
+/* Уменьшить margin у .rc-head (контейнер вкладок) */
+.rc-head {
+  margin-bottom: 6px !important;
+}
+.rc-head-bar {
+  margin-bottom: 4px !important;
+}
+
+
+/* 2026-10-15: Десктоп — все вкладки в одну строку (separator скрыт).
+   Мобильный — 2 строки (separator переносит). */
+@media (min-width: 481px) {
+  .rc-nav-inline {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+  }
+  /* Скрыть separator — на десктопе все кнопки в одну строку */
+  .rc-stance-separator {
+    display: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .rc-nav-inline {
+    flex-wrap: wrap !important;
+    overflow: visible !important;
+    overflow-x: visible !important;
+  }
+  /* На мобильном separator переносит на новую строку */
+  .rc-stance-separator {
+    display: block !important;
+    flex-basis: 100% !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}
+
+
+/* 2026-10-15: "Поделиться опытом" — отдельная строка сверху, над вкладками. */
+.rc-share-top {
+  margin-bottom: 8px;
+}
+.rc-addbtn-top {
+  display: inline-block !important;
+  background: #0a5caa !important;
+  color: #fff !important;
+  border: 1px solid #084c8b !important;
+  padding: 8px 16px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  border-radius: 3px !important;
+}
+.rc-addbtn-top:hover {
+  background: #084c8b !important;
+}
+
+/* На мобильном — кнопка на всю ширину */
+@media (max-width: 480px) {
+  .rc-share-top {
+    text-align: center;
+  }
+  .rc-addbtn-top {
+    display: block !important;
+    width: 100% !important;
+  }
+}
+
+
+/* 2026-10-15: "Поделиться опытом" — отдельная строка сверху, кнопка справа. */
+.rc-share-top {
+  display: flex !important;
+  justify-content: flex-end !important;
+  margin-bottom: 8px !important;
+}
+.rc-addbtn-top {
+  background: #0a5caa !important;
+  color: #fff !important;
+  border: 1px solid #084c8b !important;
+  padding: 8px 16px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  border-radius: 3px !important;
+}
+.rc-addbtn-top:hover {
+  background: #084c8b !important;
+}
+

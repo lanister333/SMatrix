@@ -995,6 +995,7 @@ export function RecommendPage(props: {
   onNeedAuth: () => void;
 }) {
   const [tab, setTab] = useState<"all" | "mine">("all");
+  const [stanceFilter, setStanceFilter] = useState<"recommend" | "notrecommend" | "all">("all");
   const [activeNav, setActiveNav] = useState<"home" | "latest" | "mine">("home");
   const [items, setItems] = useState<RecItem[] | null>(null);
   const [total, setTotal] = useState(0);
@@ -1024,6 +1025,7 @@ export function RecommendPage(props: {
         sp.set("pageSize", String(PAGE_SIZE));
         if (appliedQ) sp.set("q", appliedQ);
         if (appliedPlace) sp.set("place", appliedPlace);
+        if (stanceFilter !== "all") sp.set("stance", stanceFilter);
         // ТЗ 2026-09-24: токен в публичной ленте — чтобы сервер вернул myVote
         // (подсветка выбранной кнопки «Рекомендую»/«Не рекомендую»). Гости
         // получают ленту без токена — myVote null.
@@ -1041,7 +1043,7 @@ export function RecommendPage(props: {
     } finally {
       // nothing
     }
-  }, [tab, page, appliedQ, appliedPlace, props.token]);
+  }, [tab, page, appliedQ, appliedPlace, props.token, stanceFilter]);
 
   useEffect(() => {
     load();
@@ -1317,6 +1319,11 @@ export function RecommendPage(props: {
 
         {/* Центральная колонка — лента */}
         <div className="rc-col-main center-column">
+          <div className="rc-share-top">
+            <button className="rc-addbtn-top" onClick={() => { setEditItem(null); setFormOpen(true); }}>
+              ＋ Поделиться опытом
+            </button>
+          </div>
           <div className="rc-head">
             {/* 29.09.2026: header-bar — H1 «Рекомендую / Не рекомендую» слева,
                 nav + кнопка «Поделиться опытом» справа (как на /gde-deshevle,
@@ -1326,6 +1333,28 @@ export function RecommendPage(props: {
               <div className="rc-title">Рекомендую / Не рекомендую</div>
               <div className="rc-head-right">
                 <div className="rc-nav-inline">
+                  {/* 2026-10-15: Вкладки Рекомендую / Не рекомендую */}
+                  <button
+                    className={stanceFilter === "all" ? "active" : ""}
+                    onClick={() => { setStanceFilter("all"); }}
+                    style={{ marginRight: 6 }}
+                  >
+                    Все
+                  </button>
+                  <button
+                    className={stanceFilter === "recommend" ? "active rc-stance-tab-rec" : "rc-stance-tab-rec"}
+                    onClick={() => { setStanceFilter("recommend"); setPage(1); }}
+                    style={{ marginRight: 6 }}
+                  >
+                    👍 Рекомендую
+                  </button>
+                  <button
+                    className={stanceFilter === "notrecommend" ? "active rc-stance-tab-norec" : "rc-stance-tab-norec"}
+                    onClick={() => { setStanceFilter("notrecommend"); setPage(1); }}
+                  >
+                    👎 Не рекомендую
+                  </button>
+                  <span className="rc-stance-separator" />
                   <button className={activeNav === "latest" ? "active" : ""} onClick={() => mineTab("all", "latest")}>
                     Последние публикации
                   </button>

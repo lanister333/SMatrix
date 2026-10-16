@@ -198,8 +198,11 @@ export async function GET(req: NextRequest) {
 
     // Публичная лента. Поиск поддерживает частичное совпадение и русский регистр.
     // 29.09.2026: добавлен author.gender — для покраски ника по полу автора.
+    // 2026-10-15: фильтр по stance (recommend|notrecommend)
+    const stanceFilter = (sp.get("stance") || "").trim();
+    const stanceClause = stanceFilter === "recommend" || stanceFilter === "notrecommend" ? { stance: stanceFilter } : {};
     const rows = await db.recPost.findMany({
-      where: { isDeleted: false, isHiddenByAi: false },
+      where: { isDeleted: false, isHiddenByAi: false, ...stanceClause },
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       take: 1000,
       include: { _count: { select: { usefulVotes: true } }, author: { select: { nickname: true, gender: true } } },
