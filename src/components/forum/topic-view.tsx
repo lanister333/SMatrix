@@ -178,6 +178,7 @@ function MessageRow(props: {
   onPermalink: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  isAdmin?: boolean;
   onAppeal: () => void;
   appealSent: boolean;
   /** 2026-10-11: кнопка-переключатель вложенных ответов в .sk-msg-actions.
@@ -269,7 +270,7 @@ function MessageRow(props: {
             Редактировать
           </button>
         )}
-        {own && (
+        {(own || props.isAdmin) && (
           <button className="sk-flood-btn sk-msg-del" onClick={props.onDelete}>
             Удалить
           </button>
@@ -904,6 +905,7 @@ export default function TopicView(props: {
       onGoParent={m.parentNum ? () => gotoMessage(m.parentNum as number) : undefined}
       onEdit={() => setEditMsg(m)}
       onDelete={() => deleteMsg(m)}
+      isAdmin={isAdmin}
       onAppeal={() => setAppealMsg(m)}
       appealSent={appealedIds.has(m.id)}
     />
