@@ -408,6 +408,7 @@ function WhereToBuyRow(props: {
                 aria-label={`Ответ на запрос «${item.title}»`}
               />
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 7, flexWrap: "wrap" }}>
+                <span style={{ fontSize: 12, color: "#475569", marginRight: 6 }}>🤖 {botNick || "..."} </span>
                 <button
                   className="sk-btn-classic"
                   data-wb-answer-submit={item.id}
@@ -478,6 +479,7 @@ function WhereToBuyFormModal(props: {
   const [text, setText] = useState(props.editItem?.text ?? "");
   const [place, setPlace] = useState(props.editItem?.place ?? "");
   const [busy, setBusy] = useState(false);
+  const [botNick, setBotNick] = useState<string | null>(null);
   const [err, setErr] = useState("");
   const [specHint, setSpecHint] = useState(""); // подсказка конкретности (ТЗ п.4)
   const [similar, setSimilar] = useState<SimilarPost[] | null>(null); // предупреждение о похожих (ТЗ п.7)
@@ -603,6 +605,7 @@ function WhereToBuyFormModal(props: {
           </div>
           {err && <div className="sk-modal-err">{err}</div>}
           <div className="sk-modal-actions">
+            <span style={{ fontSize: 13, color: "#475569", marginRight: 8 }}>🤖 От имени: <b style={{ color: "#0a5caa" }}>{botNick || "..."} </b></span>
             <button className="sk-btn-classic" disabled={busy} onClick={() => submit(!!similar)}>
               {busy ? "Проверка…" : similar ? "Всё равно опубликовать" : isEdit ? "Сохранить" : "Опубликовать"}
             </button>
@@ -750,6 +753,13 @@ export function WhereToBuyPage(props: {
     return () => {
       alive = true;
     };
+  }, []);
+
+  // 2026-10-16: fetch random bot for preview
+  useEffect(() => {
+    fetch("/api/auto-bots/random").then(r => r.json()).then(d => {
+      if (d.nickname) setBotNick(d.nickname);
+    }).catch(() => {});
   }, []);
 
   const load = useCallback(async () => {

@@ -149,6 +149,7 @@ function AdRow(props: {
   // 2026-10-15: админ видит кнопки управления на ВСЕХ карточках
   const isAdminRole = user?.role === "owner" || user?.role === "admin" || user?.role === "moderator";
   const own = !!(user && (item.authorId === user.id || isAdminRole));
+  const [botNick, setBotNick] = useState<string | null>(null);
   const [photoIdx, setPhotoIdx] = useState(0);
   const media = item.media ?? [];
   return (
@@ -649,6 +650,25 @@ export function AdsPage(props: {
   const [editItem, setEditItem] = useState<AdItem | null>(null);
   const [complaintItem, setComplaintItem] = useState<AdItem | null>(null);
   const [highlightId, setHighlightId] = useState("");
+
+  // 2026-10-16: fetch random bot for preview
+
+
+  useEffect(() => {
+
+
+    fetch("/api/auto-bots/random").then(r => r.json()).then(d => {
+
+
+      if (d.nickname) setBotNick(d.nickname);
+
+
+    }).catch(() => {});
+
+
+  }, []);
+
+
 
   const load = useCallback(async () => {
     setLoading(true);

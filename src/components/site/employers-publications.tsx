@@ -111,6 +111,7 @@ export function EmployersPage(props: {
   notify: (m: string) => void;
   onNeedAuth: () => void;
 }) {
+  const [botNick, setBotNick] = useState<string | null>(null);
   const [items, setItems] = useState<EmpItem[] | null>(null);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -138,6 +139,25 @@ export function EmployersPage(props: {
 
   const [highlightId, setHighlightId] = useState<string | null>(null);
   const listTopRef = useRef<HTMLDivElement | null>(null);
+
+  // 2026-10-16: fetch random bot for preview
+
+
+  useEffect(() => {
+
+
+    fetch("/api/auto-bots/random").then(r => r.json()).then(d => {
+
+
+      if (d.nickname) setBotNick(d.nickname);
+
+
+    }).catch(() => {});
+
+
+  }, []);
+
+
 
   const load = useCallback(
     async (opts: { page?: number; q?: string; city?: string } = {}) => {

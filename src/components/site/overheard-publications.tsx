@@ -201,6 +201,7 @@ function OverheardFormModal(props: {
   onDone: (msg: string) => void;
 }) {
   const isEdit = !!props.editItem;
+  const [botNick, setBotNick] = useState<string | null>(null);
   const [title, setTitle] = useState(props.editItem?.title ?? "");
   const [text, setText] = useState(props.editItem?.text ?? "");
   const [place, setPlace] = useState(props.editItem?.place ?? "");
@@ -311,6 +312,8 @@ function OverheardFormModal(props: {
           </div>
           {err && <div className="sk-modal-err">{err}</div>}
           <div className="sk-modal-actions">
+            <span style={{ fontSize: 13, color: "#475569", marginRight: 8 }}>🤖 От имени: <b style={{ color: "#0a5caa" }}>{botNick || "..."} </b></span>
+            
             <button className="sk-btn-classic" disabled={busy} onClick={submit}>
               {busy ? "Проверка…" : isEdit ? "Сохранить" : "Опубликовать"}
             </button>
@@ -441,6 +444,25 @@ export function OverheardPage(props: {
   const [busy, setBusy] = useState(false);
   const [highlightId, setHighlightId] = useState<string | null>(null);
   const listTopRef = useRef<HTMLDivElement | null>(null);
+
+  // 2026-10-16: fetch random bot for preview
+
+
+  useEffect(() => {
+
+
+    fetch("/api/auto-bots/random").then(r => r.json()).then(d => {
+
+
+      if (d.nickname) setBotNick(d.nickname);
+
+
+    }).catch(() => {});
+
+
+  }, []);
+
+
 
   const load = useCallback(async () => {
     setError("");

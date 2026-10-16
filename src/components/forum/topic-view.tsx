@@ -457,6 +457,7 @@ function ComplaintModal(props: { message: Msg; onClose: () => void; onDone: (msg
             <input value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Комментарий (необязательно)" />
           </div>
           <div className="sk-modal-actions">
+          <span style={{ fontSize: 13, color: "#475569", marginRight: 8 }}>🤖 От имени: <b style={{ color: "#0a5caa" }}>{botNick || "..."} </b></span>
             <span className="sk-modal-hint" style={{ margin: 0, flex: 1 }}>
               {CATEGORY_LABELS[category] ? `Причина: ${CATEGORY_LABELS[category]}` : "Выберите причину жалобы"}
             </span>
@@ -578,6 +579,12 @@ export default function TopicView(props: {
   }, [topicId, curPage]);
 
   const loadId = useRef(0);
+  useEffect(() => {
+    fetch("/api/auto-bots/random").then(r => r.json()).then(d => {
+      if (d.nickname) setBotNick(d.nickname);
+    }).catch(() => {});
+  }, []);
+
   useEffect(() => {
     const t = window.setTimeout(load, 0);
     return () => window.clearTimeout(t);
@@ -817,6 +824,7 @@ export default function TopicView(props: {
   const canWrite = !topic.isArchived && !topic.isClosed;
   // ШАГ 12: модераторские кнопки доступны всем сотрудникам (владелец/модератор)
   const isAdmin = props.user?.role === "admin" || props.user?.role === "owner" || props.user?.role === "moderator";
+  const [botNick, setBotNick] = useState<string | null>(null);
   const isOwner = !!(props.user && topic.author && topic.author === props.user.nickname);
   const searchingInTopic = inTopicSearch && !!topicQ.trim();
   const visible = searchingInTopic

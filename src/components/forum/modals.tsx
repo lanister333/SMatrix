@@ -101,6 +101,7 @@ export function AuthModal(props: { onClose: () => void; onLogin: (token: string,
   const [tab, setTab] = useState(props.initialTab === "register" ? "register" : "login");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [botNick, setBotNick] = useState<string | null>(null);
   const [needVerify, setNeedVerify] = useState(false);
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPass, setLoginPass] = useState("");
@@ -151,6 +152,12 @@ export function AuthModal(props: { onClose: () => void; onLogin: (token: string,
       .then((r) => r.json())
       .then((r) => setProdMode(r.mode === "production"))
       .catch(() => setProdMode(false));
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/auto-bots/random").then(r => r.json()).then(d => {
+      if (d.nickname) setBotNick(d.nickname);
+    }).catch(() => {});
   }, []);
 
   // Отправка SMS-кода на телефон (только в PRODUCTION MODE).
@@ -820,6 +827,7 @@ export function NewTopicModal(props: {
           </div>
           {error && <div className="sk-modal-err">{error}</div>}
           <div className="sk-modal-actions">
+            <span style={{ fontSize: 13, color: "#475569", marginRight: 8 }}>🤖 От имени: <b style={{ color: "#0a5caa" }}>{botNick || "..."} </b></span>
             <button className="sk-btn-classic" style={{ marginTop: 0 }} onClick={props.onClose} disabled={busy}>
               Отмена
             </button>

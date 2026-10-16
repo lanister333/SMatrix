@@ -386,6 +386,7 @@ function RecRow(props: {
   // 29.09.2026 (правка 3): «Ответ организации» — КНОПКА в actrow рядом с
   // «Обсудить на форуме». Видна только если тема НЕ закрыта. По клику
   // открывается форма RecOrgResponseForm (toggle).
+  const [botNick, setBotNick] = useState<string | null>(null);
   const [orgFormOpen, setOrgFormOpen] = useState(false);
   // Тема закрыта / в архиве — кнопка «Ответ организации» пропадает.
   const topicClosed = item.topicState === "closed" || item.topicState === "archived";
@@ -881,6 +882,8 @@ function RecFormModal(props: {
           </div>
           {err && <div className="sk-modal-err">{err}</div>}
           <div className="sk-modal-actions">
+            <span style={{ fontSize: 13, color: "#475569", marginRight: 8 }}>🤖 От имени: <b style={{ color: "#0a5caa" }}>{botNick || "..."} </b></span>
+            
             <button className="sk-btn-classic" disabled={busy} onClick={() => submit(!!similar)}>
               {busy ? "Проверка…" : similar ? "Всё равно опубликовать" : isEdit ? "Сохранить" : "Опубликовать"}
             </button>
@@ -1012,6 +1015,25 @@ export function RecommendPage(props: {
   const [busy, setBusy] = useState(false);
   const [highlightId, setHighlightId] = useState<string | null>(null);
   const listTopRef = useRef<HTMLDivElement | null>(null);
+
+  // 2026-10-16: fetch random bot for preview
+
+
+  useEffect(() => {
+
+
+    fetch("/api/auto-bots/random").then(r => r.json()).then(d => {
+
+
+      if (d.nickname) setBotNick(d.nickname);
+
+
+    }).catch(() => {});
+
+
+  }, []);
+
+
 
   const load = useCallback(async () => {
     setError("");

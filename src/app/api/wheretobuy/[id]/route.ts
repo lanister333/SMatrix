@@ -17,6 +17,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { pickRandomBot } from "@/lib/auto-bots";
 import { db } from "@/lib/db";
 import { isStaffRole } from "@/lib/admin";
 import { userByToken } from "@/lib/auth";
@@ -118,8 +119,11 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
       // 2026-10-15: убрана серверная блокировка телефонов/эмоциональных слов —
       // ответы с номерами телефонов разрешены (темы часто спрашивают контакты мастеров).
       const hadAnswers = (await db.whereToBuyAnswer.count({ where: { postId: id } })) > 0;
+      // 2026-10-16: AUTO-BOTS - random bot author
+      const answerBot = await pickRandomBot();
+      const answerAuthorName = answerBot ? answerBot.nickname : user.nickname;
       await db.whereToBuyAnswer.create({
-        data: { postId: id, text: answerText, authorName: user.nickname },
+        data: { postId: id, text: answerText, authorName: answerAuthorName },
       });
       const becameFound = post.status !== "found";
       if (becameFound) {

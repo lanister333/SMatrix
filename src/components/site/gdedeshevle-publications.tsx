@@ -189,6 +189,7 @@ function CheapRow(props: {
   const isAdminRole = user?.role === "owner" || user?.role === "admin" || user?.role === "moderator";
   const own = !!(user && (item.authorId === user.id || isAdminRole));
   // ТЗ часть 3: кнопка «📍 Ответить на запрос» → инлайн-поле прямо на странице.
+  const [botNick, setBotNick] = useState<string | null>(null);
   const [answerOpen, setAnswerOpen] = useState(false);
   const [answerText, setAnswerText] = useState("");
   const [answerBlocked, setAnswerBlocked] = useState<"phones" | "labels" | null>(null);
@@ -233,13 +234,7 @@ function CheapRow(props: {
       return;
     }
     setAnswerErr("");
-    // Проверка ДО отправки: тот же движок, что на сервере и на Главной.
-    const phones = findPhoneNumbers(t);
-    const labels = findEmotionalLabels(t);
-    if (phones.length > 0 || labels.length > 0) {
-      setAnswerBlocked(phones.length > 0 ? "phones" : "labels");
-      return; // без fetch: ничего не отправляется и не стирается
-    }
+    // 2026-10-16: убрана блокировка телефонов в ответах.
     setAnswerBlocked(null);
     setAnswerBusy(true);
     try {
@@ -573,6 +568,8 @@ function CheapFormModal(props: {
           </div>
           {err && <div className="sk-modal-err">{err}</div>}
           <div className="sk-modal-actions">
+            <span style={{ fontSize: 13, color: "#475569", marginRight: 8 }}>🤖 От имени: <b style={{ color: "#0a5caa" }}>{botNick || "..."} </b></span>
+            
             <button className="sk-btn-classic" disabled={busy} onClick={() => submit(!!similar)}>
               {busy ? "Проверка…" : similar ? "Всё равно опубликовать" : isEdit ? "Сохранить" : "Опубликовать"}
             </button>
@@ -721,6 +718,25 @@ export function GdedeshevlePage(props: {
       alive = true;
     };
   }, []);
+
+  // 2026-10-16: fetch random bot for preview
+
+
+  useEffect(() => {
+
+
+    fetch("/api/auto-bots/random").then(r => r.json()).then(d => {
+
+
+      if (d.nickname) setBotNick(d.nickname);
+
+
+    }).catch(() => {});
+
+
+  }, []);
+
+
 
   const load = useCallback(async () => {
     setError("");

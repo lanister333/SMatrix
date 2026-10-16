@@ -102,6 +102,7 @@ export default function LoveSakhPage(props: {
   notify: (m: string) => void;
   onNeedAuth: () => void;
 }) {
+  const [botNick, setBotNick] = useState<string | null>(null);
   const [tab, setTab] = useState(DATING_CATEGORIES[0]?.key ?? "m4w");
   const [items, setItems] = useState<LsItem[] | null>(null);
   const [total, setTotal] = useState(0);
@@ -125,6 +126,25 @@ export default function LoveSakhPage(props: {
   const [note, setNote] = useState("");
 
   const listTopRef = useRef<HTMLDivElement | null>(null);
+
+  // 2026-10-16: fetch random bot for preview
+
+
+  useEffect(() => {
+
+
+    fetch("/api/auto-bots/random").then(r => r.json()).then(d => {
+
+
+      if (d.nickname) setBotNick(d.nickname);
+
+
+    }).catch(() => {});
+
+
+  }, []);
+
+
 
   const load = useCallback(
     async (opts: { tab?: string; page?: number; q?: string; place?: string } = {}) => {
