@@ -10533,3 +10533,9 @@ div[style*="background-color: rgb(0, 74, 143)"] {
   }
 }
 
+
+/* 2026-10-16: скрыть блок «Добавить тему» в левой колонке форума. */
+.sk-sideblock.sk-sideblock-addtopic {
+  display: none !important;
+}
+
