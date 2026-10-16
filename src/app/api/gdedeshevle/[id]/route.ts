@@ -17,6 +17,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { isStaffRole } from "@/lib/admin";
 import { pickRandomBot } from "@/lib/auto-bots";
 import { db } from "@/lib/db";
 import { userByToken } from "@/lib/auth";
@@ -140,7 +141,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     }
 
     // Редактировать, удалять и менять статус может только автор (ТЗ п.14).
-    if (post.authorId !== user.id) {
+    if (post.authorId !== user.id && !isStaffRole(user.role)) {
       return NextResponse.json(
         { error: "Изменить вопрос может только его автор" },
         { status: 403 }

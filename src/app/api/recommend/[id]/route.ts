@@ -10,6 +10,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { isStaffRole } from "@/lib/admin";
 import { db } from "@/lib/db";
 import { userByToken } from "@/lib/auth";
 import { handleApiError } from "@/lib/api";
@@ -89,7 +90,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     }
 
     // Редактировать, удалять и менять позицию может только автор.
-    if (post.authorId !== user.id) {
+    if (post.authorId !== user.id && !isStaffRole(user.role)) {
       return NextResponse.json(
         { error: "Изменить публикацию может только её автор" },
         { status: 403 }

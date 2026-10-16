@@ -474,6 +474,16 @@ export default function LoveSakhPage(props: {
                   {/* ТЗ 2026-09-23, ЖЁСТКОЕ ПРАВИЛО: кнопок «Обсудить на
                       форуме» на странице Знакомств НЕТ — общение идёт
                       напрямую по контактам из текста карточки. */}
+                {(props.user?.role === "owner" || props.user?.role === "admin" || props.user?.role === "moderator") && (
+
+                  <button type="button" onClick={async () => { if (!window.confirm("Удалить?")) return; try { const r = await fetch(`/api/znakomstva/${it.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: props.token, action: "delete" }) }); const d = await r.json(); if (!r.ok) { props.notify(d.error || "Ошибка"); return; } props.notify("Удалено"); load(); } catch { props.notify("Сеть недоступна"); } }} style={{ cursor: "pointer", background: "none", border: "none", color: "#dc2626", padding: "4px 8px", fontFamily: "inherit", fontSize: "12px", fontWeight: 600, textDecoration: "underline" }}>
+
+                    Удалить
+
+                  </button>
+
+                )}
+
                 </article>
               );
             })}

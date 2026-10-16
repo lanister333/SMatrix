@@ -12,6 +12,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { isStaffRole } from "@/lib/admin";
 import { db } from "@/lib/db";
 import { userByToken } from "@/lib/auth";
 import { handleApiError } from "@/lib/api";
@@ -97,7 +98,7 @@ export async function PATCH(
     if (!post || post.isDeleted) {
       return NextResponse.json({ error: "Объявление не найдено" }, { status: 404 });
     }
-    if (post.authorId !== user.id) {
+    if (post.authorId !== user.id && !isStaffRole(user.role)) {
       return NextResponse.json(
         { error: "Действия с объявлением доступны только его автору" },
         { status: 403 }
@@ -258,7 +259,7 @@ export async function DELETE(
     if (!post || post.isDeleted) {
       return NextResponse.json({ error: "Объявление не найдено" }, { status: 404 });
     }
-    if (post.authorId !== user.id) {
+    if (post.authorId !== user.id && !isStaffRole(user.role)) {
       return NextResponse.json(
         { error: "Действия с объявлением доступны только его автору" },
         { status: 403 }

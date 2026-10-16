@@ -85,6 +85,11 @@ export interface FlatBoardProps {
   /** Фильтр города из левой колонки (ТЗ «Фильтр городов Сахалина»):
    *  добавляется в GET ленты (?place=). */
   placeFilter?: string;
+  /** 2026-10-16: admin delete support */
+  user?: { role?: string; id?: string; nickname?: string } | null;
+  token?: string | null;
+  notify?: (msg: string) => void;
+  onReload?: () => void;
 }
 
 /** Дата «26.04.2025» — как в соседних блоках сайта. */
@@ -473,6 +478,29 @@ export default function FlatBoard(props: FlatBoardProps) {
                     <b style={{ color: "#047857" }}>📞 Связь:</b>{" "}
                     {renderContacts(it.contact)}
                   </div>
+                )}
+                {/* 2026-10-16: Admin delete button */}
+                {(props.user?.role === "owner" || props.user?.role === "admin" || props.user?.role === "moderator") && (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!window.confirm("Удалить?")) return;
+                      try {
+                        const r = await fetch(`/api/${props.apiPath}/${it.id}`, {
+                          method: "PATCH",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ token: props.token, action: "delete" }),
+                        });
+                        const d = await r.json();
+                        if (!r.ok) { props.notify(d.error || "Ошибка"); return; }
+                        props.notify("Удалено");
+                        props.onReload?.();
+                      } catch { props.notify("Сеть недоступна"); }
+                    }}
+                    style={{ cursor: "pointer", background: "none", border: "none", color: "#dc2626", padding: "4px 8px", fontFamily: "inherit", fontSize: "12px", fontWeight: 600, textDecoration: "underline", marginTop: 4 }}
+                  >
+                    Удалить
+                  </button>
                 )}
               </article>
             );
