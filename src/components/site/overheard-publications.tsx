@@ -114,7 +114,9 @@ function OverheardRow(props: {
   onComplain: (item: OverheardItem) => void;
 }) {
   const { item, user } = props;
-  const own = !!(user && item.authorId === user.id);
+  // 2026-10-15: админ видит кнопки управления на ВСЕХ карточках
+  const isAdminRole = user?.role === "owner" || user?.role === "admin" || user?.role === "moderator";
+  const own = !!(user && (item.authorId === user.id || isAdminRole));
   return (
     <article className={`oh-item${props.highlight ? " oh-highlight" : ""}`} data-oh-id={item.id}>
       {item.tag && item.tag !== "message" && (

@@ -38,6 +38,7 @@ import {
   normalizedProblemTitle,
 } from "@/lib/gkh";
 
+import { pickRandomBot, scheduleBotReplies } from "@/lib/auto-bots";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
@@ -431,6 +432,12 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // 2026-10-15: AUTO-BOTS
+
+
+    const autoBot = await pickRandomBot();
+
+
     const created = await db.gkhProblem.create({
       data: {
         title,
@@ -439,8 +446,8 @@ export async function POST(req: NextRequest) {
         place,
         problemDate,
         status: "active",
-        authorId: user.id,
-        authorName: user.nickname,
+        authorId: autoBot ? autoBot.id : user.id,
+        authorName: autoBot ? autoBot.nickname : user.nickname,
         aiStatus: outcome.action === "hide" ? "hidden" : outcome.action === "human" ? "human" : "ok",
         aiNote: outcome.aiNote ?? "",
         isHiddenByAi: outcome.action === "hide",
@@ -449,6 +456,22 @@ export async function POST(req: NextRequest) {
         ...(mediaConnect.length ? { media: { connect: mediaConnect } } : {}),
       },
     });
+
+    // 2026-10-15: AUTO-BOTS — запланировать ответы
+    if (autoBot) {
+      try {
+        await scheduleBotReplies({
+          section: "gkh",
+          postId: created.id,
+          topicTitle: title,
+          topicText: text,
+          authorId: autoBot ? autoBot.id : user.id,
+          authorNickname: autoBot ? autoBot.nickname : user.nickname,
+        });
+      } catch (e) {
+        console.error("[auto-bots] scheduleBotReplies failed:", e);
+      }
+    }
 
     // Очевидное нарушение скрыто — мягкая лестница санкций (общий механизм сайта).
     // Подозрение само по себе пользователя не блокирует (ТЗ п.18).

@@ -372,7 +372,9 @@ function RecRow(props: {
   onOrgDone: (msg: string) => void;
 }) {
   const { item, user } = props;
-  const own = !!(user && item.authorId === user.id);
+  // 2026-10-15: админ/модератор видит кнопки управления на ВСЕХ карточках
+  const isAdminRole = user?.role === "owner" || user?.role === "admin" || user?.role === "moderator";
+  const own = !!(user && (item.authorId === user.id || isAdminRole));
   const notrecommend = item.stance === "notrecommend";
   const hasResponse = !!item.orgResponseText && !!item.orgResponseAt;
   // ТЗ 2026-09-22: демо-карточка с присланным подвалом .review-card-footer-fixed
@@ -713,7 +715,7 @@ function RecFormModal(props: {
     setBusy(true);
     try {
       const payload: Record<string, unknown> = isEdit
-        ? { token: props.token, action: "edit", subject: subject.trim(), title: title.trim(), text: text.trim(), place: place.trim(), humanHighlight: human.trim() }
+        ? { token: props.token, action: "edit", subject: subject.trim(), stance, title: title.trim(), text: text.trim(), place: place.trim(), humanHighlight: human.trim() }
         : { token: props.token, subject: subject.trim(), stance, title: title.trim(), text: text.trim(), place: place.trim(), humanHighlight: human.trim() };
       if (confirmSimilar) payload.confirmSimilar = true;
       const r = await fetch(isEdit ? `/api/recommend/${props.editItem!.id}` : "/api/recommend", {
@@ -767,7 +769,7 @@ function RecFormModal(props: {
               {specHint}
             </div>
           )}
-          {!isEdit && (
+          {(
             <div className="sk-modal-row">
               <label>Ваша позиция</label>
               <div className="rc-stances">

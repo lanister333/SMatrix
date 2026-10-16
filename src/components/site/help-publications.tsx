@@ -117,7 +117,9 @@ function HelpCard(props: {
   onNeedAuth: () => void;
 }) {
   const { item, user } = props;
-  const own = !!(user && item.authorId === user.id);
+  // 2026-10-15: админ видит кнопки управления на ВСЕХ карточках
+  const isAdminRole = user?.role === "owner" || user?.role === "admin" || user?.role === "moderator";
+  const own = !!(user && (item.authorId === user.id || isAdminRole));
   const closed = item.status !== "active";
 
   return (

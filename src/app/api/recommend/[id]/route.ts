@@ -175,10 +175,14 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
       return NextResponse.json({ error: outcome.blockMessage }, { status: 400 });
     }
 
+    // 2026-10-15: обновляем stance при редактировании (если он передан)
+    const newStance = String(body.stance ?? post.stance);
     await db.recPost.update({
       where: { id },
       data: {
         subject,
+        stance: newStance,
+        stanceAt: new Date(),
         title,
         text,
         place,

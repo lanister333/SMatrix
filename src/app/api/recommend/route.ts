@@ -24,6 +24,7 @@ import { restrictionBlockMessage } from "@/lib/moderation";
 import { getActiveRestriction, handleConfirmedViolation } from "@/lib/moderation/sanctions";
 import { moderateNewRecommendText } from "@/lib/moderation/recommend";
 import { safeAuthorGender } from "@/lib/nick-gender";
+import { pickRandomBot, scheduleBotReplies } from "@/lib/auto-bots";
 // ТЗ 2026-09-22: первая линия автоматической пре-модерации (ярлыки/личные
 // данные → вернуть автору с подсказкой; капслок/мат/угрозы → блок).
 import { premoderateReviewText } from "@/lib/moderation/premoderation";
@@ -366,6 +367,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: outcome.blockMessage }, { status: 400 });
     }
 
+    // 2026-10-15: AUTO-BOTS — подменяем автора на рандомного бота
+    const autoBot = await pickRandomBot();
+    const finalAuthorId = autoBot ? autoBot.id : user.id;
+    const finalAuthorName = autoBot ? autoBot.nickname : user.nickname;
+
     const created = await db.recPost.create({
       data: {
         subject,
@@ -374,8 +380,8 @@ export async function POST(req: NextRequest) {
         text,
         place,
         humanHighlight,
-        authorId: user.id,
-        authorName: user.nickname,
+        authorId: finalAuthorId,
+        authorName: finalAuthorName,
         aiStatus: outcome.action === "hide" ? "hidden" : outcome.action === "human" ? "human" : "ok",
         aiNote: outcome.aiNote ?? "",
         isHiddenByAi: outcome.action === "hide",
@@ -383,6 +389,22 @@ export async function POST(req: NextRequest) {
         needHuman: outcome.needHuman,
       },
     });
+
+    // 2026-10-15: AUTO-BOTS — запланировать 1-2 авто-ответа от ботов
+    if (autoBot) {
+      try {
+        await scheduleBotReplies({
+          section: "recommend",
+          postId: created.id,
+          topicTitle: title,
+          topicText: text,
+          authorId: finalAuthorId,
+          authorNickname: finalAuthorName,
+        });
+      } catch (e) {
+        console.error("[auto-bots] scheduleBotReplies failed:", e);
+      }
+    }
 
     // Очевидное нарушение скрыто — мягкая лестница санкций (общий механизм сайта).
     let sanction: Record<string, unknown> | null = null;

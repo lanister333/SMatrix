@@ -38,6 +38,7 @@ import {
 } from "@/lib/znakomstva";
 import { safeAuthorGender } from "@/lib/nick-gender";
 
+import { pickRandomBot, scheduleBotReplies } from "@/lib/auto-bots";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
@@ -313,14 +314,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: outcome.blockMessage }, { status: 400 });
     }
 
+    // 2026-10-15: AUTO-BOTS
+
+
+    const autoBot = await pickRandomBot();
+
+
     const created = await db.datingPost.create({
       data: {
         category,
         title,
         body: bodyText,
         place,
-        authorId: user.id,
-        authorName: user.nickname,
+        authorId: autoBot ? autoBot.id : user.id,
+        authorName: autoBot ? autoBot.nickname : user.nickname,
         aiStatus: outcome.action === "hide" ? "hidden" : outcome.action === "human" ? "human" : "ok",
         aiNote: outcome.aiNote ?? "",
         isHiddenByAi: outcome.action === "hide",
@@ -328,6 +335,22 @@ export async function POST(req: NextRequest) {
         needHuman: outcome.needHuman,
       },
     });
+
+    // 2026-10-15: AUTO-BOTS — запланировать ответы
+    if (autoBot) {
+      try {
+        await scheduleBotReplies({
+          section: "znakomstva",
+          postId: created.id,
+          topicTitle: title,
+          topicText: text,
+          authorId: autoBot ? autoBot.id : user.id,
+          authorNickname: autoBot ? autoBot.nickname : user.nickname,
+        });
+      } catch (e) {
+        console.error("[auto-bots] scheduleBotReplies failed:", e);
+      }
+    }
 
     // Прикрепляем заранее загруженные фото (максимум 5, ТЗ «при желании фото»).
     if (photos.length) {
