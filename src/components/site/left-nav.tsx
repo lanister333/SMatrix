@@ -118,7 +118,7 @@ export const DISCUSS_RUBRICS: {
     title: "Ветка форума: обсуждение сообщений из «Подслушано»",
   },
   {
-    name: "Где купить",
+    name: "Где купить/где заказать",
     href: "/forum/category/wheretobuy-discuss",
     title: "Ветка форума: обсуждения раздела «Где купить»",
   },
