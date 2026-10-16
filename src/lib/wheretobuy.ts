@@ -64,6 +64,11 @@ export function isTooGeneric(title: string, text: string): boolean {
   const combined = `${title}\n${text}`;
   // Признак конкретики: латиница (модель/бренд) или цифры (артикул/размер/объём).
   if (/[a-z]/i.test(combined) || /\d/.test(combined)) return false;
+  // 2026-10-15: вопросительный текст (с вопросительным словом или знаком ?) — НЕ блокировать.
+  const questionWords = ["подскаж", "посовет", "кто", "где", "как", "какой", "какая", "какие", "сколько", "нужен", "нужно", "ищу", "ищете"];
+  const lower = combined.toLowerCase();
+  const hasQuestion = lower.includes("?") || questionWords.some(w => lower.includes(w));
+  if (hasQuestion) return false;
   const s = combined.toLowerCase();
   return GENERIC_GOODS.some((w) => s.includes(w)) || GENERIC_SHOP.some((w) => s.includes(w));
 }

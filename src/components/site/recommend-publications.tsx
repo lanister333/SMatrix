@@ -772,9 +772,23 @@ function RecFormModal(props: {
               <label>Ваша позиция</label>
               <div className="rc-stances">
                 <label className="complaint-option">
+                  <input
+                    type="radio"
+                    name="stance"
+                    value="recommend"
+                    checked={stance === "recommend"}
+                    onChange={() => setStance("recommend")}
+                  />
                   Рекомендую — опыт положительный
                 </label>
                 <label className="complaint-option">
+                  <input
+                    type="radio"
+                    name="stance"
+                    value="notrecommend"
+                    checked={stance === "notrecommend"}
+                    onChange={() => setStance("notrecommend")}
+                  />
                   Не рекомендую — опыт отрицательный
                 </label>
               </div>
