@@ -10620,3 +10620,32 @@ div[style*="background-color: rgb(0, 74, 143)"] {
   color: #1a2433;
 }
 
+
+/* 2026-10-16: Кнопка Удалить для админа — ниже блока Связь, не перекрывается */
+article [style*="cursor: pointer"][style*="color: rgb(220, 38, 38)"],
+article button[style*="color: #dc2626"] {
+  display: block !important;
+  clear: both !important;
+  margin-top: 8px !important;
+  width: auto !important;
+}
+
+
+
+
+
+/* 2026-10-16: Кнопка Удалить для админа — заметная, синий фон белый текст */
+article button[style*="color: rgb(220, 38, 38)"],
+article button[style*="color: #dc2626"] {
+  background: #dc2626 !important;
+  color: #fff !important;
+  padding: 6px 14px !important;
+  border-radius: 3px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  border: 1px solid #991b1b !important;
+  display: inline-block !important;
+  margin-top: 8px !important;
+  text-decoration: none !important;
+}
+
