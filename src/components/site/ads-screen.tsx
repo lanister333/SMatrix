@@ -167,12 +167,11 @@ export default function AdsScreen() {
             {/* ============ ЦЕНТРАЛЬНАЯ КОЛОНКА (лента FlatBoard) ============ */}
             <div className="center-column" data-ads-center="1">
               <FlatBoard
-
+                {...FLAT_ADS_BOARD}
                 user={user}
                 token={token}
                 notify={notify}
                 onReload={() => window.location.reload()}
-                {...FLAT_ADS_BOARD}
                 controlledOpen
                 open={formOpen}
                 onOpenChange={setFormOpen}

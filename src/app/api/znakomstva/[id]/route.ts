@@ -113,6 +113,15 @@ export async function PATCH(
       );
     }
 
+    // 2026-10-16: delete action for admin
+    if (body.action === "delete") {
+      await db.datingPost.update({
+        where: { id },
+        data: { isDeleted: true, deletedAt: new Date(), needHuman: false },
+      });
+      return NextResponse.json({ ok: true, note: "Объявление удалено." });
+    }
+
     // Переключение статуса «Актуально» ↔ «Неактуально» (только автор).
     if (body.action === "status") {
       const status = String(body.status ?? "").trim();

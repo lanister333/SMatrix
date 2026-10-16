@@ -486,7 +486,7 @@ export default function FlatBoard(props: FlatBoardProps) {
                     onClick={async () => {
                       if (!window.confirm("Удалить?")) return;
                       try {
-                        const r = await fetch(`/api/${props.apiPath}/${it.id}`, {
+                        const r = await fetch(`${props.apiPath}/${it.id}`, {
                           method: "PATCH",
                           headers: { "Content-Type": "application/json" },
                           body: JSON.stringify({ token: props.token, action: "delete" }),
