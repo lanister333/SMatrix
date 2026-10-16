@@ -10461,3 +10461,75 @@ div[style*="background-color: rgb(0, 74, 143)"] {
   background: #084c8b !important;
 }
 
+
+/* 2026-10-15: rc-share-top — title left, button right (same row). */
+.rc-share-top {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 8px !important;
+}
+.rc-share-top .rc-title {
+  margin: 0 !important;
+  font-size: 26px !important;
+  font-weight: 700 !important;
+  color: #0a5caa !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+
+
+/* 2026-10-15: Заголовок Рекомендую / Не рекомендую — крупнее и ярче. */
+
+
+
+/* 2026-10-15: Button nowrap + title 20px (fits with button on one row). */
+.rc-addbtn-top {
+  white-space: nowrap !important;
+}
+.rc-share-top .rc-title {
+  font-size: 20px !important;
+}
+
+
+/* 2026-10-15: Mobile share button (compact, in 3rd row with Последние/Мои публикации).
+   Desktop: hidden (uses .rc-addbtn-top instead). */
+.rc-addbtn-mobile {
+  display: none !important;
+}
+
+@media (max-width: 480px) {
+  /* Hide the top-right share button on mobile */
+  .rc-share-top {
+    display: none !important;
+  }
+  /* Show mobile share button */
+  .rc-addbtn-mobile {
+    display: inline-block !important;
+    background: #0a5caa !important;
+    color: #fff !important;
+    border: 1px solid #084c8b !important;
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    border-radius: 3px !important;
+    white-space: nowrap !important;
+    margin-left: auto !important;
+    flex: 0 0 auto !important;
+  }
+  .rc-addbtn-mobile:hover {
+    background: #084c8b !important;
+  }
+  /* Title: full row */
+  .rc-title {
+    width: 100% !important;
+    text-align: left !important;
+    font-size: 18px !important;
+  }
+}
+

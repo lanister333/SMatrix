@@ -1232,7 +1232,7 @@ export function RecommendPage(props: {
       <div className="rc-layout main-grid-container">
         {/* Левая колонка — органайзер раздела (орг. кабинет + фильтр по месту)
             29.09.2026: навигация (Последние/Мои публикации) + кнопка
-            «＋ Поделиться опытом» ПЕРЕНЕСЕНЫ в header-bar центральной колонки,
+            «Поделиться опытом» ПЕРЕНЕСЕНЫ в header-bar центральной колонки,
             в одну строку с H1 «Рекомендую / Не рекомендую». */}
         <aside className="rc-col-left left-column">
           {/* 29.09.2026 (правка 2): блок «О разделе» перемещён из правой
@@ -1320,8 +1320,9 @@ export function RecommendPage(props: {
         {/* Центральная колонка — лента */}
         <div className="rc-col-main center-column">
           <div className="rc-share-top">
+            <div className="rc-title">Рекомендую / Не рекомендую</div>
             <button className="rc-addbtn-top" onClick={() => { setEditItem(null); setFormOpen(true); }}>
-              ＋ Поделиться опытом
+              Поделиться опытом
             </button>
           </div>
           <div className="rc-head">
@@ -1330,7 +1331,6 @@ export function RecommendPage(props: {
                 /gde-kupit). Активная nav-кнопка «Рекомендую / Не рекомендую»
                 удалена (была чёрной #1a1a1a — дубликат названия раздела). */}
             <div className="rc-head-bar">
-              <div className="rc-title">Рекомендую / Не рекомендую</div>
               <div className="rc-head-right">
                 <div className="rc-nav-inline">
                   {/* 2026-10-15: Вкладки Рекомендую / Не рекомендую */}
@@ -1360,6 +1360,9 @@ export function RecommendPage(props: {
                   </button>
                   <button className={activeNav === "mine" ? "active" : ""} onClick={() => mineTab("mine", "mine")}>
                     Мои публикации
+                  </button>
+                  <button className="rc-addbtn-mobile" onClick={() => { setEditItem(null); setFormOpen(true); }}>
+                    Поделиться опытом
                   </button>
                 </div>
                 <button className="rc-addbtn" onClick={openNewForm}>
