@@ -10598,3 +10598,25 @@ div[style*="background-color: rgb(0, 74, 143)"] {
   margin-top: 8px !important;
 }
 
+
+/* 2026-10-16: Блок «Рекомендация для работодателей» в правой колонке. */
+.ep-emp-recblock {
+  background: #fff;
+  border: 1px solid #4A688C;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.ep-emp-recblock-head {
+  background: #1E3A5F;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 5px 9px;
+}
+.ep-emp-recblock-body {
+  padding: 9px 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #1a2433;
+}
+

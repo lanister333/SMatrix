@@ -668,6 +668,13 @@ export function EmployersPage(props: {
           «Правила публикации» оформлены в дизайне блока «Время» (.sakh-clock). */}
       <aside className="right-column">
         <SakhDatetimeBlock />
+        {/* 2026-10-16: Recommendation for employers */}
+        <div className="ep-emp-recblock">
+          <div className="ep-emp-recblock-head">📋 Рекомендация для работодателей</div>
+          <div className="ep-emp-recblock-body">
+            Если в отзыве есть претензии к вашей компании — свяжитесь с автором напрямую, чтобы урегулировать разногласия. Зарегистрируйтесь как представитель организации и оставьте официальный ответ под отзывом.
+          </div>
+        </div>
         <div className="sakh-clock ep-clock-block ep-clock-rules" data-ep-rules="1">
           <div className="sakh-clock-head">⚠️ Правила публикации</div>
           <div className="sakh-clock-body sakh-clock-body-content">

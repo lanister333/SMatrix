@@ -689,6 +689,12 @@ export function GkhPage(props: {
                     >
                       💬 Обсудить на форуме ЖКХ
                     </button>
+
+                    {(props.user?.role === "owner" || props.user?.role === "admin" || props.user?.role === "moderator") && (
+                      <button type="button" onClick={async () => { if (!window.confirm("Удалить жалобу?")) return; try { const r = await fetch(`/api/gkh/${it.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: props.token, action: "delete" }) }); const d = await r.json(); if (!r.ok) { props.notify(d.error || "Ошибка"); return; } props.notify("Жалоба удалена"); load(); } catch { props.notify("Сеть недоступна"); } }} style={{ cursor: "pointer", background: "none", border: "none", color: "#dc2626", padding: "6px 10px", fontFamily: "inherit", fontSize: "13px", fontWeight: 600, textDecoration: "underline" }}>
+                        Удалить
+                      </button>
+                    )}
                   </div>
                 </article>
               );
@@ -729,6 +735,13 @@ export function GkhPage(props: {
           «Правила публикации» оформлены в дизайне блока «Время» (.sakh-clock). */}
       <aside className="right-column">
         <SakhDatetimeBlock />
+        {/* 2026-10-16: Recommendation for organizations */}
+        <div className="ep-emp-recblock">
+          <div className="ep-emp-recblock-head">📋 Рекомендация для организаций</div>
+          <div className="ep-emp-recblock-body">
+            Если в жалобе есть претензии к вашей организации — свяжитесь с автором напрямую, чтобы урегулировать разногласия. Зарегистрируйтесь как представитель организации и оставьте официальный ответ под жалобой.
+          </div>
+        </div>
         <div className="sakh-clock gkh-clock-block gkh-clock-rules" data-gkf-rules="1">
           <div className="sakh-clock-head">⚠️ Правила публикации</div>
           <div className="sakh-clock-body sakh-clock-body-content">

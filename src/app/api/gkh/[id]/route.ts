@@ -220,7 +220,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     const isStaff = isStaffRole(user.role);
 
     // Правка и удаление — только автор (ТЗ п.7/16).
-    if ((action === "edit" || action === "delete") && !isAuthor) {
+    if ((action === "edit" || action === "delete") && !isAuthor && !isStaff) {
       return NextResponse.json({ error: "Изменить публикацию может только её автор" }, { status: 403 });
     }
 
