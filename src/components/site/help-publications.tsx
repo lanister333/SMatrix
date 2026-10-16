@@ -143,11 +143,6 @@ function HelpCard(props: {
             Контакты (телефон, @telegram, https-ссылка, email) —
             ПОДСВЕЧЕНЫ СИНИМ и КЛИКАБЕЛЬНЫ (tel: позвонить, t.me/ Telegram,
             mailto: почта). */}
-        {item.contactData && (
-          <div className="help-item-contact">
-            <b>📞 Связь:</b> {renderContacts(item.contactData)}
-          </div>
-        )}
       </div>
 
       {own && item.isHiddenByAi && (
@@ -162,6 +157,11 @@ function HelpCard(props: {
 
       {(!closed || item.status === "resolved" || own) && (
         <div className="help-item-footer hp-actrow-unified">
+          {item.contactData && (
+            <div className="help-item-contact">
+              <b>📞 Связь:</b> {renderContacts(item.contactData)}
+            </div>
+          )}
           {item.status === "resolved" && (
             <span className="resolved-text">✓ Взаимопомощь оказана</span>
           )}

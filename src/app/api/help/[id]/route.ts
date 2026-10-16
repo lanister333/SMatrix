@@ -11,6 +11,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { isStaffRole } from "@/lib/admin";
 import { db } from "@/lib/db";
 import { userByToken } from "@/lib/auth";
 import { handleApiError } from "@/lib/api";

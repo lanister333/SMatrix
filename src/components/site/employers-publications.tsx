@@ -606,6 +606,29 @@ export function EmployersPage(props: {
                     >
                       {forumButtonLabel(it.topicId ? it.topicState : "none")}
                     </button>
+                    {/* 2026-10-16: Admin delete button */}
+                    {(props.user?.role === "owner" || props.user?.role === "admin" || props.user?.role === "moderator") && (
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          if (!window.confirm("Удалить отзыв?")) return;
+                          try {
+                            const r = await fetch(`/api/employers/${it.id}`, {
+                              method: "PATCH",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ token: props.token, action: "delete" }),
+                            });
+                            const d = await r.json();
+                            if (!r.ok) { props.notify(d.error || "Ошибка"); return; }
+                            props.notify("Отзыв удалён");
+                            load();
+                          } catch { props.notify("Сеть недоступна"); }
+                        }}
+                        style={{ cursor: "pointer", background: "none", border: "none", color: "#dc2626", padding: "6px 10px", fontFamily: "inherit", fontSize: "13px", fontWeight: 600, textDecoration: "underline" }}
+                      >
+                        Удалить
+                      </button>
+                    )}
                   </div>
                 </article>
               );
