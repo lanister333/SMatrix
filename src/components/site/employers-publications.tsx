@@ -56,6 +56,10 @@ interface EmpItem {
   topicId: number | null;
   topicState?: string; // none | open | closed | archived
   topicAnswers?: number; // 2026-10-17: число ответов в теме (num > 1)
+  // 2026-10-17: голоса читателей «Рекомендую» / «Не рекомендую».
+  recommendCount?: number;
+  notrecommendCount?: number;
+  myVote?: string | null; // "recommend" | "notrecommend" | null
   isHiddenByAi?: boolean;
   hiddenReason?: string;
   needHuman?: boolean;
@@ -129,9 +133,11 @@ export function EmployersPage(props: {
   // Форма: гость → ДОСЛОВНАЯ строка ТЗ (форма НЕ открывается);
   // авторизованный → форма карточки трудового опыта.
   const [formOpen, setFormOpen] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
   const [guestHint, setGuestHint] = useState(false);
   const [rewrite, setRewrite] = useState(false); // ИИ-фильтр лозунгов сработал (Пункт 8 ТЗ №2)
   const [formEmployer, setFormEmployer] = useState("");
+  const [formStance, setFormStance] = useState<"recommend" | "notrecommend">("recommend");
   const [formCity, setFormCity] = useState("");
   const [formPeriod, setFormPeriod] = useState("");
   const [formExperience, setFormExperience] = useState("");
@@ -170,6 +176,7 @@ export function EmployersPage(props: {
       const sp = new URLSearchParams({ page: String(p), pageSize: String(PAGE_SIZE) });
       if (qq) sp.set("q", qq);
       if (cc) sp.set("city", cc);
+      if (props.token) sp.set("token", props.token);  // 2026-10-17: для myVote
       try {
         const r = await fetch(`/api/employers?${sp.toString()}`);
         const d: FeedResponse = await r.json();
@@ -181,15 +188,17 @@ export function EmployersPage(props: {
         setItems([]);
       }
     },
-    [appliedQ, appliedCity]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [appliedQ, appliedCity, props.token]
   );
 
   // Применение поиска/города — без перезагрузки страницы.
+  // 2026-10-17: зависимость от props.token — перезагружаем ленту после того,
+  // как useAuth достанет токен из localStorage (изначально он null при SSR).
   useEffect(() => {
     setItems(null);
     load({ page: 1 });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appliedQ, appliedCity]);
+  }, [load]);
 
   // Глубокая ссылка из темы форума: /o-rabotodatelyah?post=ID — подсветить карточку.
   useEffect(() => {
@@ -234,6 +243,53 @@ export function EmployersPage(props: {
     setGuestHint(false);
     setRewrite(false);
     setErr("");
+    setEditId(null);  // 2026-10-17: ensure form is in "create" mode
+    setFormStance("recommend");  // 2026-10-17: default position for new review
+    setFormOpen(true);
+  };
+
+  // 2026-10-17: голос читателя «Рекомендую» / «Не рекомендую».
+  const vote = async (item: EmpItem, kind: "recommend" | "notrecommend") => {
+    if (!props.user) {
+      props.onNeedAuth();
+      return;
+    }
+    try {
+      const r = await fetch(`/api/employers/${item.id}/support`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: props.token, kind }),
+      });
+      const d = await r.json();
+      if (!r.ok) throw Error(d.error || "Не удалось учесть голос");
+      setItems((prev) =>
+        (prev ?? []).map((p) =>
+          p.id === item.id
+            ? {
+                ...p,
+                recommendCount: d.recommendCount ?? p.recommendCount,
+                notrecommendCount: d.notrecommendCount ?? p.notrecommendCount,
+                myVote: d.myVote ?? null,
+              }
+            : p
+        )
+      );
+      if (d.note) props.notify(d.note);
+    } catch (e) {
+      props.notify(e instanceof Error ? e.message : "Ошибка");
+    }
+  };
+
+  // 2026-10-17: открыть форму в режиме редактирования (заполнить поля).
+  const openEdit = (item: EmpItem) => {
+    setEditId(item.id);
+    setFormEmployer(item.employer);
+    setFormCity(item.city);
+    setFormPeriod(item.workPeriod);
+    setFormExperience(item.experience);
+    setFormMention(item.personMention);
+    // 2026-10-17: при редактировании можно сменить позицию автора.
+    setFormStance(item.stance === "notrecommend" ? "notrecommend" : "recommend");
     setFormOpen(true);
   };
 
@@ -255,18 +311,25 @@ export function EmployersPage(props: {
     }
     setBusy(true);
     try {
-      const r = await fetch("/api/employers", {
-        method: "POST",
+      // 2026-10-17: если editId задан — PATCH (редактирование), иначе POST (создание).
+      const isEdit = !!editId;
+      const url = isEdit ? `/api/employers/${editId}` : "/api/employers";
+      const method = isEdit ? "PATCH" : "POST";
+      const payload: Record<string, unknown> = {
+        token: props.token,
+        employer: formEmployer.trim(),
+        city: formCity.trim(),
+        workPeriod: formPeriod.trim(),
+        experience: formExperience.trim(),
+        personMention: formMention.trim(),
+        stance: formStance,  // 2026-10-17: позиция автора — recommend | notrecommend
+      };
+      if (!isEdit) payload.confirmSimilar = true;
+      if (isEdit) payload.action = "edit";
+      const r = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          token: props.token,
-          employer: formEmployer.trim(),
-          city: formCity.trim(),
-          workPeriod: formPeriod.trim(),
-          experience: formExperience.trim(),
-          personMention: formMention.trim(),
-          confirmSimilar: true, // подсказка «похожий отзыв» не входит в ТЗ Flat 2.0
-        }),
+        body: JSON.stringify(payload),
       });
       const d = await r.json();
       if (!r.ok) {
@@ -281,7 +344,9 @@ export function EmployersPage(props: {
       }
       // Успех: форма закрывается, поля чистятся, карточка падает наверх ленты.
       setFormOpen(false);
+      setEditId(null);
       setFormEmployer("");
+      setFormStance("recommend");
       setFormCity("");
       setFormPeriod("");
       setFormExperience("");
@@ -409,6 +474,35 @@ export function EmployersPage(props: {
         {/* Форма карточки трудового опыта (только для вошедших). */}
         {formOpen && props.token && (
           <div className="ep-form" data-ep-form="1">
+            {/* 2026-10-17: позиция автора — рекомендует или не рекомендует.
+                Видна и при создании, и при редактировании. */}
+            <div className="ep-step" data-ep-field-stance="1">
+              <label className="ep-steplabel">
+                Ваша позиция <span className="ep-step-hint">Определяет цвет карточки: зелёная — рекомендую, красная — не рекомендую</span>
+              </label>
+              <div className="ep-stances">
+                <label className="complaint-option">
+                  <input
+                    type="radio"
+                    name="ep-stance"
+                    value="recommend"
+                    checked={formStance === "recommend"}
+                    onChange={() => setFormStance("recommend")}
+                  />
+                  Рекомендую — опыт положительный
+                </label>
+                <label className="complaint-option">
+                  <input
+                    type="radio"
+                    name="ep-stance"
+                    value="notrecommend"
+                    checked={formStance === "notrecommend"}
+                    onChange={() => setFormStance("notrecommend")}
+                  />
+                  Не рекомендую — опыт отрицательный
+                </label>
+              </div>
+            </div>
             <div className="ep-step" data-ep-field-employer="1">
               <label className="ep-steplabel" htmlFor="ep-f-employer">
                 Компания / ИП <span className="ep-step-hint">Только официальное название организации</span>
@@ -497,7 +591,7 @@ export function EmployersPage(props: {
             </div>
             <div className="ep-formfoot">
               <button className="sk-btn-classic" data-ep-publish="1" disabled={busy} onClick={publish} style={{ borderRadius: 0 }}>
-                {busy ? "Проверка…" : "Опубликовать"}
+                {busy ? "Проверка…" : editId ? "Сохранить" : "Опубликовать"}
               </button>
             </div>
             {/* ИИ-фильтр лозунгов (Пункт 8 ТЗ №2): дословное сообщение,
@@ -629,28 +723,38 @@ export function EmployersPage(props: {
                     >
                       {forumButtonLabel(it.topicId ? it.topicState : "none", (it.topicAnswers ?? 0) >= 1)}
                     </button>
-                    {/* 2026-10-16: Admin delete button */}
+                    {/* 2026-10-17: Admin/author edit + delete buttons */}
                     {(props.user?.role === "owner" || props.user?.role === "admin" || props.user?.role === "moderator" || props.user?.id === it.authorId || props.user?.id === it.originalAuthorId) && (
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          if (!window.confirm("Удалить отзыв?")) return;
-                          try {
-                            const r = await fetch(`/api/employers/${it.id}`, {
-                              method: "PATCH",
-                              headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({ token: props.token, action: "delete" }),
-                            });
-                            const d = await r.json();
-                            if (!r.ok) { props.notify(d.error || "Ошибка"); return; }
-                            props.notify("Отзыв удалён");
-                            load();
-                          } catch { props.notify("Сеть недоступна"); }
-                        }}
-                        className="ep-btn-delete"
-                      >
-                        Удалить
-                      </button>
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => openEdit(it)}
+                          className="ep-btn-edit"
+                          title="Редактировать отзыв"
+                        >
+                          Редактировать
+                        </button>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            if (!window.confirm("Удалить отзыв?")) return;
+                            try {
+                              const r = await fetch(`/api/employers/${it.id}`, {
+                                method: "PATCH",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ token: props.token, action: "delete" }),
+                              });
+                              const d = await r.json();
+                              if (!r.ok) { props.notify(d.error || "Ошибка"); return; }
+                              props.notify("Отзыв удалён");
+                              load();
+                            } catch { props.notify("Сеть недоступна"); }
+                          }}
+                          className="ep-btn-delete"
+                        >
+                          Удалить
+                        </button>
+                      </>
                     )}
                   </div>
                 </article>

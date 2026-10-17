@@ -2428,6 +2428,7 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .matrix-review-card.rc-highlight{background:#fff8dc;outline:2px solid #e8cf6e;transition:background 1.2s ease}
 .rc-act{color:#0a5caa;cursor:pointer;background:0 0;border:0;margin-right:12px;padding:3px 0;font-family:inherit;font-size:12.5px;text-decoration:underline}
 .rc-act:hover{color:#c40000}
+
 .rc-act.rc-del:hover{color:#d3402c}
 .rc-act.rc-statusbtn:hover{color:#1e5c2e}
 /* Кнопка состояния форума (ТЗ п.10) — та же логика состояний, что у «Подслушано» */
@@ -2686,6 +2687,17 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
    скругление), цвет — нейтральный серый, не красный. */
 .ep-btn-delete{border-radius:2px;border:0;cursor:pointer;display:inline-block;font-family:inherit;font-size:13px;font-weight:700;padding:6px 14px;text-decoration:none !important;white-space:nowrap;flex-shrink:0;color:#1a2433 !important;background:#e2e6ea}
 .ep-btn-delete:hover{background:#cbd5e1}
+/* 2026-10-17: .ep-btn-edit — кнопка «Редактировать» для автора/админа.
+   Метрики совпадают с .ep-btn-delete, нейтральный синий фон. */
+.ep-btn-edit{border-radius:2px;border:0;cursor:pointer;display:inline-block;font-family:inherit;font-size:13px;font-weight:700;padding:6px 14px;text-decoration:none !important;white-space:nowrap;flex-shrink:0;color:#fff !important;background:#0a5caa}
+.ep-btn-edit:hover{background:#084c8b}
+/* 2026-10-17: .ep-stances — radio-группа позиции автора в форме.
+   По образу .rc-stances из recommend-publications.tsx. */
+.ep-stances{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.ep-stances .complaint-option{display:flex;align-items:center;gap:8px;font-size:13.5px;color:#1a2433;cursor:pointer}
+.ep-stances .complaint-option input[type=radio]{margin:0;cursor:pointer}
+
+
 
 /* Форма карточки трудового опыта (inline, как у ЖКХ) */
 .ep-form{background:#fff;border:1px solid #d4d4d8;border-radius:0;margin-bottom:12px;padding:12px}

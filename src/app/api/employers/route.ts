@@ -148,12 +148,26 @@ export async function GET(req: NextRequest) {
         ? await db.message.groupBy({ by: ["topicId"], where: { topicId: { in: topicIds }, num: { gt: 1 }, isDeleted: false }, _count: { _all: true } })
         : [];
       const acMap = new Map(answerCounts.map((a) => [a.topicId, a._count._all]));
+      // 2026-10-17: голоса читателей «Рекомендую» / «Не рекомендую».
+      const minePostIds = rows.map((r) => r.id);
+      const mineVoteRows = minePostIds.length
+        ? await db.empVote.groupBy({ by: ["postId", "kind"], where: { postId: { in: minePostIds } }, _count: { _all: true } })
+        : [];
+      const recMapM = new Map<string, number>();
+      const nrecMapM = new Map<string, number>();
+      for (const v of mineVoteRows) {
+        if (v.kind === "recommend") recMapM.set(v.postId, v._count._all);
+        else if (v.kind === "notrecommend") nrecMapM.set(v.postId, v._count._all);
+      }
       // В «Моих публикациях» автор видит и скрытые ИИ — с объяснением причины.
       return NextResponse.json({
         posts: rows.map((r) => ({
           ...publicShape(r),
           topicState: r.topicId ? topicStateOf(tmap.get(r.topicId) ?? null) : "none",
           topicAnswers: r.topicId ? (acMap.get(r.topicId) ?? 0) : 0,
+          recommendCount: recMapM.get(r.id) ?? 0,
+          notrecommendCount: nrecMapM.get(r.id) ?? 0,
+          myVote: null, // автор не голосует за свою публикацию
           isHiddenByAi: r.isHiddenByAi,
           hiddenReason: r.hiddenReason,
           needHuman: r.needHuman,
@@ -186,11 +200,33 @@ export async function GET(req: NextRequest) {
         : [];
       const acMap = new Map(answerCounts.map((a) => [a.topicId, a._count._all]));
 
+    // 2026-10-17: голоса читателей «Рекомендую» / «Не рекомендую».
+    const pubPostIds = pageRows.map((r) => r.id);
+    const pubVoteRows = pubPostIds.length
+      ? await db.empVote.groupBy({ by: ["postId", "kind"], where: { postId: { in: pubPostIds } }, _count: { _all: true } })
+      : [];
+    const recMap = new Map<string, number>();
+    const nrecMap = new Map<string, number>();
+    for (const v of pubVoteRows) {
+      if (v.kind === "recommend") recMap.set(v.postId, v._count._all);
+      else if (v.kind === "notrecommend") nrecMap.set(v.postId, v._count._all);
+    }
+    // ТЗ 2026-09-24: токен в публичной ленте — чтобы сервер вернул myVote
+    // (подсветка выбранной кнопки «Рекомендую»/«Не рекомендую»).
+    const viewer = token ? await userByToken(token) : null;
+    const myVotes = viewer
+      ? await db.empVote.findMany({ where: { postId: { in: pubPostIds }, userId: viewer.id }, select: { postId: true, kind: true } })
+      : [];
+    const myVoteMap = new Map<string, string>(myVotes.map((v) => [v.postId, v.kind]));
+
     return NextResponse.json({
       posts: pageRows.map((r) => ({
         ...publicShape(r),
         topicState: r.topicId ? topicStateOf(tmap.get(r.topicId) ?? null) : "none",
-          topicAnswers: r.topicId ? (acMap.get(r.topicId) ?? 0) : 0,
+        topicAnswers: r.topicId ? (acMap.get(r.topicId) ?? 0) : 0,
+        recommendCount: recMap.get(r.id) ?? 0,
+        notrecommendCount: nrecMap.get(r.id) ?? 0,
+        myVote: myVoteMap.get(r.id) ?? null,
       })),
       total,
       page,
@@ -233,6 +269,8 @@ export async function POST(req: NextRequest) {
 
     const employer = String(body.employer ?? "").trim().slice(0, 120);
     const city = String(body.city ?? "").trim().slice(0, 80);
+    // 2026-10-17: позиция автора — recommend (зелёная) | notrecommend (красная).
+    const stance = body.stance === "notrecommend" ? "notrecommend" : "recommend";
     const workPeriod = String(body.workPeriod ?? "").trim().slice(0, 120);
     const experience = String(body.experience ?? body.text ?? body.body ?? "").trim();
     const personMention = String(body.personMention ?? "").trim().slice(0, 2000);
@@ -330,6 +368,7 @@ export async function POST(req: NextRequest) {
     const created = await db.empPost.create({
       data: {
         employer,
+        stance,
         city,
         workPeriod,
         experience,

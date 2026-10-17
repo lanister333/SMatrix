@@ -136,6 +136,8 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     // action === "edit"
     const employer = String(body.employer ?? post.employer).trim().slice(0, 120);
     const city = String(body.city ?? post.city).trim().slice(0, 80);
+    // 2026-10-17: при редактировании можно сменить позицию автора.
+    const stance = body.stance === "notrecommend" ? "notrecommend" : body.stance === "recommend" ? "recommend" : post.stance;
     const workPeriod = String(body.workPeriod ?? post.workPeriod).trim().slice(0, 120);
     const experience = String(body.experience ?? "").trim();
     const personMention = String(body.personMention ?? post.personMention ?? "").trim().slice(0, 2000);
@@ -165,6 +167,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
       where: { id },
       data: {
         employer,
+        stance,
         city,
         workPeriod,
         experience,

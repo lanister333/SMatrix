@@ -1041,7 +1041,25 @@ model EmpPost {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   complaints    EmpComplaint[]
+  // 2026-10-17: голоса читателей «Рекомендую» / «Не рекомендую».
+  empVotes    EmpVote[]
 }
+
+/// 2026-10-17: голоса читателей на карточках «О работодателях».
+/// kind хранит "recommend" | "notrecommend"; уникальный индекс [postId, userId]
+/// — один голос на пользователя. Повторный клик по той же кнопке снимает голос,
+/// клик по соседней — переключает.
+model EmpVote {
+  id        String   @id @default(cuid())
+  postId    String
+  post      EmpPost  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String
+  kind      String   @default("recommend") // recommend | notrecommend
+  createdAt DateTime @default(now())
+
+  @@unique([postId, userId])
+}
+
 
 /// ШАГ 25. Жалоба на отзыв «О работодателях» — ровно пять причин
 /// (реклама; спам; мошенничество; личные данные; другое).
