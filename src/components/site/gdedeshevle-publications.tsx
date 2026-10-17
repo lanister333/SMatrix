@@ -462,6 +462,14 @@ function CheapFormModal(props: {
   const [err, setErr] = useState("");
   const [specHint, setSpecHint] = useState(""); // подсказка конкретности / нескольких товаров (ТЗ п.2/3)
   const [similar, setSimilar] = useState<SimilarPost[] | null>(null); // предупреждение о похожих (ТЗ п.11)
+  const [botNick, setBotNick] = useState<string | null>(null);
+  // 2026-10-17: badges "🤖 От имени: ..." — fetch random bot nickname once.
+  // Bug fix: previously botNick was used but never declared → ReferenceError → "This page couldn't load".
+  useEffect(() => {
+    fetch("/api/auto-bots/random").then(r => r.json()).then(d => {
+      if (d.nickname) setBotNick(d.nickname);
+    }).catch(() => {});
+  }, []);
 
   const clearWarnings = () => {
     setSpecHint("");

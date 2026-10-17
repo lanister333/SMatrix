@@ -210,6 +210,14 @@ function WhereToBuyRow(props: {
   const own = !!(user && (item.authorId === user.id || item.originalAuthorId === user.id || isAdminRole));
   // ТЗ часть 3: кнопка «📍 Ответить на запрос» → инлайн-поле прямо на странице.
   const [answerOpen, setAnswerOpen] = useState(false);
+  const [botNick, setBotNick] = useState<string | null>(null);
+  // 2026-10-17: badges "🤖 От имени: ..." — fetch random bot nickname once.
+  // Bug fix: previously botNick was used but never declared → ReferenceError → "This page couldn't load".
+  useEffect(() => {
+    fetch("/api/auto-bots/random").then(r => r.json()).then(d => {
+      if (d.nickname) setBotNick(d.nickname);
+    }).catch(() => {});
+  }, []);
   const [answerText, setAnswerText] = useState("");
   const [answerBlocked, setAnswerBlocked] = useState<"phones" | "labels" | null>(null);
   const [answerErr, setAnswerErr] = useState("");

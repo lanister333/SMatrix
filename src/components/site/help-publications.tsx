@@ -371,6 +371,14 @@ function HelpFormModal(props: {
   const [title, setTitle] = useState(props.editItem?.title ?? "");
   const [text, setText] = useState(props.editItem?.text ?? "");
   const [contactData, setContactData] = useState(props.editItem?.contactData ?? "");
+  const [botNick, setBotNick] = useState<string | null>(null);
+  // 2026-10-17: badge "🤖 От имени: ..." — fetch random bot nickname once.
+  // Bug fix: previously botNick was used but never declared → ReferenceError → "This page couldn't load".
+  useEffect(() => {
+    fetch("/api/auto-bots/random").then(r => r.json()).then(d => {
+      if (d.nickname) setBotNick(d.nickname);
+    }).catch(() => {});
+  }, []);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
 

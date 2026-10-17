@@ -689,6 +689,14 @@ function RecFormModal(props: {
   // ТЗ 2026-09-22 (Пункты 2 и 8 Манифеста): чекбокс подтверждения личного опыта
   // и ответственности. Сбрасывается сам — модалка размонтируется при закрытии.
   const [agree, setAgree] = useState(false);
+  const [botNick, setBotNick] = useState<string | null>(null);
+  // 2026-10-17: badges "🤖 От имени: ..." — fetch random bot nickname once.
+  // Bug fix: previously botNick was used but never declared → ReferenceError → "This page couldn't load".
+  useEffect(() => {
+    fetch("/api/auto-bots/random").then(r => r.json()).then(d => {
+      if (d.nickname) setBotNick(d.nickname);
+    }).catch(() => {});
+  }, []);
 
   const clearWarnings = () => {
     setSpecHint("");

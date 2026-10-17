@@ -1109,8 +1109,6 @@ model AdListing {
   /// Аккаунт может быть удалён — объявление остаётся.
   author       User?    @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   authorName   String
-  /// 2026-10-17: real author before bot substitution
-  originalAuthorId String?
   aiStatus     String   @default("ok") // ok | hidden | human
   aiNote       String   @default("")
   hiddenReason String   @default("")
