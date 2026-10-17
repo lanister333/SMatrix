@@ -37,6 +37,7 @@ import {
   significantTokens,
 } from "@/lib/recommend";
 
+import { isStaffRole } from "@/lib/admin";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
@@ -372,7 +373,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 2026-10-15: AUTO-BOTS — подменяем автора на рандомного бота
-    const autoBot = await pickRandomBot();
+    const autoBot = isStaffRole(user.role) ? await pickRandomBot() : null;
     const finalAuthorId = autoBot ? autoBot.id : user.id;
     const finalAuthorName = autoBot ? autoBot.nickname : user.nickname;
 

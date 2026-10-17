@@ -711,7 +711,7 @@ export function GkhPage(props: {
                       💬 Обсудить на форуме ЖКХ
                     </button>
 
-                    {(props.user?.role === "owner" || props.user?.role === "admin" || props.user?.role === "moderator") && (
+                    {(props.user?.role === "owner" || props.user?.role === "admin" || props.user?.role === "moderator" || props.user?.id === it.authorId || props.user?.id === it.originalAuthorId) && (
                       <button type="button" onClick={async () => { if (!window.confirm("Удалить жалобу?")) return; try { const r = await fetch(`/api/gkh/${it.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: props.token, action: "delete" }) }); const d = await r.json(); if (!r.ok) { props.notify(d.error || "Ошибка"); return; } props.notify("Жалоба удалена"); load(); } catch { props.notify("Сеть недоступна"); } }} style={{ cursor: "pointer", background: "none", border: "none", color: "#dc2626", padding: "6px 10px", fontFamily: "inherit", fontSize: "13px", fontWeight: 600, textDecoration: "underline" }}>
                         Удалить
                       </button>

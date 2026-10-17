@@ -37,6 +37,7 @@ import {
 import { safeAuthorGender } from "@/lib/nick-gender";
 
 import { pickRandomBot, scheduleBotReplies } from "@/lib/auto-bots";
+import { isStaffRole } from "@/lib/admin";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
@@ -309,7 +310,7 @@ export async function POST(req: NextRequest) {
     // 2026-10-15: AUTO-BOTS
 
 
-    const autoBot = await pickRandomBot();
+    const autoBot = isStaffRole(user.role) ? await pickRandomBot() : null;
 
 
     const created = await db.empPost.create({

@@ -628,7 +628,7 @@ export function EmployersPage(props: {
                       {forumButtonLabel(it.topicId ? it.topicState : "none")}
                     </button>
                     {/* 2026-10-16: Admin delete button */}
-                    {(props.user?.role === "owner" || props.user?.role === "admin" || props.user?.role === "moderator") && (
+                    {(props.user?.role === "owner" || props.user?.role === "admin" || props.user?.role === "moderator" || props.user?.id === it.authorId || props.user?.id === it.originalAuthorId) && (
                       <button
                         type="button"
                         onClick={async () => {

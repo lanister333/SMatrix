@@ -10649,3 +10649,21 @@ article button[style*="color: #dc2626"] {
   text-decoration: none !important;
 }
 
+
+/* 2026-10-17: Кнопки управления не вылезают за край — flex-wrap */
+.help-item-footer.hp-actrow-unified {
+  flex-wrap: wrap !important;
+  overflow: visible !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+.help-item-footer.hp-actrow-unified .help-sys-actions {
+  flex-wrap: wrap !important;
+  overflow: visible !important;
+  max-width: 100% !important;
+}
+.help-item-footer.hp-actrow-unified .hp-act {
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+}
+
