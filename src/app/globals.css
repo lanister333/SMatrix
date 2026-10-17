@@ -2681,6 +2681,12 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .ep-btn-forum.is-open:hover{background:#05a79b}
 .ep-btn-forum.is-closed,.ep-btn-forum.is-archived{color:#55606c !important;background:#e2e6ea}
 .ep-btn-forum:visited{color:#fff !important}
+/* 2026-10-17: .ep-btn-delete — кнопка «Удалить» для админа/автора на карточках
+   «О работодателях». Метрики совпадают с .ep-btn-forum (та же высота, шрифт,
+   скругление), цвет — нейтральный серый, не красный. */
+.ep-btn-delete{border-radius:2px;border:0;cursor:pointer;display:inline-block;font-family:inherit;font-size:13px;font-weight:700;padding:6px 14px;text-decoration:none !important;white-space:nowrap;flex-shrink:0;color:#1a2433 !important;background:#e2e6ea}
+.ep-btn-delete:hover{background:#cbd5e1}
+
 /* Форма карточки трудового опыта (inline, как у ЖКХ) */
 .ep-form{background:#fff;border:1px solid #d4d4d8;border-radius:0;margin-bottom:12px;padding:12px}
 .ep-step{margin-top:10px}
@@ -5876,7 +5882,10 @@ div[style*="background-color: rgb(0, 74, 143)"] {
 .wb-statusline.is-irrelevant{color:#6a7480}
 .wb-answers,.cd-answers{display:flex;flex-direction:column;gap:5px;margin-top:6px}
 /* Ответ — ПЛОСКАЯ строка без рамки; внутри ответа НЕТ кнопки «Ответить». */
-.wb-answer,.cd-answer{color:#1a2433;font-size:13.5px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+/* 2026-10-17 answer-highlight-2026-10-17: ответы выделены рамкой и фоном,
+   чтобы визуально отделить их от текста вопроса. Бирюзовый акцент слева
+   и мягкий светло-бирюзовый фон — в фирменных цветах SakhMatrix. */
+.wb-answer,.cd-answer{color:#1a2433;font-size:13.5px;line-height:1.5;white-space:pre-wrap;word-break:break-word;background:#eff6ff;border-left:3px solid #3b82f6;border-radius:4px;padding:6px 10px;margin-top:2px}
 /* Служебный ряд (авторские статусы/правки или жалоба) — НЕ в основном ряду:
    внизу карточки стоят СТРОГО две кнопки ТЗ. */
 .wb-secrow,.cd-secrow{display:flex;flex-wrap:wrap;gap:2px 12px;margin-top:2px}
@@ -9958,6 +9967,23 @@ div[style*="background-color: rgb(0, 74, 143)"] {
   transition: transform 0.2s ease !important;
 }
 .mp-cell[aria-label="Где купить"] .biz-rot:hover .biz-rot-ico::before {
+  transform: scale(1.1) !important;
+}
+
+/* 2026-10-17: aria-label now "Где купить / где заказать" — mirror the rule. */
+.mp-cell[aria-label="Где купить / где заказать"] .biz-rot-ico svg { display: none !important; }
+.mp-cell[aria-label="Где купить / где заказать"] .biz-rot-ico::before {
+  content: "" !important;
+  display: block !important;
+  width: 50px !important;
+  height: 50px !important;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23c026d3%22%20stroke-width%3D%221.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%202%203%206v14a2%202%200%200%200%202%202h14a2%202%200%200%200%202-2V6l-3-4z%20M3%206h18%20M16%2010a4%204%200%200%201-8%200%22%2F%3E%3C%2Fsvg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: contain !important;
+  transition: transform 0.2s ease !important;
+}
+.mp-cell[aria-label="Где купить / где заказать"] .biz-rot:hover .biz-rot-ico::before {
   transform: scale(1.1) !important;
 }
 

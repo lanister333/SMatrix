@@ -125,19 +125,17 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
       await db.whereToBuyAnswer.create({
         data: { postId: id, text: answerText, authorName: answerAuthorName },
       });
-      const becameFound = post.status !== "found";
-      if (becameFound) {
-        await db.whereToBuyPost.update({
-          where: { id },
-          data: { status: "found", statusAt: new Date() },
-        });
-      }
+      // 2026-10-17: Получение ответа БОЛЬШЕ НЕ меняет статус вопроса.
+      // Автор или админ явно отмечает вопрос решённым кнопкой «✅ Вопрос решён»
+      // (action="status" с status="found"), либо «Неактуально» — также от автора/админа.
+      // До этого момента вопрос остаётся в статусе "seeking" (Ищу) независимо от
+      // количества полученных ответов.
       return NextResponse.json({
         ok: true,
-        status: "found",
+        status: post.status,
         note: hadAnswers
           ? "Ответ опубликован в списке на карточке."
-          : "Ответ принят: статус вопроса — «Найдено». Ответ добавлен в список на карточке.",
+          : "Ответ опубликован в списке на карточке. Статус вопроса не меняется — автор решает, когда вопрос решён.",
       });
     }
 

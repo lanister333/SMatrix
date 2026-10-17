@@ -542,6 +542,26 @@ function RecRow(props: {
           Все кнопки в одной строке, flex-wrap — на узких экранах
           переносятся на следующую строку. */}
       <div className="rc-actrow rc-actrow-unified" data-rc-actrow={item.id}>
+        {/* 2026-10-17: голоса читателей «👍 Рекомендую» / «👎 Не рекомендую» —
+            видны ВСЕМ (и гостям тоже). Гость при клике получает AuthModal. */}
+        <button
+          type="button"
+          className={`rc-act rc-vote-btn rc-vote-rec${props.myVote === "recommend" ? " is-active" : ""}`}
+          disabled={props.busy}
+          onClick={() => props.onVote(item, "recommend")}
+          title={props.myVote === "recommend" ? "Вы порекомендовали — нажмите ещё раз, чтобы снять голос" : "Рекомендую эту организацию"}
+        >
+          👍 Рекомендовать{typeof item.recommendCount === "number" && item.recommendCount > 0 ? ` (${item.recommendCount})` : ""}
+        </button>
+        <button
+          type="button"
+          className={`rc-act rc-vote-btn rc-vote-norec${props.myVote === "notrecommend" ? " is-active" : ""}`}
+          disabled={props.busy}
+          onClick={() => props.onVote(item, "notrecommend")}
+          title={props.myVote === "notrecommend" ? "Вы не порекомендовали — нажмите ещё раз, чтобы снять голос" : "Не рекомендую эту организацию"}
+        >
+          👎 Не рекомендовать{typeof item.notrecommendCount === "number" && item.notrecommendCount > 0 ? ` (${item.notrecommendCount})` : ""}
+        </button>
         {/* Кнопки автора — видны только владельцу публикации */}
         {own && !isFooterFixed && (
           <>

@@ -124,19 +124,17 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
       await db.cheapAnswer.create({
         data: { postId: id, text: answerText, authorName: answerAuthorName },
       });
-      const becameFixed = post.status !== "fixed";
-      if (becameFixed) {
-        await db.cheapPost.update({
-          where: { id },
-          data: { status: "fixed", statusAt: new Date() },
-        });
-      }
+      // 2026-10-17: Получение ответа БОЛЬШЕ НЕ меняет статус вопроса.
+      // Автор или админ явно отмечает вопрос решённым кнопкой «✅ Вопрос решён»
+      // (action="status" с status="fixed"), либо «Неактуально» — также от автора/админа.
+      // До этого момента вопрос остаётся в статусе "comparing" (Сравниваю) независимо
+      // от количества полученных ответов.
       return NextResponse.json({
         ok: true,
-        status: "fixed",
+        status: post.status,
         note: hadAnswers
           ? "Ответ опубликован в списке на карточке."
-          : "Ответ принят: статус вопроса — «Цена зафиксирована». Ответ добавлен в список на карточке.",
+          : "Ответ опубликован в списке на карточке. Статус вопроса не меняется — автор решает, когда цена зафиксирована.",
       });
     }
 

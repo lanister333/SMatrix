@@ -647,7 +647,7 @@ export function EmployersPage(props: {
                             load();
                           } catch { props.notify("Сеть недоступна"); }
                         }}
-                        style={{ cursor: "pointer", background: "none", border: "none", color: "#dc2626", padding: "6px 10px", fontFamily: "inherit", fontSize: "13px", fontWeight: 600, textDecoration: "underline" }}
+                        className="ep-btn-delete"
                       >
                         Удалить
                       </button>

@@ -1021,6 +1021,8 @@ model EmpPost {
   /// Аккаунт может быть удалён — публикация остаётся.
   author        User?    @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   authorName    String
+  /// 2026-10-17: real author before bot substitution
+  originalAuthorId String?
   topicId       Int?     @unique
   topic         Topic?   @relation(fields: [topicId], references: [id])
   aiStatus      String   @default("ok")
