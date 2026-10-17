@@ -15,6 +15,7 @@ import { handleConfirmedViolation } from "@/lib/moderation/sanctions";
 import { checkComplaintAllowed, hasAlreadyComplained, detectRaid } from "@/lib/security";
 import { notifyAdmin } from "@/lib/notifications";
 
+import { safeAnonReporterName } from "@/lib/security/complaint-guard";
 export const runtime = "nodejs";
 export const maxDuration = 120;
 

@@ -19,6 +19,7 @@ import { isDatingComplaintReason, datingComplaintLabel } from "@/lib/znakomstva"
 import { checkComplaintAllowed, hasAlreadyComplained, detectRaid } from "@/lib/security";
 import { notifyAdmin } from "@/lib/notifications";
 
+import { safeAnonReporterName } from "@/lib/security/complaint-guard";
 export const runtime = "nodejs";
 export const maxDuration = 120;
 
