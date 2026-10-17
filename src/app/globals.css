@@ -4516,6 +4516,27 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
   .sk-msg-author{font-size:11px !important;max-width:60px !important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:1}
   .sk-msg-time{font-size:9px !important;flex-shrink:0}
   .sk-msg-actions{flex-shrink:0 !important}
+  /* 2026-10-17 msg-actions-wrap-2026-10-17: на мобильных кнопки
+     действия (Пожаловаться/Не по делу/Удалить/Ответить/Редактировать и т.п.)
+     не помещаются в одну строку — выносим .sk-msg-actions на отдельную
+     строку под мета-инфой (.sk-msg-head), даём ей полную ширину родителя
+     (.sk-msg) и flex-wrap:wrap — кнопки переносятся. */
+  .sk-msg-head{flex-wrap:wrap !important;overflow-x:visible !important}
+  .sk-msg-actions{
+    flex-basis:auto !important;
+    /* 2026-10-17: растянуть actions на всю ширину карточки сообщения.
+       .sk-msg-head имеет padding 7px L/R (content = 246px), но .sakh-comment
+       (карточка) имеет padding 10+9px L/R. Чтобы actions заняла всю видимую
+       ширину карточки, используем calc(100% + 14px) для компенсации padding
+       родителя + negative margin. */
+    width:calc(100% + 34px) !important;
+    flex-wrap:wrap !important;
+    overflow-x:visible !important;
+    margin-top:4px !important;
+    margin-left:-17px !important;
+    margin-right:-17px !important;
+  }
+  .sk-msg-actions > *{flex-shrink:0;white-space:nowrap}
   .sk-msg-actions .sk-flood-btn{font-size:9px !important;padding:0 !important}
   .sk-msg-actions .sk-btn-answer{font-size:9px !important;padding:1px 4px !important}
 
@@ -4527,7 +4548,7 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
   .sk-msg-new{order:4}
   .sk-ai-badge{order:6}
   .sk-msg-spacer{display:block !important; flex:1 !important; order:5} /* распорка — прижать кнопки вправо */
-  .sk-msg-actions{order:6 !important; flex-shrink:0 !important; margin-left:auto !important}
+  .sk-msg-actions{order:6 !important; width:calc(100% + 34px) !important; margin-left:-17px !important; margin-right:-17px !important}
 
   /* 3) Кнопка «Ответить» внутри сообщения — compact-стиль по ТЗ:
      шрифт 12px, padding 3px 8px (вдвое ниже исходной 8px 13px/13px) */
@@ -6561,7 +6582,8 @@ div[style*="background-color: rgb(0, 74, 143)"] {
     padding-top: 0 !important;
   }
   .sk-qr button.sk-btn-classic {
-    padding: 4px 10px !important;
+    /* 2026-10-17: padding 10px → 16px — текст не касается правого края кнопки */
+    padding: 4px 16px !important;
     font-size: 12px !important;
     margin-top: 0 !important;
   }
