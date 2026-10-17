@@ -70,6 +70,7 @@ function publicShape(p: {
     place: p.place,
     status: p.status,
     authorId: p.authorId,
+    originalAuthorId: p.originalAuthorId,
     authorName: p.authorName,
     authorGender: safeAuthorGender(p.authorName, p.author as { nickname: string; gender: string | null } | null),
     editedAt: p.editedAt,

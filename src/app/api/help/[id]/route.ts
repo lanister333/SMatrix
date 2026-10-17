@@ -42,7 +42,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     }
 
     // Менять статус, редактировать и удалять может только автор (ТЗ п.6).
-    if (publication.authorId !== user.id && !isStaffRole(user.role)) {
+    if (publication.authorId !== user.id && publication.originalAuthorId !== user.id && !isStaffRole(user.role)) {
       return NextResponse.json(
         { error: "Изменить публикацию может только её автор" },
         { status: 403 }

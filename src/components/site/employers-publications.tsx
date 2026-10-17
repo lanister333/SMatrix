@@ -44,6 +44,7 @@ interface EmpItem {
   experience: string;
   personMention: string;
   authorId: string;
+  originalAuthorId?: string | null;
   authorName: string;
   /** 29.09.2026: stance — recommend (зелёная карточка) | notrecommend (красная). */
   stance?: string;

@@ -88,6 +88,7 @@ interface GkfItem {
   text: string;
   actions: string;
   authorId: string;
+  originalAuthorId?: string | null;
   authorName: string;
   createdAt: string;
   /** Официальный ответ организации (один на публикацию). */

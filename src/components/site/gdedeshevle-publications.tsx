@@ -42,6 +42,7 @@ interface CheapItem {
   place: string;
   status: string; // comparing | cheaper | fixed | irrelevant
   authorId: string;
+  originalAuthorId?: string | null;
   authorName: string;
   editedAt: string | null;
   createdAt: string;
@@ -187,7 +188,7 @@ function CheapRow(props: {
   const { item, user } = props;
   // 2026-10-15: админ видит кнопки управления на ВСЕХ карточках
   const isAdminRole = user?.role === "owner" || user?.role === "admin" || user?.role === "moderator";
-  const own = !!(user && (item.authorId === user.id || isAdminRole));
+  const own = !!(user && (item.authorId === user.id || item.originalAuthorId === user.id || isAdminRole));
   // ТЗ часть 3: кнопка «📍 Ответить на запрос» → инлайн-поле прямо на странице.
   const [botNick, setBotNick] = useState<string | null>(null);
   const [answerOpen, setAnswerOpen] = useState(false);

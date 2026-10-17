@@ -30,6 +30,7 @@ interface OverheardItem {
   place: string;
   tag?: string; // rumor | observation | message
   authorId: string;
+  originalAuthorId?: string | null;
   authorName: string;
   authorGender?: string | null;
   editedAt: string | null;
@@ -116,7 +117,7 @@ function OverheardRow(props: {
   const { item, user } = props;
   // 2026-10-15: админ видит кнопки управления на ВСЕХ карточках
   const isAdminRole = user?.role === "owner" || user?.role === "admin" || user?.role === "moderator";
-  const own = !!(user && (item.authorId === user.id || isAdminRole));
+  const own = !!(user && (item.authorId === user.id || item.originalAuthorId === user.id || isAdminRole));
   return (
     <article className={`oh-item${props.highlight ? " oh-highlight" : ""}`} data-oh-id={item.id}>
       {item.tag && item.tag !== "message" && (

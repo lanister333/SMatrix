@@ -328,6 +328,7 @@ export async function POST(req: NextRequest) {
         place,
         authorId: autoBot ? autoBot.id : user.id,
         authorName: autoBot ? autoBot.nickname : user.nickname,
+        originalAuthorId: user.id,
         aiStatus: outcome.action === "hide" ? "hidden" : outcome.action === "human" ? "human" : "ok",
         aiNote: outcome.aiNote ?? "",
         isHiddenByAi: outcome.action === "hide",

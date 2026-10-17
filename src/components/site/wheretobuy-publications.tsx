@@ -42,6 +42,7 @@ interface WhereToBuyItem {
   place: string;
   status: string; // seeking | found | irrelevant
   authorId: string;
+  originalAuthorId?: string | null;
   authorName: string;
   authorGender?: string | null;
   editedAt: string | null;
@@ -190,7 +191,7 @@ function WhereToBuyRow(props: {
   const { item, user } = props;
   // 2026-10-15: админ/модератор видит кнопки управления на ВСЕХ карточках
   const isAdminRole = user?.role === "owner" || user?.role === "admin" || user?.role === "moderator";
-  const own = !!(user && (item.authorId === user.id || isAdminRole));
+  const own = !!(user && (item.authorId === user.id || item.originalAuthorId === user.id || isAdminRole));
   // ТЗ часть 3: кнопка «📍 Ответить на запрос» → инлайн-поле прямо на странице.
   const [answerOpen, setAnswerOpen] = useState(false);
   const [answerText, setAnswerText] = useState("");

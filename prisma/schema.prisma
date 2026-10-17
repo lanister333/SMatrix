@@ -419,6 +419,8 @@ model HelpPublication {
   status       String          @default("active")
   authorId     String
   authorName   String
+  /// 2026-10-17: реальный автор (до подмены на бота) — для управления объявлением
+  originalAuthorId String?
   author       User?    @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   /// 2026-10-01: ссылка на тему форума (0..1, уникально — максимум одна
   /// тема на публикацию; ни повторные нажатия, ни обновление страницы,
@@ -474,6 +476,8 @@ model OverheardPost {
   tag          String   @default("message") // rumor | observation | message
   authorId     String
   authorName   String
+  /// 2026-10-17: real author before bot substitution
+  originalAuthorId String?
   author       User?    @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   topicId      Int?     @unique
   topic        Topic?   @relation(fields: [topicId], references: [id])
@@ -700,6 +704,8 @@ model GkhUpdate {
   authorId     String
   author       User?      @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   authorName   String
+  /// 2026-10-17: real author before bot substitution
+  originalAuthorId String?
   text         String
   aiStatus     String     @default("ok")
   aiNote       String     @default("")
@@ -790,6 +796,8 @@ model DatingPost {
   status       String        @default("actual") // actual «Актуально» | stale «Неактуально»
   statusAt     DateTime      @default(now()) // время последней смены статуса (стабильная сортировка)
   authorId     String
+  /// 2026-10-17: real author before bot substitution
+  originalAuthorId String?
   author       User?    @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   /// Автор известен системе, ИИ-модерации и администратору (ТЗ);
   /// публично ник/имя/пол/аватар/профиль не показываются НИКОГДА.
@@ -843,6 +851,8 @@ model CheapPost {
   /// Аккаунт может быть удалён — публикация остаётся.
   author       User?    @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   authorName   String
+  /// 2026-10-17: real author before bot substitution
+  originalAuthorId String?
   topicId      Int?     @unique
   topic        Topic?   @relation(fields: [topicId], references: [id])
   aiStatus     String   @default("ok") // ok | hidden | human
@@ -1094,9 +1104,13 @@ model AdListing {
   status       String   @default("active") // active «Актуально» | closed «Снято с публикации»
   statusAt     DateTime @default(now())
   authorId     String
+  /// 2026-10-17: real author before bot substitution
+  originalAuthorId String?
   /// Аккаунт может быть удалён — объявление остаётся.
   author       User?    @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   authorName   String
+  /// 2026-10-17: real author before bot substitution
+  originalAuthorId String?
   aiStatus     String   @default("ok") // ok | hidden | human
   aiNote       String   @default("")
   hiddenReason String   @default("")

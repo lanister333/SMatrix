@@ -24,6 +24,7 @@ interface HelpItem {
   contactData: string;
   status: string; // active | resolved | irrelevant
   authorId: string;
+  originalAuthorId?: string | null;
   authorName: string;
   editedAt: string | null;
   createdAt: string;
@@ -119,7 +120,7 @@ function HelpCard(props: {
   const { item, user } = props;
   // 2026-10-15: админ видит кнопки управления на ВСЕХ карточках
   const isAdminRole = user?.role === "owner" || user?.role === "admin" || user?.role === "moderator";
-  const own = !!(user && (item.authorId === user.id || isAdminRole));
+  const own = !!(user && (item.authorId === user.id || item.originalAuthorId === user.id || isAdminRole));
   const closed = item.status !== "active";
 
   return (
