@@ -2321,7 +2321,7 @@ export default function HomeCenter(props: {
               <GkhRotator onOpen={() => { window.location.href = c.href; }} />
             ) : c.title === "О работодателях" ? (
               <EmployersRotator onOpen={() => { window.location.href = c.href; }} />
-            ) : c.title === "Где купить" ? (
+            ) : c.title === "Где купить / где заказать" ? (
               <WhereToBuyRotator onOpen={() => { window.location.href = c.href; }} />
             ) : c.title === "Где дешевле" ? (
               <WhereCheaperRotator onOpen={() => { window.location.href = c.href; }} />

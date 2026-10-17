@@ -985,7 +985,7 @@ export function GdedeshevlePage(props: {
               {/* 28.09.2026: H1 «Где дешевле» прижат к левому краю,
                   nav + кнопка «Задать вопрос» — к правому. Группировка
                   через .cd-head-right + justify-content: space-between. */}
-                            <div className="cd-head-right" style={{ gap: "2px", justifyContent: "flex-start" }}>
+                            <div className="cd-head-right" style={{ gap: "12px", justifyContent: "flex-start", flexWrap: "wrap" }}>
                 <div className="cd-nav-inline">
                   <button className={activeNav === "latest" ? "active" : ""} onClick={() => mineTab("all", "latest")}>
                     Последние вопросы
