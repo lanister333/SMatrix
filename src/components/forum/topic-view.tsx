@@ -254,17 +254,24 @@ function MessageRow(props: {
             в sk-msg-body (в начало), чтобы head был в одну строку:
             #N, ник, дата, spacer, Пожаловаться, Не по делу, Ответить. */}
         <div className="sk-msg-actions">
-        {/* ШАГ 10: жалоба на сообщение — модальное окно с 7 причинами */}
-        <button className="sk-flood-btn" onClick={props.onComplain} title="Жалоба уходит модератору; спорные случаи рассмотрит человек">
-          Пожаловаться
-        </button>
-        {/* 2026-10-01: кнопка «Не по делу» — быстрая жалоба без модалки.
-            Гостю показывается, но требует авторизации (onNeedAuth в
-            родителе). Залогиненый клик → POST /api/messages/<id>/complaint
-            с category="other" + comment="Не по делу…" → уведомление. */}
-        <button className="sk-flood-btn" onClick={props.onOfftopic} title="Быстрая жалоба: сообщение не по теме обсуждения">
-          Не по делу
-        </button>
+        {/* 2026-10-17: «Пожаловаться» и «Не по делу» видны только НЕ автору
+            сообщения (автор не может жаловаться на свой пост). Админ видит —
+            он может пожаловаться как обычный пользователь. */}
+        {!own && (
+          <>
+            {/* ШАГ 10: жалоба на сообщение — модальное окно с 7 причинами */}
+            <button className="sk-flood-btn" onClick={props.onComplain} title="Жалоба уходит модератору; спорные случаи рассмотрит человек">
+              Пожаловаться
+            </button>
+            {/* 2026-10-01: кнопка «Не по делу» — быстрая жалоба без модалки.
+                Гостю показывается, но требует авторизации (onNeedAuth в
+                родителе). Залогиненый клик → POST /api/messages/<id>/complaint
+                с category="other" + comment="Не по делу…" → уведомление. */}
+            <button className="sk-flood-btn" onClick={props.onOfftopic} title="Быстрая жалоба: сообщение не по теме обсуждения">
+              Не по делу
+            </button>
+          </>
+        )}
         {own && (
           <button className="sk-flood-btn" onClick={props.onEdit}>
             Редактировать

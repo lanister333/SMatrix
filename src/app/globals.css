@@ -1135,7 +1135,8 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 @media (max-width:900px){
   /* Мобильная версия: левая колонка → центральная → правая, одна вертикальная последовательность.
      Мобильный padding .help-item-card убран — 20px из CSS заказчика действуют на всех ширинах. */
-  .hp-layout{padding:0 10px;display:block}
+  /* 2026-10-17: padding 10px → 4px — выровнять с другими разделами. */
+  .hp-layout{padding:0 4px;display:block}
   .hp-sideblock{margin-bottom:10px}
 }
 
@@ -4513,7 +4514,8 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
   /* 2026-10-01: кнопки и текст шапки — очень компактные, чтобы все
      влезли в одну строку на 375px: font 9-10px, padding минимален. */
   .sk-msg-num{font-size:10px !important;flex-shrink:0}
-  .sk-msg-author{font-size:11px !important;max-width:60px !important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:1}
+  /* 2026-10-17: ник больше не урезается — показывается полностью. */
+  .sk-msg-author{font-size:11px !important;flex-shrink:1;white-space:nowrap}
   .sk-msg-time{font-size:9px !important;flex-shrink:0}
   .sk-msg-actions{flex-shrink:0 !important}
   /* 2026-10-17 msg-actions-wrap-2026-10-17: на мобильных кнопки
@@ -4521,34 +4523,34 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
      не помещаются в одну строку — выносим .sk-msg-actions на отдельную
      строку под мета-инфой (.sk-msg-head), даём ей полную ширину родителя
      (.sk-msg) и flex-wrap:wrap — кнопки переносятся. */
-  .sk-msg-head{flex-wrap:wrap !important;overflow-x:visible !important}
+  .sk-msg-head{flex-wrap:wrap !important;overflow:visible !important;overflow-x:visible !important;padding-left:0 !important;padding-right:0 !important}
   .sk-msg-actions{
     flex-basis:auto !important;
-    /* 2026-10-17: растянуть actions на всю ширину карточки сообщения.
-       .sk-msg-head имеет padding 7px L/R (content = 246px), но .sakh-comment
-       (карточка) имеет padding 10+9px L/R. Чтобы actions заняла всю видимую
-       ширину карточки, используем calc(100% + 14px) для компенсации padding
-       родителя + negative margin. */
-    width:calc(100% + 34px) !important;
+    /* 2026-10-17: padding убран у .sk-msg-head — negative margin больше не нужен. */
+    width:100% !important;
     flex-wrap:wrap !important;
     overflow-x:visible !important;
     margin-top:4px !important;
-    margin-left:-17px !important;
-    margin-right:-17px !important;
+    margin-left:0 !important;
+    margin-right:0 !important;
   }
   .sk-msg-actions > *{flex-shrink:0;white-space:nowrap}
-  .sk-msg-actions .sk-flood-btn{font-size:9px !important;padding:0 !important}
-  .sk-msg-actions .sk-btn-answer{font-size:9px !important;padding:1px 4px !important}
+  /* 2026-10-17: padding-left:0 — текст кнопок выровнен с текстом сообщения. */
+  .sk-msg-actions .sk-flood-btn{font-size:11px !important;padding:2px 4px 2px 0 !important}
+  .sk-msg-actions .sk-btn-answer{font-size:11px !important;padding:2px 4px 2px 0 !important}
+  /* 2026-10-17: на мобильных убрать margin-left:6px у «Ответить»,
+     чтобы при переносе на новую строку она была выровнена с другими кнопками. */
+  .sk-msg .sk-btn-answer-in-msg{margin-left:0 !important}
 
   /* 2) Верхняя цепочка: № сообщения, ник, дата — одной строкой; ник
      усечивается многоточием, чтобы цепочка не ломалась на длинных никах */
   .sk-msg-num{order:1;padding:0;font-size:11px}
-  .sk-msg-author{order:2;font-size:13px;max-width:30%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sk-msg-author{order:2;font-size:13px;white-space:nowrap}
   .sk-msg-time{order:3;font-size:11px}
   .sk-msg-new{order:4}
   .sk-ai-badge{order:6}
   .sk-msg-spacer{display:block !important; flex:1 !important; order:5} /* распорка — прижать кнопки вправо */
-  .sk-msg-actions{order:6 !important; width:calc(100% + 34px) !important; margin-left:-17px !important; margin-right:-17px !important}
+  .sk-msg-actions{order:6 !important; width:100% !important; margin-left:0 !important; margin-right:0 !important}
 
   /* 3) Кнопка «Ответить» внутри сообщения — compact-стиль по ТЗ:
      шрифт 12px, padding 3px 8px (вдвое ниже исходной 8px 13px/13px) */
