@@ -116,11 +116,18 @@ export async function GET(req: NextRequest) {
         ? await db.topic.findMany({ where: { id: { in: topicIds } }, select: { id: true, isClosed: true, isArchived: true, deletedAt: true } })
         : [];
       const tmap = new Map(topics.map((t) => [t.id, t]));
+      // 2026-10-17: «Обсуждается на форуме» = есть хотя бы один ответ (num > 1, не удалён).
+      // msg#1 — это тело публикации, его не считаем ответом.
+      const answerCounts = topicIds.length
+        ? await db.message.groupBy({ by: ["topicId"], where: { topicId: { in: topicIds }, num: { gt: 1 }, isDeleted: false }, _count: { _all: true } })
+        : [];
+      const acMap = new Map(answerCounts.map((a) => [a.topicId, a._count._all]));
       // В «Моих публикациях» автор видит и скрытые ИИ — с объяснением причины.
       return NextResponse.json({
         posts: rows.map((r) => ({
           ...publicShape(r),
           topicState: r.topicId ? topicStateOf(tmap.get(r.topicId) ?? null) : "none",
+          topicAnswers: r.topicId ? (acMap.get(r.topicId) ?? 0) : 0,
           isHiddenByAi: r.isHiddenByAi,
           hiddenReason: r.hiddenReason,
           needHuman: r.needHuman,
@@ -147,11 +154,18 @@ export async function GET(req: NextRequest) {
       ? await db.topic.findMany({ where: { id: { in: topicIds } }, select: { id: true, isClosed: true, isArchived: true, deletedAt: true } })
       : [];
     const tmap = new Map(topics.map((t) => [t.id, t]));
+      // 2026-10-17: «Обсуждается на форуме» = есть хотя бы один ответ (num > 1, не удалён).
+      // msg#1 — это тело публикации, его не считаем ответом.
+      const answerCounts = topicIds.length
+        ? await db.message.groupBy({ by: ["topicId"], where: { topicId: { in: topicIds }, num: { gt: 1 }, isDeleted: false }, _count: { _all: true } })
+        : [];
+      const acMap = new Map(answerCounts.map((a) => [a.topicId, a._count._all]));
 
     return NextResponse.json({
       posts: pageRows.map((r) => ({
         ...publicShape(r),
         topicState: r.topicId ? topicStateOf(tmap.get(r.topicId) ?? null) : "none",
+          topicAnswers: r.topicId ? (acMap.get(r.topicId) ?? 0) : 0,
       })),
       total,
       page,

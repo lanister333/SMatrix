@@ -49,6 +49,7 @@ interface WhereToBuyItem {
   createdAt: string;
   topicId: number | null;
   topicState?: string; // none | open | closed | archived
+  topicAnswers?: number; // 2026-10-17: число ответов в теме (num > 1)
   isHiddenByAi?: boolean;
   hiddenReason?: string;
   needHuman?: boolean;
@@ -144,6 +145,21 @@ const FALLBACK_TRANSFER_TOPIC_ID = 177;
  * цветом класса и всплывающей подсказкой, надпись — всегда по ТЗ.
  */
 const FORUM_BUTTON_LABEL = "💬 Обсудить на форуме";
+/** 2026-10-17: динамическая подпись кнопки форума.
+ *  «Обсуждается» = есть хотя бы один ответ в теме (num > 1, не удалён).
+ *  В остальных случаях (темы нет / есть тема, но 0 ответов) — «Обсудить на форуме». */
+function forumButtonLabel(state: string | undefined, hasAnswers: boolean): string {
+  switch (state) {
+    case "open":
+      return hasAnswers ? "💬 Обсуждается на форуме" : "💬 Обсудить на форуме";
+    case "closed":
+      return "💬 Тема закрыта";
+    case "archived":
+      return "💬 Тема в архиве";
+    default:
+      return "💬 Обсудить на форуме";
+  }
+}
 
 function forumButtonTitle(state: string | undefined): string {
   switch (state) {
@@ -388,7 +404,7 @@ function WhereToBuyRow(props: {
             onClick={() => props.onDiscuss(item)}
             title={forumButtonTitle(item.topicId ? item.topicState : "none")}
           >
-            {FORUM_BUTTON_LABEL}
+            {forumButtonLabel(item.topicId ? item.topicState ?? "open" : "none", (item.topicAnswers ?? 0) >= 1)}
           </button>
         </div>
       </div>

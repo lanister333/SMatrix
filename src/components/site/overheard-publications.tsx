@@ -37,6 +37,7 @@ interface OverheardItem {
   createdAt: string;
   topicId: number | null;
   topicState?: string; // none | open | closed | archived
+  topicAnswers?: number; // 2026-10-17: число ответов в теме (num > 1)
   isHiddenByAi?: boolean;
   hiddenReason?: string;
   needHuman?: boolean;
@@ -87,10 +88,11 @@ const OVERHEARD_RULES = [
 ];
 
 /** Состояния кнопки форума (ТЗ п.5): одинаковый размер и форма для всех. */
-function forumButtonLabel(state: string | undefined): string {
+function forumButtonLabel(state: string | undefined, hasAnswers: boolean): string {
   switch (state) {
     case "open":
-      return "Обсуждается на форуме";
+      // 2026-10-17: «Обсуждается» = есть хотя бы один ответ в теме.
+      return hasAnswers ? "Обсуждается на форуме" : "Обсудить на форуме";
     case "closed":
       return "Тема закрыта";
     case "archived":
@@ -179,11 +181,11 @@ function OverheardRow(props: {
             onClick={() => props.onDiscuss(item)}
             title="Открыть тему обсуждения на форуме"
           >
-            {forumButtonLabel(item.topicState)}
+            {forumButtonLabel(item.topicState, (item.topicAnswers ?? 0) >= 1)}
           </button>
         ) : (
           <button className="oh-btn-forum is-none" disabled={props.busy} onClick={() => props.onDiscuss(item)}>
-            {forumButtonLabel(item.topicState)}
+            {forumButtonLabel(item.topicState, (item.topicAnswers ?? 0) >= 1)}
           </button>
         )}
       </div>

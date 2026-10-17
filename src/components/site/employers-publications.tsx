@@ -55,6 +55,7 @@ interface EmpItem {
   createdAt: string;
   topicId: number | null;
   topicState?: string; // none | open | closed | archived
+  topicAnswers?: number; // 2026-10-17: число ответов в теме (num > 1)
   isHiddenByAi?: boolean;
   hiddenReason?: string;
   needHuman?: boolean;
@@ -93,10 +94,11 @@ function fmtDay(v: string): string {
 
 /** Состояния кнопки форума: одинаковый размер и форма для всех (единая
  *  логика ТЗ 2026-09-23 «Кнопки „Обсудить на форуме"»). */
-function forumButtonLabel(state: string | undefined): string {
+function forumButtonLabel(state: string | undefined, hasAnswers: boolean): string {
   switch (state) {
     case "open":
-      return "💬 Обсуждается на форуме";
+      // 2026-10-17: «Обсуждается» = есть хотя бы один ответ в теме.
+      return hasAnswers ? "💬 Обсуждается на форуме" : "💬 Обсудить на форуме";
     case "closed":
       return "💬 Тема закрыта";
     case "archived":
@@ -625,7 +627,7 @@ export function EmployersPage(props: {
                       onClick={() => discussOnForum("employers", it.id, props.token, props.onNeedAuth)}
                       title="Создать тему обсуждения в рубрике «Карьера, бизнес ▸ Работодатели»"
                     >
-                      {forumButtonLabel(it.topicId ? it.topicState : "none")}
+                      {forumButtonLabel(it.topicId ? it.topicState : "none", (it.topicAnswers ?? 0) >= 1)}
                     </button>
                     {/* 2026-10-16: Admin delete button */}
                     {(props.user?.role === "owner" || props.user?.role === "admin" || props.user?.role === "moderator" || props.user?.id === it.authorId || props.user?.id === it.originalAuthorId) && (

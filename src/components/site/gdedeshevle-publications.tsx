@@ -48,6 +48,7 @@ interface CheapItem {
   createdAt: string;
   topicId: number | null;
   topicState?: string; // none | open | closed | archived
+  topicAnswers?: number; // 2026-10-17: число ответов в теме (num > 1)
   isHiddenByAi?: boolean;
   hiddenReason?: string;
   needHuman?: boolean;
@@ -140,6 +141,20 @@ const FALLBACK_TRANSFER_TOPIC_ID = 178;
  * надпись кнопки форума — всегда по ТЗ (состояние темы — цветом/подсказкой).
  */
 const FORUM_BUTTON_LABEL = "💬 Обсудить на форуме";
+/** 2026-10-17: динамическая подпись кнопки форума.
+ *  «Обсуждается» = есть хотя бы один ответ в теме. */
+function forumButtonLabel(state: string | undefined, hasAnswers: boolean): string {
+  switch (state) {
+    case "open":
+      return hasAnswers ? "💬 Обсуждается на форуме" : "💬 Обсудить на форуме";
+    case "closed":
+      return "💬 Тема закрыта";
+    case "archived":
+      return "💬 Тема в архиве";
+    default:
+      return "💬 Обсудить на форуме";
+  }
+}
 
 function forumButtonTitle(state: string | undefined): string {
   switch (state) {
@@ -348,12 +363,12 @@ function CheapRow(props: {
         {!own && (
           <div className="cd-row cd-row-actions-other">
             <button className="cd-act cd-answerbtn" disabled={props.busy || answerBusy} onClick={toggleAnswer}>{ANSWER_BUTTON_LABEL}</button>
-            <button className={`cd-act cd-btn-forum is-${item.topicId ? item.topicState ?? "open" : "none"}`} disabled={props.busy} onClick={() => props.onDiscuss(item)} title={forumButtonTitle(item.topicId ? item.topicState : "none")}>{FORUM_BUTTON_LABEL}</button>
+            <button className={`cd-act cd-btn-forum is-${item.topicId ? item.topicState ?? "open" : "none"}`} disabled={props.busy} onClick={() => props.onDiscuss(item)} title={forumButtonTitle(item.topicId ? item.topicState : "none")}>{forumButtonLabel(item.topicId ? item.topicState ?? "open" : "none", (item.topicAnswers ?? 0) >= 1)}</button>
           </div>
         )}
         {own && (
           <div className="cd-row cd-row-4">
-            <button className={`cd-act cd-btn-forum is-${item.topicId ? item.topicState ?? "open" : "none"}`} disabled={props.busy} onClick={() => props.onDiscuss(item)} title={forumButtonTitle(item.topicId ? item.topicState : "none")}>{FORUM_BUTTON_LABEL}</button>
+            <button className={`cd-act cd-btn-forum is-${item.topicId ? item.topicState ?? "open" : "none"}`} disabled={props.busy} onClick={() => props.onDiscuss(item)} title={forumButtonTitle(item.topicId ? item.topicState : "none")}>{forumButtonLabel(item.topicId ? item.topicState ?? "open" : "none", (item.topicAnswers ?? 0) >= 1)}</button>
           </div>
         )}
       </div>

@@ -29,7 +29,7 @@
  *  (или «Аноним») · 📅 дата; строка «⚠️ Текущий статус: …» (В поиске решения /
  *  Передано в УК / Решено / Отклонено); «Проблема: …» (суть без лозунгов);
  *  «Действия: …» (куда звонили/писали, номер заявки, статус); кнопка
- *  «💬 Обсудить на форуме ЖКХ» → рубрика «Недвижимость ▸ ЖКХ и управляющие
+ *  «{forumButtonLabel(it.topicId ? it.topicState ?? "open" : "none", (it.topicAnswers ?? 0) >= 1)}» → рубрика «Недвижимость ▸ ЖКХ и управляющие
  *  компании» (/?rubric=…, относительный путь, никаких localhost).
  *  Без аватаров.
  *  ФОРМА ДОБАВЛЕНИЯ — 3 ОБЯЗАТЕЛЬНЫХ ШАГА (вместо одного поля «Напишите,
@@ -98,6 +98,7 @@ interface GkfItem {
   /** Привязка к теме форума (если уже создана). */
   topicId?: number | null;
   topicState?: string; // none | open | closed | archived
+  topicAnswers?: number; // 2026-10-17: число ответов в теме (num > 1)
   editedAt?: string | null;
 }
 
@@ -111,6 +112,22 @@ function fmtDay(v: string): string {
 }
 
 /** ДОСЛОВНЫЕ тексты ТЗ №2 (левая колонка, гость, ИИ-фильтр). */
+/** 2026-10-17: динамическая подпись кнопки форума для ЖКХ.
+ *  «Обсуждается на форуме ЖКХ» = есть хотя бы один ответ в теме. */
+function forumButtonLabel(state: string | undefined, hasAnswers: boolean): string {
+  const suffix = " ЖКХ";
+  switch (state) {
+    case "open":
+      return (hasAnswers ? "💬 Обсуждается на форуме" : "💬 Обсудить на форуме") + suffix;
+    case "closed":
+      return "💬 Тема закрыта" + suffix;
+    case "archived":
+      return "💬 Тема в архиве" + suffix;
+    default:
+      return "💬 Обсудить на форуме" + suffix;
+  }
+}
+
 const GKF_ACCESS_NOTE =
   "Оставлять сигналы о городских и коммунальных проблемах могут только зарегистрированные жители. Город видит каждый адрес";
 const GKF_GUEST_HINT =
@@ -238,6 +255,7 @@ export function GkhPage(props: {
           orgResponseByName: x.orgResponseByName ? String(x.orgResponseByName) : undefined,
           topicId: x.topicId != null ? Number(x.topicId) : null,
           topicState: x.topicState ? String(x.topicState) : undefined,
+          topicAnswers: x.topicAnswers != null ? Number(x.topicAnswers) : 0,
           editedAt: x.editedAt ? String(x.editedAt) : null,
         }));
         setItems(rows);
@@ -708,7 +726,7 @@ export function GkhPage(props: {
                       onClick={() => discussOnForum("gkh", it.id, props.token, props.onNeedAuth)}
                       title="Создать тему обсуждения в рубрике «ЖКХ и управляющие компании»"
                     >
-                      💬 Обсудить на форуме ЖКХ
+                      {forumButtonLabel(it.topicId ? it.topicState ?? "open" : "none", (it.topicAnswers ?? 0) >= 1)}
                     </button>
 
                     {(props.user?.role === "owner" || props.user?.role === "admin" || props.user?.role === "moderator" || props.user?.id === it.authorId || props.user?.id === it.originalAuthorId) && (

@@ -517,6 +517,7 @@ export default function TopicView(props: {
   const seenRef = useRef<number | null>(null);
   const [pages, setPages] = useState(1);
   const [curPage, setCurPage] = useState(() => (props.jumpMsg ? Math.max(1, Math.ceil(props.jumpMsg / 35)) : 1));
+  const [botNick, setBotNick] = useState<string | null>(null);
 
   const load = useCallback(() => {
     const id = ++loadId.current;
@@ -824,7 +825,6 @@ export default function TopicView(props: {
   const canWrite = !topic.isArchived && !topic.isClosed;
   // ШАГ 12: модераторские кнопки доступны всем сотрудникам (владелец/модератор)
   const isAdmin = props.user?.role === "admin" || props.user?.role === "owner" || props.user?.role === "moderator";
-  const [botNick, setBotNick] = useState<string | null>(null);
   const isOwner = !!(props.user && topic.author && topic.author === props.user.nickname);
   const searchingInTopic = inTopicSearch && !!topicQ.trim();
   const visible = searchingInTopic
