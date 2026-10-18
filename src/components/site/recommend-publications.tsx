@@ -1365,27 +1365,7 @@ export function RecommendPage(props: {
                 удалена (была чёрной #1a1a1a — дубликат названия раздела). */}
             <div className="rc-head-bar">
               <div className="rc-head-right">
-                <div className="status-tabs rc-nav-inline">
-                  {/* 2026-10-18: Вкладки-маркеры в стиле картотеки */}
-                  <button
-                    className={"status-tab tab-all" + (stanceFilter === "all" ? " is-active" : "")}
-                    onClick={() => { setStanceFilter("all"); }}
-                  >
-                    <span className="status-tab-label">Все</span>
-                  </button>
-                  <button
-                    className={"status-tab tab-recommend" + (stanceFilter === "recommend" ? " is-active" : "")}
-                    onClick={() => { setStanceFilter("recommend"); setPage(1); }}
-                  >
-                    <span className="status-tab-label">👍 Рекомендую</span>
-                  </button>
-                  <button
-                    className={"status-tab tab-notrecommend" + (stanceFilter === "notrecommend" ? " is-active" : "")}
-                    onClick={() => { setStanceFilter("notrecommend"); setPage(1); }}
-                  >
-                    <span className="status-tab-label">👎 Не рекомендую</span>
-                  </button>
-                  <span className="rc-stance-separator" />
+                <div className="rc-nav-inline">
                   <button className={activeNav === "latest" ? "active" : ""} onClick={() => mineTab("all", "latest")}>
                     Последние публикации
                   </button>
@@ -1421,6 +1401,27 @@ export function RecommendPage(props: {
                   Сбросить
                 </button>
               )}
+            </div>
+            {/* 2026-10-18: вкладки-маркеры — ПОД поисковым окном, в стиле картотеки */}
+            <div className="status-tabs rc-nav-inline">
+              <button
+                className={"status-tab tab-all" + (stanceFilter === "all" ? " is-active" : "")}
+                onClick={() => { setStanceFilter("all"); }}
+              >
+                <span className="status-tab-label">Все</span>
+              </button>
+              <button
+                className={"status-tab tab-recommend" + (stanceFilter === "recommend" ? " is-active" : "")}
+                onClick={() => { setStanceFilter("recommend"); setPage(1); }}
+              >
+                <span className="status-tab-label">👍 Рекомендую</span>
+              </button>
+              <button
+                className={"status-tab tab-notrecommend" + (stanceFilter === "notrecommend" ? " is-active" : "")}
+                onClick={() => { setStanceFilter("notrecommend"); setPage(1); }}
+              >
+                <span className="status-tab-label">👎 Не рекомендую</span>
+              </button>
             </div>
           </div>
 
