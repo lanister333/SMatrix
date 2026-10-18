@@ -204,6 +204,8 @@ export function GkhPage(props: {
   const [formDate, setFormDate] = useState("");
   const [formActions, setFormActions] = useState("");
   const [busy, setBusy] = useState(false);
+  // 2026-10-18: вкладки-маркеры по статусам (картотека).
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [err, setErr] = useState("");
   const [note, setNote] = useState("");
   const [highlightId, setHighlightId] = useState<string | null>(null);
@@ -626,9 +628,42 @@ export function GkhPage(props: {
           </div>
         )}
 
+        {/* 2026-10-18: вкладки-маркеры по статусам (картотека). */}
+        {items !== null && (
+          <div className="gkf-status-tabs">
+            <button
+              className={`gkf-tab gkf-tab-all${statusFilter === "all" ? " is-active" : ""}`}
+              onClick={() => setStatusFilter("all")}
+            >
+              <span className="gkf-tab-label">Все</span>
+              <span className="gkf-tab-count">{items.length}</span>
+            </button>
+            {(["active", "in_progress", "solved", "rejected"] as const).map((st) => {
+              const count = items.filter(it => (it.status ?? "active") === st).length;
+              if (count === 0) return null;
+              const labels: Record<string, string> = {
+                active: "Активные",
+                in_progress: "В работе",
+                solved: "Решено",
+                rejected: "Отклонено",
+              };
+              return (
+                <button
+                  key={st}
+                  className={`gkf-tab gkf-tab-${st}${statusFilter === st ? " is-active" : ""}`}
+                  onClick={() => setStatusFilter(st)}
+                >
+                  <span className="gkf-tab-label">{labels[st]}</span>
+                  <span className="gkf-tab-count">{count}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         {items !== null && list.length > 0 && (
           <div data-gkf-cards="1">
-            {list.map((it) => {
+            {list.filter(it => statusFilter === "all" || (it.status ?? "active") === statusFilter).map((it) => {
               const stLabel = GKH_STATUS_LABELS[it.status] ?? it.status;
               const stCls = GKF_STATUS_CLASS[it.status] ?? "gkf-status is-search";
               return (

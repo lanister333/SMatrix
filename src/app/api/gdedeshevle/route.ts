@@ -107,7 +107,7 @@ function matchesPlace(p: { place: string }, place: string): boolean {
 
 /** Состояние связанной темы форума для кнопки (ТЗ п.15). */
 export function topicStateOf(t: { isClosed: boolean; isArchived: boolean; deletedAt: Date | null } | null): string {
-  if (!t || t.deletedAt) return "archived"; // тема удалена — «Тема в архиве», к «Обсудить» не возвращаемся
+  if (!t || t.deletedAt) return "none"; // 2026-10-18: deleted topic → treat as no topic // тема удалена — «Тема в архиве», к «Обсудить» не возвращаемся
   if (t.isArchived) return "archived";
   if (t.isClosed) return "closed";
   return "open";
