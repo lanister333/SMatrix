@@ -10741,31 +10741,60 @@ article button[style*="color: #dc2626"] {
 }
 
 
-/* 2026-10-18: Вкладки-маркеры по статусам ЖКХ (картотека).
-   Цветные маркеры сверху, как папки в картотеке.
-   Активная вкладка выделена, остальные приглушены. */
-.gkf-status-tabs{display:flex;gap:2px;margin-bottom:8px;flex-wrap:wrap}
-.gkf-tab{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border:0;border-radius:3px 3px 0 0;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;color:#fff;background:#94a3b8;transition:background 0.15s ease,transform 0.1s ease;white-space:nowrap}
-.gkf-tab:hover{transform:translateY(-1px)}
-.gkf-tab.is-active{font-weight:700;box-shadow:0 -2px 6px rgba(0,0,0,0.1)}
-.gkf-tab-count{display:inline-block;min-width:16px;padding:0 4px;border-radius:8px;background:rgba(255,255,255,0.3);font-size:11px;text-align:center}
-/* Цвета маркеров по статусам */
+/* 2026-10-18: Вкладки-маркеры ЖКХ в стиле картотеки (filing cabinet).
+   Слитая полоса с выступающими цветными ярлыками-разделителями.
+   Активный ярлык приподнят, неактивные — приглушены.
+   Стиль: как алфавитные разделители в индексном ящике. */
+.gkf-status-tabs{
+  display:flex;gap:0;margin-bottom:0;flex-wrap:nowrap;
+  background:#e2e8f0;padding:4px 4px 0 4px;border-radius:4px 4px 0 0;
+  border:1px solid #cbd5e1;border-bottom:0;overflow:hidden;
+}
+.gkf-tab{
+  display:inline-flex;align-items:center;justify-content:center;gap:3px;
+  padding:6px 12px 8px 12px;border:0;border-radius:4px 4px 0 0;
+  cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;
+  color:#fff;background:#94a3b8;white-space:nowrap;
+  margin-right:1px;position:relative;
+  transition:padding 0.15s ease,opacity 0.15s ease;
+  clip-path:polygon(0 0,100% 0,100% 100%,4px 100%,0 calc(100% - 4px));
+}
+.gkf-tab:last-child{margin-right:0}
+.gkf-tab:hover{padding-top:8px}
+.gkf-tab.is-active{padding-top:10px;font-weight:700;opacity:1}
+.gkf-tab.is-active::after{
+  content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;
+  background:inherit;
+}
+.gkf-tab-count{
+  display:inline-block;min-width:14px;padding:0 3px;border-radius:8px;
+  background:rgba(255,255,255,0.3);font-size:10px;text-align:center;
+}
+/* Цвета разделителей */
 .gkf-tab-all{background:#1E3A5F}
-.gkf-tab-all.is-active{background:#1E3A5F}
 .gkf-tab-active{background:#f59e0b}
-.gkf-tab-active.is-active{background:#d97706}
 .gkf-tab-in_progress{background:#3b82f6}
-.gkf-tab-in_progress.is-active{background:#2563eb}
 .gkf-tab-solved{background:#16a34a}
-.gkf-tab-solved.is-active{background:#15803d}
 .gkf-tab-rejected{background:#dc2626}
-.gkf-tab-rejected.is-active{background:#b91c1c}
-/* Неактивные вкладки — приглушены */
-.gkf-tab:not(.is-active){opacity:0.55}
-.gkf-tab:not(.is-active):hover{opacity:0.8}
+/* Неактивные — приглушены */
+.gkf-tab:not(.is-active){opacity:0.5}
+.gkf-tab:not(.is-active):hover{opacity:0.75}
+/* Mobile compact */
 @media(max-width:768px){
-  .gkf-status-tabs{gap:1px}
-  .gkf-tab{padding:4px 8px;font-size:11px}
-  .gkf-tab-label{font-size:11px}
-  .gkf-tab-count{font-size:10px;min-width:14px}
+  .gkf-status-tabs{padding:3px 3px 0 3px}
+  .gkf-tab{padding:5px 8px 7px 8px;font-size:11px;gap:2px}
+  .gkf-tab.is-active{padding-top:8px}
+  .gkf-tab-label{font-size:10.5px}
+  .gkf-tab-count{font-size:9.5px;min-width:12px;padding:0 2px}
+}
+
+/* 2026-10-18: На странице темы форума (/forum/topic/*) на мобильных —
+   скрыть левую колонку «О форуме» и правую «Время/Правила»,
+   чтобы тема была видна сразу, без прокрутки через инфо-блоки.
+   Используем :has() — современный CSS parent selector. */
+@media (max-width: 768px) {
+  .main-grid-container:has([data-forum-topic-page]) .left-column,
+  .main-grid-container:has([data-forum-topic-page]) .right-column {
+    display: none !important;
+  }
 }

@@ -102,7 +102,7 @@ interface GkfItem {
   editedAt?: string | null;
 }
 
-const PAGE_SIZE = 15;
+const PAGE_SIZE = 100; // 2026-10-18: increase to show all statuses including rejected
 
 /** Дата «23.09.2026» — как в карточке ТЗ. */
 function fmtDay(v: string): string {

@@ -209,7 +209,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ kind: stri
 
     // Шаг 5: если уже есть topicId — возвращаем существующую тему (без дубликата).
     if (post.topicId != null) {
-      return NextResponse.json({ redirect: `/forum/topic/${post.topicId}` });
+      return NextResponse.json({ redirect: `/?view=forum&topic=${post.topicId}` });
     }
 
     // Шаг 6: формируем заголовок и текст темы.
@@ -282,7 +282,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ kind: stri
     });
 
     // Шаг 12: возвращаем URL для редиректа.
-    return NextResponse.json({ redirect: `/forum/topic/${topic.id}` });
+    return NextResponse.json({ redirect: `/?view=forum&topic=${topic.id}` });
   } catch (e) {
     return handleApiError(e);
   }
