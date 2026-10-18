@@ -508,6 +508,8 @@ function WhereToBuyFormModal(props: {
   const [err, setErr] = useState("");
   const [specHint, setSpecHint] = useState(""); // подсказка конкретности (ТЗ п.4)
   const [similar, setSimilar] = useState<SimilarPost[] | null>(null); // предупреждение о похожих (ТЗ п.7)
+  // 2026-10-18: тип вопроса — товар или услуга/специалист.
+  const [postType, setPostType] = useState<"product" | "service">("product");
 
   const clearWarnings = () => {
     setSpecHint("");
@@ -580,6 +582,17 @@ function WhereToBuyFormModal(props: {
               }}
               placeholder="Например: Где купить аккумулятор Bosch S5 AGM 70 Ah?"
             />
+            {/* 2026-10-18: тип вопроса — товар или услуга/специалист */}
+            <div className="wb-post-type" style={{ marginTop: 6, display: "flex", gap: 12, fontSize: 13 }}>
+              <label style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
+                <input type="radio" name="wb-post-type" checked={postType === "product"} onChange={() => setPostType("product")} />
+                📦 Товар
+              </label>
+              <label style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
+                <input type="radio" name="wb-post-type" checked={postType === "service"} onChange={() => setPostType("service")} />
+                🔧 Услуга / специалист
+              </label>
+            </div>
           </div>
           {specHint && (
             <div className="wb-spechint" role="alert">

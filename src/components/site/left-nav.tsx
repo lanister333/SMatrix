@@ -310,7 +310,7 @@ export default function ForumSideNav() {
           «Обсудить на форуме» теперь ВЫШЕ «Служебный раздел» (раньше была
           ниже) — по прямому указанию заказчика. Тот же блок стоит и в левой
           колонке Главной/форума (page.tsx). */}
-      <ForumDiscussCard />
+      {/* 2026-10-18: блок «Обсудить на форуме» убран — дублирует рубрики форума. */}
       {modAsk && (
         <div className="sk-sideblock">
           <div className="sk-blocktitle">

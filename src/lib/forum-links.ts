@@ -92,10 +92,10 @@ export const SECTION_FORUM: Record<string, SectionForumTarget> = {
     parentName: "Карьера, бизнес",
   },
   overheard: {
-    label: "Обсуждение сообщений из «Подслушано»",
+    label: "Городская жизнь ▸ Подслушано Сахалин",
     rubricSlug: "podslyshano-discuss",
-    rubricName: "Обсуждение сообщений из «Подслушано»",
-    parentName: "Обсуждения из блоков",
+    rubricName: "Подслушано Сахалин",
+    parentName: "Городская жизнь",
   },
 };
 

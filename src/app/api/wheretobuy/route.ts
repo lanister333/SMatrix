@@ -69,6 +69,7 @@ function publicShape(p: {
     title: p.title,
     text: p.text,
     place: p.place,
+    postType: p.postType,
     status: p.status,
     authorId: p.authorId,
     originalAuthorId: p.originalAuthorId,
@@ -247,6 +248,7 @@ export async function POST(req: NextRequest) {
     const title = String(body.title ?? "").trim();
     const text = String(body.text ?? body.body ?? "").trim();
     const place = String(body.place ?? "").trim().slice(0, 80);
+  const postType = body.postType === "service" ? "service" : "product"; // 2026-10-18
 
     if (title.length < 5 || title.length > 150) {
       return NextResponse.json(
@@ -342,6 +344,8 @@ export async function POST(req: NextRequest) {
         title,
         text,
         place,
+        postType,
+        postType,
         status: "seeking",
         authorId: finalAuthorId,
         authorName: finalAuthorName,

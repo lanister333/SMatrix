@@ -163,7 +163,13 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ kind: stri
     if (!sectionData) {
       return NextResponse.json({ error: "Карта рубрик не настроена" }, { status: 500 });
     }
-    const rubric = await db.rubric.findUnique({ where: { slug: sectionData.rubricSlug } });
+    // 2026-10-18: для wheretobuy — если postType === "service", используем рубрику
+    // «Услуги и специалисты» вместо «Где купить».
+    let rubricSlug = sectionData.rubricSlug;
+    if (kind === "wheretobuy" && (post as any).postType === "service") {
+      rubricSlug = SECTION_FORUM.help.rubricSlug; // "tovary-i-uslugi--uslugi-i-specialisty"
+    }
+    const rubric = await db.rubric.findUnique({ where: { slug: rubricSlug } });
     if (!rubric) {
       return NextResponse.json({ error: "Рубрика-назначение не найдена" }, { status: 500 });
     }
