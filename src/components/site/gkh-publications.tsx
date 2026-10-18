@@ -727,11 +727,12 @@ export function GkhPage(props: {
                       </div>
                     ) : null}
                     {/* 29.09.2026: «🏢 Ответ организации» — В ОДНОЙ строке с «💬 Обсудить на форуме» (оба справа). */}
-                    {props.user?.orgRep && props.user.id !== it.authorId && !it.orgResponseText && props.token ? (
+                    {!it.orgResponseText && (
                         <button
                           type="button"
                           className="gkf-btn-org-response"
                           onClick={async () => {
+                            if (!props.user || !props.token) { props.onNeedAuth(); return; }
                             const text = window.prompt("Введите официальный ответ организации:");
                             if (!text || text.trim().length < 10) { props.notify("Текст ответа: от 10 символов"); return; }
                             try {
@@ -751,7 +752,7 @@ export function GkhPage(props: {
                         >
                           🏢 Ответ организации
                         </button>
-                    ) : null}
+                    )}
                     {/* 29.09.2026: «💬 Обсудить на форуме» — ПОД ответом организации,
                         на отдельной строке. */}
                     <button

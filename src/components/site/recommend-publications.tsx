@@ -1365,27 +1365,25 @@ export function RecommendPage(props: {
                 удалена (была чёрной #1a1a1a — дубликат названия раздела). */}
             <div className="rc-head-bar">
               <div className="rc-head-right">
-                <div className="rc-nav-inline">
-                  {/* 2026-10-15: Вкладки Рекомендую / Не рекомендую */}
+                <div className="status-tabs rc-nav-inline">
+                  {/* 2026-10-18: Вкладки-маркеры в стиле картотеки */}
                   <button
-                    className={stanceFilter === "all" ? "active" : ""}
+                    className={"status-tab tab-all" + (stanceFilter === "all" ? " is-active" : "")}
                     onClick={() => { setStanceFilter("all"); }}
-                    style={{ marginRight: 6 }}
                   >
-                    Все
+                    <span className="status-tab-label">Все</span>
                   </button>
                   <button
-                    className={stanceFilter === "recommend" ? "active rc-stance-tab-rec" : "rc-stance-tab-rec"}
+                    className={"status-tab tab-recommend" + (stanceFilter === "recommend" ? " is-active" : "")}
                     onClick={() => { setStanceFilter("recommend"); setPage(1); }}
-                    style={{ marginRight: 6 }}
                   >
-                    👍 Рекомендую
+                    <span className="status-tab-label">👍 Рекомендую</span>
                   </button>
                   <button
-                    className={stanceFilter === "notrecommend" ? "active rc-stance-tab-norec" : "rc-stance-tab-norec"}
+                    className={"status-tab tab-notrecommend" + (stanceFilter === "notrecommend" ? " is-active" : "")}
                     onClick={() => { setStanceFilter("notrecommend"); setPage(1); }}
                   >
-                    👎 Не рекомендую
+                    <span className="status-tab-label">👎 Не рекомендую</span>
                   </button>
                   <span className="rc-stance-separator" />
                   <button className={activeNav === "latest" ? "active" : ""} onClick={() => mineTab("all", "latest")}>

@@ -120,6 +120,7 @@ export function EmployersPage(props: {
 }) {
   const [botNick, setBotNick] = useState<string | null>(null);
   const [items, setItems] = useState<EmpItem[] | null>(null);
+  const [stanceFilter, setStanceFilter] = useState<"all" | "recommend" | "notrecommend">("all");
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
@@ -623,9 +624,27 @@ export function EmployersPage(props: {
 
         {/* Лента карточек: изолированные белые карточки в тонкой светло-серой
             рамке, новые сверху (ТЗ Flat 2.0). */}
+        {/* 2026-10-18: вкладки-маркеры в стиле картотеки */}
+        {items !== null && (
+          <div className="status-tabs">
+            <button className={"status-tab tab-all" + (stanceFilter === "all" ? " is-active" : "")}
+              onClick={() => setStanceFilter("all")}>
+              <span className="status-tab-label">Все</span>
+            </button>
+            <button className={"status-tab tab-recommend" + (stanceFilter === "recommend" ? " is-active" : "")}
+              onClick={() => setStanceFilter("recommend")}>
+              <span className="status-tab-label">👍 Рекомендую</span>
+            </button>
+            <button className={"status-tab tab-notrecommend" + (stanceFilter === "notrecommend" ? " is-active" : "")}
+              onClick={() => setStanceFilter("notrecommend")}>
+              <span className="status-tab-label">👎 Не рекомендую</span>
+            </button>
+          </div>
+        )}
+
         {items !== null && list.length > 0 && (
           <div data-ep-cards="1">
-            {list.map((it) => {
+            {list.filter(it => stanceFilter === "all" || (it.stance ?? "recommend") === stanceFilter).map((it) => {
               const state = it.topicId ? it.topicState ?? "open" : "none";
               return (
                 <article key={it.id} className={`ep-card${it.stance === "recommend" ? " ep-positive" : it.stance === "notrecommend" ? " ep-negative" : ""}${highlightId === it.id ? " ep-highlight" : ""}`} data-ep-card={it.id}>

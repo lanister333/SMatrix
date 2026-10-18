@@ -10798,3 +10798,47 @@ article button[style*="color: #dc2626"] {
     display: none !important;
   }
 }
+
+/* 2026-10-18 status-tabs-universal: вкладки-маркеры для Рекомендую и Работодатели.
+   Тот же картотечный стиль, что .gkf-status-tabs на ЖКХ. */
+.status-tabs{
+  display:flex;gap:0;margin-bottom:0;flex-wrap:nowrap;
+  background:#e2e8f0;padding:4px 4px 0 4px;border-radius:4px 4px 0 0;
+  border:1px solid #cbd5e1;border-bottom:0;overflow:hidden;
+}
+.status-tab{
+  display:inline-flex !important;align-items:center !important;justify-content:center !important;gap:3px !important;
+  padding:6px 12px 8px 12px !important;border:0 !important;border-radius:4px 4px 0 0 !important;
+  cursor:pointer !important;font-family:inherit !important;font-size:12px !important;font-weight:600 !important;
+  color:#fff !important;background:#94a3b8 !important;white-space:nowrap !important;
+  margin-right:1px !important;position:relative !important;text-decoration:none !important;
+  transition:padding 0.15s ease,opacity 0.15s ease !important;
+  clip-path:polygon(0 0,100% 0,100% 100%,4px 100%,0 calc(100% - 4px)) !important;
+}
+.status-tab:last-child{margin-right:0}
+.status-tab:hover{padding-top:8px}
+.status-tab.is-active{padding-top:10px !important;font-weight:700 !important;opacity:1 !important}
+.status-tab.is-active::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:inherit}
+.status-tab-count{display:inline-block;min-width:14px;padding:0 3px;border-radius:8px;background:rgba(255,255,255,0.3);font-size:10px;text-align:center}
+.status-tab.tab-all{background:#1E3A5F !important}
+.status-tab.tab-recommend{background:#16a34a !important}
+.status-tab.tab-recommend.is-active{background:#15803d !important}
+.status-tab.tab-notrecommend{background:#dc2626 !important}
+.status-tab.tab-notrecommend.is-active{background:#b91c1c !important}
+.status-tab:not(.is-active){opacity:0.5}
+.status-tab:not(.is-active):hover{opacity:0.75}
+@media(max-width:768px){
+  .status-tabs{padding:3px 3px 0 3px}
+  .status-tab{padding:5px 8px 7px 8px !important;font-size:11px !important;gap:2px !important}
+  .status-tab.is-active{padding-top:8px}
+  .status-tab-label{font-size:10.5px}
+  .status-tab-count{font-size:9.5px;min-width:12px;padding:0 2px}
+}
+
+/* 2026-10-18: force consistent padding inside .rc-nav-inline */
+.rc-nav-inline.status-tabs .status-tab{padding:6px 12px 8px 12px !important}
+.rc-nav-inline.status-tabs .status-tab.is-active{padding-top:10px !important}
+@media(max-width:768px){
+  .rc-nav-inline.status-tabs .status-tab{padding:5px 8px 7px 8px !important}
+  .rc-nav-inline.status-tabs .status-tab.is-active{padding-top:8px !important}
+}
