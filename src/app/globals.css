@@ -10842,3 +10842,14 @@ article button[style*="color: #dc2626"] {
   .rc-nav-inline.status-tabs .status-tab{padding:5px 8px 7px 8px !important}
   .rc-nav-inline.status-tabs .status-tab.is-active{padding-top:8px !important}
 }
+
+/* 2026-10-18 flat-board-order: форма «Добавить объявление» — ПЕРЕД списком.
+   Используем CSS order (flexbox) для визуального переупорядочивания
+   без изменения JSX-структуры (что ломало билд). */
+[data-flat-board]{
+  display:flex;
+  flex-direction:column;
+}
+[data-flat-board] > [data-flat-form]{
+  order:-1 !important;
+}

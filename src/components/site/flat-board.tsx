@@ -234,10 +234,9 @@ export default function FlatBoard(props: FlatBoardProps) {
     } else {
       setFormOpen(true);
     }
-    // 2026-10-18: прокрутить страницу к форме (форма рендерится внизу секции).
     setTimeout(() => {
-      const form = document.querySelector('[data-flat-form]');
-      if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const el = document.querySelector('[data-flat-form]');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
   };
 
@@ -373,6 +372,169 @@ export default function FlatBoard(props: FlatBoardProps) {
             "Чтобы добавить объявление — войдите в аккаунт."}
         </div>
       )}
+      {/* Минималистичный заголовок блока (без панельной шапки — строгий флэт). */}
+      <h2
+        style={{
+          margin: "0 0 10px",
+          fontSize: 16,
+          fontWeight: 700,
+          color: "#1a1a1a",
+          fontFamily: "inherit",
+        }}
+      >
+        {props.heading}
+      </h2>
+
+      {/* Пункт 1 ТЗ: простые текстовые вкладки-кнопки. */}
+      <div data-flat-tabs="1" role="tablist" style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
+        {props.tabs.map((t) => (
+          <button
+            key={t.key}
+            role="tab"
+            aria-selected={tab === t.key}
+            data-flat-tab={t.key}
+            style={tabBtn(tab === t.key)}
+            onClick={() => setTab(t.key)}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Пункт 2 ТЗ: лента — белые карточки в тонкой светло-серой рамке:
+          только город, дата и текст пользователя с прямыми контактами. */}
+      <div data-flat-cards="1" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {items === null ? (
+          <div style={{ fontSize: 13.5, color: "#6b7280" }}>Загрузка…</div>
+        ) : items.length === 0 ? (
+          <div data-flat-empty="1" style={{ fontSize: 13.5, color: "#6b7280" }}>
+            {props.emptyText}
+          </div>
+        ) : (
+          items.map((it) => {
+            const dim = it.status !== "actual" && it.status !== "active";
+            return (
+              <article
+                key={it.id}
+                data-flat-card={it.id}
+                style={{
+                  background: "#fff",
+                  border: FLAT_BORDER,
+                  borderRadius: 0,
+                  padding: "10px 12px",
+                }}
+              >
+                <div style={{ display: "flex", gap: 10, alignItems: "baseline", flexWrap: "wrap" }}>
+                  <span
+                    data-flat-card-city={it.id}
+                    style={{ fontSize: 13.5, fontWeight: 700, color: "#1a1a1a" }}
+                  >
+                    {it.place}
+                  </span>
+                  {/* ТЗ 2026-09-23: ник автора БЕЗ аватара (гостям и авторам
+                      без ника — «Аноним»); сортировка ленты — новые сверху.
+                      2026-10-01: цвет ника — по полу (мужской/женский/нейтральный). */}
+                  <span
+                    data-flat-card-nick={it.id}
+                    style={{ fontSize: 12.5, fontWeight: 600 }}
+                    className={nickGenderClass(it.nick || "")}
+                  >
+                    {it.nick || "Аноним"}
+                  </span>
+                  <span
+                    data-flat-card-date={it.id}
+                    style={{ fontSize: 12.5, color: "#9ca3af", marginLeft: "auto" }}
+                  >
+                    {fmtDay(it.createdAt)}
+                  </span>
+                </div>
+                <div
+                  data-flat-card-text={it.id}
+                  style={{
+                    marginTop: 5,
+                    fontSize: 14,
+                    lineHeight: 1.5,
+                    whiteSpace: "pre-wrap",
+                    color: dim ? "#9ca3af" : "#1a1a1a",
+                    fontFamily: "inherit",
+                  }}
+                >
+                  {it.body}
+                </div>
+                {/* 2026-10-01: ТЗ — контакт обязателен. Показываем его
+                    отдельной выделенной зелёной строкой под текстом, чтобы
+                    покупатель сразу видел способ связи с автором.
+                    Контакты (телефон, @telegram, https, email) — ПОДСВЕЧЕНЫ
+                    СИНИМ и КЛИКАБЕЛЬНЫ: tel: → позвонить, t.me/ → Telegram,
+                    mailto: → почта, https:// → открыть в новой вкладке. */}
+                {it.contact && (
+                  <div
+                    data-flat-card-contact={it.id}
+                    style={{
+                      marginTop: 6,
+                      padding: "6px 9px",
+                      background: "#ecfdf5",
+                      border: "1px solid #6ee7b7",
+                      fontSize: 13,
+                      color: "#065f46",
+                      wordBreak: "break-word",
+                      overflowWrap: "anywhere",
+                    }}
+                  >
+                    <b style={{ color: "#047857" }}>📞 Связь:</b>{" "}
+                    {renderContacts(it.contact)}
+                  </div>
+                )}
+                {/* 2026-10-16: Admin delete button */}
+                {(props.user?.role === "owner" || props.user?.role === "admin" || props.user?.role === "moderator" || props.user?.id === it.authorId || props.user?.id === it.originalAuthorId) && (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!window.confirm("Удалить?")) return;
+                      try {
+                        const r = await fetch(`${props.apiPath}/${it.id}`, {
+                          method: "PATCH",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ token: props.token, action: "delete" }),
+                        });
+                        const d = await r.json();
+                        if (!r.ok) { props.notify(d.error || "Ошибка"); return; }
+                        props.notify("Удалено");
+                        props.onReload?.();
+                      } catch { props.notify("Сеть недоступна"); }
+                    }}
+                    style={{ cursor: "pointer", background: "none", border: "none", color: "#dc2626", padding: "4px 8px", fontFamily: "inherit", fontSize: "12px", fontWeight: 600, textDecoration: "underline", marginTop: 4 }}
+                  >
+                    Удалить
+                  </button>
+                )}
+              </article>
+            );
+          })
+        )}
+      </div>
+      {items !== null && page < pages && (
+        <button
+          data-flat-more="1"
+          style={{
+            marginTop: 10,
+            background: "#fff",
+            border: FLAT_BORDER,
+            borderRadius: 0,
+            padding: "7px 12px",
+            fontSize: 13,
+            cursor: "pointer",
+            color: "#1E3A5F",
+          }}
+          onClick={() => load({ page: page + 1, append: true })}
+        >
+          Показать ещё
+        </button>
+      )}
+
+      {/* 2026-10-03: дубликат кнопки «Добавить объявление» (был внизу) —
+          удалён, т.к. кнопка перенесена в верх секции. */}
+
       {formShown && (
         <div
           data-flat-form="1"
@@ -579,170 +741,6 @@ export default function FlatBoard(props: FlatBoardProps) {
                 </div>
               </div>
             )}
-
-      {/* Минималистичный заголовок блока (без панельной шапки — строгий флэт). */}
-      <h2
-        style={{
-          margin: "0 0 10px",
-          fontSize: 16,
-          fontWeight: 700,
-          color: "#1a1a1a",
-          fontFamily: "inherit",
-        }}
-      >
-        {props.heading}
-      </h2>
-
-      {/* Пункт 1 ТЗ: простые текстовые вкладки-кнопки. */}
-      <div data-flat-tabs="1" role="tablist" style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
-        {props.tabs.map((t) => (
-          <button
-            key={t.key}
-            role="tab"
-            aria-selected={tab === t.key}
-            data-flat-tab={t.key}
-            style={tabBtn(tab === t.key)}
-            onClick={() => setTab(t.key)}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Пункт 2 ТЗ: лента — белые карточки в тонкой светло-серой рамке:
-          только город, дата и текст пользователя с прямыми контактами. */}
-      <div data-flat-cards="1" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {items === null ? (
-          <div style={{ fontSize: 13.5, color: "#6b7280" }}>Загрузка…</div>
-        ) : items.length === 0 ? (
-          <div data-flat-empty="1" style={{ fontSize: 13.5, color: "#6b7280" }}>
-            {props.emptyText}
-          </div>
-        ) : (
-          items.map((it) => {
-            const dim = it.status !== "actual" && it.status !== "active";
-            return (
-              <article
-                key={it.id}
-                data-flat-card={it.id}
-                style={{
-                  background: "#fff",
-                  border: FLAT_BORDER,
-                  borderRadius: 0,
-                  padding: "10px 12px",
-                }}
-              >
-                <div style={{ display: "flex", gap: 10, alignItems: "baseline", flexWrap: "wrap" }}>
-                  <span
-                    data-flat-card-city={it.id}
-                    style={{ fontSize: 13.5, fontWeight: 700, color: "#1a1a1a" }}
-                  >
-                    {it.place}
-                  </span>
-                  {/* ТЗ 2026-09-23: ник автора БЕЗ аватара (гостям и авторам
-                      без ника — «Аноним»); сортировка ленты — новые сверху.
-                      2026-10-01: цвет ника — по полу (мужской/женский/нейтральный). */}
-                  <span
-                    data-flat-card-nick={it.id}
-                    style={{ fontSize: 12.5, fontWeight: 600 }}
-                    className={nickGenderClass(it.nick || "")}
-                  >
-                    {it.nick || "Аноним"}
-                  </span>
-                  <span
-                    data-flat-card-date={it.id}
-                    style={{ fontSize: 12.5, color: "#9ca3af", marginLeft: "auto" }}
-                  >
-                    {fmtDay(it.createdAt)}
-                  </span>
-                </div>
-                <div
-                  data-flat-card-text={it.id}
-                  style={{
-                    marginTop: 5,
-                    fontSize: 14,
-                    lineHeight: 1.5,
-                    whiteSpace: "pre-wrap",
-                    color: dim ? "#9ca3af" : "#1a1a1a",
-                    fontFamily: "inherit",
-                  }}
-                >
-                  {it.body}
-                </div>
-                {/* 2026-10-01: ТЗ — контакт обязателен. Показываем его
-                    отдельной выделенной зелёной строкой под текстом, чтобы
-                    покупатель сразу видел способ связи с автором.
-                    Контакты (телефон, @telegram, https, email) — ПОДСВЕЧЕНЫ
-                    СИНИМ и КЛИКАБЕЛЬНЫ: tel: → позвонить, t.me/ → Telegram,
-                    mailto: → почта, https:// → открыть в новой вкладке. */}
-                {it.contact && (
-                  <div
-                    data-flat-card-contact={it.id}
-                    style={{
-                      marginTop: 6,
-                      padding: "6px 9px",
-                      background: "#ecfdf5",
-                      border: "1px solid #6ee7b7",
-                      fontSize: 13,
-                      color: "#065f46",
-                      wordBreak: "break-word",
-                      overflowWrap: "anywhere",
-                    }}
-                  >
-                    <b style={{ color: "#047857" }}>📞 Связь:</b>{" "}
-                    {renderContacts(it.contact)}
-                  </div>
-                )}
-                {/* 2026-10-16: Admin delete button */}
-                {(props.user?.role === "owner" || props.user?.role === "admin" || props.user?.role === "moderator" || props.user?.id === it.authorId || props.user?.id === it.originalAuthorId) && (
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      if (!window.confirm("Удалить?")) return;
-                      try {
-                        const r = await fetch(`${props.apiPath}/${it.id}`, {
-                          method: "PATCH",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ token: props.token, action: "delete" }),
-                        });
-                        const d = await r.json();
-                        if (!r.ok) { props.notify(d.error || "Ошибка"); return; }
-                        props.notify("Удалено");
-                        props.onReload?.();
-                      } catch { props.notify("Сеть недоступна"); }
-                    }}
-                    style={{ cursor: "pointer", background: "none", border: "none", color: "#dc2626", padding: "4px 8px", fontFamily: "inherit", fontSize: "12px", fontWeight: 600, textDecoration: "underline", marginTop: 4 }}
-                  >
-                    Удалить
-                  </button>
-                )}
-              </article>
-            );
-          })
-        )}
-      </div>
-      {items !== null && page < pages && (
-        <button
-          data-flat-more="1"
-          style={{
-            marginTop: 10,
-            background: "#fff",
-            border: FLAT_BORDER,
-            borderRadius: 0,
-            padding: "7px 12px",
-            fontSize: 13,
-            cursor: "pointer",
-            color: "#1E3A5F",
-          }}
-          onClick={() => load({ page: page + 1, append: true })}
-        >
-          Показать ещё
-        </button>
-      )}
-
-      {/* 2026-10-03: дубликат кнопки «Добавить объявление» (был внизу) —
-          удалён, т.к. кнопка перенесена в верх секции. */}
-
       </div>
       )}
 
@@ -808,4 +806,5 @@ export const FLAT_ADS_BOARD: FlatBoardProps = {
   textareaPlaceholder:
     "Что отдаёте/ищете/обмениваете, город, любые удобные вам контакты: WhatsApp, Telegram, телефон или соцсеть.",
   emptyText: "Объявлений пока нет — ваше может стать первым.",
+  publishMode: "direct", // 2026-10-18: без SMS-подтверждения
 };
