@@ -359,14 +359,29 @@ export async function POST(req: NextRequest) {
     const last = await db.topic.findFirst({ orderBy: { number: "desc" }, select: { number: true } });
     const number = (last?.number ?? 0) + 1;
 
+    // 2026-10-20 Этап 3: подмена автора на бота, если задан botAuthor (только для staff)
+    let authorName = user.nickname;
+    let authorId = user.id;
+    const botAuthorNick = body.botAuthor ? String(body.botAuthor).trim() : null;
+    if (botAuthorNick && isStaffRole(user.role)) {
+      const botUser = await db.user.findUnique({
+        where: { nickname: botAuthorNick },
+        select: { id: true, nickname: true, email: true },
+      });
+      if (botUser && botUser.email && botUser.email.includes("@theatre.local")) {
+        authorName = botUser.nickname;
+        authorId = botUser.id;
+      }
+    }
+
     const topic = await db.topic.create({
       data: {
         number,
         title,
-        authorName: user.nickname,
-        authorId: user.id,
+        authorName,
+        authorId,
         rubricId,
-        lastAuthorName: user.nickname,
+        lastAuthorName: authorName,
       },
     });
 
@@ -374,8 +389,8 @@ export async function POST(req: NextRequest) {
       data: {
         topicId: topic.id,
         num: 1,
-        authorName: user.nickname,
-        authorId: user.id,
+        authorName,
+        authorId,
         body: text,
         aiStatus: outcome.action === "hide" ? "hidden" : outcome.action === "human" ? "human" : "ok",
         aiNote: outcome.aiNote ?? "",
@@ -419,7 +434,7 @@ export async function POST(req: NextRequest) {
           isTopicStarter: true,
         });
         // Fire-and-forget: не ждём ответа (асинхронная обработка)
-        fetch(`${process.env.SELF_URL || "http://127.0.0.1:3001"}/api/theatre-bots/auto-reply`, {
+        /* auto-bots disabled 2026-10-20 */ Promise.resolve( {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: hookBody,

@@ -205,7 +205,7 @@ export default function TopicList(props: {
             Найти
           </button>
           <button className="sk-btn-classic sk-newtopic-btn" style={{ margin: 0 }} type="button" onClick={props.onAddTopic}>
-            + Новая тема
+            Новая тема
           </button>
         </form>
       </div>

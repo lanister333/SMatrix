@@ -163,8 +163,8 @@ body{background:#E8EAEB}
    серая подложка #E8EAEB, на которой выделяются белые карточки;
    Шаг 2: вертикальные линии-рамки слева/справа удалены (border:none) —
    разделение только зазорами и фоновым контрастом */
-.sk-shell{background:transparent;border-left:none;border-right:none;flex-direction:column;flex:1 0 auto;width:100%;max-width:none;margin:0;padding:8px 10px;display:flex}
-.sk-layout{flex:1 0 auto;grid-template-columns:320px minmax(0,1fr) 320px;align-items:start;gap:12px;display:grid}
+.sk-shell{background:transparent;border-left:none;border-right:none;flex-direction:column;flex:0 0 auto;width:100%;max-width:none;margin:0;padding:8px 10px 0;display:flex}
+.sk-layout{flex:0 0 auto;grid-template-columns:320px minmax(0,1fr) 320px;align-items:start;gap:12px;display:grid}
 /* ЗАДАЧА 14, Шаг 2: серая вертикальная линия между боковым меню и
    контентными карточками удалена на всех страницах */
 .sk-col-left{border-right:none;min-height:400px;padding-right:12px}
@@ -1532,7 +1532,7 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
    ШАГ 11: сжатый настольный диапазон 901–1150px («ПК-версия на телефоне»)
    ============================================================ */
 @media (min-width:901px) and (max-width:1150px){
-  .sk-shell{padding:8px 10px}
+  .sk-shell{padding:8px 10px 0}
   .sk-layout{grid-template-columns:196px minmax(0,1fr) 214px;gap:10px}
   /* ТЗ 2026-09-23 «уменьшить боковые отступы»: padding-right:8px
      добавлялся к зазору 10px — слева визуально 18px против 10px
@@ -1551,7 +1551,7 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
    кнопки под палец, навигация компактная, без горизонтальной прокрутки
    ============================================================ */
 @media (max-width:900px){
-  .sk-shell{border:0;max-width:100%;padding:0 0 10px}
+  .sk-shell{border:0;max-width:100%;padding:0}
   .sk-topbar{display:flex;position:sticky;top:0}
   .sk-layout{padding:0 10px;display:block}
   /* СТАДИЯ 2 / ЗАДАЧА 1: на мобайле контейнер сетки Главной ведёт себя
@@ -3284,7 +3284,7 @@ a.pl-entry-detail:hover{color:#0a5caa}
    над футером ВСЕГДА стоит карусель волонтёров из SiteFooter — отдельный зазор
    не нужен; СТАЛО зазор 10px задаёт marginBottom карусели в
    volunteers-carousel.tsx). */
-.mp-footer{color:#FFFFFF;background-color:#1e3a5f !important;border-top:1px solid #4a688c;flex-shrink:0;margin-top:0;padding:30px 0;font-size:12.5px}
+.mp-footer{color:#FFFFFF;background-color:#1e3a5f !important;border-top:1px solid #4a688c;flex-shrink:0;margin-top:0;padding:0 12px 30px;font-size:12.5px}
 .mp-footer a{color:#A9CBEF;cursor:pointer;text-decoration:underline}
 .mp-footer a:hover{color:#FFFFFF}
 .mp-footer-links{border-bottom:1px solid #e1e7ee;flex-wrap:wrap;gap:4px 14px;padding-bottom:6px;margin-bottom:7px;display:flex}
@@ -3340,7 +3340,7 @@ a.pl-entry-detail:hover{color:#0a5caa}
 
   /* ---- Шаг 2: сквозная ужимка отступов и плотности (контейнеры 4-6px) ----
      Форум и общие контейнеры */
-  .sk-shell{padding:0 0 6px}
+  .sk-shell{padding:0}
   .sk-layout{padding:0 4px}
   .sk-topicbox{padding:4px 5px;margin-bottom:6px}
   /* 2026-10-01: на странице темы форума — заголовок темы СВЕРХУ
@@ -3415,7 +3415,7 @@ a.pl-entry-detail:hover{color:#0a5caa}
   .mp-trow{padding:4px 5px}
   .mp-list{margin:4px 5px 5px}
   .mp-grid{gap:6px;margin-top:2px}
-  .mp-footer{margin-top:0;padding:4px 6px 5px}
+  .mp-footer{margin-top:0;padding:0 6px 5px}
   .mp-footer{padding-bottom:calc(5px + env(safe-area-inset-bottom,0px))}
   /* Самостоятельные разделы: oh/wb/cd/rc/ep/dk/ad/gkh + pl
      (у семейства ad- контейнеры зовутся ad-grid/ad-sidebox/ad-entry) */

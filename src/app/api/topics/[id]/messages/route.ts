@@ -238,7 +238,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
           triggerAuthorRole: user.role,
           isTopicStarter: false,
         });
-        fetch(`${process.env.SELF_URL || "http://127.0.0.1:3001"}/api/theatre-bots/auto-reply`, {
+        /* auto-bots disabled 2026-10-20 */ Promise.resolve( {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: hookBody,

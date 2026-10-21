@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -51,13 +52,27 @@ export default function RootLayout({
           type="font/woff2"
           crossOrigin="anonymous"
         />
-        {/* Шрифт Anton самолокализован (public/fonts + @font-face в
-            globals.css): внешний блокирующий запрос к fonts.googleapis.com
-            убран — сторонний хост мог подвисать в сети пользователя и
-            удерживать событие загрузки страницы (вечный спиннер панели
-            предпросмотра платформы). */}
       </head>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        {/* Яндекс.Метрика — счётчик 113691446.
+            Установлен 2026-10-20. Включён вебвизор, клики по ссылкам,
+            точный показатель отказов, карта кликов.
+            Стратегия afterInteractive — скрипт грузится сразу после
+            интерактивности, не блокируя рендер. */}
+        <Script id="yandex-metrika" strategy="afterInteractive">
+          {`(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");ym(113691446, "init", {clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true});`}
+        </Script>
+        <noscript>
+          <div>
+            <img
+              src="https://mc.yandex.ru/watch/113691446"
+              style={{ position: "absolute", left: "-9999px" }}
+              alt=""
+            />
+          </div>
+        </noscript>
+        {children}
+      </body>
     </html>
   );
 }

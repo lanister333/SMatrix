@@ -35,6 +35,8 @@ export async function loadTheatreBots(): Promise<TheatreBot[]> {
     try {
       const meta = JSON.parse(u.bio);
       if (meta.role !== "theatre_bot") continue;
+      // 2026-10-20 Этап 5: пропускать удалённых ботов (bio.deleted === true)
+      if (meta.deleted === true) continue;
       const gender: TheatreBot["gender"] =
         u.gender === "female" ? "female" :
         u.gender === "male" ? "male" : "unspecified";
@@ -307,6 +309,40 @@ export async function rewriteTopicWithBots(topicText: string, bots: TheatreBot[]
 - Стиль: бытовой, мессенджерный, как живой форум.
 - Lowercase-персонажи пишут без заглавных (опечатка допускается 30%).
 - Замены: «Южно-Сахалинск» → «Южный», «Сахалинская область» → «остров».
+
+САХАЛИНСКИЙ СЛЕНГ (используй НЕ БОЛЕЕ 15% слов в каждом сообщении, естественно встраивая):
+- Кукса — лапша быстрого приготовления
+- Уёк — мойва
+- Чилим — креветка
+- Зубатка — крупная корюшка
+- Пруль — праворульный автомобиль
+- Копытить — тяжело работать
+- Вкатывать — нравиться, приносить удовольствие
+- Пульный — похожий, такой же
+- Гольный — чистый, полнейший
+- Позоруха — позор
+- Гопка — шайка, компания
+- Богодул — алкоголик, бомж
+- Потеха — автомобильная магнитола
+- Аргамак — снегокат
+- Пузотёрка — низкий автомобиль
+- Клоповка — местная ягода (красница)
+- Чимча — кимчи
+- Пянсе — пирожки на пару
+- Хачи — палочки для еды
+- Фанза — ветхий барак
+- Корка — смешно
+- Кубатурить — думать, размышлять
+- Шваркаться — ходить туда-сюда без дела
+- Юкола — вяленая рыба
+- Материк — континентальная Россия
+- Эн-бэн-цо — камень-ножницы-бумага
+- «Через Корсаков» — очень долго добираться
+- «До корейской Пасхи» — никогда
+- «На 16-м до конечной» — сойти с ума
+- Муфта / тяпка — автоматическая коробка передач
+- Титаны — литые диски
+Сленг должен звучать органично, не как словарь. Если слово не подходит по смыслу — не вставляй.
 - Никогда НЕ повторяй один и тот же факт одинаково у разных ботов — каждый видит тему по-своему.
 - Не используй эмодзи, если только персонаж не «пацанский» или «девчоночьий» стиль.
 
@@ -463,17 +499,64 @@ export interface ProcessTopicResult {
  *   3. Рерайт через Z.ai
  *   4. Сохраняет в BotQueue для премодерации
  */
+export interface ProvidedReply {
+  botNickname: string;
+  text: string;
+  delayMin?: number;
+}
+
 export async function processTopic(
   topicText: string,
-  opts: { rubricId?: number | null; topicId?: number | null; parentMessageId?: string | null; topicTitle?: string | null } = {},
+  opts: {
+    rubricId?: number | null;
+    topicId?: number | null;
+    parentMessageId?: string | null;
+    topicTitle?: string | null;
+    // 2026-10-20 Этап 4: готовые ответы от пользователя + доп. боты
+    providedReplies?: ProvidedReply[];
+    extraBotRepliesCount?: number;
+    useSakhalinSlang?: boolean;
+  } = {},
 ): Promise<ProcessTopicResult> {
   const bots = await loadTheatreBots();
   if (bots.length === 0) throw new Error("No theatre bots in DB");
 
-  const selected = selectBots(bots, topicText);
-  if (selected.length < 3) throw new Error(`Only ${selected.length} bots matched, need ≥3`);
+  // Этап 4: если есть готовые ответы — используем их + добавляем extraBotRepliesCount ботов
+  const extraCount = opts.extraBotRepliesCount ?? 1;
+  const providedReplies = opts.providedReplies ?? [];
 
-  const replies = await rewriteTopicWithBots(topicText, selected);
+  let selected;
+  let replies;
+
+  if (providedReplies.length > 0) {
+    // Режим A: готовые ответы от пользователя
+    // Найти ботов по никнеймам из providedReplies
+    const providedBots = providedReplies
+      .map((r) => bots.find((b) => b.nickname === r.botNickname))
+      .filter((b): b is TheatreBot => b !== undefined);
+
+    // Выбрать дополнительных ботов по тематике (исключая уже использованных)
+    const usedNicks = new Set(providedBots.map((b) => b.nickname));
+    const availableForExtra = bots.filter((b) => !usedNicks.has(b.nickname));
+    const extraBots = selectBots(availableForExtra, topicText, [extraCount, extraCount]);
+
+    selected = [...providedBots, ...extraBots];
+
+    // Готовые ответы используем как есть, для доп. ботов генерируем через Z.ai
+    const extraReplies = extraBots.length > 0
+      ? await rewriteTopicWithBots(topicText, extraBots)
+      : [];
+
+    replies = [
+      ...providedReplies.map((r) => ({ username: r.botNickname, text: r.text })),
+      ...extraReplies,
+    ];
+  } else {
+    // Режим B: обычный — все реплики генерируются через Z.ai
+    selected = selectBots(bots, topicText);
+    if (selected.length < 3) throw new Error(`Only ${selected.length} bots matched, need ≥3`);
+    replies = await rewriteTopicWithBots(topicText, selected);
+  }
 
   const q = await queueForModeration(replies, {
     sourceText: topicText,

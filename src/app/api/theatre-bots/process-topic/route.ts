@@ -18,12 +18,22 @@ export const runtime = "nodejs";
 
 const THEATRE_BOTS_TOKEN = process.env.THEATRE_BOTS_TOKEN || process.env.SAKHMATRIX_API_TOKEN || "sakhmatrix-theatre-2026";
 
+interface ProvidedReply {
+  botNickname: string;
+  text: string;
+  delayMin?: number;
+}
+
 interface ProcessBody {
   token?: string;
   text?: string;
   rubricId?: number | null;
   topicId?: number | null;
   topicTitle?: string | null;
+  // 2026-10-20 Этап 4: готовые ответы + доп. боты + сленг
+  providedReplies?: ProvidedReply[];
+  extraBotRepliesCount?: number;
+  useSakhalinSlang?: boolean;
 }
 
 export async function POST(req: NextRequest) {
@@ -44,7 +54,18 @@ export async function POST(req: NextRequest) {
     const topicId = typeof body.topicId === "number" ? body.topicId : null;
     const topicTitle = body.topicTitle?.trim() || null;
 
-    const result = await processTopic(text, { rubricId, topicId, topicTitle });
+    const providedReplies = Array.isArray(body.providedReplies) ? body.providedReplies : [];
+    const extraBotRepliesCount = typeof body.extraBotRepliesCount === "number" ? body.extraBotRepliesCount : 1;
+    const useSakhalinSlang = body.useSakhalinSlang !== false;  // default true
+
+    const result = await processTopic(text, {
+      rubricId,
+      topicId,
+      topicTitle,
+      providedReplies,
+      extraBotRepliesCount,
+      useSakhalinSlang,
+    });
 
     console.log(`[bot-theatre] Processed topic: batch=${result.batchId} bots=${result.selectedBots.length} queued=${result.queuedCount}`);
 

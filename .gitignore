@@ -1,8 +1,41 @@
+# Dependencies
 node_modules/
+
+# Build
 .next/
-*.log
+out/
+dist/
+
+# Env & secrets
 .env
 .env.local
+.env.*.local
+
+# Database (содержит пользователей и пароли!)
+db/*.db
 db/*.db-journal
+db/*.db.bak*
+db/*.db.backup*
+db/*.bak*
+
+# Backups
+*.bak
+*.bak.*
+**/*.bak.*
+
+# Logs
+*.log
 server.log
 dev.log
+
+# Z.ai config (секретный токен)
+.z-ai-config
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp

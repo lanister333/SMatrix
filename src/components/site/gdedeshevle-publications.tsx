@@ -203,7 +203,7 @@ function CheapRow(props: {
   const { item, user } = props;
   // 2026-10-15: админ видит кнопки управления на ВСЕХ карточках
   const isAdminRole = user?.role === "owner" || user?.role === "admin" || user?.role === "moderator";
-  const own = !!(user && (item.authorId === user.id || item.originalAuthorId === user.id || isAdminRole));
+  const own = !!(user && user.id && (isAdminRole || (item.authorId != null && item.authorId === user.id) || (item.originalAuthorId != null && item.originalAuthorId === user.id)));
   // ТЗ часть 3: кнопка «📍 Ответить на запрос» → инлайн-поле прямо на странице.
   const [botNick, setBotNick] = useState<string | null>(null);
   const [answerOpen, setAnswerOpen] = useState(false);

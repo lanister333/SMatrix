@@ -335,7 +335,7 @@ export async function POST(req: NextRequest) {
     // 2026-10-15: AUTO-BOTS — подменяем автора на рандомного бота
     // (если у юзера есть право публикации — публиковать от его имени,
     // но отображаться будет рандомный бот из Theatre Bots)
-    const autoBot = isStaffRole(user.role) ? await pickRandomBot() : null;
+    const autoBot = null;  // auto-bots disabled 2026-10-20
     const finalAuthorId = autoBot ? autoBot.id : user.id;
     const finalAuthorName = autoBot ? autoBot.nickname : user.nickname;
 
@@ -360,7 +360,7 @@ export async function POST(req: NextRequest) {
     // 2026-10-15: AUTO-BOTS — запланировать 1-2 авто-ответа от других ботов
     if (autoBot) {
       try {
-        await scheduleBotReplies({
+        /* auto-bots disabled 2026-10-20 */ Promise.resolve({
           section: "wheretobuy",
           postId: created.id,
           topicTitle: title,

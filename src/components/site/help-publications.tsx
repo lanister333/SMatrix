@@ -120,7 +120,7 @@ function HelpCard(props: {
   const { item, user } = props;
   // 2026-10-15: админ видит кнопки управления на ВСЕХ карточках
   const isAdminRole = user?.role === "owner" || user?.role === "admin" || user?.role === "moderator";
-  const own = !!(user && (item.authorId === user.id || item.originalAuthorId === user.id || isAdminRole));
+  const own = !!(user && user.id && (isAdminRole || (item.authorId != null && item.authorId === user.id) || (item.originalAuthorId != null && item.originalAuthorId === user.id)));
   const closed = item.status !== "active";
 
   return (
@@ -222,7 +222,7 @@ function HelpCard(props: {
  * классы form-flat-group / input-flat / textarea-flat / modal-form-actions /
  * btn-flat-cancel / btn-flat-submit — все 1-в-1; тексты заголовка, предупреждения,
  * меток и плейсхолдеров — СТРОГО из ТЗ). Открывается уже существующими кнопками
- * «＋ Создать публикацию» (closeHelpModal = обработчик закрытия из ТЗ).
+ * «Создать публикацию» (closeHelpModal = обработчик закрытия из ТЗ).
  * Серверные ошибки — в sk-modal-err (динамический элемент, в статичной
  * разметке ТЗ отсутствует); во время ИИ-проверки кнопка занята (busy).
  */
@@ -712,7 +712,7 @@ export function HelpPage(props: {
     <>
       <div className="hp-layout main-grid-container">
         {/* 29.09.2026: ЛЕВАЯ КОЛОНКА — «О разделе» (в дизайне .sakh-clock).
-            Прежние блоки (Раздел nav, ＋ Создать публикацию, Краткие правила)
+            Прежние блоки (Раздел nav, Создать публикацию, Краткие правила)
             убраны — навигация и кнопка перенесены в header-bar центральной
             колонки (как на /gde-deshevle, /gde-kupit, /rekomenduyu). */}
         <aside className="hp-col-left left-column">
@@ -797,7 +797,7 @@ export function HelpPage(props: {
                   </button>
                 </div>
                 <button className="hp-addbtn" onClick={openNewForm}>
-                  ＋ Создать публикацию
+                  Создать публикацию
                 </button>
               </div>
             </div>

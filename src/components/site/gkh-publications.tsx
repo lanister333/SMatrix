@@ -14,7 +14,7 @@
  *
  * ДОСЛОВНЫЕ требования ТЗ №2 и их реализация:
  *  ЛЕВАЯ КОЛОНКА (Фильтр и Управление):
- *   Блок 1 (Кнопка действия) — «+ Зафиксировать проблему» + текст снизу
+ *   Блок 1 (Кнопка действия) — «Зафиксировать проблему» + текст снизу
  *   «Оставлять сигналы о городских и коммунальных проблемах могут только
  *   зарегистрированные жители. Город видит каждый адрес».
  *   Блок 2 (Локация) — поле ввода «Район / Улица / Дом» (список городов:
@@ -22,7 +22,7 @@
  *   кнопка «Показать» (API ?place=).
  *  ЦЕНТРАЛЬНАЯ КОЛОНКА (Лента городских фактов):
  *   1. Заголовок «ЖКХ и городские проблемы»; 2. подзаголовок (одна строка);
- *   3. кнопка «+ Зафиксировать проблему» (дублирует левую колонку);
+ *   3. кнопка «Зафиксировать проблему» (дублирует левую колонку);
  *   4. поле поиска по проблемам; 5. лента карточек — плоский список,
  *   новые сверху.
  *  СТРУКТУРА КАРТОЧКИ (Flat 2.0): 📍 адрес (район, улица, дом) · ник автора
@@ -496,7 +496,7 @@ export function GkhPage(props: {
           </div>
           {/* Пункт 3: кнопка дублирует левую колонку. */}
           <button className="gkf-newbtn" data-gkf-add-center="1" onClick={openForm}>
-            + Зафиксировать проблему
+            Зафиксировать проблему
           </button>
           {/* Пункт 4: поле поиска по проблемам. */}
           <div className="gkf-search">
@@ -765,7 +765,7 @@ export function GkhPage(props: {
                       {forumButtonLabel(it.topicId ? it.topicState ?? "open" : "none", (it.topicAnswers ?? 0) >= 1)}
                     </button>
 
-                    {(props.user?.role === "owner" || props.user?.role === "admin" || props.user?.role === "moderator" || props.user?.id === it.authorId || props.user?.id === it.originalAuthorId) && (
+                    {props.user && props.user.id && (props.user.role === "owner" || props.user.role === "admin" || props.user.role === "moderator" || (it.authorId != null && props.user.id === it.authorId) || (it.originalAuthorId != null && props.user.id === it.originalAuthorId)) && (
                       <button type="button" onClick={async () => { if (!window.confirm("Удалить жалобу?")) return; try { const r = await fetch(`/api/gkh/${it.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: props.token, action: "delete" }) }); const d = await r.json(); if (!r.ok) { props.notify(d.error || "Ошибка"); return; } props.notify("Жалоба удалена"); load(); } catch { props.notify("Сеть недоступна"); } }} style={{ cursor: "pointer", background: "none", border: "none", color: "#dc2626", padding: "6px 10px", fontFamily: "inherit", fontSize: "13px", fontWeight: 600, textDecoration: "underline" }}>
                         Удалить
                       </button>

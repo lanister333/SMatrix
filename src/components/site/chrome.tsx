@@ -9,6 +9,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState, type ComponentType, type MouseEvent as ReactMouseEvent } from "react";
+import VolunteersCarousel from "@/components/site/volunteers-carousel";
 import { usePathname } from "next/navigation";
 import {
   Search,
@@ -30,7 +31,6 @@ import {
 } from "lucide-react";
 import { AUTH_KEY, type ForumUser } from "@/lib/ui";
 import { AuthModal } from "@/components/forum/modals";
-import VolunteersCarousel from "@/components/site/volunteers-carousel";
 
 /** ШАГ 12: настройки сайта из /api/bootstrap (шапка и подвал). */
 export interface SiteSettings {
@@ -134,7 +134,7 @@ export function Masthead(props: { settings: SiteSettings }) {
          #0d8476 (L28%) → #0f9989 (L33%), #085951 (L19%) → #0a7066 (L24%). */
       style={{
         background:
-          "radial-gradient(130% 150% at 16% 0%,rgba(255,255,255,0.22) 0%,rgba(255,255,255,0) 44%),linear-gradient(150deg,#00ffd5 0%,#00d9b8 46%,#00ab94 100%)",
+          "linear-gradient(120deg, rgba(220,225,230,0.32) 0%, rgba(180,190,200,0.18) 50%, rgba(220,225,230,0.32) 100%), radial-gradient(130% 150% at 16% 0%, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0) 44%), linear-gradient(150deg, #00e6c3 0%, #00c9aa 46%, #00a88e 100%)",
       }}
     >
       {/* ЗАДАЧА 14 (рестайл ПК), Шаг 1.2: слоган (.header-slogan) и правый
@@ -833,8 +833,7 @@ export function SiteFooter(props: { settings?: SiteSettings | null; onNavigate?:
     }
   };
   return (
-    <>
-      {/* Директива «Сквозной блок волонтёров»: вставлен в SiteFooter,
+    <>      {/* Сквозной блок волонтёров: вставлен в SiteFooter,
           который подключается на ВСЕХ страницах без исключения.
           Стоит строго НАД синей плашкой футера. */}
       <VolunteersCarousel />

@@ -1,0 +1,48 @@
+/* === АДАПТИВНЫЙ ПАТЧ 2026-10-19 === */
+/* Для 15" ноутбуков (1024-1499px) — снимаем жёсткий min-width */
+
+@media (min-width: 1024px) and (max-width: 1499px) {
+  .center-column,
+  .left-column,
+  .right-column {
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+  .center-column {
+    flex: 1 1 0 !important;
+  }
+  .left-column,
+  .right-column {
+    flex: 0 0 280px !important;
+    min-width: 240px !important;
+  }
+  .main-grid-container {
+    max-width: 100% !important;
+    gap: 8px !important;
+  }
+  .sk-shell {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1366px) {
+  .left-column,
+  .right-column {
+    flex: 0 0 250px !important;
+    min-width: 200px !important;
+  }
+  .main-grid-container {
+    gap: 6px !important;
+  }
+  .sm-mainnav-link {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    font-size: 13px !important;
+  }
+}
+
+html, body {
+  overflow-x: hidden !important;
+}
+

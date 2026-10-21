@@ -318,7 +318,7 @@ export async function POST(req: NextRequest) {
     // 2026-10-15: AUTO-BOTS
 
 
-    const autoBot = isStaffRole(user.role) ? await pickRandomBot() : null;
+    const autoBot = null;  // auto-bots disabled 2026-10-20
 
 
     const created = await db.datingPost.create({
@@ -341,7 +341,7 @@ export async function POST(req: NextRequest) {
     // 2026-10-15: AUTO-BOTS — запланировать ответы
     if (autoBot) {
       try {
-        await scheduleBotReplies({
+        /* auto-bots disabled 2026-10-20 */ Promise.resolve({
           section: "znakomstva",
           postId: created.id,
           topicTitle: title,

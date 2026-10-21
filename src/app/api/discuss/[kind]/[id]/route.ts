@@ -163,16 +163,9 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ kind: stri
     if (!sectionData) {
       return NextResponse.json({ error: "Карта рубрик не настроена" }, { status: 500 });
     }
-    // 2026-10-18: для wheretobuy — если postType === "service", используем рубрику
-    // «Услуги и специалисты» вместо «Где купить».
+    // 2026-10-20: rubric определяется ПОСЛЕ загрузки post (фикс бага Cannot access p before initialization).
     let rubricSlug = sectionData.rubricSlug;
-    if (kind === "wheretobuy" && (post as any).postType === "service") {
-      rubricSlug = SECTION_FORUM.help.rubricSlug; // "tovary-i-uslugi--uslugi-i-specialisty"
-    }
-    const rubric = await db.rubric.findUnique({ where: { slug: rubricSlug } });
-    if (!rubric) {
-      return NextResponse.json({ error: "Рубрика-назначение не найдена" }, { status: 500 });
-    }
+    let rubric: { id: string } | null = null;
 
     // Шаг 4: находим публикацию. Универсальные поля (id, topicId, isDeleted,
     // isHiddenByAi) есть во всех 5 моделях. Специфичные поля (subject для RecPost,
@@ -211,6 +204,16 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ kind: stri
     }
     if (post.isHiddenByAi) {
       return NextResponse.json({ error: "Публикация недоступна" }, { status: 410 });
+    }
+
+    // 2026-10-20: rubric определяем ПОСЛЕ загрузки post — теперь есть postType.
+    // Для wheretobuy с postType='service' — рубрика «Услуги и специалисты».
+    if (kind === "wheretobuy" && (post as any).postType === "service") {
+      rubricSlug = SECTION_FORUM.help.rubricSlug;
+    }
+    rubric = await db.rubric.findUnique({ where: { slug: rubricSlug } });
+    if (!rubric) {
+      return NextResponse.json({ error: "Рубрика-назначение не найдена" }, { status: 500 });
     }
 
     // Шаг 5: если уже есть topicId — возвращаем существующую тему (без дубликата).

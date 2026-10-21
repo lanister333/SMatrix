@@ -162,6 +162,8 @@ export default function FlatBoard(props: FlatBoardProps) {
   const [formTab, setFormTab] = useState(props.tabs[0]?.key ?? "");
   const [city, setCity] = useState("");
   const [text, setText] = useState("");
+  // 2026-10-20: отдельное поле контактов для связи (как в AdsPage).
+  const [contact, setContact] = useState("");
   // Двухшаговая форма ТЗ: поля объявления → шаг СМС-верификации.
   const [stage, setStage] = useState<"form" | "sms">("form");
   const [phone, setPhone] = useState("");
@@ -295,6 +297,7 @@ export default function FlatBoard(props: FlatBoardProps) {
           [props.postKey]: formTab,
           place: city.trim(),
           text: text.trim(),
+          contact: contact.trim(),
           /* ТЗ 2026-09-23: в прямой публикации (dating) СМС-полей нет; они
              уходят только в прежнем двухшаговом режиме (блок «Объявления»,
              у которого publishMode не задан — по умолчанию СМС-режим). */
@@ -310,6 +313,7 @@ export default function FlatBoard(props: FlatBoardProps) {
       setStage("form");
       setCity("");
       setText("");
+      setContact("");
       setPhone("");
       setCode("");
       setDevCode("");
@@ -485,8 +489,18 @@ export default function FlatBoard(props: FlatBoardProps) {
                     {renderContacts(it.contact)}
                   </div>
                 )}
-                {/* 2026-10-16: Admin delete button */}
-                {(props.user?.role === "owner" || props.user?.role === "admin" || props.user?.role === "moderator" || props.user?.id === it.authorId || props.user?.id === it.originalAuthorId) && (
+                {/* 2026-10-19: BUG FIX — гость видел кнопки удаления (undefined === undefined)
+                    Условие: кнопка удаления видна ТОЛЬКО если:
+                    1. Пользователь залогинен (props.user существует и есть id)
+                    2. И при этом он автор объявления (authorId или originalAuthorId совпадает)
+                    3. ИЛИ он админ/модератор/owner */}
+                {props.user && props.user.id && (
+                  props.user.role === "owner" ||
+                  props.user.role === "admin" ||
+                  props.user.role === "moderator" ||
+                  (it.authorId != null && props.user.id === it.authorId) ||
+                  (it.originalAuthorId != null && props.user.id === it.originalAuthorId)
+                ) && (
                   <button
                     type="button"
                     onClick={async () => {
@@ -614,6 +628,34 @@ export default function FlatBoard(props: FlatBoardProps) {
                   fontFamily: "inherit",
                 }}
               />
+
+              {/* 2026-10-20: отдельное поле «Контакты для связи» с рамкой,
+                  стилистика как у textarea выше. Контакт сохраняется в БД
+                  в поле contact (API /api/obyavleniya принимает body.contact). */}
+              <div style={{ marginTop: 10 }}>
+                <label htmlFor={`${props.boardId}-contact`} style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#3f3f46" }}>
+                  Контакты для связи
+                </label>
+                <input
+                  id={`${props.boardId}-contact`}
+                  data-flat-contact="1"
+                  value={contact}
+                  maxLength={200}
+                  onChange={(e) => setContact(e.target.value)}
+                  placeholder="Телефон, мессенджер (@telegram, wa.me/…), ссылка — чтобы с вами могли связаться"
+                  style={{
+                    marginTop: 4,
+                    width: "100%",
+                    boxSizing: "border-box",
+                    border: FLAT_BORDER,
+                    borderRadius: 0,
+                    background: "#fff",
+                    padding: "7px 9px",
+                    fontSize: 13.5,
+                    fontFamily: "inherit",
+                  }}
+                />
+              </div>
             </div>
 
             {stage === "form" ? (

@@ -33,7 +33,7 @@ export function proxy(_req: NextRequest) {
     "default-src 'self'",
     // script-src: 'self' для _next chunks; 'unsafe-inline' для Next.js
     // hydration inline scripts (NeXTгенерирует <script>...</script>).
-    "script-src 'self' 'unsafe-inline'",
+    "script-src 'self' 'unsafe-inline' https://mc.yandex.ru",
     // style-src: 'unsafe-inline' обязателен — Next.js Critical CSS инлайн.
     "style-src 'self' 'unsafe-inline'",
     // image-src: 'self' + data: (base64 small images) + https: для внешних
@@ -42,7 +42,7 @@ export function proxy(_req: NextRequest) {
     "font-src 'self' data:",
     // connect-src: 'self' для /api/* fetch; open-meteo.com (погода);
     // сайт больше не делает внешних XHR.
-    "connect-src 'self' https://api.open-meteo.com",
+    "connect-src 'self' https://api.open-meteo.com https://mc.yandex.ru",
     "media-src 'self'",
     // frame-src: белый список внешних iframe-виджетов, которые реально
     // используются на главной:

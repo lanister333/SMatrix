@@ -377,7 +377,7 @@ function RecRow(props: {
   const { item, user } = props;
   // 2026-10-15: админ/модератор видит кнопки управления на ВСЕХ карточках
   const isAdminRole = user?.role === "owner" || user?.role === "admin" || user?.role === "moderator";
-  const own = !!(user && (item.authorId === user.id || item.originalAuthorId === user.id || isAdminRole));
+  const own = !!(user && user.id && (isAdminRole || (item.authorId != null && item.authorId === user.id) || (item.originalAuthorId != null && item.originalAuthorId === user.id)));
   const notrecommend = item.stance === "notrecommend";
   const hasResponse = !!item.orgResponseText && !!item.orgResponseAt;
   // ТЗ 2026-09-22: демо-карточка с присланным подвалом .review-card-footer-fixed

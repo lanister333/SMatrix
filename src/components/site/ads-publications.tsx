@@ -149,7 +149,7 @@ function AdRow(props: {
   const { item, user } = props;
   // 2026-10-15: админ видит кнопки управления на ВСЕХ карточках
   const isAdminRole = user?.role === "owner" || user?.role === "admin" || user?.role === "moderator";
-  const own = !!(user && (item.authorId === user.id || item.originalAuthorId === user.id || isAdminRole));
+  const own = !!(user && user.id && (isAdminRole || (item.authorId != null && item.authorId === user.id) || (item.originalAuthorId != null && item.originalAuthorId === user.id)));
   const [botNick, setBotNick] = useState<string | null>(null);
   const [photoIdx, setPhotoIdx] = useState(0);
   const media = item.media ?? [];
@@ -474,7 +474,7 @@ function AdFormModal(props: {
                     disabled={uploading}
                     onClick={() => fileRef.current?.click()}
                   >
-                    {uploading ? "Загрузка…" : "＋ Добавить фото"}
+                    {uploading ? "Загрузка…" : "Добавить фото"}
                   </button>
                   <input
                     ref={fileRef}
@@ -817,7 +817,7 @@ export function AdsPage(props: {
         </div>
         {!mine && (
           <button className="ad-create ad-create-mobile" onClick={openCreate}>
-            ＋ Создать объявление
+            Создать объявление
           </button>
         )}
         {loading ? (

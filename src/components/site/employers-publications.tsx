@@ -9,7 +9,7 @@
  *
  * Трёхколоночная схема Flat 2.0:
  *  ◀️ ЛЕВАЯ КОЛОНКА (Доступ и Поиск компании):
- *     Блок 1 — кнопка «+ Описать трудовой опыт» + текст снизу (дословно ТЗ);
+ *     Блок 1 — кнопка «Описать трудовой опыт» + текст снизу (дословно ТЗ);
  *     Блок 2 — «Поиск по организации»: поле «Название компании или ИП» →
  *              «Найти» + фильтр по городам (Южно-Сахалинск, Холмск, Корсаков…).
  *  ⏺️ ЦЕНТРАЛЬНАЯ КОЛОНКА (Лента трудовых фактов): каждая карточка —
@@ -232,7 +232,7 @@ export function EmployersPage(props: {
 
   const searching = !!(appliedQ || appliedCity);
 
-  /** «+ Описать трудовой опыт»: гостю — ДОСЛОВНАЯ строка ТЗ (форма НЕ
+  /** «Описать трудовой опыт»: гостю — ДОСЛОВНАЯ строка ТЗ (форма НЕ
    *  открывается), авторизованному — форма карточки опыта. */
   const openForm = () => {
     setNote("");
@@ -462,7 +462,7 @@ export function EmployersPage(props: {
             Сухая фиксация личного трудового опыта: компания, период работы, факты — без лозунгов и «чёрных списков».
           </div>
           <button className="ep-newbtn" data-ep-add-center="1" onClick={openForm}>
-            + Описать трудовой опыт
+            Описать трудовой опыт
           </button>
           {/* Логика доступа: гость кликнул → ДОСЛОВНАЯ строка ТЗ, форма НЕ открыта. */}
           {guestHint && (
@@ -743,7 +743,7 @@ export function EmployersPage(props: {
                       {forumButtonLabel(it.topicId ? it.topicState : "none", (it.topicAnswers ?? 0) >= 1)}
                     </button>
                     {/* 2026-10-17: Admin/author edit + delete buttons */}
-                    {(props.user?.role === "owner" || props.user?.role === "admin" || props.user?.role === "moderator" || props.user?.id === it.authorId || props.user?.id === it.originalAuthorId) && (
+                    {props.user && props.user.id && (props.user.role === "owner" || props.user.role === "admin" || props.user.role === "moderator" || (it.authorId != null && props.user.id === it.authorId) || (it.originalAuthorId != null && props.user.id === it.originalAuthorId)) && (
                       <>
                         <button
                           type="button"

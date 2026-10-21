@@ -725,6 +725,34 @@ export function NewTopicModal(props: {
   const [body, setBody] = useState(props.initialMessage ?? "");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  // 2026-10-20 Этап 3: «Писать от лица бота» — для owner/admin
+  const [botAuthor, setBotAuthor] = useState<string>("");
+  const [availableBots, setAvailableBots] = useState<string[]>([]);
+
+  // Загрузка списка ботов (только для staff — см. API auto-bots/random)
+  useEffect(() => {
+    fetch("/api/auto-bots/random")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.nickname) {
+          setBotAuthor(d.nickname);
+          setAvailableBots((prev) => prev.length > 0 ? prev : [d.nickname]);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const pickRandomBot = () => {
+    if (availableBots.length === 0) return;
+    if (availableBots.length === 1) return;
+    let next = botAuthor;
+    let attempts = 0;
+    while (next === botAuthor && attempts < 20) {
+      next = availableBots[Math.floor(Math.random() * availableBots.length)];
+      attempts++;
+    }
+    setBotAuthor(next);
+  };
 
   useEffect(() => {
     fetch("/api/bootstrap")
@@ -760,7 +788,7 @@ export function NewTopicModal(props: {
       const r = await fetch("/api/topics", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rubricId, title: title.trim(), body: body.trim(), token: props.token }),
+        body: JSON.stringify({ rubricId, title: title.trim(), body: body.trim(), token: props.token, botAuthor: botAuthor || undefined }),
       });
       const data = await r.json();
       if (!r.ok) throw Error(data.error || "Не удалось опубликовать. Проверьте связь и попробуйте ещё раз.");
@@ -827,7 +855,17 @@ export function NewTopicModal(props: {
           </div>
           {error && <div className="sk-modal-err">{error}</div>}
           <div className="sk-modal-actions">
-            <span style={{ fontSize: 13, color: "#475569", marginRight: 8 }}>🤖 От имени: <b style={{ color: "#0a5caa" }}>{botNick || "..."} </b></span>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#475569", marginRight: 8, flexWrap: "wrap" }}>
+              <span>🤖 От имени: <b style={{ color: "#0a5caa" }}>{botAuthor || "..."}</b></span>
+              {botAuthor && (
+              <button
+              type="button"
+              onClick={pickRandomBot}
+              title="Сменить бота на другого рандомного"
+              style={{ padding: "2px 8px", fontSize: 11, background: "#f1f5f9", border: "1px solid #C9D4E2", borderRadius: 4, cursor: "pointer", color: "#1E3A5F" }}
+              >🔄 Сменить</button>
+              )}
+              </div>
             <button className="sk-btn-classic" style={{ marginTop: 0 }} onClick={props.onClose} disabled={busy}>
               Отмена
             </button>

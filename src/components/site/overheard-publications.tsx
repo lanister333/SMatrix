@@ -119,7 +119,7 @@ function OverheardRow(props: {
   const { item, user } = props;
   // 2026-10-15: админ видит кнопки управления на ВСЕХ карточках
   const isAdminRole = user?.role === "owner" || user?.role === "admin" || user?.role === "moderator";
-  const own = !!(user && (item.authorId === user.id || item.originalAuthorId === user.id || isAdminRole));
+  const own = !!(user && user.id && (isAdminRole || (item.authorId != null && item.authorId === user.id) || (item.originalAuthorId != null && item.originalAuthorId === user.id)));
   return (
     <article className={`oh-item${props.highlight ? " oh-highlight" : ""}`} data-oh-id={item.id}>
       {item.tag && item.tag !== "message" && (
@@ -636,7 +636,7 @@ export function OverheardPage(props: {
               подтверждённым фактом.
             </div>
             <button className="oh-newbtn" onClick={openNewForm}>
-              ＋ Написать в «Подслушано»
+              Написать в «Подслушано»
             </button>
           </div>
 
