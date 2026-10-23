@@ -88,7 +88,7 @@ function omYsUrl(): string {
     `https://api.open-meteo.com/v1/forecast?latitude=${YUZHNO.lat}&longitude=${YUZHNO.lon}` +
     `&current=temperature_2m,relative_humidity_2m,apparent_temperature,surface_pressure,wind_speed_10m,wind_direction_10m,weather_code` +
     `&hourly=temperature_2m,relative_humidity_2m,apparent_temperature,surface_pressure,wind_speed_10m,wind_direction_10m,weather_code` +
-    `&wind_speed_unit=ms&timezone=Asia%2FSakhalin&forecast_days=1`
+    `&wind_speed_unit=ms&timezone=Asia%2FSakhalin&forecast_days=2`
   );
 }
 
@@ -133,7 +133,8 @@ function metNoPoint(lat: number, lon: number): Promise<{ now: WeatherNow; hours:
       const todayEntries = ts.filter((e) => e.time && sakhalinLocal(e.time).date === today);
       if (!todayEntries.length) return null;
       const det = (e: MetNoEntry) => e.data?.instant?.details ?? {};
-      const hours: WeatherHour[] = todayEntries
+      const allEntries = d.properties?.timeseries ?? [];
+      const hours: WeatherHour[] = allEntries
         .filter((e) => sakhalinLocal(e.time!).hh.slice(0, 2) >= curHour)
         .map((e) => {
           const x = det(e);

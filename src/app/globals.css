@@ -3415,7 +3415,7 @@ a.pl-entry-detail:hover{color:#0a5caa}
   .mp-trow{padding:4px 5px}
   .mp-list{margin:4px 5px 5px}
   .mp-grid{gap:6px;margin-top:2px}
-  .mp-footer{margin-top:0;padding:0 6px 5px}
+  .mp-footer{margin-top:0;padding:12px 6px 5px}
   .mp-footer{padding-bottom:calc(5px + env(safe-area-inset-bottom,0px))}
   /* Самостоятельные разделы: oh/wb/cd/rc/ep/dk/ad/gkh + pl
      (у семейства ad- контейнеры зовутся ad-grid/ad-sidebox/ad-entry) */
@@ -4232,6 +4232,7 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
 .wth-now-r{display:flex;flex-direction:column;gap:2px;min-width:0}
 .wth-now-l{font-size:13.5px;font-weight:700;color:#1a2433}
 .wth-now-r small{font-size:11.5px;color:#56657a}
+.wth-now-icon{font-size:72px;line-height:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;vertical-align:middle}
 .wth-metrics{display:flex;gap:6px}
 .wth-metric{flex:1;background:#f2f6f9;border:1px solid #e1e8ee;border-radius:4px;padding:6px 7px;display:flex;flex-direction:column;gap:2px;min-width:0}
 .wth-metric small{font-size:10.5px;color:#56657a;line-height:1.2}
@@ -4259,7 +4260,7 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
 .hourly-forecast::-webkit-scrollbar{height:4px}
 .hourly-forecast::-webkit-scrollbar-thumb{background:#c8d8e3;border-radius:2px}
 .hourly-forecast::-webkit-scrollbar-track{background:transparent}
-.hour-cell{position:relative;flex:1 0 130px;max-width:200px;scroll-snap-align:start;padding:12px 8px;border:1px solid #d6e4f0;border-radius:6px;text-align:center;font-size:13px;background:#fff;transition:background .15s ease,filter .15s ease;cursor:pointer}
+.hour-cell{position:relative;flex:1 0 130px;max-width:200px;scroll-snap-align:start;padding:6px 6px;border:none;border-radius:6px;text-align:center;font-size:13px;background:#fff;transition:background .15s ease,filter .15s ease;cursor:pointer}
 /* ТЗ 2026-09-21 «ячейки ярко-голубые, темнее/светлее по времени суток»:
    заливка ячейки зависит от часа суток (класс из weather-screen):
    день 09/10/16/17 ч — базовый ярко-голубой #2196f3; 11:00–15:59 .midday —
@@ -4286,16 +4287,17 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
 .hour-cell.midday:not(.current) .hour-time{color:#1e3a5f}
 .hour-cell.midday:not(.current) .hour-wind{color:#274b6d}
 /* hover: яркость заливки + светлая рамка (фон НЕ белеет) */
-.hour-cell:hover{filter:brightness(1.08);border-color:rgba(255,255,255,.55)}
+.hour-cell:hover{filter:brightness(1.08)}
 /* текущий час — белая ячейка с двойным бирюзовым кольцом: выделяется
    среди насыщенного ряда, текст сохраняет обычные тёмные цвета */
-.hour-cell.current{background:#fff;border-color:#06cdbd;box-shadow:inset 0 0 0 1px #06cdbd}
+.hour-cell.current{background:#fff;border:none;box-shadow:none}
 .hour-cell.current .hour-time{font-weight:700}
-.hour-cell.selected{border-color:#0aa89a;box-shadow:inset 0 0 0 1px #0aa89a}
+.hour-cell.selected{border:none;box-shadow:none}
 .hour-now{position:absolute;top:calc(100% + 2px);left:50%;transform:translateX(-50%);background:#06cdbd;color:#0e2a44;font-size:10.5px;font-weight:700;line-height:1;padding:3px 9px;border-radius:8px;white-space:nowrap}
 .hour-time{font-size:13.5px;font-weight:600;color:#2a6fa8;font-variant-numeric:tabular-nums}
-.hour-icon{font-size:32px;line-height:1;margin:6px 0}
-.hour-temp{font-size:20px;font-weight:700;color:#1a2433;font-variant-numeric:tabular-nums}
+.hour-icon{font-size:44px;line-height:0;margin:2px 0;display:inline-flex;align-items:center;justify-content:center}
+.hour-temp{font-size:26px;font-weight:800;color:#1a2433;font-variant-numeric:tabular-nums}
+.hour-icon{font-size:44px;line-height:0;margin:2px 0;display:inline-flex;align-items:center;justify-content:center}
 .hour-temp.cool{color:#3a9ca5}
 .hour-temp.warm{color:#6bbf59}
 .hour-temp.hot{color:#e8a33d}
@@ -4309,17 +4311,20 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
    hourTempClass (классы уже стоят на элементе). Правила стоят ПОСЛЕ
    цветовых классов .hour-temp.* выше — больший вес (0,3,0) и порядок
    каскада гарантируют применение внутри ячеек почасовки */
-.hour-cell .hour-temp{display:inline-block;margin:2px 0 1px;padding:1px 12px;border-radius:0;background:#4da4e4;color:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.65)}
-.hour-cell .hour-temp.cold{background:#2e7dd6;color:#fff}
-.hour-cell .hour-temp.cool{background:#3db3a8;color:#fff}
-.hour-cell .hour-temp.warm{background:#a2c93b;color:#1e3a5f}
-.hour-cell .hour-temp.hot{background:#f5d327;color:#1e3a5f}
-.hour-cell .hour-temp.veryhot{background:#f5820b;color:#fff}
-.hour-humidity{display:inline-block;margin:3px 0 2px;padding:2px 9px;border-radius:8px;font-size:11.5px;font-weight:700;line-height:1.35;color:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.65)}
+.hour-cell .hour-temp{display:block;margin:2px 0 0px;padding:0;border-radius:0;background:transparent;color:#1a2433;box-shadow:none}
+.hour-cell:not(.current):not(.midday) .hour-temp{color:#fff !important}
+.hour-cell.midday:not(.current) .hour-temp{color:#1a2433 !important}
+.hour-cell.current .hour-temp{color:#1a2433 !important}
+.hour-cell .hour-temp.cold{background:transparent;color:#1e6fb8}
+.hour-cell .hour-temp.cool{background:transparent;color:#3a9ca5}
+.hour-cell .hour-temp.warm{background:transparent;color:#6bbf59}
+.hour-cell .hour-temp.hot{background:transparent;color:#e8a33d}
+.hour-cell .hour-temp.veryhot{background:transparent;color:#d9534f}
+.hour-humidity{display:inline-block;margin:0 0 0px;padding:2px 9px;border-radius:8px;font-size:11.5px;font-weight:700;line-height:1.35;color:#fff;}
 .hour-humidity.hum-low{background:#8a97a3}
 .hour-humidity.hum-mid{background:#3a9ca5}
 .hour-humidity.hum-high{background:#4a90d9}
-.hour-wind{font-size:12px;color:#8a97a3;white-space:nowrap}
+.hour-wind{font-size:12px;color:#8a97a3;white-space:nowrap;margin:0}
 .wind-arrow{display:inline-block}
 .hour-details{margin-top:8px;background:#f5f8fb;border:1px solid #d9e2ea;border-radius:6px;padding:7px 10px;font-size:12px;color:#1a2433;display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline}
 .hour-details b{color:#0a5caa}
@@ -4695,7 +4700,9 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
   .wth-body{padding:6px}
   /* .sk .wth-back (мобильное) УДАЛЕНО 2026-09-19 — см. комментарий у десктопного блока .wth-body */
   .wth-now{gap:8px;padding:0 0 4px}
-  .wth-now-t{font-size:38px !important} /* 2026-09-21 «ярче»: было 30px; !important побеждает инлайн-48px десктопа */
+  .wth-now-icon{font-size:72px;line-height:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;vertical-align:middle}
+  .wth-now-t{font-size:38px !important}
+  .wth-now-icon{font-size:56px !important}
   .wth-now-l{font-size:12.5px}
   .wth-now-r small{font-size:10.5px}
   .wth-metrics{gap:4px}
@@ -4708,8 +4715,8 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
   .hourly-forecast{gap:8px;padding-bottom:24px}
   .hour-cell{flex:0 0 88px;padding:9px 6px}
   .hour-time{font-size:12px}
-  .hour-icon{font-size:24px}
-  .hour-temp{font-size:16px}
+  .hour-icon{font-size:44px;line-height:0;margin:2px 0;display:inline-flex;align-items:center;justify-content:center}
+  .hour-temp{font-size:22px}
   .hour-details{gap:4px 10px}
   .wth-dirs{padding:0 4px 6px}
   .wth-g{margin-top:5px}
@@ -5700,7 +5707,7 @@ div[style*="background-color: rgb(0, 74, 143)"] {
 /* Карточки: белые на голубом, чёткая спокойная рамка, радиус 6px.
    box-shadow:none гасит тень .sakh-card (globals.css:1713) и тень
    .mp-panel из @media ≥768px (globals.css:1720) — по ТЗ теней нет. */
-.sk .sidebar-card{background:#fff;border:1px solid #d6e4f0;border-radius:6px;margin-bottom:12px;overflow:hidden;box-shadow:none}
+.sk .sidebar-card{background:#fff;border:none;border-radius:6px;margin-bottom:12px;overflow:hidden;box-shadow:none}
 /* Шапка карточки: плоский фирменный синий, надпись по центру,
    без нижней линии (по ТЗ у .card-header только фон + паддинг). */
 .sk .sidebar-card > .card-header{background:#1f3a5f;color:#fff;font-weight:600;font-size:14px;padding:8px 12px;text-align:center;border-bottom:0}
@@ -5723,7 +5730,7 @@ div[style*="background-color: rgb(0, 74, 143)"] {
    только цвет рамки, мгновенно). Этот блок ДУБЛИРУЕТ инлайн-стили
    <style id="wth-minimal-css"> в weather-screen.tsx (страховка на
    случай устаревшего CSS-чанка Turbopack — значения держать синхронно). */
-.sk .district-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#fff;border:1px solid #d6e4f0;border-radius:6px;margin-bottom:0}
+.sk .district-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#fff;border:none;border-radius:6px;margin-bottom:0}
 .sk .district-row:hover{border-color:#3a9ca5}
 .sk .district-name{color:#1f3a5f;font-size:14px}
 /* Температура района — СТРОГО фирменный синий для любого значения;

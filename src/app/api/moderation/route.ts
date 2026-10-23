@@ -25,18 +25,31 @@ export async function GET(req: NextRequest) {
     }
     const q = (sp.get("q") || "").trim();
     const limit = Math.min(200, Math.max(1, parseInt(sp.get("limit") || "60", 10) || 60));
+    // 2026-10-21: опциональный фильтр — если задан, показываем только этот тип
+    // (нужно для блоков админки: «Спорных случаев», «Скрыто авто», и т.д.)
+    const filter = (sp.get("filter") || "").trim().toLowerCase();
 
-    const where: Record<string, unknown> = {
-      OR: [
+    const where: Record<string, unknown> = {};
+    if (filter === "needhuman") {
+      where.needHuman = true;
+    } else if (filter === "hiddenbyai") {
+      where.isHiddenByAi = true;
+    } else if (filter === "deleted") {
+      where.isDeleted = true;
+    } else if (filter === "complaints") {
+      where.complaints = { some: { resolved: false } };
+    } else {
+      // По умолчанию — все спорные/скрытые/удалённые/с жалобами (как было)
+      where.OR = [
         { needHuman: true },
         { isHiddenByAi: true },
         { isDeleted: true },
         { complaints: { some: { resolved: false } } },
-      ],
-    };
+      ];
+    }
     if (q) {
       where.AND = [
-        { OR: where.OR },
+        where.OR ? { OR: where.OR } : (filter === "needhuman" ? { needHuman: true } : filter === "hiddenbyai" ? { isHiddenByAi: true } : filter === "deleted" ? { isDeleted: true } : filter === "complaints" ? { complaints: { some: { resolved: false } } } : {}),
         {
           OR: [
             { body: { contains: q } },
@@ -45,7 +58,12 @@ export async function GET(req: NextRequest) {
           ],
         },
       ];
-      delete where.OR;
+      // Чистим — оставляем только AND
+      if (where.OR) delete where.OR;
+      if (where.needHuman !== undefined && filter !== "needhuman") delete where.needHuman;
+      if (where.isHiddenByAi !== undefined && filter !== "hiddenbyai") delete where.isHiddenByAi;
+      if (where.isDeleted !== undefined && filter !== "deleted") delete where.isDeleted;
+      if (where.complaints !== undefined && filter !== "complaints") delete where.complaints;
     }
 
     const messages = await db.message.findMany({
