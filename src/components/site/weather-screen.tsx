@@ -602,7 +602,7 @@ section.mp-panel[aria-label="Оперативная обстановка на п
 /* 2а. ТЗ 2026-09-21 №4: фон блоков ЦЕНТРАЛЬНОЙ колонки — нежно-голубой
       (было белым): «Погода», «Приливы и отливы» (mp-panel с
       классом .sidebar-card), «Температура по районам», «Перевалы».
-      ТЗ 2026-09-21 «ярче»: #eef3f8 → #e8f4fb — чище/светлее голубой,
+      ТЗ 2026-09-21 «ярче»: #eef3f8 → #e8f4fb; 2026-10-23 «заметнее»: #e8f4fb → #d4ecf7 — насыщеннее, контраст с белым.
       белый карточек-заполнителей читается на нём контрастнее.
       Шапки остаются тёмно-синими (rule 3); карточки боковых колонок —
       белые (глобальный .sk .sidebar-card в globals.css) */
@@ -611,7 +611,7 @@ section.mp-panel[aria-label="Температура по районам Саха
 section.mp-panel[aria-label="Оперативная обстановка на перевалах"],
 .sk .center-column.sidebar .sidebar-card,
 .sk .center-column:has(> section[aria-label="Погода в Южно-Сахалинске"]) .sidebar-card{
-  background:#e8f4fb !important;
+  background:#d4ecf7 !important;
 }
 /* 2б. ТЗ 2026-09-21 «фон как у Перевалов»: тело .card-body (глобальный
       .sk .card-body белый, globals.css) делаем прозрачным — сквозь него
@@ -953,11 +953,11 @@ section.mp-panel[aria-label="Оперативная обстановка на п
    mp-w-upd (строка источника): padding 4px → 1px; font 11.5px → 10.5px.
    Итог: блок 605px → ~360px (−245px). */
 .tide-chart svg{display:block;width:100%;max-height:180px !important;height:auto}
-.tide-row{padding:2px 8px !important;margin-bottom:1px !important;border-radius:0 !important;font-size:11px !important}
+.tide-row{padding:4px 8px !important;margin:0 !important;border-radius:4px !important;font-size:11px !important}
 .tide-kind{font-size:11px !important}
 .tide-time{font-size:11px !important}
 .tide-h{font-size:13px !important}
-.tides-list{gap:0 !important}
+.tides-list{gap:6px !important}
 .tide-note{margin-top:1px !important;font-size:10.5px !important}
 .tides-body .mp-w-upd{padding:1px 8px !important;font-size:10.5px !important;margin-top:2px !important}
 .tides-body{padding:4px !important}

@@ -224,6 +224,46 @@ body{background:#E8EAEB}
   .center-column{flex:1 1 1105px !important;width:auto !important;min-width:850px !important;max-width:1105px;margin-left:0 !important;margin-right:0 !important;padding-left:0 !important;padding-right:0 !important}
 }
 
+/* ===== 2026-10-23: адаптация под 15-дюймовые ноутбуки (1366/1440px) =====
+   На 17" (1920px) центральная колонка 1105px max + 2×300px боковые + 24px gap = 1729px.
+   На 15" (1366px) доступно ~1346px после padding 10px — 3 колонки 150+850+150+24=1174
+   умещаются минимально, но max-width:1105px раздувает центр и обрезает правую колонку.
+   Решение: на 1024-1439px уменьшить min-width центральной (850→560) и убрать max-width,
+   боковые — 220px вместо 300. Тогда 220+12+~870+12+220=1334px, влезает в 1346. */
+@media (min-width:1024px) and (max-width:1439px){
+  .main-grid-container{max-width:1439px !important;gap:10px !important}
+  .left-column{flex:0 0 220px !important;min-width:200px !important;max-width:240px !important}
+  .right-column{flex:0 0 220px !important;min-width:200px !important;max-width:240px !important}
+  .center-column{flex:1 1 100% !important;min-width:0 !important;max-width:none !important}
+  /* Каркас страницы — меньше воздуха по бокам */
+  .sk-shell{padding:6px 6px 0 !important}
+  /* Карточки внутри центральной колонки — компактнее */
+  .mp-panel,.sidebar-card{margin-bottom:8px !important}
+  /* Почасовой прогноз: ячейки компактнее, чтобы влезало больше часов */
+  .hour-cell{flex:0 0 76px !important;max-width:90px !important;padding:5px 3px !important}
+  .hour-icon{font-size:32px !important}
+  .hour-temp{font-size:18px !important}
+  .hour-time{font-size:12px !important}
+  .hour-humidity{font-size:10px !important}
+  .hour-wind{font-size:10px !important}
+  /* Главная иконка погоды — чуть меньше */
+  .wth-now-icon{font-size:56px !important}
+  .wth-now-t{font-size:32px !important}
+  /* Виджет meteoblue — ужимаем по высоте */
+  .mp-w-frame,.mp-w-frame-sm{height:180px !important}
+  /* Таблица валют в правой колонке — компактнее */
+  .right-column table{font-size:11px !important}
+  .right-column th,.right-column td{padding:2px 4px !important}
+  /* Левое меню — компактнее */
+  .left-column{font-size:12.5px !important}
+  /* Почасовой прогноз — gap меньше, чтобы влезло больше ячеек */
+  .hourly-forecast{gap:4px !important;padding-bottom:14px !important}
+  /* Метрики (Влажность/Давление/Ветер) — компактнее */
+  .wth-metric{padding:4px 6px !important}
+  .wth-metric small{font-size:9.5px !important}
+  .wth-metric b{font-size:12px !important}
+}
+
 .sk-addtopic{color:#c40000;margin-bottom:10px;font-size:14px;font-weight:700;display:inline-block}
 .sk-addtopic:hover,.sk a.sk-addtopic:hover{color:#8f0000}
 
@@ -2859,7 +2899,7 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
   [data-flat-card-contact]{padding:4px 8px !important;font-size:12px !important}
   .sm-nick-gender{font-size:inherit}
   .tide-chart svg{max-height:150px !important}
-  .tide-row{padding:2px 6px !important}
+  .tide-row{padding:3px 6px !important;min-width:0 !important;flex:1 1 100px !important}
   .wth-metric{padding:3px 6px !important}
   .wth-pass{padding:2px 6px !important;margin:0 0 1px !important}
   .help-item-body p{line-height:1.3}
@@ -5746,13 +5786,13 @@ div[style*="background-color: rgb(0, 74, 143)"] {
    Marine). Карточка наследует .sidebar-card/.card-header/.card-body
    минимализма сайдбара (белая, рамка #d6e4f0, шапка #1f3a5f по центру);
    здесь только строки экстремумов. Без @media и без анимаций. */
-.tides-list{display:flex;flex-direction:column}
-.tide-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:7px 10px;border:1px solid #2196f3;border-radius:6px;margin-bottom:6px;background:#fff}
+.tides-list{display:flex;flex-direction:row;flex-wrap:wrap;gap:6px;justify-content:space-between}
+.tide-row{flex:1 1 140px;min-width:140px;max-width:200px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:5px 8px;border:1px solid #2196f3;border-radius:6px;margin:0;background:#fff}
 .tide-row.tide-next{border-color:#1f3a5f}
 .tide-kind{font-size:13px;font-weight:700;color:#1f3a5f;white-space:nowrap}
 .tide-kind.low{color:#2a6fa8}
-.tide-time{font-size:13px;color:#1a2433;flex:1 1 auto;text-align:right;white-space:nowrap}
-.tide-h{font-size:15px;font-weight:700;color:#1f3a5f;white-space:nowrap}
+.tide-time{font-size:12px;color:#1a2433;white-space:nowrap}
+.tide-h{font-size:14px;font-weight:700;color:#1f3a5f;white-space:nowrap}
 .tide-note{font-size:12px;color:#8a97a3;margin-top:2px}
 .tides-empty{font-size:13px;color:#56657a}
 
