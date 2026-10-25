@@ -150,7 +150,7 @@ export default function TrafficScreen() {
               360–414px не ломает. */}
           <section className="mp-panel sakh-card" aria-label="Оперативные дорожные события">
             <div className="mp-paneltitle">
-              <span className="tri">▼</span>Оперативные дорожные события
+              Оперативные дорожные события
             </div>
             {reports.items.length > 0 ? (
               <div className="trf-log">
@@ -175,7 +175,7 @@ export default function TrafficScreen() {
               Закрыта / Тяжело; отчётов нет — «н/д»). */}
           <section className="mp-panel sakh-card" aria-label="Состояние загородных трасс">
             <div className="mp-paneltitle">
-              <span className="tri">▼</span>Состояние загородных трасс
+              Состояние загородных трасс
             </div>
             <table className="trf-roads">
               <tbody>

@@ -2215,7 +2215,7 @@ export default function HomeCenter(props: {
       */}
       <section className="mp-panel" aria-label="Подслушано Сахалин">
         <div className="mp-paneltitle">
-          <span className="tri">▼</span>Подслушано Сахалин
+          <span className="tri">▼</span><a href="/podslyshano" title="Все сообщения «Подслушано Сахалин»">Подслушано Сахалин</a>
         </div>
         <div
           className="mp-rows mp-overheard mp-overheard-scroll"
@@ -2263,7 +2263,7 @@ export default function HomeCenter(props: {
       {/* 7.2 «Последние темы форума» — заголовок ровно как в макете */}
       <section className="mp-panel" aria-label="Последние темы форума">
         <div className="mp-paneltitle">
-          <span className="tri">▼</span>Последние темы форума
+          <span className="tri">▼</span><a href="/forum" title="Все темы форума">Последние темы форума</a>
         </div>
         <div className="mp-rows">
           {topics === null ? (

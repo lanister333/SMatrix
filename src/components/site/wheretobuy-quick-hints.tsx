@@ -258,7 +258,7 @@ export default function WhereToBuyQuickHints() {
   return (
     <section className="mp-panel" aria-label="Быстрые подсказки «Где купить»" data-wtb-hints="1">
       <div className="mp-paneltitle">
-        <span className="tri">▼</span>Быстрые подсказки «Где купить»
+        <span className="tri">▼</span><a href="/gde-kupit" title="Все подсказки «Где купить»">Быстрые подсказки «Где купить»</a>
       </div>
 
       {/* Витрина сухих географических фактов: последние подсказки (новые сверху). */}

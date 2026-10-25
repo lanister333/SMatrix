@@ -400,7 +400,7 @@ function tideFmt(v: number): string {
 function TideWaveChart({ tides, nowIso }: { tides: TidesData; nowIso: string }) {
   const pts = (tides.series ?? []).filter((p) => Number.isFinite(p.height));
   if (pts.length < 2) return null;
-  const W = 600, H = 140, padL = 42, padR = 14, padT = 28, padB = 20;
+  const W = 1150, H = 140, padL = 42, padR = 14, padT = 28, padB = 20;
   const plotW = W - padL - padR;
   const baseY = padT + (H - padT - padB);
   const t0 = tideMin(pts[0].iso);
@@ -953,11 +953,11 @@ section.mp-panel[aria-label="Оперативная обстановка на п
    mp-w-upd (строка источника): padding 4px → 1px; font 11.5px → 10.5px.
    Итог: блок 605px → ~360px (−245px). */
 .tide-chart svg{display:block;width:100%;max-height:180px !important;height:auto}
-.tide-row{padding:4px 8px !important;margin:0 !important;border-radius:4px !important;font-size:11px !important}
+.tide-row{padding:2px 8px !important;margin-bottom:1px !important;border-radius:0 !important;font-size:11px !important}
 .tide-kind{font-size:11px !important}
 .tide-time{font-size:11px !important}
 .tide-h{font-size:13px !important}
-.tides-list{gap:6px !important}
+.tides-list{gap:0 !important}
 .tide-note{margin-top:1px !important;font-size:10.5px !important}
 .tides-body .mp-w-upd{padding:1px 8px !important;font-size:10.5px !important;margin-top:2px !important}
 .tides-body{padding:4px !important}
@@ -1329,7 +1329,7 @@ export default function WeatherScreen() {
               треугольник в шапке) не менялась. */}
           <section className="mp-panel sakh-card sidebar-card" aria-label="Температура по районам Сахалина и Курил">
             <div className="mp-paneltitle card-header">
-              <span className="tri">▼</span>Температура по районам
+              Температура по районам
             </div>
             <div className="wth-dirs card-body">
               {wx.cities.length > 0 ? (
@@ -1369,7 +1369,7 @@ export default function WeatherScreen() {
               ломает правую границу .sakh-card на телефонах. */}
           <section className="mp-panel sakh-card" aria-label="Оперативная обстановка на перевалах">
             <div className="mp-paneltitle">
-              <span className="tri">▼</span>Оперативная обстановка на перевалах
+              Оперативная обстановка на перевалах
             </div>
             {roads.items.length > 0 ? (
               <div className="wth-passes">

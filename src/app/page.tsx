@@ -87,7 +87,7 @@ function PinnedAndRules({ onOpenTopic: _onOpenTopic }: { onOpenTopic: (id: numbe
   return (
     <div className="sk-sidezone">
       <div className="sk-blocktitle">
-        <span className="tri">▼</span>Правила форума
+        <span className="tri">▼</span><a href="/rules.php" title="Правила форума SakhMatrix">Правила форума</a>
       </div>
       <ul className="sk-ruleslist">
         <li>Без оскорблений и переходов на личности</li>
@@ -147,7 +147,7 @@ function Sidebar(props: {
       )}
       <div className="sk-sideblock">
         <div className="sk-blocktitle">
-          <span className="tri">▼</span>Навигация
+          Навигация
         </div>
         <ul className="sk-navlist">
           {[
@@ -173,7 +173,7 @@ function Sidebar(props: {
       </div>
       <div className="sk-sideblock">
         <div className="sk-blocktitle">
-          <span className="tri">▼</span>Рубрики форума
+          Рубрики форума
         </div>
         <ul className="sk-navlist">
           {rubrics
@@ -233,7 +233,7 @@ function Sidebar(props: {
       {/* 2026-10-18: блок «Обсудить на форуме» убран — дублирует рубрики форума. */}
       <div className="sk-sideblock">
         <div className="sk-blocktitle">
-          <span className="tri">▼</span>Служебный раздел
+          Служебный раздел
         </div>
         <ul className="sk-navlist">
           {modAsk ? (

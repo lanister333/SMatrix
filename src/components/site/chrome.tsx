@@ -596,6 +596,9 @@ export function MainNav(props: {
                   href={m.href}
                   className="block w-full px-4 py-2.5 text-left text-[15px] font-semibold text-[#1E3A5F] hover:bg-[#EEF3F8]"
                 >
+                  {m.href === "/transport.php" ? (
+                    <span className="tri" style={{color: "#fff", backgroundColor: "#1f3a5f", padding: "1px 4px", marginRight: "6px", fontSize: "9px", verticalAlign: "1px", display: "inline-block"}}>▼</span>
+                  ) : null}
                   {m.label}
                 </a>
               ))}

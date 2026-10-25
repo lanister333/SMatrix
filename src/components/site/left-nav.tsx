@@ -171,7 +171,7 @@ export function ForumDiscussCard() {
   return (
     <div className="sk-sideblock">
       <div className="sk-blocktitle">
-        <span className="tri">▼</span>Обсудить на форуме
+        Обсудить на форуме
       </div>
 
       {/* ТЕЛО БЛОКА СО СПИСКОМ РУБРИК — inline-стили строк сохранены
@@ -247,7 +247,7 @@ export default function ForumSideNav() {
     <aside className="sk-col-left sk-col-left-inner left-column" aria-label="Навигация и категории форума">
       <div className="sk-sideblock">
         <div className="sk-blocktitle">
-          <span className="tri">▼</span>Навигация
+          Навигация
         </div>
         <ul className="sk-navlist">
           {SCOPE_LINKS.map((s) => {
@@ -263,7 +263,7 @@ export default function ForumSideNav() {
       </div>
       <div className="sk-sideblock">
         <div className="sk-blocktitle">
-          <span className="tri">▼</span>Рубрики форума
+          Рубрики форума
         </div>
         <ul className="sk-navlist">
           {rubrics
@@ -314,7 +314,7 @@ export default function ForumSideNav() {
       {modAsk && (
         <div className="sk-sideblock">
           <div className="sk-blocktitle">
-            <span className="tri">▼</span>Служебный раздел
+            Служебный раздел
           </div>
           <ul className="sk-navlist">
             <li className="sk-navico-row">

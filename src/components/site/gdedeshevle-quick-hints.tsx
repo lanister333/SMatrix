@@ -256,7 +256,7 @@ export default function GdedeshevleQuickHints() {
   return (
     <section className="mp-panel" aria-label="Быстрые подсказки «Где дешевле»" data-cheap-hints="1">
       <div className="mp-paneltitle">
-        <span className="tri">▼</span>Быстрые подсказки «Где дешевле»
+        <span className="tri">▼</span><a href="/gde-deshevle" title="Все подсказки «Где дешевле»">Быстрые подсказки «Где дешевле»</a>
       </div>
 
       {/* Витрина сухих фактов стоимости: последние подсказки (новые сверху). */}

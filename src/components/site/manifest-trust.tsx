@@ -9,7 +9,7 @@ export function ManifestTrust() {
   return (
     <div className="sk-sidezone sk-manifest">
       <div className="sk-blocktitle">
-        <span className="tri">▼</span>📋 Манифест SakhMatrix
+        📋 Манифест SakhMatrix
       </div>
 
       <div className="sk-manifest-content">

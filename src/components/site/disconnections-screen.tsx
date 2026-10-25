@@ -176,7 +176,6 @@ export default function DisconnectionsScreen() {
             return (
               <section className="mp-panel sakh-card" aria-label={b.title} key={b.key}>
                 <div className="mp-paneltitle">
-                  <span className="tri">▼</span>
                   {b.title}
                 </div>
                 {blockEmpty ? (
@@ -234,7 +233,7 @@ export default function DisconnectionsScreen() {
               ссылки href="tel:...": тап с телефона сразу набирает вызов */}
           <section className="mp-panel sakh-card" aria-label="Телефоны экстренных служб">
             <div className="mp-paneltitle">
-              <span className="tri">▼</span>Телефоны экстренных служб
+              Телефоны экстренных служб
             </div>
             <table className="dis-phones">
               <tbody>

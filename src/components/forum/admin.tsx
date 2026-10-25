@@ -318,7 +318,7 @@ function AdminHome(props: { token: string | null; notify: (m: string) => void; o
 
       {/* Дела, требующие внимания */}
       <div className="sk-blocktitle mt-4">
-        <span className="tri">▼</span>Дела, требующие внимания
+        Дела, требующие внимания
       </div>
       {data.attention.items.length === 0 ? (
         <p className="mt-1 text-[13.5px] text-[#56657a]">Все спокойно: спорных случаев и нерешённых жалоб нет.</p>
@@ -360,7 +360,7 @@ function AdminHome(props: { token: string | null; notify: (m: string) => void; o
 
       {/* Спорные AI-решения */}
       <div className="sk-blocktitle mt-4">
-        <span className="tri">▼</span>Спорные AI-решения
+        Спорные AI-решения
       </div>
       {data.disputed.appeals.length === 0 && data.disputed.aiSanctions.length === 0 ? (
         <p className="mt-1 text-[13.5px] text-[#56657a]">Спорных автоматических решений нет. Открытых апелляций: 0.</p>
@@ -404,7 +404,7 @@ function AdminHome(props: { token: string | null; notify: (m: string) => void; o
 
       {/* Последние действия модерации */}
       <div className="sk-blocktitle mt-4">
-        <span className="tri">▼</span>Последние действия модерации
+        Последние действия модерации
       </div>
       {data.recentActions.length === 0 ? (
         <p className="mt-1 text-[13.5px] text-[#56657a]">Журнал пуст — действий ещё не было.</p>

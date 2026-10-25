@@ -48,8 +48,8 @@ export type CurrencyCode = (typeof CURRENCIES)[number];
 export const CITY_SLUG = "yuzhno-sahalinsk";
 
 /** Коды источников (поле source в БД + диагностика ответа API). */
-export type SourceId = "bankdep" | "mainfin" | "banktop";
-export const SOURCE_IDS: SourceId[] = ["bankdep", "mainfin", "banktop"];
+export type SourceId = "bankdep" | "mainfin" | "banktop" | "kovalut";
+export const SOURCE_IDS: SourceId[] = ["bankdep", "mainfin", "banktop", "kovalut"];
 
 export interface SourceRate {
   bank: string; // каноническое имя ТЗ (после matchTargetBank)
@@ -290,7 +290,57 @@ export async function fetchBanktop(): Promise<SourceOutcome> {
 }
 
 /* ------------------------------------------------------------------ */
-/* 4) Сборка: приоритет bankdep → mainfin → banktop + запись серии     */
+/* 3б) KOVALUT.RU — дополнительный прямой источник для отдельных банков
+ *      (Итуруп — единственный банк ТЗ, которого нет в bankdep/mainfin).
+ *      2026-10-24: kovalut.ru/iturup/juzhno-sahalinsk отдаёт только USD
+ *      (98.68/102.68 — высокий, но реальный для регионального банка).
+ *      EUR/CNY/JPY/KRW/THB у Итурупа не публикуются — эти ячейки
+ *      остаются «unpublished», как и раньше.
+ * ------------------------------------------------------------------ */
+
+const KOVALUT_ROW_RE = /<div class="text-sm">(USD|EUR|CNY|JPY|KRW|THB)<\/div>[\s\S]*?font-bold">([^<]+)<!-- \+?-->\s*\/\s*<!-- \+?-->([^<]+)<\/div>/g;
+
+export async function fetchKovalut(): Promise<SourceOutcome> {
+  const rows: SourceRate[] = [];
+  // Пока kovalut нужен только для Итурупа — если появятся и другие банки,
+  // расширить список (slug банка на kovalut → каноническое имя ТЗ).
+  const KOVALUT_BANKS: { slug: string; bank: string }[] = [
+    { slug: "iturup", bank: "Банк «Итуруп»" },
+  ];
+  for (const { slug, bank } of KOVALUT_BANKS) {
+    // kovalut.ru использует транслитерацию «juzhno-sahalinsk» (с «j»),
+    // тогда как bankdep/mainfin — «yuzhno-sahalinsk» (с «y»).
+    const url = `https://kovalut.ru/${slug}/juzhno-sahalinsk`;
+    let html: string;
+    try {
+      html = await getPage(url);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      if (/HTTP 404/.test(msg)) continue;
+      continue;
+    }
+    let m: RegExpExecArray | null;
+    KOVALUT_ROW_RE.lastIndex = 0;
+    while ((m = KOVALUT_ROW_RE.exec(html)) !== null) {
+      const cur = m[1] as CurrencyCode;
+      if (m[2].includes("—") || m[3].includes("—")) continue;
+      const buy = num(m[2]);
+      const sell = num(m[3]);
+      if (!validRate(buy)) continue;
+      rows.push({
+        bank,
+        currency: cur,
+        buy,
+        sell: validRate(sell) && sell <= buy * 1.5 ? sell : null,
+        sourceStamp: null,
+      });
+    }
+  }
+  return { ok: true, empty: rows.length === 0, rows };
+}
+
+/* ------------------------------------------------------------------ */
+/* 4) Сборка: приоритет bankdep → mainfin → banktop + kovalut + запись */
 /* ------------------------------------------------------------------ */
 
 export interface AggregateOutcome {
@@ -441,6 +491,7 @@ export async function runCurrencyAggregate(): Promise<AggregateOutcome> {
     ["bankdep", fetchBankdep],
     ["mainfin", fetchMainfin],
     ["banktop", fetchBanktop],
+    ["kovalut", fetchKovalut],
   ];
   const settled = await Promise.allSettled(tasks.map(([, f]) => f()));
 

@@ -451,7 +451,7 @@ export default function HomeRight() {
           службы» по ТЗ 2026-09-21; содержимое (PHONES) не менялось */}
       <section className="mp-panel" aria-label="Службы спасения">
         <div className="mp-paneltitle">
-          <span className="tri">▼</span>Службы спасения
+          Службы спасения
         </div>
         <ul className="mp-phones">
           {PHONES.map(([name, num]) => (
