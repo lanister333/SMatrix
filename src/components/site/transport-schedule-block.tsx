@@ -103,7 +103,7 @@ export default function TransportScheduleBlock() {
   };
 
   const bodyStyle: React.CSSProperties = {
-    padding: "6px 9px 8px",
+    padding: "6px 9px 0",
     backgroundColor: "#FFFFFF",
   };
 

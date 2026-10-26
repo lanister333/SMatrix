@@ -221,7 +221,13 @@ body{background:#E8EAEB}
   .main-grid-container{display:flex !important;justify-content:center;width:100%;max-width:1729px;margin:0 auto;gap:12px !important}
   .left-column{flex:0 1 300px;min-width:150px;margin-left:0 !important;margin-right:0 !important;padding-left:0 !important;padding-right:0 !important}
   .right-column{flex:0 1 300px;min-width:150px;margin-left:0 !important;margin-right:0 !important;padding-left:0 !important;padding-right:0 !important}
-  .center-column{flex:1 1 1105px !important;width:auto !important;min-width:850px !important;max-width:1105px;margin-left:0 !important;margin-right:0 !important;padding-left:0 !important;padding-right:0 !important}
+  /* 2026-10-24: симметричные отступы карусели — убрать margin-bottom
+   у последнего блока в каждой колонке (чтобы marginTop карусели 11px
+   не складывался с 10px от колонки → не было 21px сверху vs 11px снизу) */
+.left-column > :last-child,
+.center-column > :last-child,
+ .center-column > .mp-center > :last-child,
+.right-column > :last-child{margin-bottom:0 !important}
 }
 
 /* ===== 2026-10-23: адаптация под 15-дюймовые ноутбуки (1366/1440px) =====
@@ -262,6 +268,17 @@ body{background:#E8EAEB}
   .wth-metric{padding:4px 6px !important}
   .wth-metric small{font-size:9.5px !important}
   .wth-metric b{font-size:12px !important}
+  /* VolunteersCarousel: на 15" (1024-1439) уменьшить карточки 320x180 → 240x140 */
+  .sakh-marquee-track a{flex:0 0 240px !important;width:240px !important;min-width:240px !important;height:140px !important;padding:10px 12px !important}
+  .sakh-marquee-track a img{width:60px !important;height:60px !important}
+  .sakh-marquee-track a span{font-size:14px !important}
+}
+
+/* 2026-10-26: компенсировать 3px flex-расширения на 1024-1150,
+   чтобы gap от кнопки "Показать ещё" до карусели был 12px (как 11px ниже).
+   На 1200+ правая колонка не длиннее центральной — компенсация не нужна. */
+@media (min-width:1024px) and (max-width:1150px){
+  .sakh-carousel-wrap{margin-top:8px !important;margin-bottom:11px !important}
 }
 
 .sk-addtopic{color:#c40000;margin-bottom:10px;font-size:14px;font-weight:700;display:inline-block}
@@ -5637,6 +5654,53 @@ div[style*="background-color: rgb(0, 74, 143)"] {
 }
 
 /* ============================================================
+   2026-10-26: Плавная бесконечная карусель через CSS transform.
+   .sakh-marquee — внешний контейнер (overflow:hidden, обрезает выходящие за пределы карточки).
+   .sakh-marquee-track — flex-row, содержит удвоенный набор карточек.
+   Анимация: translateX(0) → translateX(-50%) за 40с, linear infinite.
+   -50% — это ровно половина ширины track (т.е. один набор карточек),
+   после чего анимация мгновенно и бесшовно начинается заново.
+   Пауза при наведении мыши и касании — через :hover и :active.
+   ============================================================ */
+.sakh-marquee {
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 4px 0;
+  /* touch-action: pan-y pan-x — страница скроллится вертикально,
+     а карусель ловит горизонтальный свайп для ручной прокрутки. */
+  touch-action: pan-y pan-x;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
+}
+.sakh-marquee-track {
+  display: flex;
+  gap: 8px;
+  width: max-content;
+  /* JS управляет transform напрямую через requestAnimationFrame.
+     CSS-анимация убрана — она нестабильна (prefers-reduced-motion, рывки GPU). */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* Не задаём transform в CSS — JS задаёт его каждый кадр */
+}
+
+/* 2026-10-26: На ВСЕХ устройствах карусель использует JS requestAnimationFrame
+   для плавного автоскролла. CSS-анимация убрана (нестабильна).
+   touch-action: pan-y — разрешает странице вертикальный скролл при касании
+   карусели; карусель НЕ реагирует на горизонтальный свайп (управляется только JS).
+   Это решает проблему "карусель застревает и дёргается" и "баннеры заканчиваются".
+   Пауза автоскролла — при наведении (ПК) или касании (мобайл), через JS. */
+
+/* На 15" (1024-1439px) — стили для карточек (см. выше).
+   Скорость анимации регулируется в JS (PX_PER_SEC = 30), не зависит от ширины экрана. */
+
+/* prefers-reduced-motion убран — карусель критична, должна анимироваться всегда.
+   Если пользователь хочет паузу — наведёт мышь или коснётся карусели. */
+
+/* ============================================================
    ТЗ 2026-09-23 «Единый вид 7 сценариев»: кнопка «💬 Обсудить на
    форуме» в карточках сквозных тестовых сообщений
    (e2e-transfer-test-panel.tsx). Путь — ОТНОСИТЕЛЬНЫЙ
@@ -10900,3 +10964,5 @@ article button[style*="color: #dc2626"] {
 [data-flat-board] > [data-flat-form]{
   order:-1 !important;
 }
+
+.cache-bust-marker{content:"20261026-v2"}
