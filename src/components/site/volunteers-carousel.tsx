@@ -166,7 +166,8 @@ export default function VolunteersCarousel() {
       subColor: "#E5D9F2",
       url: "https://t.me/animals_sakhalin",
       logo: "/partners/animals-sakhalin-logo-nobg.png?v=4",
-      siteLabel: "t.me/animals_sakhalin"
+      siteLabel: "t.me/animals_sakhalin",
+      logoSize: 140
     },
     {
       name: "ПЁС И КОТ",
@@ -282,8 +283,9 @@ export default function VolunteersCarousel() {
                 // и тень (box-shadow) — это и есть «круги» поверх логотипа.
                 // Круглая форма (border-radius:50%) оставлена — это форма
                 // самого логотипа, а не рамка. Размер увеличен с 78 до 110px.
-                height: '110px',
-                width: '110px',
+                // Индивидуальный размер можно задать через p.logoSize.
+                height: `${p.logoSize || 110}px`,
+                width: `${p.logoSize || 110}px`,
                 borderRadius: '50%',
                 objectFit: 'cover',
                 flexShrink: 0
@@ -292,8 +294,9 @@ export default function VolunteersCarousel() {
                 // и тень (box-shadow) — это и есть «круги» поверх логотипа.
                 // Круглая форма (border-radius:50%) оставлена — это форма
                 // самого логотипа, а не рамка. Размер увеличен с 78 до 110px.
-                width: '110px',
-                height: '110px',
+                // Индивидуальный размер можно задать через p.logoSize.
+                width: `${p.logoSize || 110}px`,
+                height: `${p.logoSize || 110}px`,
                 borderRadius: '50%',
                 objectFit: 'cover',
                 flexShrink: 0
