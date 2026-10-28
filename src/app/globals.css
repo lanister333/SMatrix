@@ -295,7 +295,7 @@ body{background:#E8EAEB}
   .wth-metric b{font-size:12px !important}
   /* VolunteersCarousel: на 15" (1024-1439) уменьшить карточки 320x180 → 240x140 */
   .sakh-marquee-track a{flex:0 0 240px !important;width:240px !important;min-width:240px !important;height:140px !important;padding:10px 12px !important}
-  .sakh-marquee-track a img{width:100px !important;height:100px !important;object-fit:contain !important}
+  .sakh-marquee-track a img{height:100px !important;width:auto !important;max-width:140px !important;object-fit:contain !important}
   .sakh-marquee-track a span{font-size:14px !important}
 }
 
