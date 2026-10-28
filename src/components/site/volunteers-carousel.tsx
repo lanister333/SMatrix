@@ -278,21 +278,24 @@ export default function VolunteersCarousel() {
               src={p.logo}
               alt=""
               style={p.logoHorizontal ? {
-                // 2026-10-28: убраны круги (border-radius:50% + border + box-shadow),
-                // высота увеличена с 78px до 110px. Ширина auto — логотип
-                // занимает свою естественную форму, без принудительного квадрата.
+                // 2026-10-28: убраны белая обводка (border:3px solid #FFFFFF)
+                // и тень (box-shadow) — это и есть «круги» поверх логотипа.
+                // Круглая форма (border-radius:50%) оставлена — это форма
+                // самого логотипа, а не рамка. Размер увеличен с 78 до 110px.
                 height: '110px',
-                width: 'auto',
-                maxWidth: '170px',
-                objectFit: 'contain',
+                width: '110px',
+                borderRadius: '50%',
+                objectFit: 'cover',
                 flexShrink: 0
               } : {
-                // 2026-10-28: убраны круги (border-radius:50% + border +
-                // box-shadow). Высота 110px, ширина auto — логотип занимает
-                // свою естественную форму, без принудительного квадрата.
+                // 2026-10-28: убраны белая обводка (border:3px solid #FFFFFF)
+                // и тень (box-shadow) — это и есть «круги» поверх логотипа.
+                // Круглая форма (border-radius:50%) оставлена — это форма
+                // самого логотипа, а не рамка. Размер увеличен с 78 до 110px.
+                width: '110px',
                 height: '110px',
-                width: 'auto',
-                objectFit: 'contain',
+                borderRadius: '50%',
+                objectFit: 'cover',
                 flexShrink: 0
               }}
             />
