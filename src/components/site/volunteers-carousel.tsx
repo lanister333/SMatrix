@@ -278,20 +278,23 @@ export default function VolunteersCarousel() {
               src={p.logo}
               alt=""
               style={p.logoHorizontal ? {
-                height: '78px',
+                // 2026-10-28: убраны круги (border-radius:50% + border) —
+                // логотипы теперь крупнее и без белой обводки-круга.
+                height: '96px',
                 width: 'auto',
-                maxWidth: '130px',
+                maxWidth: '170px',
                 objectFit: 'contain',
                 flexShrink: 0,
-                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
+                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.25))'
               } : {
-                width: '78px',
-                height: '78px',
-                borderRadius: '50%',
-                border: '3px solid #FFFFFF',
-                objectFit: 'cover',
+                // 2026-10-28: убраны круги (border-radius:50% + border +
+                // box-shadow) — былo 78×78 в круге с белой обводкой,
+                // стало 110×110 «чистый» PNG с object-fit:contain.
+                width: '110px',
+                height: '110px',
+                objectFit: 'contain',
                 flexShrink: 0,
-                boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
+                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.25))'
               }}
             />
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, minWidth: 0 }}>

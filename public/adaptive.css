@@ -1,48 +1,25 @@
-/* === АДАПТИВНЫЙ ПАТЧ 2026-10-19 === */
-/* Для 15" ноутбуков (1024-1499px) — снимаем жёсткий min-width */
-
-@media (min-width: 1024px) and (max-width: 1499px) {
-  .center-column,
-  .left-column,
-  .right-column {
-    min-width: 0 !important;
-    max-width: none !important;
-  }
-  .center-column {
-    flex: 1 1 0 !important;
-  }
-  .left-column,
-  .right-column {
-    flex: 0 0 280px !important;
-    min-width: 240px !important;
-  }
-  .main-grid-container {
-    max-width: 100% !important;
-    gap: 8px !important;
-  }
-  .sk-shell {
-    padding-left: 6px !important;
-    padding-right: 6px !important;
-  }
-}
-
-@media (min-width: 1024px) and (max-width: 1366px) {
-  .left-column,
-  .right-column {
-    flex: 0 0 250px !important;
-    min-width: 200px !important;
-  }
-  .main-grid-container {
-    gap: 6px !important;
-  }
-  .sm-mainnav-link {
-    padding-left: 8px !important;
-    padding-right: 8px !important;
-    font-size: 13px !important;
-  }
-}
-
-html, body {
-  overflow-x: hidden !important;
-}
-
+/* === АДАПТИВНЫЙ ПАТЧ (DEPRECATED, 2026-10-28) ===
+ *
+ * ФАЙЛ НЕ ИМПОРТИРУЕТСЯ в src/app и не подключается через <link> ни в одном
+ * page.tsx (поиск `adaptive.css` по всему репозиторию возвращает 0 совпадений
+ * вне этого файла). Оставлен как историческая справка — правила из него
+ * были перенесены/превзойдены в src/app/globals.css:
+ *
+ *   • 1024-1679px  → @media (min-width:1024px) and (max-width:1679px)
+ *     в globals.css: .main-grid-container max-width:1679px, gap:10px;
+ *     .left-column/.right-column = clamp(220px, 25vw-100px, 300px);
+ *     .center-column = flex:1 1 100%;
+ *     + override всех секционных grids (sk/hp/oh/wb/cd/rc/ep/dk/gkh/ad/pl)
+ *     к симметричному шаблону clamp(220→300)/1fr/clamp(220→300).
+ *
+ *   • 1024-1366px  → в globals.css нет отдельного правила, но flex-override
+ *     clamp(220,25vw-100,300) плавно ужимает боковые колонки: на 1280px →
+ *     220px, на 1366px → ~241px, на 1440px → ~260px, на 1600px → 300px.
+ *
+ * Если понадобится отдельный adaptive.css в будущем — импортируйте через
+ * import "../public/adaptive.css" (но проще держать всё в globals.css,
+ * где правила уже живут).
+ *
+ * Сам файл оставлен пустым (только комментарий), чтобы не создавать риск
+ * конфликтов при случайном подключении.
+ * ============================================================ */

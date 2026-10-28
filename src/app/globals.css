@@ -164,7 +164,7 @@ body{background:#E8EAEB}
    Шаг 2: вертикальные линии-рамки слева/справа удалены (border:none) —
    разделение только зазорами и фоновым контрастом */
 .sk-shell{background:transparent;border-left:none;border-right:none;flex-direction:column;flex:0 0 auto;width:100%;max-width:none;margin:0;padding:8px 10px 0;display:flex}
-.sk-layout{flex:0 0 auto;grid-template-columns:320px minmax(0,1fr) 320px;align-items:start;gap:12px;display:grid}
+.sk-layout{flex:0 0 auto;grid-template-columns:300px minmax(0,1fr) 300px;align-items:start;gap:12px;display:grid}
 /* ЗАДАЧА 14, Шаг 2: серая вертикальная линия между боковым меню и
    контентными карточками удалена на всех страницах */
 .sk-col-left{border-right:none;min-height:400px;padding-right:12px}
@@ -255,6 +255,17 @@ body{background:#E8EAEB}
   .left-column{flex:0 0 clamp(220px,calc(25vw - 100px),300px) !important;min-width:0 !important;max-width:300px !important}
   .right-column{flex:0 0 clamp(220px,calc(25vw - 100px),300px) !important;min-width:0 !important;max-width:300px !important}
   .center-column{flex:1 1 100% !important;min-width:0 !important;max-width:none !important}
+  /* 2026-10-28: унификация секционных grids на 17" мониторах —
+     ранее .sk-layout/.hp-layout/.oh-layout/.wb-layout/.cd-layout/
+     .rc-layout/.ep-layout/.dk-layout/.gkh-layout/.ad-grid/.pl-grid
+     имели асимметрию 300/1fr/320 (Δ=20px справа) и на 1024-1679px не
+     всегда перекрывались flex-override'ом .main-grid-container —
+     отсюда «чехарда» ширины колонок при переходе между Главной/форумом
+     и секционными страницами. Теперь все секционные grid'ы приведены к
+     симметричному шаблону flex-каркаса: clamp(220→300)/1fr/clamp(220→300).
+     Это страховка — даже если flex-override .main-grid-container будет
+     ослаблен в будущем, секционные grid'ы останутся симметричными. */
+  .sk-layout,.hp-layout,.oh-layout,.wb-layout,.cd-layout,.rc-layout,.ep-layout,.dk-layout,.gkh-layout,.ad-grid,.pl-grid{grid-template-columns:clamp(220px,calc(25vw - 100px),300px) minmax(0,1fr) clamp(220px,calc(25vw - 100px),300px) !important;gap:10px !important}
   /* Каркас страницы — меньше воздуха по бокам */
   .sk-shell{padding:6px 6px 0 !important}
   /* Карточки внутри центральной колонки — компактнее */
@@ -284,7 +295,7 @@ body{background:#E8EAEB}
   .wth-metric b{font-size:12px !important}
   /* VolunteersCarousel: на 15" (1024-1439) уменьшить карточки 320x180 → 240x140 */
   .sakh-marquee-track a{flex:0 0 240px !important;width:240px !important;min-width:240px !important;height:140px !important;padding:10px 12px !important}
-  .sakh-marquee-track a img{width:60px !important;height:60px !important}
+  .sakh-marquee-track a img{width:100px !important;height:100px !important;object-fit:contain !important}
   .sakh-marquee-track a span{font-size:14px !important}
 }
 
@@ -839,7 +850,7 @@ li.sk-rubric-row{display:block}
    Спокойный стиль: тонкие серые границы, светлый фон, компактно,
    БЕЗ тёмно-синих рамок форума, без теней и градиентов.
    ============================================================ */
-.hp-layout{align-items:start;grid-template-columns:300px minmax(0,1fr) 320px;gap:14px;display:grid}
+.hp-layout{align-items:start;grid-template-columns:300px minmax(0,1fr) 300px;gap:12px;display:grid}
 
 /* ТЗ 2026-09-29 (правки /help — аналог /gde-deshevle, /rekomenduyu):
    3-колоночный layout СОХРАНЯЕТСЯ. Блоки перераспределены:
@@ -1201,7 +1212,7 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 }
 
 @media (min-width:901px) and (max-width:1150px){
-  .hp-layout{grid-template-columns:196px minmax(0,1fr) 214px;gap:10px}
+  .hp-layout{grid-template-columns:196px minmax(0,1fr) 196px;gap:10px}
 }
 @media (max-width:900px){
   /* Мобильная версия: левая колонка → центральная → правая, одна вертикальная последовательность.
@@ -1215,7 +1226,7 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
    Компактный информационный формат (ТЗ п.11/17): светлый фон, тонкие серые
    границы, серые разделители, линейный список — без тёмно-синих форумных
    рамок, больших декоративных карточек, теней и градиентов. */
-.oh-layout{align-items:start;grid-template-columns:300px minmax(0,1fr) 320px;gap:14px;display:grid}
+.oh-layout{align-items:start;grid-template-columns:300px minmax(0,1fr) 300px;gap:12px;display:grid}
 .oh-sideblock{background:#fff;border:1px solid #d9dee5;margin-bottom:12px;padding:9px 10px}
 .oh-blocktitle{color:#3d4a5c;border-bottom:1px solid #e4e8ee;margin-bottom:7px;padding-bottom:5px;font-size:13px;font-weight:700}
 .oh-navlist{margin:0;padding:0;list-style:none}
@@ -1290,7 +1301,7 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .oh-sourcebar{background:#fbfcfd;border:1px solid #d9dee5;border-top:0;color:#3d4a5c;margin-bottom:10px;padding:6px 10px;font-size:12.5px}
 .oh-sourcebar a{color:#0a5caa;font-weight:700;text-decoration:underline}
 @media (min-width:901px) and (max-width:1150px){
-  .oh-layout{grid-template-columns:196px minmax(0,1fr) 214px;gap:10px}
+  .oh-layout{grid-template-columns:196px minmax(0,1fr) 196px;gap:10px}
 }
 @media (max-width:900px){
   /* Мобильная версия: левая → центральная → правая, одна вертикальная колонка (ТЗ п.18) */
@@ -1307,7 +1318,7 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
    у «Подслушано»: светлый фон, тонкие серые границы, компактный список,
    без тёмно-синих форумных рамок/теней/градиентов (ТЗ п.22). */
 
-.wb-layout{align-items:start;grid-template-columns:300px minmax(0,1fr) 320px;gap:14px;display:grid}
+.wb-layout{align-items:start;grid-template-columns:300px minmax(0,1fr) 300px;gap:12px;display:grid}
 
 /* ТЗ 2026-09-28 (правки 1–4 страницы /gde-kupit — аналог /gde-deshevle):
    3-колоночный layout СОХРАНЯЕТСЯ. Блоки перераспределены:
@@ -1477,7 +1488,7 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .wb-sourcebar{background:#fbfcfd;border:1px solid #d9dee5;border-top:0;color:#3d4a5c;margin-bottom:10px;padding:6px 10px;font-size:12.5px}
 .wb-sourcebar a{color:#0a5caa;font-weight:700;text-decoration:underline}
 @media (min-width:901px) and (max-width:1150px){
-  .wb-layout{grid-template-columns:196px minmax(0,1fr) 214px;gap:10px}
+  .wb-layout{grid-template-columns:196px minmax(0,1fr) 196px;gap:10px}
 }
 @media (max-width:900px){
   /* Мобильная версия (ТЗ п.23): левая → центральная → правая, одна колонка */
@@ -1604,7 +1615,7 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
    ============================================================ */
 @media (min-width:901px) and (max-width:1150px){
   .sk-shell{padding:8px 10px 0}
-  .sk-layout{grid-template-columns:220px minmax(0,1fr) 220px;gap:10px}
+  .sk-layout{grid-template-columns:196px minmax(0,1fr) 196px;gap:10px}
   /* ТЗ 2026-09-23 «уменьшить боковые отступы»: padding-right:8px
      добавлялся к зазору 10px — слева визуально 18px против 10px
      справа; обнулён — зазоры поровну по 10px */
@@ -1695,7 +1706,7 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
    серые границы, компактный список, без тёмно-синих форумных рамок, теней
    и градиентов (ТЗ п.22). */
 
-.gkh-layout{align-items:start;grid-template-columns:300px minmax(0,1fr) 320px;gap:14px;display:grid}
+.gkh-layout{align-items:start;grid-template-columns:300px minmax(0,1fr) 300px;gap:12px;display:grid}
 
 /* ТЗ 2026-09-28 (правки страницы /gkh — аналог /gde-deshevle и /o-rabotodatelyah):
    3-колоночный layout СОХРАНЯЕТСЯ. Блоки перераспределены:
@@ -1865,7 +1876,7 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .gkh-sourcebar{background:#fbfcfd;border:1px solid #d9dee5;border-top:0;color:#3d4a5c;margin-bottom:10px;padding:6px 10px;font-size:12.5px}
 .gkh-sourcebar a{color:#0a5caa;font-weight:700;text-decoration:underline}
 @media (min-width:901px) and (max-width:1150px){
-  .gkh-layout{grid-template-columns:196px minmax(0,1fr) 214px;gap:10px}
+  .gkh-layout{grid-template-columns:196px minmax(0,1fr) 196px;gap:10px}
 }
 @media (max-width:900px){
   /* Мобильная версия (ТЗ п.29): левая → центральная → правая, одна колонка */
@@ -1885,7 +1896,7 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
    форумных рамок/теней/градиентов. В карточках НЕТ ника, аватара, пола
    и ссылки на профиль (анонимность ТЗ); система цветов ника не используется. */
 
-.dk-layout{align-items:start;grid-template-columns:300px minmax(0,1fr) 320px;gap:14px;display:grid}
+.dk-layout{align-items:start;grid-template-columns:300px minmax(0,1fr) 300px;gap:12px;display:grid}
 
 /* ТЗ 2026-09-28 (правки /znakomstva — аналог /gde-deshevle и др.):
    3-колоночный layout СОХРАНЯЕТСЯ. Блоки перераспределены:
@@ -1979,7 +1990,7 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .dk-entry-text{color:#3d4a5c;margin:0 0 8px;font-size:13px;line-height:1.5}
 .dk-entry-link{color:#0A4FA8;cursor:pointer;font-size:13px;font-weight:700}
 @media (min-width:901px) and (max-width:1150px){
-  .dk-layout{grid-template-columns:196px minmax(0,1fr) 214px;gap:10px}
+  .dk-layout{grid-template-columns:196px minmax(0,1fr) 196px;gap:10px}
 }
 @media (max-width:900px){
   /* Мобильная версия (ТЗ): левая → центральная → правая, одна колонка */
@@ -2156,7 +2167,7 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
    Самостоятельный раздел сравнения цен на конкретные товары. Тот же стиль,
    что у «Где купить»: светлый фон, тонкие серые границы, компактный список,
    без тёмно-синих форумных рамок/теней/градиентов (ТЗ п.25). */
-.cd-layout{align-items:start;grid-template-columns:300px minmax(0,1fr) 320px;gap:14px;display:grid}
+.cd-layout{align-items:start;grid-template-columns:300px minmax(0,1fr) 300px;gap:12px;display:grid}
 
 /* ТЗ 2026-09-28 (правки 1–4 страницы /gde-deshevle): 3-колоночный layout
    СОХРАНЯЕТСЯ. Блоки перераспределены:
@@ -2317,7 +2328,7 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .cd-sourcebar{background:#fbfcfd;border:1px solid #d9dee5;border-top:0;color:#3d4a5c;margin-bottom:10px;padding:6px 10px;font-size:12.5px}
 .cd-sourcebar a{color:#0a5caa;font-weight:700;text-decoration:underline}
 @media (min-width:901px) and (max-width:1150px){
-  .cd-layout{grid-template-columns:196px minmax(0,1fr) 214px;gap:10px}
+  .cd-layout{grid-template-columns:196px minmax(0,1fr) 196px;gap:10px}
 }
 @media (max-width:900px){
   /* Мобильная версия (ТЗ п.23): левая → центральная → правая, одна колонка */
@@ -2339,7 +2350,7 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
    Самостоятельный раздел личного опыта. Тот же стиль, что у «Где дешевле»:
    светлый фон, тонкие серые границы, компактный список, без тёмно-синих
    форумных рамок/теней/градиентов. */
-.rc-layout{align-items:start;grid-template-columns:300px minmax(0,1fr) 320px;gap:14px;display:grid}
+.rc-layout{align-items:start;grid-template-columns:300px minmax(0,1fr) 300px;gap:12px;display:grid}
 
 /* ТЗ 2026-09-29 (правка страницы /rekomenduyu — аналог /gde-deshevle, /gde-kupit):
    3-колоночный layout СОХРАНЯЕТСЯ. Навигация (Последние/Мои публикации)
@@ -2547,7 +2558,7 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .rc-sourcebar{background:#fbfcfd;border:1px solid #d9dee5;border-top:0;color:#3d4a5c;margin-bottom:10px;padding:6px 10px;font-size:12.5px}
 .rc-sourcebar a{color:#0a5caa;font-weight:700;text-decoration:underline}
 @media (min-width:901px) and (max-width:1150px){
-  .rc-layout{grid-template-columns:196px minmax(0,1fr) 214px;gap:10px}
+  .rc-layout{grid-template-columns:196px minmax(0,1fr) 196px;gap:10px}
 }
 @media (max-width:900px){
   /* Мобильная версия (ТЗ п.23): левая → центральная → правая, одна колонка */
@@ -2664,7 +2675,7 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
    Flat 2.0 (Пункты 5/6/8/20 ТЗ №2): лента ИЗОЛИРОВАННЫХ белых карточек в
    тонкой светло-серой рамке — сухой трудовой опыт без «чёрных списков».
    Тот же стиль, что у ЖКХ (gkf-*): светлый фон, тонкие серые границы. */
-.ep-layout{align-items:start;grid-template-columns:300px minmax(0,1fr) 320px;gap:14px;display:grid}
+.ep-layout{align-items:start;grid-template-columns:300px minmax(0,1fr) 300px;gap:12px;display:grid}
 
 /* ТЗ 2026-09-28 (правки страницы /o-rabotodatelyah — аналог /gde-deshevle):
    3-колоночный layout СОХРАНЯЕТСЯ. Блоки перераспределены:
@@ -2807,7 +2818,7 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .ep-sourcebar{background:#fbfcfd;border:1px solid #d9dee5;border-top:0;color:#3d4a5c;margin-bottom:10px;padding:6px 10px;font-size:12.5px}
 .ep-sourcebar a{color:#0a5caa;font-weight:700;text-decoration:underline}
 @media (min-width:901px) and (max-width:1150px){
-  .ep-layout{grid-template-columns:196px minmax(0,1fr) 214px;gap:10px}
+  .ep-layout{grid-template-columns:196px minmax(0,1fr) 196px;gap:10px}
 }
 @media (max-width:900px){
   /* Мобильная версия: левая → центральная → правая, одна колонка */
@@ -2826,7 +2837,7 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
    Доска объявлений жителей Сахалина: восемь рубрик. Тот же стиль, что у
    «Где дешевле» и «Рекомендую»: светлый фон, тонкие серые границы,
    компактный список, без тёмно-синих форумных рамок/теней/градиентов. */
-.ad-grid{align-items:start;grid-template-columns:300px minmax(0,1fr) 320px;gap:14px;display:grid}
+.ad-grid{align-items:start;grid-template-columns:300px minmax(0,1fr) 300px;gap:12px;display:grid}
 
 /* ТЗ 2026-09-28 (правки /obyavlenya — аналог /gde-deshevle и др.):
    3-колоночный layout СОХРАНЯЕТСЯ. Блоки перераспределены:
@@ -3009,7 +3020,7 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
 .ad-entry-text{color:#3d4a5c;margin:0 0 8px;font-size:13px;line-height:1.5}
 .ad-entry-link{color:#0A4FA8;cursor:pointer;font-size:13px;font-weight:700}
 @media (min-width:901px) and (max-width:1150px){
-  .ad-grid{grid-template-columns:196px minmax(0,1fr) 214px;gap:10px}
+  .ad-grid{grid-template-columns:196px minmax(0,1fr) 196px;gap:10px}
 }
 @media (max-width:900px){
   /* Мобильная версия: левая → центральная → правая, одна колонка */
@@ -3027,7 +3038,7 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
    Справочный раздел из пяти сервисов. Тот же стиль, что у остальных
    самостоятельных разделов: светлый фон, тонкие серые границы, компактный
    список, без тёмно-синих форумных рамок/теней/градиентов. */
-.pl-grid{align-items:start;grid-template-columns:300px minmax(0,1fr) 320px;gap:14px;display:grid}
+.pl-grid{align-items:start;grid-template-columns:300px minmax(0,1fr) 300px;gap:12px;display:grid}
 .pl-sidebox{background:#fff;border:1px solid #d9dee5;margin-bottom:12px;padding:9px 10px}
 .pl-side-title{color:#3d4a5c;border-bottom:1px solid #e4e8ee;margin:0 0 7px;padding-bottom:5px;font-size:13px;font-weight:700}
 .pl-side-note{color:#56657a;margin:0;font-size:12.5px;line-height:1.5}
@@ -3056,7 +3067,7 @@ a.pl-entry-detail:hover{color:#0a5caa}
 .pl-entry-main .pl-entry-text{color:#3d4a5c;margin:0 0 8px;font-size:13px;line-height:1.5}
 .pl-entry-main .pl-entry-link{color:#0A4FA8;cursor:pointer;font-size:13px;font-weight:700}
 @media (min-width:901px) and (max-width:1150px){
-  .pl-grid{grid-template-columns:196px minmax(0,1fr) 214px;gap:10px}
+  .pl-grid{grid-template-columns:196px minmax(0,1fr) 196px;gap:10px}
 }
 @media (max-width:900px){
   /* Мобильная версия: левая → центральная → правая, одна колонка */
