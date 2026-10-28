@@ -20,7 +20,8 @@ export async function pickRandomBot(excludeIds: string[] = []) {
     if (!u.bio) return false;
     try {
       const meta = JSON.parse(u.bio);
-      return meta.role === "theatre_bot";
+      // 2026-10-27: не возвращать мягко удалённых ботов (meta.deleted=true)
+      return meta.role === "theatre_bot" && !meta.deleted;
     } catch {
       return false;
     }
@@ -43,8 +44,9 @@ export async function scheduleBotReplies(params: {
 }) {
   // Random count: 1 or 2 replies
   const replyCount = Math.random() < 0.6 ? 1 : 2;
-  // Random delay: 5-30 minutes
-  const baseDelay = 5 + Math.floor(Math.random() * 25); // 5..29 minutes
+  // 2026-10-27: ТЕСТОВЫЙ РЕЖИМ — мгновенные ответы (0-5 секунд).
+  // В проде было: 5-30 минут. После теста вернуть baseDelay = 5 + Math.floor(Math.random() * 25).
+  const baseDelaySec = Math.floor(Math.random() * 5); // 0..4 секунды
   // Pick distinct bots for replies (exclude original author)
   const replyBots = [];
   const used = [params.authorId];
@@ -58,8 +60,8 @@ export async function scheduleBotReplies(params: {
   const entries = [];
   for (let i = 0; i < replyBots.length; i++) {
     const bot = replyBots[i];
-    const delayMin = baseDelay + i * (3 + Math.floor(Math.random() * 7)); // stagger 3-10 min between replies
-    const scheduledAt = new Date(Date.now() + delayMin * 60 * 1000);
+    const delaySec = baseDelaySec + i * (2 + Math.floor(Math.random() * 4)); // stagger 2-6 sec between replies
+    const scheduledAt = new Date(Date.now() + delaySec * 1000);
     const entry = await db.botReplyQueue.create({
       data: {
         section: params.section,

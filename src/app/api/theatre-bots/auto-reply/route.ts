@@ -156,7 +156,10 @@ export async function POST(req: NextRequest) {
     const batchId = crypto.randomUUID();
 
     // Build initial scheduledAt: NOW + 15-120 min, cascade +5-30 min between bots
-    let baseDelayMin = 15 + Math.floor(Math.random() * 105); // 15..119
+    // 2026-10-27: ТЕСТОВЫЙ РЕЖИМ — мгновенные ответы.
+    // В проде: 15 + Math.floor(Math.random() * 105) минут.
+    // Сейчас: 0-5 секунд (умножаем на 60_000 потом, поэтому делим — задаём в минутах как 0..0.083)
+    let baseDelayMin = Math.random() * 0.083; // 0..5 секунд в минутах
     const items: { id: string; botNickname: string; scheduledAt: Date }[] = [];
     for (let i = 0; i < selected.length; i++) {
       const bot = selected[i];
@@ -187,7 +190,7 @@ export async function POST(req: NextRequest) {
         },
       });
       items.push({ id: q.id, botNickname: bot.nickname, scheduledAt: at });
-      baseDelayMin += 5 + Math.floor(Math.random() * 25); // +5..30 min between bots
+      baseDelayMin += 0.033 + Math.random() * 0.05; // +2..5 секунд между ботами (тест)
     }
 
     console.log(`[bot-theatre] Auto-reply queued: topic=${body.topicId} bots=${selected.length} batch=${batchId}`);

@@ -238,7 +238,8 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
           triggerAuthorRole: user.role,
           isTopicStarter: false,
         });
-        /* auto-bots disabled 2026-10-20 */ Promise.resolve( {
+        // 2026-10-27: АКТИВИРОВАНО (было отключено 2026-10-20)
+        fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost"}/api/theatre-bots/auto-reply`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: hookBody,

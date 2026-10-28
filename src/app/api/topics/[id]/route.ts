@@ -89,6 +89,14 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
     const page = Math.max(1, parseInt(sp.get("page") || "1", 10) || 1);
     const countView = sp.get("view") === "1";
 
+    // 2026-10-27: скрытые ИИ сообщения — контент (body/aiNote) виден только
+    // staff (owner/admin/moderator) и автору сообщения. Всем остальным
+    // (включая гостей) API больше не отдаёт текст скрытого сообщения —
+    // в UI рисуется заглушка без содержимого. Раньше body уходил в ответе
+    // любому, кто открыл тему, что нарушало правило «виден только админу».
+    const viewer = await userByToken(sp.get("token"));
+    const viewerIsStaff = !!viewer && isStaffRole(viewer.role);
+
     const topic = await loadTopic(topicId);
     if (!topic || topic.deletedAt) {
       return NextResponse.json(
@@ -136,20 +144,28 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
       // ответов красятся по гендеру на всём форуме — и в существующих,
       // и в будущих темах, потому что правка в едином API-эндпоинте.
       include: {
-        author: { select: { nickname: true, gender: true } },
-        parent: { include: { author: { select: { nickname: true, gender: true } } } },
+        author: { select: { nickname: true, gender: true, email: true } },
+        parent: { include: { author: { select: { nickname: true, gender: true, email: true } } } },
       },
     });
 
     return NextResponse.json({
       topic: topicView(topic),
-      messages: messages.map((m) => ({
+      messages: messages.map((m) => {
+        const hiddenContentVisible =
+          !m.isHiddenByAi ||
+          viewerIsStaff ||
+          (!!viewer && (m.authorId === viewer.id || m.authorName === viewer.nickname));
+        return {
         id: m.id,
         num: m.num,
         author: m.authorName,
         authorGender: safeAuthorGender(m.authorName, m.author as { nickname: string; gender: string | null } | null),
+        // Бот-маркер: aiSignal начинается с "theatre-bot" ИЛИ email автора содержит @theatre.local
+        isBot: !!(m as any).aiSignal && (m as any).aiSignal.startsWith("theatre-bot")
+          || !!(m.author as any)?.email && (m.author as any).email.includes("@theatre.local"),
         createdAt: m.createdAt,
-        body: m.body,
+        body: hiddenContentVisible ? m.body : "",
         parentId: m.parentId,
         parentAuthor: m.parent?.authorName ?? null,
         parentAuthorGender: m.parent ? safeAuthorGender(m.parent.authorName ?? "", m.parent?.author as { nickname: string; gender: string | null } | null) : null,
@@ -159,9 +175,10 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
         deletedBy: m.deletedBy,
         isHiddenByAi: m.isHiddenByAi,
         hiddenReason: m.hiddenReason,
-        aiNote: m.aiNote,
+        aiNote: hiddenContentVisible ? m.aiNote : "",
         editedAt: m.editedAt,
-      })),
+        };
+      }),
       page,
       pages,
       total,

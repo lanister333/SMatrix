@@ -28,6 +28,8 @@ export interface TopicRow {
   rubricName: string;
   rubricSlug: string;
   subName: string;
+  /** 2026-10-26: бот-маркер автора темы (виден только staff). */
+  isBot?: boolean;
 }
 
 export interface ForumUser {
@@ -61,6 +63,11 @@ export interface Msg {
   hiddenReason: string;
   aiNote: string;
   editedAt: string | null;
+  /** 2026-10-26: бот-маркер (виден только staff). true, если сообщение от бота
+   *  «Театра ботов» (aiSignal начинается с "theatre-bot") или email автора
+   *  содержит "@theatre.local". Серверная логика — в api/topics/[id]/route.ts
+   *  и api/topics/route.ts. На клиенте рисуется иконка 🤖 рядом с ником. */
+  isBot?: boolean;
 }
 
 /** ШАГ 10: причины жалоб — ровно 7 по ТЗ. */

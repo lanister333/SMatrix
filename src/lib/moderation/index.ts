@@ -7,6 +7,9 @@
  *     ИИ предлагает решение, но НЕ применяет hide/block автоматически.
  *     Вместо этого помечает needHuman и пишет ModerationHistory.
  *     По умолчанию включён — админ проверяет качество и отключает.
+ *     ВАЖНО (вариант A, 2026-10-27): детерминированный фильтр нецензурной
+ *     лексики (checkProfanity) ВСЕГДА блокирует при отправке — shadow mode
+ *     его НЕ обходит. Фильтр детерминированный, false-positive минимален.
  *   - Контекст: moderateNewTextWithContext принимает соседние сообщения,
  *     тему, жалобы, историю нарушений автора — передаётся в LLM.
  *   - Кэш: если SiteSetting aiCacheEnabled = "1", вердикты кэшируются
@@ -14,6 +17,7 @@
  */
 
 import { checkProfanity } from "./profanity";
+import { checkCommerce } from "./commerce";
 import { aiModerate, type AiModerationVerdict, type AiModerationContext } from "./ai";
 import { db } from "@/lib/db";
 
@@ -70,10 +74,14 @@ export async function moderateNewText(
   ctx?: AiModerationContext
 ): Promise<ModerationOutcome> {
   // Шаг 1. Детерминированный фильтр нецензурной/оскорбительной лексики.
-  // В shadow mode фильтр тоже не блокирует — но фиксирует hits.
+  // Блокирует ВСЕГДА при отправке (вариант A) — shadow mode не обходит.
   const prof = checkProfanity(text);
   const shadowMode = await isShadowMode();
-  if (prof.blocked && !shadowMode) {
+  // ВАРИАНТ A (2026-10-27): детерминированный фильтр мата блокирует ВСЕГДА
+  // при отправке — shadow mode его НЕ обходит. Фильтр надёжный (whitelist
+  // «бляха»/«херсон»/«медик», учитывает обфускации и скелеты) — false-positive
+  // минимален. Shadow mode сохраняется только для AI-модератора (см. ниже).
+  if (prof.blocked) {
     return {
       action: "block",
       blockMessage: PROFANITY_BLOCK_MESSAGE,
@@ -81,18 +89,23 @@ export async function moderateNewText(
       needHuman: false,
       source: "profanity",
       hits: prof.hits,
-      shadowMode: false,
+      shadowMode,
     };
   }
-  if (prof.blocked && shadowMode) {
-    // В shadow mode — не блокируем, передаём человеку.
+
+  // Шаг 1b. Детерминированный фильтр коммерции (продажа/закупка/опт).
+  // Блокирует ВСЕГДА при отправке — shadow mode не обходит (как и profanity).
+  // Триггер: «продам горбушу 800 руб», «куплю рыбу оптом», «горбуша 500 руб».
+  const commerce = checkCommerce(text);
+  if (commerce.blocked) {
     return {
-      action: "human",
-      aiNote: "[shadow] нецензурная лексика (автофильтр) — передано человеку",
-      needHuman: true,
-      source: "profanity",
-      hits: prof.hits,
-      shadowMode: true,
+      action: "block",
+      blockMessage: commerce.reason,
+      aiNote: "коммерческое объявление (автофильтр)",
+      needHuman: false,
+      source: "card-filter",
+      hiddenReason: commerce.reason,
+      shadowMode,
     };
   }
 
@@ -219,10 +232,14 @@ export async function moderatePublishedText(
 ): Promise<ModerationOutcome> {
   const outcome = await moderateNewText(text, ctx);
   if (outcome.action === "block") {
+    // Различаем причины: profanity vs commerce
+    const isCommerce = outcome.aiNote?.includes("коммерческое");
     return {
       ...outcome,
       action: "hide",
-      hiddenReason: "нецензурная или оскорбительная лексика",
+      hiddenReason: isCommerce
+        ? (outcome.hiddenReason || "коммерческое объявление — скрыто автофильтром")
+        : "нецензурная или оскорбительная лексика",
       needHuman: false,
     };
   }

@@ -255,6 +255,22 @@ export default function TopicList(props: {
                     {r.rubricName}
                     {r.rubricName && " · "}
                     <Nick name={r.author} gender={r.authorGender} onOpen={props.onOpenProfile} />
+                    {(r as any).isBot && props.user && (props.user.role === "admin" || props.user.role === "owner" || props.user.role === "moderator") && (
+                      <span style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        marginLeft: "4px",
+                        padding: "1px 6px",
+                        background: "#475569",
+                        color: "#fff",
+                        fontSize: "10px",
+                        fontWeight: 700,
+                        borderRadius: "3px",
+                        verticalAlign: "middle",
+                      }} title="Результат от бота «Театра ботов»">
+                        🤖 БОТ
+                      </span>
+                    )}
                   </div>
                 </div>
               ))
@@ -318,6 +334,22 @@ export default function TopicList(props: {
               </div>
               <div className="r-author">
                 <Nick name={t.author} gender={t.authorGender} onOpen={props.onOpenProfile} />
+                {t.isBot && props.user && (props.user.role === "admin" || props.user.role === "owner" || props.user.role === "moderator") && (
+                  <span style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    marginLeft: "4px",
+                    padding: "1px 6px",
+                    background: "#475569",
+                    color: "#fff",
+                    fontSize: "10px",
+                    fontWeight: 700,
+                    borderRadius: "3px",
+                    verticalAlign: "middle",
+                  }} title="Тема создана ботом «Театра ботов»">
+                    🤖 БОТ
+                  </span>
+                )}
               </div>
               <div className="r-num">{t.answers}</div>
               <div className="r-num r-views">{fmtNum(t.views)}</div>

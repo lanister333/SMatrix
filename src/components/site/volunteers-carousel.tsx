@@ -8,10 +8,9 @@ export default function VolunteersCarousel() {
     if (!track) return;
 
     // Скорость: пикселей в секунду. Адаптивная:
-    // - ПК (≥1024px): 60 px/сек — комфортный темп
-    // - Мобайл/планшет (<1024px): 30 px/сек — медленнее, чтобы успеть прочитать
-    //    на маленьком экране и не утомляло глаз.
-    const PX_PER_SEC = window.innerWidth >= 1024 ? 60 : 30;
+    // - ПК (≥1024px): 15 px/сек — очень медленно
+    // - Мобайл/планшет (<1024px): 10 px/сек — еле заметно
+    const PX_PER_SEC = window.innerWidth >= 1024 ? 15 : 10;
     let rafId: number | null = null;
     let lastTime = performance.now();
     let offset = 0; // текущее смещение в пикселях
@@ -116,10 +115,12 @@ export default function VolunteersCarousel() {
     // === Ручной свайп через mouse drag (ПК — опционально, для теста) ===
     // На ПК используем колёсико мыши для горизонтальной прокрутки
     const handleWheel = (e: WheelEvent) => {
-      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-        // Горизонтальный скролл колёсиком/тачпадом
+      // Берём горизонтальную дельту если есть, иначе вертикальную (обычное колесо мыши).
+      // Это позволяет скроллить карусель как обычным колесом, так и тачпадом по горизонтали.
+      const delta = Math.abs(e.deltaX) >= Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      if (delta !== 0) {
         paused = true;
-        offset = normalizeOffset(offset + e.deltaX);
+        offset = normalizeOffset(offset + delta);
         applyTransform();
         if (resumeTimer !== null) clearTimeout(resumeTimer);
         resumeTimer = window.setTimeout(() => {
@@ -164,15 +165,80 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#E5D9F2",
       url: "https://t.me/animals_sakhalin",
-      logo: "/partners/animals-sakhalin-logo.png",
+      logo: "/partners/animals-sakhalin-logo.png?v=2",
       siteLabel: "t.me/animals_sakhalin"
     },
-    { name: "ПСО СОВА", sub: "Поисково-спасательный отряд", bg: "#1A1A1A", text: "#FFFFFF", subColor: "#FFD600", url: "https://pso-sova.ru" },
-    { name: "ЛизаAlert", sub: "Поиск пропавших людей", bg: "#FF6D00", text: "#FFFFFF", subColor: "#FFFFFF", url: "https://lizaalert.org" },
-    { name: "Помощь животным", sub: "Добрые сердца Сахалина", bg: "#00796B", text: "#FFFFFF", subColor: "#B2DFDB", url: "#" },
-    { name: "ЭкоСахалин", sub: "Защита природы острова", bg: "#4CAF50", text: "#FFFFFF", subColor: "#E8F5E9", url: "#" },
-    { name: "Я Донор Сахалин", sub: "Служба сдачи крови", bg: "#C62828", text: "#FFFFFF", subColor: "#FFCDD2", url: "#" },
-    { name: "Красный Крест", sub: "Сахалинское отделение", bg: "#D32F2F", text: "#FFFFFF", subColor: "#FFFFFF", url: "#" }
+    {
+      name: "ПЁС И КОТ",
+      sub: "Частный приют · Южно-Сахалинск",
+      bg: "linear-gradient(135deg, #2E5C9A 0%, #3B6FB0 100%)",
+      textColor: "#FFFFFF",
+      subColor: "#D6E4F5",
+      url: "https://t.me/pesikotsakh",
+      logo: "/partners/pesikot-logo.png?v=2",
+      siteLabel: "t.me/pesikotsakh"
+    },
+    {
+      name: "РОДНИК",
+      sub: "Экоцентр · Защита природы Сахалина",
+      bg: "linear-gradient(135deg, #4A7C2E 0%, #76C043 100%)",
+      textColor: "#FFFFFF",
+      subColor: "#E8F5E9",
+      url: "https://sakhrodnik.ru",
+      logo: "/partners/rodnik-logo.png?v=2",
+      siteLabel: "sakhrodnik.ru"
+    },
+    {
+      name: "РАДОСТЬ ЖИЗНИ",
+      sub: "Благотворительный фонд · Сахалин",
+      bg: "linear-gradient(135deg, #1E3A5F 0%, #2E5A8C 100%)",
+      textColor: "#FFFFFF",
+      subColor: "#AED6F1",
+      url: "https://radostzhizni.ru",
+      logo: "/partners/radost-logo.png",
+      siteLabel: "radostzhizni.ru",
+      logoHorizontal: true
+    },
+    {
+      name: "УЛЫБКА РЕБЁНКА",
+      sub: "Благотворительный фонд · Сахалин",
+      bg: "linear-gradient(135deg, #2E7D4F 0%, #3A8B5E 100%)",
+      textColor: "#FFFFFF",
+      subColor: "#E3F27A",
+      url: "https://ulybka-rebenka.ru",
+      logo: "/partners/ulybka-logo.png",
+      siteLabel: "ulybka-rebenka.ru"
+    },
+    {
+      name: "ПСО СОВА",
+      sub: "Поисково-спасательный отряд · Сахалин",
+      bg: "linear-gradient(135deg, #0D1B2A 0%, #1A3A6E 100%)",
+      textColor: "#FFFFFF",
+      subColor: "#FFD700",
+      url: "https://t.me/sakhpsosova",
+      logo: "/partners/sova-logo.png",
+      siteLabel: "t.me/sakhpsosova"
+    },
+    {
+      name: "ЖИВОТНЫЕ ТЕРРИТОРИЯ СПАСЕНИЯ",
+      sub: "СРОО · Сахалин",
+      bg: "linear-gradient(135deg, #1565C0 0%, #1E88E5 100%)",
+      textColor: "#FFFFFF",
+      subColor: "#FFE0B2",
+      url: "https://zts-sakh.ru",
+      logo: "/partners/zts-logo.png?v=2",
+      siteLabel: "zts-sakh.ru"
+    },
+    {
+      name: "СТОП СПИД",
+      sub: "Школа волонтёров · Сахалинский центр СПИД",
+      bg: "linear-gradient(135deg, #C62828 0%, #E31E24 100%)",
+      textColor: "#FFFFFF",
+      subColor: "#FFCDD2",
+      url: "http://hiv65.ru",
+      logo: "/partners/hiv-logo.png",
+      siteLabel: "hiv65.ru"
+    }
   ];
 
   const renderCard = (p: any, idx: number) => {
@@ -211,7 +277,14 @@ export default function VolunteersCarousel() {
             <img
               src={p.logo}
               alt=""
-              style={{
+              style={p.logoHorizontal ? {
+                height: '78px',
+                width: 'auto',
+                maxWidth: '130px',
+                objectFit: 'contain',
+                flexShrink: 0,
+                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
+              } : {
                 width: '78px',
                 height: '78px',
                 borderRadius: '50%',

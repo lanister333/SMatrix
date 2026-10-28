@@ -223,6 +223,27 @@ function MessageRow(props: {
           #{m.num}
         </a>
         <Nick name={m.author} gender={m.authorGender} onOpen={props.onOpenProfile} className="sk-msg-author" />
+        {/* 2026-10-26: иконка 🤖 бота — видна только staff. Яркий красный фон #ff3b30, белый значок. */}
+        {m.isBot && props.isAdmin && (
+          <span style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginLeft: "4px",
+            padding: "1px 6px",
+            background: "#475569",
+            color: "#fff",
+            fontSize: "11px",
+            fontWeight: 700,
+            borderRadius: "3px",
+            lineHeight: "1.2",
+            textShadow: "0 1px 1px rgba(0,0,0,0.3)",
+            letterSpacing: "0.3px",
+            verticalAlign: "middle",
+          }} title="Сообщение от бота «Театра ботов»">
+            🤖 БОТ
+          </span>
+        )}
         <span className="sk-msg-time">{fmtRecent(m.createdAt)}</span>
         {props.isNew && (
           <span className="sk-msg-new" title="Появилось после вашего последнего посещения темы">
@@ -537,7 +558,24 @@ export default function TopicView(props: {
     } catch {
       markView = false;
     }
-    fetch(`/api/topics/${topicId}?page=${curPage}${markView ? "&view=1" : ""}`)
+    // 2026-10-27: токен зрителя — чтобы сервер знал роль и отдал контент
+    // скрытых сообщений только staff/автору (см. GET /api/topics/[id]).
+    const viewerToken =
+      token ||
+      (typeof window !== "undefined"
+        ? (() => {
+            try {
+              return JSON.parse(localStorage.getItem("sm_auth") || "{}")?.token;
+            } catch {
+              return null;
+            }
+          })()
+        : null);
+    fetch(
+      `/api/topics/${topicId}?page=${curPage}${markView ? "&view=1" : ""}${
+        viewerToken ? `&token=${encodeURIComponent(viewerToken)}` : ""
+      }`
+    )
       .then(async (r) => {
         const data = await r.json();
         if (!r.ok) {
@@ -1085,7 +1123,22 @@ export default function TopicView(props: {
           </button>
         </div>
         <div className="t-meta">
-          Автор: <Nick name={topic.author as string} gender={topic.authorGender as string} onOpen={props.onOpenProfile} /> · создана{" "}
+          Автор: <Nick name={topic.author as string} gender={topic.authorGender as string} onOpen={props.onOpenProfile} />{(topic as any).isBot && isAdmin && (
+            <span style={{
+              display: "inline-flex",
+              alignItems: "center",
+              marginLeft: "4px",
+              padding: "1px 6px",
+              background: "#475569",
+              color: "#fff",
+              fontSize: "11px",
+              fontWeight: 700,
+              borderRadius: "3px",
+              verticalAlign: "middle",
+            }} title="Тема создана ботом «Театра ботов»">
+              🤖 БОТ
+            </span>
+          )} · создана{" "}
           {fmtDateTime(topic.createdAt as string)} · просмотров: {fmtNum(topic.views as number)} · ответов: {fmtNum(answers)} · обновлено:{" "}
           {fmtRecent(topic.lastActivityAt as string)}
         </div>

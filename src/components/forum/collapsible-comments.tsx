@@ -68,9 +68,21 @@ function buildTree(messages: Msg[]): TreeNode[] {
   // 2026-10-13: первое сообщение темы (num===1) НЕ показываем в ленте —
   // оно отображается в шапке темы. Но оставляем его в byId (выше),
   // чтобы его дети (Boss, Серёга) могли найти своего родителя.
+  // 2026-10-27: FIX — если msg #1 убран из рендера, его прямые дети
+  // (ответы на исходное сообщение) должны стать корневыми в ленте,
+  // иначе они вообще не отображаются (боты отвечают на msg #1, и без
+  // этого фикса лента пуста).
   const allRoots = childrenMap.get(null) || [];
-  const roots = allRoots.filter((m) => m.num !== 1);
-  return roots.map(buildNode);
+  const visibleRoots = allRoots.filter((m) => m.num !== 1);
+  // Дети msg #1 (если он отфильтрован) становятся корневыми
+  const msgNum1 = allRoots.find((m) => m.num === 1);
+  if (msgNum1) {
+    const orphans = childrenMap.get(msgNum1.id) || [];
+    visibleRoots.push(...orphans);
+    // Удаляем orphans из детей msg #1, чтобы не дублировались
+    childrenMap.set(msgNum1.id, []);
+  }
+  return visibleRoots.map(buildNode);
 }
 
 /** Подсчитать ВСЕ ответы (включая вложенные) */

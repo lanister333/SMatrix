@@ -219,8 +219,17 @@ body{background:#E8EAEB}
    ============================================================ */
 @media (min-width:1024px){
   .main-grid-container{display:flex !important;justify-content:center;width:100%;max-width:1729px;margin:0 auto;gap:12px !important}
-  .left-column{flex:0 1 300px;min-width:150px;margin-left:0 !important;margin-right:0 !important;padding-left:0 !important;padding-right:0 !important}
-  .right-column{flex:0 1 300px;min-width:150px;margin-left:0 !important;margin-right:0 !important;padding-left:0 !important;padding-right:0 !important}
+  .left-column{flex:0 0 clamp(220px,calc(25vw - 100px),300px) !important;min-width:0 !important;max-width:300px !important;margin-left:0 !important;margin-right:0 !important;padding-left:0 !important;padding-right:0 !important}
+  .right-column{flex:0 0 clamp(220px,calc(25vw - 100px),300px) !important;min-width:0 !important;max-width:300px !important;margin-left:0 !important;margin-right:0 !important;padding-left:0 !important;padding-right:0 !important}
+  /* 2026-10-28: фикс чехарды колонок на 17" мониторах (≥1440px) —
+     ранее .center-column наследовала flex:0 1 auto из Tailwind-класса,
+     и из-за justify-content:center на контейнере все три колонки
+     сжимались в центре, оставляя пустоту по бокам (122px на 1600,
+     196/197px на 1920). Теперь центральная растягивается на всё
+     свободное место (flex:1 1 0), как и было заявлено в комментарии
+     198 (flex:1 1 1105px; max-width:1105px). На 1729+ центр = 1105px
+     (300+1105+300+24gap=1729 — точно по директиве). */
+  .center-column{flex:1 1 0 !important;min-width:0 !important;max-width:none !important;margin-left:0 !important;margin-right:0 !important;padding-left:0 !important;padding-right:0 !important}
   /* 2026-10-24: симметричные отступы карусели — убрать margin-bottom
    у последнего блока в каждой колонке (чтобы marginTop карусели 11px
    не складывался с 10px от колонки → не было 21px сверху vs 11px снизу) */
@@ -230,16 +239,21 @@ body{background:#E8EAEB}
 .right-column > :last-child{margin-bottom:0 !important}
 }
 
-/* ===== 2026-10-23: адаптация под 15-дюймовые ноутбуки (1366/1440px) =====
+/* ===== 2026-10-28: единая плавная система колонок (фикс «чехарды на 17") =====
+   Боковые колонки теперь clamp(220px, calc(25vw - 100px), 300px):
+   1024–1279px → 220px; 1280→1600px плавно 220→300; ≥1600px → 300px.
+   Скачок 220→300 на границе 1440px устранён; 901–1023px сетка
+   .sk-layout выровнена 196/214 → 220/220 (симметрия, стык с 1024px).
+   ===== ранее: адаптация под 15-дюймовые ноутбуки (1366/1440px) =====
    На 17" (1920px) центральная колонка 1105px max + 2×300px боковые + 24px gap = 1729px.
    На 15" (1366px) доступно ~1346px после padding 10px — 3 колонки 150+850+150+24=1174
    умещаются минимально, но max-width:1105px раздувает центр и обрезает правую колонку.
    Решение: на 1024-1439px уменьшить min-width центральной (850→560) и убрать max-width,
    боковые — 220px вместо 300. Тогда 220+12+~870+12+220=1334px, влезает в 1346. */
-@media (min-width:1024px) and (max-width:1439px){
-  .main-grid-container{max-width:1439px !important;gap:10px !important}
-  .left-column{flex:0 0 220px !important;min-width:200px !important;max-width:240px !important}
-  .right-column{flex:0 0 220px !important;min-width:200px !important;max-width:240px !important}
+@media (min-width:1024px) and (max-width:1679px){
+  .main-grid-container{max-width:1679px !important;gap:10px !important}
+  .left-column{flex:0 0 clamp(220px,calc(25vw - 100px),300px) !important;min-width:0 !important;max-width:300px !important}
+  .right-column{flex:0 0 clamp(220px,calc(25vw - 100px),300px) !important;min-width:0 !important;max-width:300px !important}
   .center-column{flex:1 1 100% !important;min-width:0 !important;max-width:none !important}
   /* Каркас страницы — меньше воздуха по бокам */
   .sk-shell{padding:6px 6px 0 !important}
@@ -1590,7 +1604,7 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
    ============================================================ */
 @media (min-width:901px) and (max-width:1150px){
   .sk-shell{padding:8px 10px 0}
-  .sk-layout{grid-template-columns:196px minmax(0,1fr) 214px;gap:10px}
+  .sk-layout{grid-template-columns:220px minmax(0,1fr) 220px;gap:10px}
   /* ТЗ 2026-09-23 «уменьшить боковые отступы»: padding-right:8px
      добавлялся к зазору 10px — слева визуально 18px против 10px
      справа; обнулён — зазоры поровну по 10px */

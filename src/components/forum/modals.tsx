@@ -743,15 +743,24 @@ export function NewTopicModal(props: {
   }, []);
 
   const pickRandomBot = () => {
-    if (availableBots.length === 0) return;
-    if (availableBots.length === 1) return;
-    let next = botAuthor;
-    let attempts = 0;
-    while (next === botAuthor && attempts < 20) {
-      next = availableBots[Math.floor(Math.random() * availableBots.length)];
-      attempts++;
-    }
-    setBotAuthor(next);
+    // 2026-10-27: вместо выбора из локального массива (всегда 1 элемент)
+    // делаем новый запрос к /api/auto-bots/random — получаем другого бота.
+    fetch("/api/auto-bots/random")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.nickname) {
+          // Если пришёл тот же бот — пробуем ещё раз (до 3 попыток)
+          if (d.nickname === botAuthor) {
+            fetch("/api/auto-bots/random")
+              .then((r) => r.json())
+              .then((d2) => { if (d2.nickname) setBotAuthor(d2.nickname); })
+              .catch(() => {});
+          } else {
+            setBotAuthor(d.nickname);
+          }
+        }
+      })
+      .catch(() => {});
   };
 
   useEffect(() => {
@@ -774,7 +783,7 @@ export function NewTopicModal(props: {
       setError("Выберите раздел, в котором публикуется тема");
       return;
     }
-    if (title.trim().length < 5) {
+    if (title.trim().length < 3) {
       setError("Заголовок слишком короткий — минимум 5 символов");
       return;
     }
@@ -872,7 +881,7 @@ export function NewTopicModal(props: {
             <button
               className="sk-btn-classic right"
               style={{ marginTop: 0 }}
-              disabled={busy || !rubricId || title.trim().length < 5 || !body.trim()}
+              disabled={busy || !rubricId || title.trim().length < 3 || !body.trim()}
               onClick={submit}
             >
               {busy ? "Проверяем и публикуем…" : "Опубликовать"}

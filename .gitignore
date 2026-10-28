@@ -41,3 +41,6 @@ Thumbs.db
 *.swp
 db/*.backup*
 db/*.before-*
+backups/
+*.bak-*
+*.bak-[0-9]*

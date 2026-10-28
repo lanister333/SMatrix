@@ -634,6 +634,10 @@ export async function publishApprovedQueueItem(queueId: string): Promise<{ topic
   const item = await db.botQueue.findUnique({ where: { id: queueId } });
   if (!item) throw new Error("Queue item not found");
   if (item.status !== "approved") throw new Error(`Item status is ${item.status}, expected approved`);
+  // 2026-10-27: не публиковать пустые ответы
+  if (!item.text || item.text.trim().length === 0) {
+    throw new Error(`Item ${queueId} has empty text — refusing to publish`);
+  }
 
   return await db.$transaction(async (tx) => {
     let topicId = item.topicId;

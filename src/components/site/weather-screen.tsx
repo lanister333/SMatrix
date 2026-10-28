@@ -466,7 +466,7 @@ function TideWaveChart({ tides, nowIso }: { tides: TidesData; nowIso: string }) 
         {grid.map((g, i) => (
           <g key={`g${i}`}>
             <line x1={padL} x2={W - padR} y1={Y(g)} y2={Y(g)} stroke="#d6e4f0" strokeWidth="1" />
-            <text x={padL - 5} y={Y(g) + 3} textAnchor="end" fontSize="9" fill="#8a97a3">
+            <text x={padL - 5} y={Y(g) + 3} textAnchor="end" fontSize="11" fill="#8a97a3">
               {tideFmt(g)}
             </text>
           </g>
@@ -528,7 +528,7 @@ function TideWaveChart({ tides, nowIso }: { tides: TidesData; nowIso: string }) 
                 }
                 fill={up ? "#2a6fa8" : "#3a9ca5"}
               />
-              <text x={x} y={up ? y - 9 : y + 15} textAnchor="middle" fontSize="9" fontWeight="700" fill="#1f3a5f">
+              <text x={x} y={up ? y - 9 : y + 15} textAnchor="middle" fontSize="11" fontWeight="700" fill="#1f3a5f">
                 {tideFmt(e.height)}
               </text>
             </g>

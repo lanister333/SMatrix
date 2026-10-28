@@ -117,7 +117,7 @@ export async function GET(req: NextRequest) {
         where,
         orderBy,
         include: {
-          author: { select: { nickname: true, gender: true } },
+          author: { select: { nickname: true, gender: true, email: true } },
           rubric: { include: { parent: true } },
           _count: { select: { messages: true } },
           messages: {
@@ -140,7 +140,7 @@ export async function GET(req: NextRequest) {
         ? await db.message.findMany({
             where: { topicId: { in: lastActivityIds } },
             orderBy: { num: "desc" },
-            select: { topicId: true, authorName: true, author: { select: { nickname: true, gender: true } } },
+            select: { topicId: true, authorName: true, author: { select: { nickname: true, gender: true, email: true } } },
           })
         : [];
       const lastByTopic = new Map<number, { name: string; gender: string | null }>();
@@ -160,6 +160,7 @@ export async function GET(req: NextRequest) {
           isClosed: t.isClosed,
           author: t.authorName,
           authorGender: safeAuthorGender(t.authorName, t.author as { nickname: string; gender: string | null } | null),
+          isBot: !!(t.author as any)?.email && (t.author as any).email.includes("@theatre.local") || (t as any).source === "theatre-bots" || !!((t as any).source || "").startsWith("biz65:"),
           answers: Math.max(0, t._count.messages - 1),
           views: t.views,
           lastActivityAt: t.lastActivityAt,
@@ -185,7 +186,7 @@ export async function GET(req: NextRequest) {
         skip: (page - 1) * perPage,
         take: perPage,
         include: {
-          author: { select: { nickname: true, gender: true } },
+          author: { select: { nickname: true, gender: true, email: true } },
           rubric: { include: { parent: true } },
           _count: { select: { messages: true } },
         },
@@ -220,6 +221,7 @@ export async function GET(req: NextRequest) {
         isClosed: t.isClosed,
         author: t.authorName,
         authorGender: safeAuthorGender(t.authorName, t.author as { nickname: string; gender: string | null } | null),
+        isBot: !!(t.author as any)?.email && (t.author as any).email.includes("@theatre.local") || (t as any).source === "theatre-bots" || !!((t as any).source || "").startsWith("biz65:"),
         answers: Math.max(0, t._count.messages - 1),
         views: t.views,
         lastActivityAt: t.lastActivityAt,
@@ -300,7 +302,7 @@ export async function POST(req: NextRequest) {
     if (!rubric) {
       return NextResponse.json({ error: "Раздел не найден" }, { status: 400 });
     }
-    if (title.length < 5 || title.length > 150) {
+    if (title.length < 3 || title.length > 150) {  // 2026-10-27: минимум 3 (было 5)
       return NextResponse.json(
         { error: "Заголовок слишком короткий — минимум 5 символов" },
         { status: 400 }
@@ -434,7 +436,8 @@ export async function POST(req: NextRequest) {
           isTopicStarter: true,
         });
         // Fire-and-forget: не ждём ответа (асинхронная обработка)
-        /* auto-bots disabled 2026-10-20 */ Promise.resolve( {
+        // 2026-10-27: АКТИВИРОВАНО (было отключено 2026-10-20)
+        fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost"}/api/theatre-bots/auto-reply`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: hookBody,

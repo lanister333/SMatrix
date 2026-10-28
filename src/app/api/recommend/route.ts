@@ -387,7 +387,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 2026-10-15: AUTO-BOTS — подменяем автора на рандомного бота
-    const autoBot = null;  // auto-bots disabled 2026-10-20
+    const autoBot = pickRandomBot();  // 2026-10-26: ВРЕМЕННО активированы для теста (было null/disabled 2026-10-20)
     const finalAuthorId = autoBot ? autoBot.id : user.id;
     const finalAuthorName = autoBot ? autoBot.nickname : user.nickname;
 
@@ -412,7 +412,7 @@ export async function POST(req: NextRequest) {
     // 2026-10-15: AUTO-BOTS — запланировать 1-2 авто-ответа от ботов
     if (autoBot) {
       try {
-        /* auto-bots disabled 2026-10-20 */ Promise.resolve({
+        scheduleBotReplies({
           section: "recommend",
           postId: created.id,
           topicTitle: title,

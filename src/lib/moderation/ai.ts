@@ -239,6 +239,9 @@ export async function aiModerate(text: string, ctx?: AiModerationContext): Promi
   }
 
   const zai = await ZAI.create();
+  // 2026-10-27 (шаг 1): таймаут 3с → 15с. ИИ-модератор работает через мост
+  // (туннель → локальный прокси → internal-api.z.ai), при нагрузке ответ
+  // может занимать больше 3с. 15с — безопасный верхний предел.
   const completion = await Promise.race([
     zai.chat.completions.create({
       messages: [
@@ -251,7 +254,7 @@ export async function aiModerate(text: string, ctx?: AiModerationContext): Promi
       thinking: { type: "disabled" },
     }),
     new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error("AI timeout")), 3000)
+      setTimeout(() => reject(new Error("AI timeout")), 15000)
     ),
   ]);
 
