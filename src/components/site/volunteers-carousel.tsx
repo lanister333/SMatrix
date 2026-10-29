@@ -186,7 +186,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#E8F5E9",
       url: "https://sakhrodnik.ru",
-      logo: "/partners/rodnik-logo.png?v=2",
+      logo: "/partners/rodnik-logo-mirrored.png?v=8",
       siteLabel: "sakhrodnik.ru"
     },
     {
@@ -196,7 +196,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#AED6F1",
       url: "https://radostzhizni.ru",
-      logo: "/partners/radost-logo-white.png?v=5",
+      logo: "/partners/radost-logo.png",
       siteLabel: "radostzhizni.ru",
       logoHorizontal: true
     },
@@ -217,7 +217,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#FFD700",
       url: "https://t.me/sakhpsosova",
-      logo: "/partners/sova-logo-centered.png?v=6",
+      logo: "/partners/sova-logo.png",
       siteLabel: "t.me/sakhpsosova"
     },
     {
@@ -227,7 +227,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#FFE0B2",
       url: "https://zts-sakh.ru",
-      logo: "/partners/zts-logo-centered.png?v=3",
+      logo: "/partners/zts-logo.png?v=2",
       siteLabel: "zts-sakh.ru"
     },
     {
@@ -237,7 +237,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#FFCDD2",
       url: "http://hiv65.ru",
-      logo: "/partners/hiv-logo-shrunk.png?v=7",
+      logo: "/partners/hiv-logo.png",
       siteLabel: "hiv65.ru"
     }
   ];
@@ -289,20 +289,6 @@ export default function VolunteersCarousel() {
                 height: '96px',
                 width: 'auto',
                 maxWidth: '170px',
-                objectFit: 'contain',
-                flexShrink: 0
-              } : p.logoPadding ? {
-                // 2026-10-29: для квадратных логотипов с белой подложкой
-                // (ПСО СОВА — белая круг-подложка, сова отцентрована внутри).
-                // backgroundColor:white + padding создаёт белую подложку
-                // вокруг PNG. object-fit:contain — PNG не обрезается, виден
-                // целиком, отцентрован внутри круга.
-                width: `${p.logoSize || 110}px`,
-                height: `${p.logoSize || 110}px`,
-                borderRadius: '50%',
-                backgroundColor: '#ffffff',
-                padding: `${p.logoPadding}px`,
-                boxSizing: 'border-box',
                 objectFit: 'contain',
                 flexShrink: 0
               } : {
