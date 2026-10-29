@@ -188,7 +188,7 @@ export default function VolunteersCarousel() {
       url: "https://sakhrodnik.ru",
       logo: "/partners/rodnik-logo.png",
       siteLabel: "sakhrodnik.ru",
-      logoShiftUp: 10
+      logoShiftUp: 5
     },
     {
       name: "РАДОСТЬ ЖИЗНИ",
