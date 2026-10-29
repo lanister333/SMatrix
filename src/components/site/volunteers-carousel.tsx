@@ -176,7 +176,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#D6E4F5",
       url: "https://t.me/pesikotsakh",
-      logo: "/partners/pesikot-logo-new.jpg",
+      logo: "/partners/pesikot-logo.png?v=8",
       siteLabel: "t.me/pesikotsakh"
     },
     {
