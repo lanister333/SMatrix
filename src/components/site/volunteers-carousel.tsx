@@ -165,7 +165,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#E5D9F2",
       url: "https://t.me/animals_sakhalin",
-      logo: "/partners/animals-sakhalin-logo-nobg.png?v=5",
+      logo: "/partners/animals-sakhalin-logo-nobg.png?v=6",
       siteLabel: "t.me/animals_sakhalin",
       logoSize: 140
     },
@@ -176,7 +176,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#D6E4F5",
       url: "https://t.me/pesikotsakh",
-      logo: "/partners/pesikot-logo-nobg.png?v=5",
+      logo: "/partners/pesikot-logo-nobg.png?v=6",
       siteLabel: "t.me/pesikotsakh"
     },
     {
