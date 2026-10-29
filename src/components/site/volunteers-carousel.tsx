@@ -186,7 +186,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#E8F5E9",
       url: "https://sakhrodnik.ru",
-      logo: "/partners/rodnik-logo-rainbow.png?v=10",
+      logo: "/partners/rodnik-logo-rainbow.png?v=11",
       siteLabel: "sakhrodnik.ru"
     },
     {
