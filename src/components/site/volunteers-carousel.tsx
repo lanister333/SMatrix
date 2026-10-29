@@ -227,7 +227,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#FFE0B2",
       url: "https://zts-sakh.ru",
-      logo: "/partners/zts-logo.png?v=2",
+      logo: "/partners/zts-logo-centered.png?v=3",
       siteLabel: "zts-sakh.ru"
     },
     {
