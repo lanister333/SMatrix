@@ -244,6 +244,7 @@ export async function aiModerate(text: string, ctx?: AiModerationContext): Promi
   // может занимать больше 3с. 15с — безопасный верхний предел.
   const completion = await Promise.race([
     zai.chat.completions.create({
+      model: "glm-4.5-flash",
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         {
