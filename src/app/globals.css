@@ -295,7 +295,14 @@ body{background:#E8EAEB}
   .wth-metric b{font-size:12px !important}
   /* VolunteersCarousel: на 15" (1024-1439) уменьшить карточки 320x180 → 240x140 */
   .sakh-marquee-track a{flex:0 0 240px !important;width:240px !important;min-width:240px !important;height:140px !important;padding:10px 12px !important}
-  .sakh-marquee-track a img{width:100px !important;height:100px !important;border-radius:50% !important;object-fit:cover !important}
+  /* 2026-10-29: убраны width/height/border-radius/object-fit !important
+     для .sakh-marquee-track img — теперь inline-style в renderCard управляет
+     размером и формой. Раньше override принудительно делал все логотипы
+     круглыми 100x100 (border-radius:50% + object-fit:cover), что ломало
+     горизонтальный логотип Радости жизни (2022x567) — обрезало его в круг.
+     Inline-style: квадратные логотипы -> borderRadius:50% (круг), размер
+     110x110 (или индивидуальный через p.logoSize). Горизонтальный логотип ->
+     height:96px, width:auto, maxWidth:170px, object-fit:contain (без круга). */
   .sakh-marquee-track a span{font-size:14px !important}
 }
 

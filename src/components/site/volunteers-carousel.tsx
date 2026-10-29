@@ -279,22 +279,22 @@ export default function VolunteersCarousel() {
               src={p.logo}
               alt=""
               style={p.logoHorizontal ? {
-                // 2026-10-28: убраны белая обводка (border:3px solid #FFFFFF)
-                // и тень (box-shadow) — это и есть «круги» поверх логотипа.
-                // Круглая форма (border-radius:50%) оставлена — это форма
-                // самого логотипа, а не рамка. Размер увеличен с 78 до 110px.
-                // Индивидуальный размер можно задать через p.logoSize.
-                height: `${p.logoSize || 110}px`,
-                width: `${p.logoSize || 110}px`,
-                borderRadius: '50%',
-                objectFit: 'cover',
+                // 2026-10-29: для горизонтальных логотипов (Радость жизни,
+                // 2022x567 PNG с прозрачным фоном) НЕ применяем border-radius:50%
+                // и object-fit:cover — они обрезают логотип в круг 110x110 и
+                // искажают. Вместо этого — естественная форма PNG (height:auto)
+                // с object-fit:contain, чтобы логотип был виден полностью.
+                // Размер: 96x170 (компромисс — крупнее оригинала 78x130,
+                // но помещается в карточку 320x180).
+                height: '96px',
+                width: 'auto',
+                maxWidth: '170px',
+                objectFit: 'contain',
                 flexShrink: 0
               } : {
-                // 2026-10-28: убраны белая обводка (border:3px solid #FFFFFF)
-                // и тень (box-shadow) — это и есть «круги» поверх логотипа.
-                // Круглая форма (border-radius:50%) оставлена — это форма
-                // самого логотипа, а не рамка. Размер увеличен с 78 до 110px.
-                // Индивидуальный размер можно задать через p.logoSize.
+                // Квадратные логотипы — круглый border-radius:50% (форма
+                // логотипа), object-fit:cover. Размер 110x110 (или
+                // индивидуальный через p.logoSize).
                 width: `${p.logoSize || 110}px`,
                 height: `${p.logoSize || 110}px`,
                 borderRadius: '50%',
