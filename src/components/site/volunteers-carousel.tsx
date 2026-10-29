@@ -218,8 +218,7 @@ export default function VolunteersCarousel() {
       subColor: "#FFD700",
       url: "https://t.me/sakhpsosova",
       logo: "/partners/sova-logo.png",
-      siteLabel: "t.me/sakhpsosova",
-      logoPadding: 14
+      siteLabel: "t.me/sakhpsosova"
     },
     {
       name: "ЖИВОТНЫЕ ТЕРРИТОРИЯ СПАСЕНИЯ",
