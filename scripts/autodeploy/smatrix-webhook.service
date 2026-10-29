@@ -1,0 +1,21 @@
+[Unit]
+Description=SMatrix GitHub Webhook Server (auto-deploy)
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/node /opt/smatrix/scripts/autodeploy/webhook-server.js
+WorkingDirectory=/opt/smatrix/scripts/autodeploy
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=smatrix-webhook
+User=root
+
+# environment variables for git
+Environment=HOME=/root
+Environment=PATH=/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+[Install]
+WantedBy=multi-user.target
