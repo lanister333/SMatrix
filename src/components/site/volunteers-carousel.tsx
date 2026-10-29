@@ -217,7 +217,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#FFD700",
       url: "https://t.me/sakhpsosova",
-      logo: "/partners/sova-logo.png",
+      logo: "/partners/sova-logo-centered.png?v=6",
       siteLabel: "t.me/sakhpsosova"
     },
     {
