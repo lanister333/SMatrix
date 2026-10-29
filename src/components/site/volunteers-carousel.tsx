@@ -187,7 +187,8 @@ export default function VolunteersCarousel() {
       subColor: "#E8F5E9",
       url: "https://sakhrodnik.ru",
       logo: "/partners/rodnik-logo.png",
-      siteLabel: "sakhrodnik.ru"
+      siteLabel: "sakhrodnik.ru",
+      logoShiftUp: 10
     },
     {
       name: "РАДОСТЬ ЖИЗНИ",
@@ -275,33 +276,67 @@ export default function VolunteersCarousel() {
       >
         {isOcean && (
           <>
-            <img
-              src={p.logo}
-              alt=""
-              style={p.logoHorizontal ? {
-                // 2026-10-29: для горизонтальных логотипов (Радость жизни,
-                // 2022x567 PNG с прозрачным фоном) НЕ применяем border-radius:50%
-                // и object-fit:cover — они обрезают логотип в круг 110x110 и
-                // искажают. Вместо этого — естественная форма PNG (height:auto)
-                // с object-fit:contain, чтобы логотип был виден полностью.
-                // Размер: 96x170 (компромисс — крупнее оригинала 78x130,
-                // но помещается в карточку 320x180).
-                height: '96px',
-                width: 'auto',
-                maxWidth: '170px',
-                objectFit: 'contain',
-                flexShrink: 0
-              } : {
-                // Квадратные логотипы — круглый border-radius:50% (форма
-                // логотипа), object-fit:cover. Размер 110x110 (или
-                // индивидуальный через p.logoSize).
+            {p.logoShiftUp ? (
+              // 2026-10-29: для логотипов со сдвигом вверх (Родник —
+              // приподнять, чтобы нижний край не касался круга).
+              // <img> не может иметь overflow:hidden внутри себя, поэтому
+              // оборачиваем в wrapper div с border-radius:50% + overflow:hidden,
+              // а <img> внутри сдвигаем вверх через position:absolute + top:-Npx.
+              // Результат: круг остаётся на месте, логотип сдвинут вверх,
+              // верхняя часть логотипа обрезана, нижняя часть круга — белая
+              // подложка (через backgroundColor:white на wrapper).
+              <div style={{
                 width: `${p.logoSize || 110}px`,
                 height: `${p.logoSize || 110}px`,
                 borderRadius: '50%',
-                objectFit: 'cover',
+                overflow: 'hidden',
+                backgroundColor: '#ffffff',
+                position: 'relative',
                 flexShrink: 0
-              }}
-            />
+              }}>
+                <img
+                  src={p.logo}
+                  alt=""
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    position: 'absolute',
+                    top: `-${p.logoShiftUp}px`,
+                    left: '0',
+                    objectFit: 'cover',
+                    flexShrink: 0
+                  }}
+                />
+              </div>
+            ) : (
+              <img
+                src={p.logo}
+                alt=""
+                style={p.logoHorizontal ? {
+                  // 2026-10-29: для горизонтальных логотипов (Радость жизни,
+                  // 2022x567 PNG с прозрачным фоном) НЕ применяем border-radius:50%
+                  // и object-fit:cover — они обрезают логотип в круг 110x110 и
+                  // искажают. Вместо этого — естественная форма PNG (height:auto)
+                  // с object-fit:contain, чтобы логотип был виден полностью.
+                  // Размер: 96x170 (компромисс — крупнее оригинала 78x130,
+                  // но помещается в карточку 320x180).
+                  height: '96px',
+                  width: 'auto',
+                  maxWidth: '170px',
+                  objectFit: 'contain',
+                  flexShrink: 0
+                } : {
+                  // Квадратные логотипы — круглый border-radius:50% (форма
+                  // логотипа), object-fit:cover. Размер 110x110 (или
+                  // индивидуальный через p.logoSize).
+                  width: `${p.logoSize || 110}px`,
+                  height: `${p.logoSize || 110}px`,
+                  borderRadius: '50%',
+                  objectFit: 'cover',
+                  flexShrink: 0
+                }}
+              />
+            )}
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, minWidth: 0 }}>
               <span style={{ color: p.textColor, fontSize: '20px', fontWeight: 800, textTransform: 'uppercase', lineHeight: '1.1', letterSpacing: '0.5px' }}>{p.name}</span>
               <span style={{ color: p.subColor, fontSize: '12px', fontWeight: 600, marginTop: '6px', lineHeight: '1.3' }}>{p.sub}</span>
