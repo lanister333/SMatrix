@@ -155,7 +155,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#AED6F1",
       url: "https://boomerangclub.ru",
-      logo: "/partners/ocean-friends-logo.png",
+      logo: "/partners/ocean-friends-logo.png?v=1",
       siteLabel: "boomerangclub.ru"
     },
     {
@@ -176,7 +176,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#D6E4F5",
       url: "https://t.me/pesikotsakh",
-      logo: "/partners/pesikot-logo-centered.png?v=9",
+      logo: "/partners/pesikot-logo-centered.png?v=10",
       siteLabel: "t.me/pesikotsakh"
     },
     {
@@ -186,7 +186,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#E8F5E9",
       url: "https://sakhrodnik.ru",
-      logo: "/partners/rodnik-logo.png",
+      logo: "/partners/rodnik-logo.png?v=2",
       siteLabel: "sakhrodnik.ru",
       logoShiftUp: 5
     },
@@ -208,7 +208,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#E3F27A",
       url: "https://ulybka-rebenka.ru",
-      logo: "/partners/ulybka-logo.png",
+      logo: "/partners/ulybka-logo.png?v=2",
       siteLabel: "ulybka-rebenka.ru"
     },
     {
