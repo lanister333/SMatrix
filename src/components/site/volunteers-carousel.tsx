@@ -237,7 +237,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#FFCDD2",
       url: "http://hiv65.ru",
-      logo: "/partners/hiv-logo.png",
+      logo: "/partners/hiv-logo-shrunk.png?v=7",
       siteLabel: "hiv65.ru"
     }
   ];
