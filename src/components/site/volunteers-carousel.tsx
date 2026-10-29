@@ -218,7 +218,8 @@ export default function VolunteersCarousel() {
       subColor: "#FFD700",
       url: "https://t.me/sakhpsosova",
       logo: "/partners/sova-logo.png",
-      siteLabel: "t.me/sakhpsosova"
+      siteLabel: "t.me/sakhpsosova",
+      logoPadding: 14
     },
     {
       name: "ЖИВОТНЫЕ ТЕРРИТОРИЯ СПАСЕНИЯ",
@@ -289,6 +290,20 @@ export default function VolunteersCarousel() {
                 height: '96px',
                 width: 'auto',
                 maxWidth: '170px',
+                objectFit: 'contain',
+                flexShrink: 0
+              } : p.logoPadding ? {
+                // 2026-10-29: для квадратных логотипов с белой подложкой
+                // (ПСО СОВА — белая круг-подложка, сова отцентрована внутри).
+                // backgroundColor:white + padding создаёт белую подложку
+                // вокруг PNG. object-fit:contain — PNG не обрезается, виден
+                // целиком, отцентрован внутри круга.
+                width: `${p.logoSize || 110}px`,
+                height: `${p.logoSize || 110}px`,
+                borderRadius: '50%',
+                backgroundColor: '#ffffff',
+                padding: `${p.logoPadding}px`,
+                boxSizing: 'border-box',
                 objectFit: 'contain',
                 flexShrink: 0
               } : {
