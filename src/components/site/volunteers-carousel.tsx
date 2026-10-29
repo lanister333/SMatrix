@@ -186,7 +186,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#E8F5E9",
       url: "https://sakhrodnik.ru",
-      logo: "/partners/rodnik-logo-rainbow.png?v=11",
+      logo: "/partners/rodnik-logo-rainbow.png?v=12",
       siteLabel: "sakhrodnik.ru"
     },
     {
@@ -196,7 +196,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#AED6F1",
       url: "https://radostzhizni.ru",
-      logo: "/partners/radost-logo.png",
+      logo: "/partners/radost-logo-white.png?v=5",
       siteLabel: "radostzhizni.ru",
       logoHorizontal: true
     },
@@ -217,7 +217,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#FFD700",
       url: "https://t.me/sakhpsosova",
-      logo: "/partners/sova-logo.png",
+      logo: "/partners/sova-logo-centered.png?v=6",
       siteLabel: "t.me/sakhpsosova"
     },
     {
@@ -227,7 +227,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#FFE0B2",
       url: "https://zts-sakh.ru",
-      logo: "/partners/zts-logo.png?v=2",
+      logo: "/partners/zts-logo-centered.png?v=3",
       siteLabel: "zts-sakh.ru"
     },
     {
@@ -237,7 +237,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#FFCDD2",
       url: "http://hiv65.ru",
-      logo: "/partners/hiv-logo.png",
+      logo: "/partners/hiv-logo-shrunk.png?v=7",
       siteLabel: "hiv65.ru"
     }
   ];
