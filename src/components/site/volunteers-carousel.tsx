@@ -196,7 +196,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#AED6F1",
       url: "https://radostzhizni.ru",
-      logo: "/partners/radost-logo.png",
+      logo: "/partners/radost-logo-white.png?v=5",
       siteLabel: "radostzhizni.ru",
       logoHorizontal: true
     },
