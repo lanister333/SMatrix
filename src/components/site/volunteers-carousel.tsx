@@ -186,10 +186,10 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#E8F5E9",
       url: "https://sakhrodnik.ru",
-      logo: "/partners/rodnik-logo.png?v=2",
+      logo: "/partners/rodnik-logo.png?v=3",
       siteLabel: "sakhrodnik.ru",
       logoShiftUp: 5,
-      logoShiftLeft: 4
+      logoShiftLeft: 2
     },
     {
       name: "РАДОСТЬ ЖИЗНИ",
