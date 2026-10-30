@@ -165,9 +165,8 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#E5D9F2",
       url: "https://t.me/animals_sakhalin",
-      logo: "/partners/animals-sakhalin-logo-nobg.png?v=9",
-      siteLabel: "t.me/animals_sakhalin",
-      logoSize: 140
+      logo: "/partners/animals-sakhalin-logo-nobg.png?v=10",
+      siteLabel: "t.me/animals_sakhalin"
     },
     {
       name: "ПЁС И КОТ",
