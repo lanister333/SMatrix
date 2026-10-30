@@ -155,8 +155,9 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#AED6F1",
       url: "https://boomerangclub.ru",
-      logo: "/partners/ocean-friends-logo.png?v=1",
-      siteLabel: "boomerangclub.ru"
+      logo: "/partners/ocean-friends-logo.png?v=2",
+      siteLabel: "boomerangclub.ru",
+      logoSize: 140
     },
     {
       name: "ПОМОЩЬ ЖИВОТНЫМ",
@@ -165,8 +166,9 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#E5D9F2",
       url: "https://t.me/animals_sakhalin",
-      logo: "/partners/animals-sakhalin-logo-nobg.png?v=10",
-      siteLabel: "t.me/animals_sakhalin"
+      logo: "/partners/animals-sakhalin-logo-nobg.png?v=11",
+      siteLabel: "t.me/animals_sakhalin",
+      logoSize: 140
     },
     {
       name: "ПЁС И КОТ",
@@ -175,8 +177,9 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#D6E4F5",
       url: "https://t.me/pesikotsakh",
-      logo: "/partners/pesikot-logo-centered.png?v=9",
-      siteLabel: "t.me/pesikotsakh"
+      logo: "/partners/pesikot-logo-centered.png?v=10",
+      siteLabel: "t.me/pesikotsakh",
+      logoSize: 140
     },
     {
       name: "РОДНИК",
@@ -185,8 +188,9 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#E8F5E9",
       url: "https://sakhrodnik.ru",
-      logo: "/partners/rodnik-logo.png?v=4",
+      logo: "/partners/rodnik-logo.png?v=5",
       siteLabel: "sakhrodnik.ru",
+      logoSize: 140,
       logoShiftUp: 8,
       logoShiftLeft: 2
     },
@@ -208,8 +212,9 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#E3F27A",
       url: "https://ulybka-rebenka.ru",
-      logo: "/partners/ulybka-logo.png?v=2",
-      siteLabel: "ulybka-rebenka.ru"
+      logo: "/partners/ulybka-logo.png?v=3",
+      siteLabel: "ulybka-rebenka.ru",
+      logoSize: 140
     },
     {
       name: "ПСО СОВА",
@@ -218,8 +223,9 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#FFD700",
       url: "https://t.me/sakhpsosova",
-      logo: "/partners/sova-logo-centered.png?v=6",
-      siteLabel: "t.me/sakhpsosova"
+      logo: "/partners/sova-logo-centered.png?v=7",
+      siteLabel: "t.me/sakhpsosova",
+      logoSize: 140
     },
     {
       name: "ЖИВОТНЫЕ ТЕРРИТОРИЯ СПАСЕНИЯ",
@@ -228,8 +234,9 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#FFE0B2",
       url: "https://zts-sakh.ru",
-      logo: "/partners/zts-logo-centered.png?v=3",
-      siteLabel: "zts-sakh.ru"
+      logo: "/partners/zts-logo-centered.png?v=4",
+      siteLabel: "zts-sakh.ru",
+      logoSize: 140
     },
     {
       name: "СТОП СПИД",
@@ -238,8 +245,9 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#FFCDD2",
       url: "http://hiv65.ru",
-      logo: "/partners/hiv-logo-shrunk.png?v=7",
-      siteLabel: "hiv65.ru"
+      logo: "/partners/hiv-logo-shrunk.png?v=8",
+      siteLabel: "hiv65.ru",
+      logoSize: 140
     }
   ];
 
