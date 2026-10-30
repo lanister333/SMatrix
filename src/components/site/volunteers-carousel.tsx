@@ -165,9 +165,10 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#E5D9F2",
       url: "https://t.me/animals_sakhalin",
-      logo: "/partners/animals-sakhalin-logo-nobg.png?v=6",
+      logo: "/partners/animals-sakhalin-logo-nobg.png?v=7",
       siteLabel: "t.me/animals_sakhalin",
-      logoSize: 140
+      logoSize: 140,
+      logoBorder: "#000000"
     },
     {
       name: "ПЁС И КОТ",
@@ -334,7 +335,8 @@ export default function VolunteersCarousel() {
                   height: `${p.logoSize || 110}px`,
                   borderRadius: '50%',
                   objectFit: 'cover',
-                  flexShrink: 0
+                  flexShrink: 0,
+                  ...(p.logoBorder ? { border: `1px solid ${p.logoBorder}` } : {})
                 }}
               />
             )}
