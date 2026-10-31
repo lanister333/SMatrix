@@ -62,10 +62,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Папка по месяцам: public/uploads/2026-10/
+    // Папка по месяцам: /opt/smatrix/uploads/2026-10/
+    // (ВНЕ standalone — чтобы не удалялась при деплое)
     const now = new Date();
     const monthDir = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
-    const uploadDir = path.join(process.cwd(), "public", "uploads", monthDir);
+    const uploadDir = path.join("/opt/smatrix/uploads", monthDir);
     await mkdir(uploadDir, { recursive: true });
 
     // Уникальное имя файла: <userId>-<timestamp>-<rand>.jpg
