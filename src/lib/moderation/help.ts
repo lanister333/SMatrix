@@ -141,6 +141,7 @@ export async function aiModerateHelp(title: string, text: string, contactData?: 
   const zai = await ZAI.create();
   const completion = await Promise.race([
     zai.chat.completions.create({
+      model: "glm-4.5-flash",
       messages: [
         { role: "system", content: HELP_SYSTEM_PROMPT },
         {
@@ -150,7 +151,7 @@ export async function aiModerateHelp(title: string, text: string, contactData?: 
       ],
       thinking: { type: "disabled" },
     }),
-    new Promise<never>((_, reject) => setTimeout(() => reject(new Error("AI timeout")), 3000)),
+    new Promise<never>((_, reject) => setTimeout(() => reject(new Error("AI timeout 15s")), 15000)),
   ]);
 
   const { extractJson } = await import("./ai");

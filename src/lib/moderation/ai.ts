@@ -269,8 +269,11 @@ export async function aiModerate(text: string, ctx?: AiModerationContext): Promi
     ),
   ]);
 
+  console.log("[ai] completion received, full:", JSON.stringify(completion).slice(0, 500));
   const content = completion.choices[0]?.message?.content ?? "";
+  console.log("[ai] content:", content.slice(0, 500));
   const parsed = extractJson(content);
+  console.log("[ai] parsed:", JSON.stringify(parsed)?.slice(0, 300));
   if (!parsed) throw new Error("AI: не удалось разобрать ответ");
 
   // 2026-10-01: новый формат ответа с уровнями 1-4 и действиями AI

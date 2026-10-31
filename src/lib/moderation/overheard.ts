@@ -89,6 +89,7 @@ export async function aiModerateOverheard(title: string, text: string, place?: s
   const zai = await ZAI.create();
   const completion = await Promise.race([
     zai.chat.completions.create({
+      model: "glm-4.5-flash",
       messages: [
         { role: "system", content: OVERHEARD_SYSTEM_PROMPT },
         {
@@ -98,7 +99,7 @@ export async function aiModerateOverheard(title: string, text: string, place?: s
       ],
       thinking: { type: "disabled" },
     }),
-    new Promise<never>((_, reject) => setTimeout(() => reject(new Error("AI timeout")), 3000)),
+    new Promise<never>((_, reject) => setTimeout(() => reject(new Error("AI timeout 15s")), 15000)),
   ]);
 
   const { extractJson } = await import("./ai");
