@@ -122,7 +122,10 @@ export default function TopicList(props: {
       p.set("scope", "participated");
       p.set("token", token);
     }
-    if (scope === "favorites") p.set("ids", favorites.ids.join(","));
+    if (scope === "favorites") {
+      p.set("scope", "favorites");
+      p.set("ids", favorites.ids.join(","));
+    }
     if (scope === "archive") p.set("scope", "archive");
     if (rubricFilter) p.set("rubric", rubricFilter.slug);
     fetch(`/api/topics?${p}`)
