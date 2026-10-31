@@ -485,7 +485,6 @@ function ComplaintModal(props: { message: Msg; onClose: () => void; onDone: (msg
             <input value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Комментарий (необязательно)" />
           </div>
           <div className="sk-modal-actions">
-          <span style={{ fontSize: 13, color: "#475569", marginRight: 8 }}>🤖 От имени: <b style={{ color: "#0a5caa" }}>{botNick || "..."} </b></span>
             <span className="sk-modal-hint" style={{ margin: 0, flex: 1 }}>
               {CATEGORY_LABELS[category] ? `Причина: ${CATEGORY_LABELS[category]}` : "Выберите причину жалобы"}
             </span>
