@@ -85,8 +85,12 @@ export async function aiModerateRecommend(
 ): Promise<RecommendAiVerdict> {
   const ZAI = (await import("z-ai-web-dev-sdk")).default;
   const zai = await ZAI.create();
+  const fs = await import("fs");
+  fs.appendFileSync("/tmp/ai-debug.log", `[${new Date().toISOString()}] recommend START, config: ${JSON.stringify(zai.config)}\n`);
+  
   const completion = await Promise.race([
     zai.chat.completions.create({
+      model: "glm-4.5-flash",
       messages: [
         { role: "system", content: RECOMMEND_SYSTEM_PROMPT },
         {
@@ -96,8 +100,10 @@ export async function aiModerateRecommend(
       ],
       thinking: { type: "disabled" },
     }),
-    new Promise<never>((_, reject) => setTimeout(() => reject(new Error("AI timeout")), 3000)),
+    new Promise<never>((_, reject) => setTimeout(() => reject(new Error("AI timeout 15s")), 15000)),
   ]);
+  
+  fs.appendFileSync("/tmp/ai-debug.log", `[${new Date().toISOString()}] recommend COMPLETION: ${JSON.stringify(completion).slice(0, 500)}\n`);
 
   const { extractJson } = await import("./ai");
   const content = completion.choices[0]?.message?.content ?? "";
