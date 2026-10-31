@@ -399,7 +399,7 @@ export async function POST(req: NextRequest) {
         text,
         place,
         humanHighlight,
-        authorId: finalAuthorId,
+        author: { connect: { id: finalAuthorId } },
         authorName: finalAuthorName,
         aiStatus: outcome.action === "hide" ? "hidden" : outcome.action === "human" ? "human" : "ok",
         aiNote: outcome.aiNote ?? "",
