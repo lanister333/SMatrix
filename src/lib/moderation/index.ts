@@ -111,7 +111,9 @@ export async function moderateNewText(
 
   // Шаг 2. ИИ-модератор: контекст, скрытые нарушения, защита мнений.
   try {
+    console.log("[moderation] calling aiModerate, text length:", text.length, "shadowMode:", shadowMode);
     const ai = await aiModerate(text, ctx);
+    console.log("[moderation] aiModerate returned:", JSON.stringify({level: ai.level, action: ai.action, source: ai.source}).slice(0, 200));
     const aiSource = ai.source ?? "llm";
 
     // ПРОМТ №2: shadow mode — ИИ предлагает решение, но НЕ действует.
@@ -208,7 +210,8 @@ export async function moderateNewText(
       shadowMode: false,
       aiSource,
     };
-  } catch {
+  } catch (e) {
+    console.error("[moderation] aiModerate FAILED:", e?.message || e, e?.stack?.slice(0, 300));
     return {
       action: "human",
       aiNote: "ИИ-модератор недоступен — требуется проверка человеком",
