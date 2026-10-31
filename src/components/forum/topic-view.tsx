@@ -13,6 +13,7 @@ import {
 } from "@/lib/ui";
 import { nickGenderClass } from "@/lib/nick-gender";
 import { AppealModal } from "@/components/forum/modals";
+import { UploadPhotoButton } from "@/components/forum/upload-photo-button";
 import ForumThread from "@/components/forum/forum-thread";
 import CollapsibleComments from "@/components/forum/collapsible-comments";
 
@@ -423,6 +424,11 @@ function EditMsgModal(props: { message: Msg; token: string | null; onClose: () =
             <button className="sk-btn-classic" disabled={busy || !text.trim()} onClick={save}>
               {busy ? "Сохранение…" : "Сохранить"}
             </button>
+            <UploadPhotoButton
+              token={props.token}
+              notify={props.onFail}
+              onUploaded={(md) => setText((prev) => (prev ? prev + "\n" + md : md))}
+            />
             <button className="right" onClick={props.onClose}>
               Отмена
             </button>
@@ -1276,6 +1282,11 @@ export default function TopicView(props: {
               <button className="sk-btn-classic" disabled={sending || !reply.trim()} onClick={sendReply}>
                 {sending ? "Проверка…" : "Отправить мнение"}
               </button>
+              <UploadPhotoButton
+                token={props.token}
+                notify={props.notify}
+                onUploaded={(md) => setReply((prev) => (prev ? prev + "\n" + md : md))}
+              />
               {/* 2026-10-02: текст «Чтобы писать на форуме, войдите или
                   зарегистрируйтесь — ссылка в левой колонке» удалён по
                   просьбе пользователя — кнопка всё равно требует входа

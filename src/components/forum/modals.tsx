@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { ForumUser, Rubric } from "@/lib/ui";
+import { UploadPhotoButton } from "@/components/forum/upload-photo-button";
 
 /**
  * ШАГ 11. Модалка «Оспорить решение» — апелляция на скрытие сообщения
@@ -875,6 +876,11 @@ export function NewTopicModal(props: {
               >🔄 Сменить</button>
               )}
               </div>
+            <UploadPhotoButton
+              token={props.token}
+              notify={(m) => setError(m)}
+              onUploaded={(md) => setBody((prev) => (prev ? prev + "\n" + md : md))}
+            />
             <button className="sk-btn-classic" style={{ marginTop: 0 }} onClick={props.onClose} disabled={busy}>
               Отмена
             </button>
