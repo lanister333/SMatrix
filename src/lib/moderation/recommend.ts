@@ -186,7 +186,8 @@ export async function moderateNewRecommendText(
       };
     }
     return { action: "allow", aiNote: ai.note, needHuman: false, source: "ai", recommendCategory: ai.category };
-  } catch {
+  } catch (e) {
+    console.error("[recommend] aiModerateRecommend FAILED:", e?.message || e, e?.stack?.slice(0, 300));
     // ИИ недоступен: лексический фильтр пройден — публикуем,
     // но обязательно ставим в очередь человеку-модератору.
     return {
