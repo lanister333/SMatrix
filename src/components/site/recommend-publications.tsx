@@ -710,10 +710,6 @@ function RecFormModal(props: {
       setSpecHint("Укажите, кого вы рекомендуете или не рекомендуете: конкретную организацию, компанию, сервис или место.");
       return;
     }
-    if (title.trim().length < 5) {
-      setErr("Заголовок слишком короткий — минимум 5 символов");
-      return;
-    }
     if (text.trim().length < 10) {
       setErr("Расскажите о своём опыте — минимум 10 символов");
       return;
@@ -726,9 +722,11 @@ function RecFormModal(props: {
     }
     setBusy(true);
     try {
+      // Заголовок автоматически из текста (поле убрано из UI)
+      const autoTitle = text.trim().slice(0, 100);
       const payload: Record<string, unknown> = isEdit
-        ? { token: props.token, action: "edit", subject: subject.trim(), stance, title: title.trim(), text: text.trim(), place: place.trim(), humanHighlight: human.trim() }
-        : { token: props.token, subject: subject.trim(), stance, title: title.trim(), text: text.trim(), place: place.trim(), humanHighlight: human.trim() };
+        ? { token: props.token, action: "edit", subject: subject.trim(), stance, title: autoTitle, text: text.trim(), place: place.trim(), humanHighlight: human.trim() }
+        : { token: props.token, subject: subject.trim(), stance, title: autoTitle, text: text.trim(), place: place.trim(), humanHighlight: human.trim() };
       if (confirmSimilar) payload.confirmSimilar = true;
       const r = await fetch(isEdit ? `/api/recommend/${props.editItem!.id}` : "/api/recommend", {
         method: isEdit ? "PATCH" : "POST",
@@ -808,19 +806,6 @@ function RecFormModal(props: {
               </div>
             </div>
           )}
-          <div className="sk-modal-row">
-            <label htmlFor="rc-f-title">Заголовок</label>
-            <input
-              id="rc-f-title"
-              value={title}
-              maxLength={150}
-              onChange={(e) => {
-                setTitle(e.target.value);
-                clearWarnings();
-              }}
-              placeholder="Например: Сделали ремонт быстро и качественно"
-            />
-          </div>
           <div className="sk-modal-row">
             <label htmlFor="rc-f-text">Ваш опыт</label>
             <textarea
