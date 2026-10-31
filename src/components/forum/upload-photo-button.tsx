@@ -4,14 +4,18 @@ import { useRef, useState } from "react";
 
 interface Props {
   token: string | null;
-  onUploaded: (markdownUrl: string) => void;
+  /** Колбэк после загрузки фото — получает URL загруженного файла */
+  onUploaded: (url: string, alt: string) => void;
   notify?: (msg: string) => void;
 }
 
 /**
  * Кнопка «📷 Фото» — простая загрузка изображения в сообщение.
- * По клику открывается выбор файла, после загрузки URL вставляется
- * в textarea через колбэк onUploaded.
+ * По клику открывается выбор файла, после загрузки URL передаётся
+ * через колбэк onUploaded (БЕЗ вставки markdown в textarea).
+ *
+ * Markdown для отправки собирается родительским компонентом из
+ * списка загруженных фото — чтобы пользователь не видел код в textarea.
  *
  * Используется в:
  *  - Модалке «Новая тема»
@@ -50,9 +54,9 @@ export function UploadPhotoButton({ token, onUploaded, notify }: Props) {
         notify?.(data.error || "Не удалось загрузить фото.");
         return;
       }
-      // Вставляем markdown в textarea
+      // Передаём URL и alt — родитель сам хранит список фото
       const alt = file.name.replace(/\.[^.]+$/, "").slice(0, 50) || "фото";
-      onUploaded(`![${alt}](${data.url})`);
+      onUploaded(data.url, alt);
       notify?.("Фото загружено.");
     } catch {
       notify?.("Сеть недоступна — попробуйте ещё раз.");

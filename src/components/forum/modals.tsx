@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { ForumUser, Rubric } from "@/lib/ui";
 import { UploadPhotoButton } from "@/components/forum/upload-photo-button";
-import { PhotoPreview } from "@/components/forum/photo-preview";
+import { PhotoPreview, photosToMarkdown } from "@/components/forum/photo-preview";
 
 /**
  * ШАГ 11. Модалка «Оспорить решение» — апелляция на скрытие сообщения
@@ -725,6 +725,7 @@ export function NewTopicModal(props: {
   const [rubricId, setRubricId] = useState<number | null>(null);
   const [title, setTitle] = useState(props.initialTitle ?? "");
   const [body, setBody] = useState(props.initialMessage ?? "");
+  const [photos, setPhotos] = useState<{ url: string; alt: string }[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   // 2026-10-20 Этап 3: «Писать от лица бота» — для owner/admin
@@ -789,7 +790,10 @@ export function NewTopicModal(props: {
       setError("Заголовок слишком короткий — минимум 5 символов");
       return;
     }
-    if (!body.trim()) {
+    // Склеиваем текст + markdown фото (фото НЕ видны в textarea, только в превью)
+    const photosPart = photos.length > 0 ? "\n" + photosToMarkdown(photos) : "";
+    const fullBody = (body.trim() + photosPart).trim();
+    if (!fullBody) {
       setError("Напишите текст сообщения — это суть темы");
       return;
     }
@@ -799,7 +803,7 @@ export function NewTopicModal(props: {
       const r = await fetch("/api/topics", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rubricId, title: title.trim(), body: body.trim(), token: props.token, botAuthor: botAuthor || undefined }),
+        body: JSON.stringify({ rubricId, title: title.trim(), body: fullBody, token: props.token, botAuthor: botAuthor || undefined }),
       });
       const data = await r.json();
       if (!r.ok) throw Error(data.error || "Не удалось опубликовать. Проверьте связь и попробуйте ещё раз.");
@@ -861,8 +865,8 @@ export function NewTopicModal(props: {
               style={{ minHeight: 220, resize: "vertical" }}
             />
             <PhotoPreview
-              text={body}
-              onRemove={(url) => setBody((prev) => prev.replace(new RegExp(`!\\[[^\\]]*\\]\\(${url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\)\\n?`, "g"), ""))}
+              photos={photos}
+              onRemove={(url) => setPhotos((prev) => prev.filter((p) => p.url !== url))}
             />
             <div className="sk-charcount">
               <span className={body.length > 18000 ? "over" : ""}>{body.length}/20000</span>
@@ -884,7 +888,7 @@ export function NewTopicModal(props: {
             <UploadPhotoButton
               token={props.token}
               notify={(m) => setError(m)}
-              onUploaded={(md) => setBody((prev) => (prev ? prev + "\n" + md : md))}
+              onUploaded={(url, alt) => setPhotos((prev) => [...prev, { url, alt }])}
             />
             <button className="sk-btn-classic" style={{ marginTop: 0 }} onClick={props.onClose} disabled={busy}>
               Отмена
@@ -892,7 +896,7 @@ export function NewTopicModal(props: {
             <button
               className="sk-btn-classic right"
               style={{ marginTop: 0 }}
-              disabled={busy || !rubricId || title.trim().length < 3 || !body.trim()}
+              disabled={busy || !rubricId || title.trim().length < 3 || (!body.trim() && photos.length === 0)}
               onClick={submit}
             >
               {busy ? "Проверяем и публикуем…" : "Опубликовать"}

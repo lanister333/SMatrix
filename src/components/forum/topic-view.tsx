@@ -14,7 +14,7 @@ import {
 import { nickGenderClass } from "@/lib/nick-gender";
 import { AppealModal } from "@/components/forum/modals";
 import { UploadPhotoButton } from "@/components/forum/upload-photo-button";
-import { PhotoPreview } from "@/components/forum/photo-preview";
+import { PhotoPreview, photosToMarkdown, markdownToPhotos, stripPhotoMarkdown } from "@/components/forum/photo-preview";
 import ForumThread from "@/components/forum/forum-thread";
 import CollapsibleComments from "@/components/forum/collapsible-comments";
 
@@ -374,10 +374,15 @@ function MessageRow(props: {
 }
 
 function EditMsgModal(props: { message: Msg; token: string | null; onClose: () => void; onDone: (msg: string) => void; onFail: (msg: string) => void }) {
-  const [text, setText] = useState(props.message.body);
+  // Инициализация: текст без markdown-фото, фото — в отдельный state
+  const [text, setText] = useState(() => stripPhotoMarkdown(props.message.body));
+  const [photos, setPhotos] = useState<{ url: string; alt: string }[]>(() => markdownToPhotos(props.message.body));
   const [busy, setBusy] = useState(false);
   const save = async () => {
-    if (!text.trim()) {
+    const textPart = text.trim();
+    const photosPart = photos.length > 0 ? "\n" + photosToMarkdown(photos) : "";
+    const fullBody = (textPart + photosPart).trim();
+    if (!fullBody) {
       props.onFail("Введите текст сообщения");
       return;
     }
@@ -386,7 +391,7 @@ function EditMsgModal(props: { message: Msg; token: string | null; onClose: () =
       const r = await fetch(`/api/messages/${props.message.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: props.token, body: text.trim() }),
+        body: JSON.stringify({ token: props.token, body: fullBody }),
       });
       const data = await r.json();
       if (!r.ok) throw Error(data.error || "Не удалось сохранить. Проверьте связь и попробуйте ещё раз.");
@@ -414,8 +419,8 @@ function EditMsgModal(props: { message: Msg; token: string | null; onClose: () =
             style={{ width: "100%", minHeight: 170, border: "1px solid #1E3A5F", padding: 9, fontFamily: "inherit", fontSize: 16, lineHeight: 1.55, boxSizing: "border-box", resize: "vertical" }}
           />
           <PhotoPreview
-            text={text}
-            onRemove={(url) => setText((prev) => prev.replace(new RegExp(`!\\[[^\\]]*\\]\\(${url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\)\\n?`, "g"), ""))}
+            photos={photos}
+            onRemove={(url) => setPhotos((prev) => prev.filter((p) => p.url !== url))}
           />
           <div className="sk-charcount">
             {text.length > 9000 && (
@@ -426,13 +431,13 @@ function EditMsgModal(props: { message: Msg; token: string | null; onClose: () =
           </div>
           <div className="sk-modal-hint">Текст повторно пройдёт проверку модерации.</div>
           <div className="sk-modal-actions">
-            <button className="sk-btn-classic" disabled={busy || !text.trim()} onClick={save}>
+            <button className="sk-btn-classic" disabled={busy || (!text.trim() && photos.length === 0)} onClick={save}>
               {busy ? "Сохранение…" : "Сохранить"}
             </button>
             <UploadPhotoButton
               token={props.token}
               notify={props.onFail}
-              onUploaded={(md) => setText((prev) => (prev ? prev + "\n" + md : md))}
+              onUploaded={(url, alt) => setPhotos((prev) => [...prev, { url, alt }])}
             />
             <button className="right" onClick={props.onClose}>
               Отмена
@@ -535,6 +540,7 @@ export default function TopicView(props: {
   const mentionAuthors = useMemo(() => new Set(messages.map((m) => m.author)), [messages]);
   const [loading, setLoading] = useState(true);
   const [reply, setReply] = useState("");
+  const [replyPhotos, setReplyPhotos] = useState<{ url: string; alt: string }[]>([]);
   const [replyTo, setReplyTo] = useState<Msg | null>(null);
   // 2026-10-13: «Вариант 2» — ответ от рандомного бота (со сменой по кнопке)
   const [replyBotAuthor, setReplyBotAuthor] = useState<string>("");
@@ -755,12 +761,16 @@ export default function TopicView(props: {
       props.onNeedAuth();
       return;
     }
-    if (!reply.trim()) return;
+    // Склеиваем текст + markdown фото (фото НЕ видны в textarea, только в превью)
+    const textPart = reply.trim();
+    const photosPart = replyPhotos.length > 0 ? "\n" + photosToMarkdown(replyPhotos) : "";
+    const fullBody = textPart + photosPart;
+    if (!fullBody.trim()) return;
     setSending(true);
     try {
       // СТАДИЯ 1/Шаг 1: автоматическое @упоминание автора ответа («@имя, текст») —
       // связь ответа с сообщением сохраняется без глубоких сдвигов лесенки
-      const text = reply.trim();
+      const text = fullBody.trim();
       const bodyWithMention =
         replyTo?.author && !text.startsWith(`@${replyTo.author}`) ? `@${replyTo.author}, ${text}` : text;
       const r = await fetch(`/api/topics/${topicId}/messages`, {
@@ -780,6 +790,7 @@ export default function TopicView(props: {
         props.notify("Сообщение опубликовано");
       }
       setReply("");
+      setReplyPhotos([]);
       setReplyTo(null);
       const num = m && m.num;
       if (num) {
@@ -1281,20 +1292,20 @@ export default function TopicView(props: {
               maxLength={10000}
             />
             <PhotoPreview
-              text={reply}
-              onRemove={(url) => setReply((prev) => prev.replace(new RegExp(`!\\[[^\\]]*\\]\\(${url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\)\\n?`, "g"), ""))}
+              photos={replyPhotos}
+              onRemove={(url) => setReplyPhotos((prev) => prev.filter((p) => p.url !== url))}
             />
             <div className="sk-charcount">
               {reply.length > 9000 && <span className={reply.length > 9500 ? "over" : ""}>{reply.length}/10000</span>}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-              <button className="sk-btn-classic" disabled={sending || !reply.trim()} onClick={sendReply}>
+              <button className="sk-btn-classic" disabled={sending || (!reply.trim() && replyPhotos.length === 0)} onClick={sendReply}>
                 {sending ? "Проверка…" : "Отправить мнение"}
               </button>
               <UploadPhotoButton
                 token={props.token}
                 notify={props.notify}
-                onUploaded={(md) => setReply((prev) => (prev ? prev + "\n" + md : md))}
+                onUploaded={(url, alt) => setReplyPhotos((prev) => [...prev, { url, alt }])}
               />
               {/* 2026-10-02: текст «Чтобы писать на форуме, войдите или
                   зарегистрируйтесь — ссылка в левой колонке» удалён по

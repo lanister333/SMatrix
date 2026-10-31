@@ -1,29 +1,22 @@
 "use client";
 
-import { useMemo } from "react";
+interface PhotoItem {
+  url: string;
+  alt: string;
+}
 
 interface Props {
-  text: string;
+  photos: PhotoItem[];
   onRemove: (url: string) => void;
 }
 
 /**
  * Превью загруженных фото над textarea.
- * Парсит markdown ![alt](url) из текста и показывает миниатюры.
- * Кнопка × удаляет фото (и markdown) из текста.
+ * Показывает миниатюры из массива photos (не парсит markdown).
+ * Кнопка × удаляет фото из списка.
  */
-export function PhotoPreview({ text, onRemove }: Props) {
-  const images = useMemo(() => {
-    const re = /!\[([^\]]*)\]\(([^)]+)\)/g;
-    const result: { alt: string; url: string }[] = [];
-    let m: RegExpExecArray | null;
-    while ((m = re.exec(text)) !== null) {
-      result.push({ alt: m[1] || "фото", url: m[2] });
-    }
-    return result;
-  }, [text]);
-
-  if (images.length === 0) return null;
+export function PhotoPreview({ photos, onRemove }: Props) {
+  if (photos.length === 0) return null;
 
   return (
     <div style={{
@@ -36,8 +29,8 @@ export function PhotoPreview({ text, onRemove }: Props) {
       borderRadius: 6,
       border: "1px solid #e2e8f0",
     }}>
-      {images.map((img, i) => (
-        <div key={i} style={{
+      {photos.map((img) => (
+        <div key={img.url} style={{
           position: "relative",
           width: 72,
           height: 72,
@@ -81,4 +74,26 @@ export function PhotoPreview({ text, onRemove }: Props) {
       ))}
     </div>
   );
+}
+
+/** Собрать markdown-строку из массива фото (для вставки в тело сообщения перед отправкой) */
+export function photosToMarkdown(photos: PhotoItem[]): string {
+  if (photos.length === 0) return "";
+  return photos.map((p) => `![${p.alt}](${p.url})`).join("\n");
+}
+
+/** Распарсить markdown-фото из текста (для инициализации при редактировании) */
+export function markdownToPhotos(text: string): PhotoItem[] {
+  const re = /!\[([^\]]*)\]\(([^)]+)\)/g;
+  const result: PhotoItem[] = [];
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text)) !== null) {
+    result.push({ alt: m[1] || "фото", url: m[2] });
+  }
+  return result;
+}
+
+/** Убрать markdown-фото из текста (оставить только обычный текст) */
+export function stripPhotoMarkdown(text: string): string {
+  return text.replace(/!\[[^\]]*\]\([^)]+\)\n?/g, "").trim();
 }
