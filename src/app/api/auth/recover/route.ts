@@ -54,19 +54,21 @@ export async function POST(req: NextRequest) {
     const resetPath = `/?reset=${encodeURIComponent(token)}`;
     const isStaff = user.role === "owner" || user.role === "admin" || user.role === "moderator";
     
-    // Отправляем письмо через Resend (кроме staff — им сразу показываем ссылку)
-    if (!isStaff) {
-      const emailSent = await sendPasswordResetEmail(email, resetPath);
-      return NextResponse.json({
-        ok: true,
-        step: "reset",
-        resetPath: emailSent ? undefined : resetPath,
-      });
-    }
+    // TEMP (тестирование): отправка email отключена — Resend dummy ключ.
+    // Всегда возвращаем resetPath (как для staff), чтобы UI мог показать ссылку.
+    // Вернуть после тестов: раскомментировать sendPasswordResetEmail ниже.
+    // if (!isStaff) {
+    //   const emailSent = await sendPasswordResetEmail(email, resetPath);
+    //   return NextResponse.json({
+    //     ok: true,
+    //     step: "reset",
+    //     resetPath: emailSent ? undefined : resetPath,
+    //   });
+    // }
     return NextResponse.json({
       ok: true,
       step: "reset",
-      resetPath: "ok",
+      resetPath,
     });
   } catch (e) {
     return handleApiError(e);
