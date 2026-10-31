@@ -246,7 +246,9 @@ export async function aiModerate(text: string, ctx?: AiModerationContext): Promi
     return { ...cached, source: "cache" };
   }
 
+  console.log("[ai] starting moderation, text length:", text.length);
   const zai = await ZAI.create();
+  console.log("[ai] ZAI created, baseUrl:", zai.config?.baseUrl);
   // 2026-10-27 (шаг 1): таймаут 3с → 15с. ИИ-модератор работает через мост
   // (туннель → локальный прокси → internal-api.z.ai), при нагрузке ответ
   // может занимать больше 3с. 15с — безопасный верхний предел.

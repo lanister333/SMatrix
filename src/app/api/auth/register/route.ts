@@ -135,9 +135,7 @@ export async function POST(req: NextRequest) {
         gender,
         secretQuestion: question,
         secretAnswer: answer.toLowerCase(),
-        // TEMP (тестирование): emailVerified=true сразу, без отправки письма.
-        // Вернуть обратно в false после окончания тестов.
-        emailVerified: true,
+        emailVerified: false,
         status: initialStatus,
         phone: phone,
         // ПРОМТ «Временная упрощённая регистрация»: phoneVerified=true
@@ -169,13 +167,12 @@ export async function POST(req: NextRequest) {
     }
 
     const token = await createAuthToken(user.id, "verify");
-    // TEMP (тестирование): отправка email отключена — Resend dummy ключ.
-    // Вернуть после тестов: раскомментировать sendVerificationEmail + emailVerified=false выше.
-    // const verifyPath = `/api/auth/verify?token=${encodeURIComponent(token)}`;
-    // const emailSent = await sendVerificationEmail(email, verifyPath);
+    // 2026-10-14: отправляем письмо через Resend. verifyPath — fallback (демо-режим).
+    const verifyPath = `/api/auth/verify?token=${encodeURIComponent(token)}`;
+    const emailSent = await sendVerificationEmail(email, verifyPath);
     return NextResponse.json({
       ok: true,
-      // verifyPath: emailSent ? undefined : verifyPath,
+      verifyPath: emailSent ? undefined : verifyPath,
       // Подсказка пользователю — не раскрываем детали безопасности.
       notice:
         initialStatus === "suspicious"
