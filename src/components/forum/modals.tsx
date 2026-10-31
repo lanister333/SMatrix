@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { ForumUser, Rubric } from "@/lib/ui";
 import { UploadPhotoButton } from "@/components/forum/upload-photo-button";
+import { PhotoPreview } from "@/components/forum/photo-preview";
 
 /**
  * ШАГ 11. Модалка «Оспорить решение» — апелляция на скрытие сообщения
@@ -858,6 +859,10 @@ export function NewTopicModal(props: {
               rows={10}
               placeholder="Опишите вопрос или ситуацию подробно — так проще получить дельный ответ."
               style={{ minHeight: 220, resize: "vertical" }}
+            />
+            <PhotoPreview
+              text={body}
+              onRemove={(url) => setBody((prev) => prev.replace(new RegExp(`!\\[[^\\]]*\\]\\(${url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\)\\n?`, "g"), ""))}
             />
             <div className="sk-charcount">
               <span className={body.length > 18000 ? "over" : ""}>{body.length}/20000</span>

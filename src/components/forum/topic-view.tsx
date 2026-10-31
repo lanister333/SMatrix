@@ -14,6 +14,7 @@ import {
 import { nickGenderClass } from "@/lib/nick-gender";
 import { AppealModal } from "@/components/forum/modals";
 import { UploadPhotoButton } from "@/components/forum/upload-photo-button";
+import { PhotoPreview } from "@/components/forum/photo-preview";
 import ForumThread from "@/components/forum/forum-thread";
 import CollapsibleComments from "@/components/forum/collapsible-comments";
 
@@ -411,6 +412,10 @@ function EditMsgModal(props: { message: Msg; token: string | null; onClose: () =
             onChange={(e) => setText(e.target.value)}
             maxLength={10000}
             style={{ width: "100%", minHeight: 170, border: "1px solid #1E3A5F", padding: 9, fontFamily: "inherit", fontSize: 16, lineHeight: 1.55, boxSizing: "border-box", resize: "vertical" }}
+          />
+          <PhotoPreview
+            text={text}
+            onRemove={(url) => setText((prev) => prev.replace(new RegExp(`!\\[[^\\]]*\\]\\(${url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\)\\n?`, "g"), ""))}
           />
           <div className="sk-charcount">
             {text.length > 9000 && (
@@ -1274,6 +1279,10 @@ export default function TopicView(props: {
               onChange={(e) => setReply(e.target.value)}
               placeholder="Напишите ваше мнение…"
               maxLength={10000}
+            />
+            <PhotoPreview
+              text={reply}
+              onRemove={(url) => setReply((prev) => prev.replace(new RegExp(`!\\[[^\\]]*\\]\\(${url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\)\\n?`, "g"), ""))}
             />
             <div className="sk-charcount">
               {reply.length > 9000 && <span className={reply.length > 9500 ? "over" : ""}>{reply.length}/10000</span>}
