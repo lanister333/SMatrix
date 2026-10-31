@@ -32,11 +32,12 @@ interface SendSanction {
  * Упоминаются только реальные участники темы (точное совпадение ника),
  * остальные «@токены» (e-mail и т.п.) остаются обычным текстом.
  */
-function renderMentions(body: string, authors: Set<string>, onOpen: (nick: string) => void): React.ReactNode {
+function renderMentions(body: string, authors: Set<string>, onOpen: (nick: string) => void, onImageClick?: (url: string, alt: string) => void): React.ReactNode {
   // 2026-10-06: обрабатываем Markdown-картинки ![alt](url) → <img>
   // До mentions, чтобы @ник внутри alt-текста картинки не ломался.
   // Поддержка только картинок (не весь Markdown) — минимальная, для
   // постов «Театра ботов» с фотографиями.
+  // 2026-10-31: фото — маленькая миниатюра, клик → лайтбокс (полный размер).
   const segments = renderMarkdownImages(body);
   // Если картинок нет — segments это просто [body], идём по старой логике.
   return segments.map((seg, i) => {
@@ -48,6 +49,8 @@ function renderMentions(body: string, authors: Set<string>, onOpen: (nick: strin
           alt={seg.alt || "фото из поста"}
           className="sk-msg-image"
           loading="lazy"
+          onClick={() => onImageClick?.(seg.url, seg.alt || "фото")}
+          style={{ cursor: "pointer", maxWidth: 200, maxHeight: 200, objectFit: "cover", borderRadius: 6, display: "block", margin: "6px 0" }}
         />
       );
     }
@@ -162,6 +165,7 @@ function MessageRow(props: {
   canReply: boolean;
   mentionAuthors: Set<string>;
   onOpenProfile: (n: string) => void;
+  onImageClick?: (url: string, alt: string) => void;
   onGoParent?: () => void; // клик по метке «└ ответ …» — плавная перемотка к сообщению-родителю
   parentPage?: number | null; // номер страницы поста-родителя, если он на ДРУГОЙ странице (иначе null)
   /** РЕСТАВРАЦИЯ «Сахкома» (2026-09-23): цитата сообщения, на которое
@@ -363,10 +367,10 @@ function MessageRow(props: {
             Применяется ко всем темам (старым, новым, будущим). */}
         {m.num === 1 ? (
           <strong className="sk-msg-body-first" style={{ fontWeight: 700 }}>
-            {renderMentions(m.body, props.mentionAuthors, props.onOpenProfile)}
+            {renderMentions(m.body, props.mentionAuthors, props.onOpenProfile, props.onImageClick)}
           </strong>
         ) : (
-          renderMentions(m.body, props.mentionAuthors, props.onOpenProfile)
+          renderMentions(m.body, props.mentionAuthors, props.onOpenProfile, props.onImageClick)
         )}
       </div>
     </div>
@@ -552,6 +556,7 @@ export default function TopicView(props: {
   const [editMsg, setEditMsg] = useState<Msg | null>(null);
   const [appealMsg, setAppealMsg] = useState<Msg | null>(null);
   const [appealedIds, setAppealedIds] = useState<Set<string>>(new Set());
+  const [lightbox, setLightbox] = useState<{ url: string; alt: string } | null>(null);
   const [page, setPage] = useState(35);
   const [total, setTotal] = useState(0);
   const [gotoNum, setGotoNum] = useState("");
@@ -924,6 +929,7 @@ export default function TopicView(props: {
       canReply={canWrite}
       mentionAuthors={mentionAuthors}
       onOpenProfile={props.onOpenProfile}
+      onImageClick={(url, alt) => setLightbox({ url, alt })}
       quoteOf={quoteOf}
       // Кросс-страничный ответ: родитель не на текущей странице → в метке
       // «└ ответ …» появляется пометка «(стр. M)»; на текущей — линия
@@ -1357,6 +1363,62 @@ export default function TopicView(props: {
           }}
           onFail={(m) => props.notify(m)}
         />
+      )}
+      {lightbox && (
+        <div
+          onClick={() => setLightbox(null)}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0,0,0,0.85)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+            cursor: "zoom-out",
+            padding: 20,
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setLightbox(null)}
+            aria-label="Закрыть"
+            style={{
+              position: "absolute",
+              top: 16,
+              right: 16,
+              width: 40,
+              height: 40,
+              borderRadius: "50%",
+              border: "none",
+              background: "rgba(255,255,255,0.2)",
+              color: "#fff",
+              fontSize: 24,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            ×
+          </button>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={lightbox.url}
+            alt={lightbox.alt}
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              maxWidth: "90vw",
+              maxHeight: "90vh",
+              objectFit: "contain",
+              borderRadius: 8,
+              cursor: "default",
+            }}
+          />
+        </div>
       )}
     </>
   );
