@@ -246,9 +246,8 @@ export async function POST(req: NextRequest) {
         text,
         place,
         tag,
-        authorId: autoBot ? autoBot.id : user.id,
+        author: { connect: { id: autoBot ? autoBot.id : user.id } },
         authorName: autoBot ? autoBot.nickname : user.nickname,
-        originalAuthorId: user.id,
         aiStatus: outcome.action === "hide" ? "hidden" : outcome.action === "human" ? "human" : "ok",
         aiNote: outcome.aiNote ?? "",
         isHiddenByAi: outcome.action === "hide",
@@ -265,7 +264,7 @@ export async function POST(req: NextRequest) {
           postId: created.id,
           topicTitle: title,
           topicText: text,
-          authorId: autoBot ? autoBot.id : user.id,
+          author: { connect: { id: autoBot ? autoBot.id : user.id } },
           authorNickname: autoBot ? autoBot.nickname : user.nickname,
         });
       } catch (e) {

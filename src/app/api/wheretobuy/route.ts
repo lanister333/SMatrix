@@ -347,7 +347,7 @@ export async function POST(req: NextRequest) {
         postType,
         postType,
         status: "seeking",
-        authorId: finalAuthorId,
+        author: { connect: { id: finalAuthorId } },
         authorName: finalAuthorName,
         aiStatus: outcome.action === "hide" ? "hidden" : outcome.action === "human" ? "human" : "ok",
         aiNote: outcome.aiNote ?? "",
@@ -365,7 +365,7 @@ export async function POST(req: NextRequest) {
           postId: created.id,
           topicTitle: title,
           topicText: text,
-          authorId: finalAuthorId,
+          author: { connect: { id: finalAuthorId } },
           authorNickname: finalAuthorName,
         });
       } catch (e) {
