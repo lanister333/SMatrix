@@ -362,6 +362,8 @@ a.sk-addtopic.sk-addtopic-btn:hover,
 
 /* Заголовки блоков: плоский тёмно-синий, без глянца */
 .sk-blocktitle{color:#fff;cursor:default;background:var(--sm-navy);border-bottom:1px solid var(--sm-navy-deep);margin-bottom:6px;padding:5px 9px;font-size:13px;font-weight:700}
+.sk-blocktitle a,.sk-blocktitle a:visited{color:#fff;text-decoration:none}
+.sk-blocktitle a:hover{color:#fff;text-decoration:underline}
 .sk-blocktitle .tri{vertical-align:1px;margin-right:5px;font-size:9px;display:inline-block}
 
 .sk-navlist{margin:0 0 10px;padding:0 0 0 6px;list-style:none}
