@@ -1,0 +1,1260 @@
+     1→generator client {
+     2→  provider = "prisma-client-js"
+     3→}
+     4→
+     5→datasource db {
+     6→  provider = "sqlite"
+     7→  url      = env("DATABASE_URL")
+     8→}
+     9→
+    10→model User {
+    11→  id            String    @id @default(cuid())
+    12→  email         String    @unique
+    13→  passwordHash  String
+    14→  nickname      String    @unique
+    15→  gender        String    @default("unspecified")
+    16→  role          String    @default("user")
+    17→  secretQuestion String   @default("")
+    18→  secretAnswer  String    @default("")
+    19→  emailVerified Boolean   @default(false)
+    20→  restrictedUntil DateTime?
+    21→  createdAt     DateTime  @default(now())
+    22→  updatedAt     DateTime  @updatedAt
+    23→  sessions      Session[]
+    24→  tokens        AuthToken[]
+    25→  messages      Message[]
+    26→  topics        Topic[]
+    27→  sanctions     Sanction[]
+    28→  /// ШАГ 19. Подтверждённый представитель организации (устанавливает только
+    29→  /// администратор; обычный пользователь не может присвоить статус сам — ТЗ п.11).
+    30→  orgRep        Boolean   @default(false)
+    31→  /// ШАГ 19. Название организации представителя (показывается при официальном ответе).
+    32→  orgName       String    @default("")
+    33→  /// 2026-10-01: профиль пользователя — город, телефон, о себе,
+    34→  /// подписки на рассылку и уведомления.
+    35→  city          String    @default("")
+    36→  phone         String    @default("")
+    37→  bio           String    @default("")
+    38→  newsletterSubscribed Boolean @default(false)
+    39→  notificationsSubscribed Boolean @default(false)
+    40→  /// ПРОМТ №1 (защита платформы): явный статус аккаунта.
+    41→  /// active — обычный; suspicious — помечен ИИ как подозрительный (требует проверки);
+    42→  /// banned — заблокирован (через Sanction с kind=ban, здесь дублируется для быстрых проверок).
+    43→  status        String    @default("active")
+    44→  /// Флаг, что телефон пользователя подтверждён (через SMS-код).
+    45→  phoneVerified Boolean   @default(false)
+    46→  /// Время последнего успешного входа — для аудита и выявления аномалий.
+    47→  lastLoginAt   DateTime?
+    48→  gkhProblems   GkhProblem[]
+    49→  gkhUpdates    GkhUpdate[]
+    50→  datingPosts   DatingPost[]
+    51→  cheapPosts    CheapPost[]
+    52→  recPosts      RecPost[]
+    53→  empPosts      EmpPost[]
+    54→  adListings    AdListing[]
+    55→  helpPublications HelpPublication[]
+    56→  overheardPosts   OverheardPost[]
+    57→  /// 29.09.2026: back-relation для WhereToBuyPost.author (покраска ника).
+    58→  wtbAuthored   WhereToBuyPost[] @relation("WtbAuthor")
+    59→  /// ПРОМТ №1: устройства, IP, попытки входа — для отслеживания обхода блокировок.
+    60→  devices       UserDevice[]
+    61→  ips           UserIp[]
+    62→  loginAttempts LoginAttempt[]
+    63→  /// 2026-10-12: очередь «Театра ботов» (этот юзер как бот)
+    64→  botQueueItems  BotQueue[]  @relation("BotQueueBotUser")
+    65→  /// Связи этого пользователя с другими аккаунтами (одинаковый phone/device/IP).
+    66→  linksA        AccountLink[] @relation("AccountLinkA")
+    67→  linksB        AccountLink[] @relation("AccountLinkB")
+    68→  /// ПРОМТ №1: жалобы, поданные этим пользователем (по всем разделам).
+    69→  complaints         Complaint[]         @relation("UserComplaints")
+    70→  helpComplaints     HelpComplaint[]     @relation("UserHelpComplaints")
+    71→  overheardComplaints OverheardComplaint[] @relation("UserOverheardComplaints")
+    72→  wheretobuyComplaints WhereToBuyComplaint[] @relation("UserWhereToBuyComplaints")
+    73→  gkhComplaints      GkhComplaint[]      @relation("UserGkhComplaints")
+    74→  cheapComplaints    CheapComplaint[]    @relation("UserCheapComplaints")
+    75→  recComplaints      RecComplaint[]      @relation("UserRecComplaints")
+    76→  empComplaints      EmpComplaint[]      @relation("UserEmpComplaints")
+    77→  datingComplaints   DatingComplaint[]   @relation("UserDatingComplaints")
+    78→  adComplaints       AdComplaint[]       @relation("UserAdComplaints")
+    79→}
+    80→
+    81→/// ПРОМТ №1: журнал всех попыток входа (успешных и неуспешных).
+    82→/// Источник данных для аудита брутфорса, обнаружения обхода блокировки.
+    83→model LoginAttempt {
+    84→  id         String   @id @default(cuid())
+    85→  email      String   // email, по которому пытались войти (не userId — пользователь может не существовать)
+    86→  userId     String?  // если успех — ID пользователя
+    87→  ip         String   @default("")
+    88→  userAgent  String   @default("")
+    89→  success    Boolean
+    90→  reason     String   @default("") // почему отказано (not_found|bad_password|locked|banned|...)
+    91→  createdAt  DateTime @default(now())
+    92→
+    93→  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    94→
+    95→  @@index([email, createdAt])
+    96→  @@index([ip, createdAt])
+    97→  @@index([userId])
+    98→}
+    99→
+   100→/// ПРОМТ №1: fingerprint устройств пользователя.
+   101→/// Несколько устройств у одного пользователя — нормально, но если одно устройство
+   102→/// используется разными аккаунтами, это сигнал для связи (AccountLink).
+   103→model UserDevice {
+   104→  id          String   @id @default(cuid())
+   105→  userId      String
+   106→  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+   107→  /// Хэш от User-Agent + screen + timezone + accept-language — простой fingerprint.
+   108→  fingerprint String
+   109→  userAgent   String   @default("")
+   110→  ip          String   @default("")
+   111→  firstSeenAt DateTime @default(now())
+   112→  lastSeenAt  DateTime @default(now())
+   113→  /// Счётчик сессий с этого устройства — для выявления активного устройства.
+   114→  sessionCount Int    @default(1)
+   115→
+   116→  @@unique([userId, fingerprint])
+   117→  @@index([fingerprint])
+   118→}
+   119→
+   120→/// ПРОМТ №1: история IP-адресов пользователя.
+   121→/// Один IP → несколько аккаунтов = сигнал связи (AccountLink).
+   122→model UserIp {
+   123→  id          String   @id @default(cuid())
+   124→  userId      String
+   125→  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+   126→  ip          String
+   127→  firstSeenAt DateTime @default(now())
+   128→  lastSeenAt  DateTime @default(now())
+   129→  hitCount    Int      @default(1)
+   130→
+   131→  @@unique([userId, ip])
+   132→  @@index([ip])
+   133→}
+   134→
+   135→/// ПРОМТ №1: автоматически обнаруженные связи аккаунтов.
+   136→/// Создаётся, когда два разных аккаунта имеют общий phone/device/IP.
+   137→/// Используется для:
+   138→/// - обнаружения обхода блокировки (новый аккаунт забаненного);
+   139→/// - выявления массовых жалоб от связанных аккаунтов (рейд-детектор);
+   140→/// - объединения истории нарушений в админ-панели.
+   141→model AccountLink {
+   142→  id         String   @id @default(cuid())
+   143→  userA      String
+   144→  userB      String
+   145→  userARef   User     @relation("AccountLinkA", fields: [userA], references: [id], onDelete: Cascade)
+   146→  userBRef   User     @relation("AccountLinkB", fields: [userB], references: [id], onDelete: Cascade)
+   147→  /// Причина: same_phone | same_device | same_ip | same_email_pattern
+   148→  reason     String
+   149→  /// Дополнительные сведения: конкретный fingerprint/ip/phone (хэшированный).
+   150→  evidence   String   @default("")
+   151→  weight     Float    @default(1.0)
+   152→  createdAt  DateTime @default(now())
+   153→
+   154→  @@unique([userA, userB, reason])
+   155→  @@index([userA])
+   156→  @@index([userB])
+   157→}
+   158→
+   159→/// ПРОМТ №2: кэш LLM-вердиктов по text-hash.
+   160→/// Защита от спам-атак на бюджет модели: одинаковые тексты не дёргают
+   161→/// LLM повторно. TTL 7 дней (см. ai-cache.ts).
+   162→/// textHash — SHA-1 от проверенного текста, 40 символов.
+   163→model AiVerdictCache {
+   164→  id          String   @id @default(cuid())
+   165→  textHash    String   @unique
+   166→  /// Полный вердикт в JSON (AiModerationVerdict).
+   167→  verdictJson String
+   168→  /// Быстрые поля для выборок/сортировки без парсинга JSON.
+   169→  level       Int
+   170→  action      String
+   171→  createdAt   DateTime @default(now())
+   172→  expiresAt   DateTime
+   173→
+   174→  @@index([expiresAt])
+   175→  @@index([action])
+   176→}
+   177→
+   178→model Session {
+   179→  id        String   @id @default(cuid())
+   180→  token     String   @unique
+   181→  userId    String
+   182→  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+   183→  createdAt DateTime @default(now())
+   184→}
+   185→
+   186→model AuthToken {
+   187→  id        String   @id @default(cuid())
+   188→  token     String   @unique
+   189→  userId    String
+   190→  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+   191→  purpose   String // "verify" | "reset"
+   192→  expiresAt DateTime
+   193→  createdAt DateTime @default(now())
+   194→}
+   195→
+   196→model Captcha {
+   197→  id        String   @id @default(cuid())
+   198→  answer    String
+   199→  expiresAt DateTime
+   200→}
+   201→
+   202→model Rubric {
+   203→  id        Int       @id @default(autoincrement())
+   204→  name      String
+   205→  slug      String    @unique
+   206→  isService Boolean   @default(false)
+   207→  parentId  Int?
+   208→  parent    Rubric?   @relation("RubricTree", fields: [parentId], references: [id], onDelete: Cascade)
+   209→  children  Rubric[]  @relation("RubricTree")
+   210→  topics    Topic[]
+   211→}
+   212→
+   213→model Topic {
+   214→  id             Int       @id @default(autoincrement())
+   215→  number         Int       @unique
+   216→  title          String
+   217→  source         String?
+   218→  authorName     String
+   219→  authorId       String?
+   220→  author         User?     @relation(fields: [authorId], references: [id])
+   221→  rubricId       Int?
+   222→  rubric         Rubric?   @relation(fields: [rubricId], references: [id])
+   223→  views          Int       @default(0)
+   224→  isPinned       Boolean   @default(false)
+   225→  isClosed       Boolean   @default(false)
+   226→  isArchived     Boolean   @default(false)
+   227→  createdAt      DateTime  @default(now())
+   228→  lastActivityAt DateTime  @default(now())
+   229→  lastAuthorName String    @default("")
+   230→  deletedAt      DateTime?
+   231→  messages       Message[]
+   232→  /// 2026-10-12: очередь «Театра ботов» для этой темы
+   233→  botQueueItems  BotQueue[]
+   234→  /// ШАГ 17. Публикация «Подслушано», к которой привязана тема (0..1, у публикации уникально).
+   235→  overheardPost  OverheardPost?
+   236→  /// ШАГ 18. Вопрос «Где купить», к которому привязана тема (0..1, у вопроса уникально).
+   237→  whereToBuyPost WhereToBuyPost?
+   238→  /// ШАГ 19. Проблема «ЖКХ и городские проблемы», к которой привязана тема
+   239→  /// (0..1, у проблемы уникально — максимум одна тема на проблему, ТЗ п.13–15).
+   240→  gkhProblem     GkhProblem?
+   241→  /// ШАГ 23. Вопрос «Где дешевле», к которому привязана тема.
+   242→  cheapPost      CheapPost?
+   243→  /// ШАГ 20. Публикация «Рекомендую / Не рекомендую», к которой привязана тема.
+   244→  recPost        RecPost?
+   245→  /// ШАГ 25. Отзыв «О работодателях», к которому привязана тема.
+   246→  empPost        EmpPost?
+   247→  /// 2026-10-01: публикация «Нужна помощь», к которой привязана тема
+   248→  /// (0..1, у публикации уникально — максимум одна тема на просьбу).
+   249→  helpPublication HelpPublication?
+   250→}
+   251→
+   252→model Message {
+   253→  id           String    @id @default(cuid())
+   254→  topicId      Int
+   255→  topic        Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
+   256→  parentId     String?
+   257→  parent       Message?  @relation("MsgTree", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+   258→  children     Message[] @relation("MsgTree")
+   259→  depth        Int       @default(0)
+   260→  num          Int
+   261→  authorName   String
+   262→  authorId     String?
+   263→  author       User?     @relation(fields: [authorId], references: [id])
+   264→  body         String
+   265→  kind         String    @default("advice")
+   266→  aiStatus     String    @default("ok")
+   267→  aiNote       String    @default("")
+   268→  needHuman    Boolean   @default(false)
+   269→  /// 2026-10-01: уровень нарушения (1-4). 4=нет нарушения, 3=нарушение
+   270→  /// правил общения, 2=серьёзное, 1=критическая опасность.
+   271→  modLevel     Int       @default(4)
+   272→  /// 2026-10-01: технический статус AI: WATCH | LIMIT | STOP | ALERT
+   273→  aiAction     String    @default("WATCH")
+   274→  /// 2026-10-01: уверенность AI (0.0 - 1.0)
+   275→  aiConfidence Float     @default(0.0)
+   276→  /// 2026-10-01: сработавший сигнал (короткое описание)
+   277→  aiSignal     String    @default("")
+   278→  floodCount   Int       @default(0)
+   279→  isCollapsed  Boolean   @default(false)
+   280→  isHiddenByAi Boolean   @default(false)
+   281→  hiddenReason String    @default("")
+   282→  isDeleted    Boolean   @default(false)
+   283→  deletedBy    String    @default("")
+   284→  editedAt     DateTime?
+   285→  createdAt    DateTime  @default(now())
+   286→  complaints   Complaint[]
+   287→  /// 2026-10-01: история решений по этому сообщению
+   288→  modHistory   ModerationHistory[]
+   289→}
+   290→
+   291→model Complaint {
+   292→  id           String    @id @default(cuid())
+   293→  messageId    String
+   294→  message      Message   @relation(fields: [messageId], references: [id], onDelete: Cascade)
+   295→  category     String
+   296→  comment      String    @default("")
+   297→  reporterName String    @default("")
+   298→  /// ПРОМТ №1: ID пользователя, подавшего жалобу. Опционально — для жалобщих от анонимов.
+   299→  reporterId   String?
+   300→  reporter     User?      @relation("UserComplaints", fields: [reporterId], references: [id], onDelete: SetNull)
+   301→  aiVerdict    String    @default("")
+   302→  aiNote       String    @default("")
+   303→  resolved     Boolean   @default(false)
+   304→  createdAt    DateTime  @default(now())
+   305→
+   306→  @@unique([messageId, reporterId])
+   307→  @@index([reporterId])
+   308→  @@index([createdAt])
+   309→}
+   310→
+   311→model Appeal {
+   312→  id        String   @id @default(cuid())
+   313→  text      String
+   314→  contact   String   @default("")
+   315→  resolved  Boolean  @default(false)
+   316→  createdAt DateTime @default(now())
+   317→}
+   318→
+   319→/// ШАГ 11. Санкции — мягкая лестница ограничений.
+   320→/// kind: warning | limit_1h | limit_24h | limit_3d | ban
+   321→/// source: ai (автоматически, осторожно) | human (человек-модератор)
+   322→model Sanction {
+   323→  id            String    @id @default(cuid())
+   324→  userId        String
+   325→  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+   326→  kind          String
+   327→  reason        String
+   328→  source        String    @default("ai")
+   329→  messageId     String?
+   330→  topicId       Int?
+   331→  expiresAt     DateTime?
+   332→  revoked       Boolean   @default(false)
+   333→  revokedBy     String    @default("")
+   334→  revokedReason String    @default("")
+   335→  revokedAt     DateTime?
+   336→  createdAt     DateTime  @default(now())
+   337→  appeals       DecisionAppeal[]
+   338→}
+   339→
+   340→/// ШАГ 11. Апелляция на решение модерации (скрытие сообщения или санкция).
+   341→/// Рассматривает ТОЛЬКО человек-модератор — ИИ не пересматривает свои решения.
+   342→model DecisionAppeal {
+   343→  id         String    @id @default(cuid())
+   344→  userId     String?
+   345→  userNick   String    @default("")
+   346→  sanctionId String?
+   347→  sanction   Sanction? @relation(fields: [sanctionId], references: [id], onDelete: Cascade)
+   348→  messageId  String?
+   349→  text       String
+   350→  status     String    @default("open") // open | accepted | rejected
+   351→  resolvedBy String    @default("")
+   352→  note       String    @default("")
+   353→  createdAt  DateTime  @default(now())
+   354→  resolvedAt DateTime?
+   355→}
+   356→
+   357→/// ШАГ 12. Журнал действий модерации и администрирования (внутренний).
+   358→/// Хранится внутри панели: кто, что и когда сделал, с каким объектом.
+   359→model AdminLog {
+   360→  id          String   @id @default(cuid())
+   361→  actor       String   // ник исполнителя
+   362→  actorRole   String   @default("owner") // owner | admin | moderator
+   363→  action      String   // например message.publish, sanction.apply, topic.move
+   364→  targetType  String   @default("") // message | topic | user | complaint | appeal | setting | section_item
+   365→  targetLabel String   @default("") // человекочитаемое описание объекта
+   366→  details     String   @default("") // дополнительные сведения
+   367→  createdAt   DateTime @default(now())
+   368→}
+   369→
+   370→/// 2026-10-01: История решений модерации по одному сообщению.
+   371→/// Каждое изменение решения (AI предложил → админ изменил → итог) —
+   372→/// отдельная запись. Не создаёт новые карточки в журнале —
+   373→/// одна карточка = одно сообщение, внутри — история.
+   374→/// actor: "ai" | ник администратора
+   375→/// action: "propose" | "publish" | "hide" | "delete" | "warn" | "limit" | "ban" | "escalate" | "emergency_stop"
+   376→/// result: финальный итог (сообщение опубликовано / скрыто / удалено / ...)
+   377→model ModerationHistory {
+   378→  id         String   @id @default(cuid())
+   379→  messageId  String
+   380→  message    Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+   381→  actor      String   // "ai" или ник администратора
+   382→  actorRole  String   @default("ai") // ai | owner | admin | moderator
+   383→  action     String   // propose | publish | hide | delete | warn | limit | ban | escalate | emergency_stop
+   384→  reason     String   @default("") // причина решения
+   385→  result     String   @default("") // финальный итог
+   386→  confidence Float    @default(0.0) // уверенность (только для actor=ai)
+   387→  createdAt  DateTime @default(now())
+   388→}
+   389→
+   390→/// ШАГ 12. Настройки сайта (ключ-значение), меняются владельцем.
+   391→model SiteSetting {
+   392→  key       String   @id
+   393→  value     String   @default("")
+   394→  updatedAt DateTime @updatedAt
+   395→}
+   396→
+   397→/// ШАГ 12. Содержимое разделов «Объявления», «Практическая информация», «Справочник».
+   398→model ContentItem {
+   399→  id        String   @id @default(cuid())
+   400→  section   String   // ads | info | directory
+   401→  title     String
+   402→  body      String   @default("")
+   403→  contact   String   @default("")
+   404→  status    String   @default("published") // published | hidden
+   405→  createdAt DateTime @default(now())
+   406→  updatedAt DateTime @updatedAt
+   407→}
+   408→
+   409→/// ШАГ 16. «Нужна помощь» — самостоятельная доска бесплатной взаимопомощи.
+   410→/// Никаких обсуждений и социальных функций: текст + контакты + статус.
+   411→/// ШАГ 16 (ТЗ п.10): самостоятельная сущность публикаций помощи.
+   412→/// Не ForumTopic и не ForumPost — отдельная таблица, никакой связи с форумом.
+   413→/// Статусы: active | resolved | irrelevant (в UI видны только два последних).
+   414→model HelpPublication {
+   415→  id           String          @id @default(cuid())
+   416→  title        String
+   417→  text         String
+   418→  contactData  String          @default("")
+   419→  status       String          @default("active")
+   420→  authorId     String
+   421→  authorName   String
+   422→  /// 2026-10-17: реальный автор (до подмены на бота) — для управления объявлением
+   423→  originalAuthorId String?
+   424→  author       User?    @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+   425→  /// 2026-10-01: ссылка на тему форума (0..1, уникально — максимум одна
+   426→  /// тема на публикацию; ни повторные нажатия, ни обновление страницы,
+   427→  /// ни параллельные запросы нескольких пользователей не создадут
+   428→  /// дубликатов). При удалении темы — cascade null (тема остаётся).
+   429→  topicId      Int?            @unique
+   430→  topic        Topic?          @relation(fields: [topicId], references: [id])
+   431→  aiStatus     String          @default("ok") // ok | hidden | human
+   432→  aiNote       String          @default("")
+   433→  hiddenReason String          @default("")
+   434→  isHiddenByAi Boolean         @default(false)
+   435→  needHuman    Boolean         @default(false)
+   436→  isDeleted    Boolean         @default(false)
+   437→  deletedAt    DateTime?
+   438→  editedAt     DateTime?
+   439→  createdAt    DateTime        @default(now())
+   440→  updatedAt    DateTime        @updatedAt
+   441→  complaints   HelpComplaint[]
+   442→}
+   443→
+   444→/// ШАГ 16. Жалоба на объявление раздела «Нужна помощь».
+   445→/// Не голосование: количество жалоб не показывается и не создаёт рейтинг.
+   446→model HelpComplaint {
+   447→  id            String          @id @default(cuid())
+   448→  publicationId String
+   449→  publication   HelpPublication @relation(fields: [publicationId], references: [id], onDelete: Cascade)
+   450→  category     String
+   451→  comment      String      @default("")
+   452→  reporterName String      @default("")
+   453→  reporterId   String?
+   454→  reporter     User?        @relation("UserHelpComplaints", fields: [reporterId], references: [id], onDelete: SetNull)
+   455→  aiVerdict    String      @default("")
+   456→  aiNote       String      @default("")
+   457→  resolved     Boolean     @default(false)
+   458→  createdAt    DateTime    @default(now())
+   459→
+   460→  @@unique([publicationId, reporterId])
+   461→  @@index([reporterId])
+   462→}
+   463→
+   464→/// ШАГ 17. «Подслушано Сахалин» — самостоятельная городская лента слухов,
+   465→/// наблюдений и сообщений жителей (отдельная страница /podslyshano).
+   466→/// НЕ форум и не «Нужна помощь». С форумом связана ровно одной ОПЦИОНАЛЬНОЙ
+   467→/// ссылкой: у публикации может быть МАКСИМУМ ОДНА тема форума (п.3 ТЗ).
+   468→/// Уникальность topicId гарантирует: ни повторные нажатия, ни обновление
+   469→/// страницы, ни одновременные нажатия нескольких пользователей не создадут
+   470→/// вторую тему.
+   471→model OverheardPost {
+   472→  id           String   @id @default(cuid())
+   473→  title        String
+   474→  text         String
+   475→  place        String   @default("") // необязательно: Южно-Сахалинск, Корсаков, Холмск, район
+   476→  tag          String   @default("message") // rumor | observation | message
+   477→  authorId     String
+   478→  authorName   String
+   479→  /// 2026-10-17: real author before bot substitution
+   480→  originalAuthorId String?
+   481→  author       User?    @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+   482→  topicId      Int?     @unique
+   483→  topic        Topic?   @relation(fields: [topicId], references: [id])
+   484→  aiStatus     String   @default("ok") // ok | hidden | human
+   485→  aiNote       String   @default("")
+   486→  hiddenReason String   @default("")
+   487→  isHiddenByAi Boolean  @default(false)
+   488→  needHuman    Boolean  @default(false)
+   489→  isDeleted    Boolean  @default(false)
+   490→  deletedAt    DateTime?
+   491→  editedAt     DateTime?
+   492→  createdAt    DateTime @default(now())
+   493→  updatedAt    DateTime @updatedAt
+   494→  complaints   OverheardComplaint[]
+   495→}
+   496→
+   497→/// ШАГ 17. Жалоба на сообщение «Подслушано». Не голосование: количество
+   498→/// жалоб не показывается и не создаёт никаких оценок.
+   499→model OverheardComplaint {
+   500→  id           String        @id @default(cuid())
+   501→  postId       String
+   502→  post         OverheardPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+   503→  category     String
+   504→  comment      String        @default("")
+   505→  reporterName String        @default("")
+   506→  reporterId   String?
+   507→  reporter     User?          @relation("UserOverheardComplaints", fields: [reporterId], references: [id], onDelete: SetNull)
+   508→  aiVerdict    String        @default("")
+   509→  aiNote       String        @default("")
+   510→  resolved     Boolean       @default(false)
+   511→  createdAt    DateTime      @default(now())
+   512→
+   513→  @@unique([postId, reporterId])
+   514→  @@index([reporterId])
+   515→}
+   516→
+   517→/// ШАГ 18. «Где купить» — самостоятельный раздел вопросов о КОНКРЕТНЫХ товарах
+   518→/// (отдельная страница /gde-kupit). НЕ форум, НЕ «Подслушано», НЕ «Нужна помощь»
+   519→/// и не рекламная площадка. Главный принцип: одна публикация — один конкретный
+   520→/// товар/модель. Статусы: seeking (Ищу) → found (Нашёл) / irrelevant (Неактуально);
+   521→/// найденные и неактуальные вопросы НЕ удаляются — накапливаются как база поиска.
+   522→/// С форумом связан ровно одной ОПЦИОНАЛЬНОЙ ссылкой: у вопроса может быть
+   523→/// МАКСИМУМ ОДНА тема форума (уникальность topicId защищает от двойных нажатий,
+   524→/// обновления страницы и параллельных запросов нескольких пользователей).
+   525→model WhereToBuyPost {
+   526→  id           String   @id @default(cuid())
+   527→  title        String
+   528→  text         String
+   529→  place        String   @default("") // необязательно: Южно-Сахалинск, Холмск, Корсаков, Долинск
+   530→  status       String   @default("seeking") // seeking (Ищу) | found (Найдено) | irrelevant (Неактуально)
+   531→  statusAt     DateTime @default(now()) // время последней смены статуса (стабильная сортировка)
+   532→  /// 2026-10-18: тип вопроса — product (товар) | service (услуга/специалист).
+   533→  /// Определяет рубрику форума при клике «Обсудить на форуме».
+   534→  postType     String   @default("product") // product | service
+   535→  /// ТЗ 2026-09-23 «Ответить на запрос»: сухой факт ответчика (точный адрес,
+   536→  /// ТЦ) под кнопкой «📍 Ответить на запрос». Ответ может оставить ЛЮБОЙ
+   537→  /// зарегистрированный житель — не только автор вопроса.
+   538→  answerText       String    @default("")
+   539→  answerAuthorName String    @default("")
+   540→  answeredAt       DateTime?
+   541→  authorId     String
+   542→  authorName   String
+   543→  /// 29.09.2026: relation для подгрузки gender автора (покраска ника по полу).
+   544→  author       User?    @relation("WtbAuthor", fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+   545→  topicId      Int?     @unique
+   546→  topic        Topic?   @relation(fields: [topicId], references: [id])
+   547→  aiStatus     String   @default("ok") // ok | hidden | human
+   548→  aiNote       String   @default("")
+   549→  hiddenReason String   @default("")
+   550→  isHiddenByAi Boolean  @default(false)
+   551→  needHuman    Boolean  @default(false)
+   552→  isDeleted    Boolean  @default(false)
+   553→  deletedAt    DateTime?
+   554→  editedAt     DateTime?
+   555→  createdAt    DateTime @default(now())
+   556→  updatedAt    DateTime @updatedAt
+   557→  complaints   WhereToBuyComplaint[]
+   558→  /// ТЗ 2026-09-23 «Ответить»: ответы на запрос — ПЛОСКИЙ СПИСОК внутри
+   559→  /// карточки; ответов может быть СКОЛЬКО УГОДНО; ответов на ответ и
+   560→  /// вложенности НЕТ (споры — только на форуме).
+   561→  answers      WhereToBuyAnswer[]
+   562→}
+   563→
+   564→/// ТЗ 2026-09-23 «Ответить»: один ответ на запрос «Где купить». Ответ
+   565→/// оставляет ЛЮБОЙ зарегистрированный житель; список плоский, хронологический.
+   566→model WhereToBuyAnswer {
+   567→  id         String         @id @default(cuid())
+   568→  postId     String
+   569→  post       WhereToBuyPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+   570→  authorName String
+   571→  text       String
+   572→  createdAt  DateTime       @default(now())
+   573→
+   574→  @@index([postId])
+   575→}
+   576→
+   577→/// ШАГ 18. Жалоба на вопрос «Где купить» (реклама; спам; мошенничество;
+   578→/// личные данные; другое). Не голосование: количество жалоб не показывается,
+   579→/// публикацию жалобой сама по себе не удаляет — это сигнал для модерации.
+   580→model WhereToBuyComplaint {
+   581→  id           String         @id @default(cuid())
+   582→  postId       String
+   583→  post         WhereToBuyPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+   584→  category     String
+   585→  comment      String         @default("")
+   586→  reporterName String         @default("")
+   587→  reporterId   String?
+   588→  reporter     User?           @relation("UserWhereToBuyComplaints", fields: [reporterId], references: [id], onDelete: SetNull)
+   589→  aiVerdict    String         @default("")
+   590→  aiNote       String         @default("")
+   591→  resolved     Boolean        @default(false)
+   592→  createdAt    DateTime       @default(now())
+   593→
+   594→  @@unique([postId, reporterId])
+   595→  @@index([reporterId])
+   596→}
+   597→
+   598→/// ТЗ 2026-09-22. Быстрая подсказка «Где купить» с ГЛАВНОЙ страницы —
+   599→/// витрина СУХИХ географических фактов (ориентиры, адреса, названия ТЦ,
+   600→/// павильонов, официальных открытых организаций). Перед записью текст
+   601→/// проходит первую линию пре-модерации (wheretobuy-hint-premoderation.ts):
+   602→/// Кейс А (телефоны физлиц) и Кейс Б (эмоциональные ярлыки) на главную
+   603→/// не попадают — автору предлагается бесшовный перенос в форумную тему
+   604→/// «Товары и услуги ▸ Где купить». Подсказка неизменяема (без updatedAt),
+   605→/// удаление — только средствами модерации.
+   606→model WheretobuyHint {
+   607→  id         String   @id @default(cuid())
+   608→  text       String
+   609→  authorId   String
+   610→  authorName String
+   611→  createdAt  DateTime @default(now())
+   612→}
+   613→
+   614→/// ТЗ 2026-09-22. Быстрая подсказка «Где дешевле» с ГЛАВНОЙ страницы
+   615→/// (блок цен) — витрина СУХИХ фактов стоимости, дат и адресов. Перед
+   616→/// записью текст проходит первую линию пре-модерации
+   617→/// (gdedeshevle-hint-premoderation.ts): Кейс А (телефоны физлиц) и
+   618→/// Кейс Б (эмоциональная критика ценообразования — «барыги», «оборзели»,
+   619→/// «крутят», «с ума сошли», «обдираловка», «грабеж») на главную не
+   620→/// попадают — автору предлагается бесшовный перенос в форумную тему
+   621→/// «Товары и услуги ▸ Цены». Подсказка неизменяема (без updatedAt),
+   622→/// удаление — только средствами модерации.
+   623→model CheapHint {
+   624→  id         String   @id @default(cuid())
+   625→  text       String
+   626→  authorId   String
+   627→  authorName String
+   628→  createdAt  DateTime @default(now())
+   629→}
+   630→
+   631→/// ШАГ 19. «ЖКХ и городские проблемы» — самостоятельная страница /gkh:
+   632→/// жители обозначают КОНКРЕТНЫЕ проблемы города, ЖКХ и инфраструктуры,
+   633→/// описывают собственный опыт и добавляют фактические обновления.
+   634→/// НЕ форум и не социальная сеть. Главный принцип (ТЗ п.26):
+   635→/// «Не обвинить — обозначить. Не осудить — рассказать о своём опыте.
+   636→/// Не обобщить — отметить конкретное. Не спорить — дать возможность
+   637→/// высказаться обеим сторонам. Не вынести приговор — дать людям информацию.»
+   638→/// Статусы (ТЗ п.3 — только три): active «Проблема актуальна»,
+   639→/// in_progress «Решается», solved «Решено». Решённые исчезают из основного
+   640→/// списка и обычного поиска, но история сохраняется и при повторном
+   641→/// возникновении проблема ВОЗВРАЩАЕТСЯ той же публикацией (ТЗ п.4/5).
+   642→/// С форумом связана ровно одной ОПЦИОНАЛЬНОЙ ссылкой: у проблемы максимум
+   643→/// ОДНА тема (уникальность topicId защищает от двойных нажатий, обновления
+   644→/// страницы и гонок, ТЗ п.13). При удалении автором тема НЕ удаляется (п.16).
+   645→model GkhProblem {
+   646→  id                String   @id @default(cuid())
+   647→  title             String
+   648→  text              String
+   649→  /// ТЗ №2 от 2026-09-23 (Flat 2.0, 3-шаговая форма): «Предпринятые
+   650→  /// действия» — куда звонили/писали, номер заявки, статус. ОБЯЗАТЕЛЬНОЕ
+   651→  /// поле — без него публикация не проходит (старые записи — пусто).
+   652→  actions           String   @default("")
+   653→  place             String   @default("") // улица/дом/двор/район/объект/ориентир — необязательно (ТЗ п.1)
+   654→  problemDate       String   @default("") // дата обнаружения/возникновения (YYYY-MM-DD или пусто) — необязательно
+   655→  status            String   @default("active") // active | in_progress | solved | rejected (ТЗ №2 2026-09-23: «В поиске решения» / «Передано в УК» / «Решено» / «Отклонено»)
+   656→  statusAt          DateTime @default(now())
+   657→  authorId          String
+   658→  /// Связь с пользователем — для цвета ника по полу (ТЗ п.20);
+   659→  /// account может быть удалён — публикация остаётся.
+   660→  author            User?    @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+   661→  authorName        String
+   662→  /// Ответственная организация — необязательна (ТЗ п.10); может быть
+   663→  /// добавлена позже администратором/модератором.
+   664→  organization      String   @default("")
+   665→  /// Официальный ответ представителя организации — МАКСИМУМ ОДИН (ТЗ п.12).
+   666→  /// Ответ сам по себе НЕ устанавливает статус «Решено» (ТЗ п.3).
+   667→  orgResponseText   String   @default("")
+   668→  orgResponseAt     DateTime?
+   669→  orgResponseById   String?
+   670→  orgResponseByName String   @default("")
+   671→  topicId           Int?     @unique
+   672→  topic             Topic?   @relation(fields: [topicId], references: [id])
+   673→  /// ШАГ 19 (ТЗ п.9). Объединение дубликатов: mergedIntoId указывает на
+   674→  /// каноническую проблему; объединённые копии не показываются в лентах.
+   675→  mergedIntoId      String?
+   676→  mergedInto        GkhProblem?  @relation("GkhMerge", fields: [mergedIntoId], references: [id], onDelete: SetNull)
+   677→  mergedDups        GkhProblem[] @relation("GkhMerge")
+   678→  aiStatus          String   @default("ok") // ok | hidden | human
+   679→  aiNote            String   @default("")
+   680→  hiddenReason      String   @default("")
+   681→  isHiddenByAi      Boolean  @default(false)
+   682→  needHuman         Boolean  @default(false)
+   683→  /// Мягкое удаление (ТЗ п.16): автор удалил публикацию, но связанная тема
+   684→  /// форума сохраняется — в теме показывается «Исходная публикация была
+   685→  /// удалена автором.»
+   686→  isDeleted         Boolean  @default(false)
+   687→  deletedAt         DateTime?
+   688→  /// Техническая отметка правки — сохраняется для модерации, пользователю
+   689→  /// надпись «Изменено» НЕ показывается (ТЗ п.6).
+   690→  editedAt          DateTime?
+   691→  createdAt         DateTime @default(now())
+   692→  updatedAt         DateTime @updatedAt
+   693→  updates           GkhUpdate[]
+   694→  statusLog         GkhStatusLog[]
+   695→  complaints        GkhComplaint[]
+   696→  media             GkhMedia[]
+   697→}
+   698→
+   699→/// ШАГ 19 (ТЗ п.7/8). Обновление к проблеме — от автора и от других жителей.
+   700→/// Каждый пользователь редактирует и удаляет ТОЛЬКО свои обновления;
+   701→/// удалённое обновление полностью исчезает из интерфейса (без надписи
+   702→/// «Обновление удалено»), техническая история сохраняется для модерации.
+   703→model GkhUpdate {
+   704→  id           String     @id @default(cuid())
+   705→  problemId    String
+   706→  problem      GkhProblem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+   707→  authorId     String
+   708→  author       User?      @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+   709→  authorName   String
+   710→  /// 2026-10-17: real author before bot substitution
+   711→  originalAuthorId String?
+   712→  text         String
+   713→  aiStatus     String     @default("ok")
+   714→  aiNote       String     @default("")
+   715→  hiddenReason String     @default("")
+   716→  isHiddenByAi Boolean    @default(false)
+   717→  needHuman    Boolean    @default(false)
+   718→  isDeleted    Boolean    @default(false)
+   719→  deletedAt    DateTime?
+   720→  editedAt     DateTime?
+   721→  createdAt    DateTime   @default(now())
+   722→  updatedAt    DateTime   @updatedAt
+   723→  complaints   GkhComplaint[]
+   724→  media        GkhMedia[]
+   725→}
+   726→
+   727→/// ШАГ 19 (ТЗ п.6). Журнал смен статусов проблемы — часть хронологии,
+   728→/// отображается в истории проблемы с датой каждого события.
+   729→model GkhStatusLog {
+   730→  id         String     @id @default(cuid())
+   731→  problemId  String
+   732→  problem    GkhProblem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+   733→  fromStatus String
+   734→  toStatus   String
+   735→  byName     String     @default("")
+   736→  byRole     String     @default("author") // author | moderator
+   737→  createdAt  DateTime   @default(now())
+   738→}
+   739→
+   740→/// ШАГ 19 (ТЗ п.27). Медиа проблемы/обновления: до 5 фото и до 1 видео
+   741→/// (≤1 минута) к публикации и к каждому обновлению. Файлы хранятся в
+   742→/// public/media/gkh/, метаданные — здесь.
+   743→model GkhMedia {
+   744→  id        String      @id @default(cuid())
+   745→  kind      String // photo | video
+   746→  url       String
+   747→  mime      String      @default("")
+   748→  size      Int         @default(0)
+   749→  problemId String?
+   750→  problem   GkhProblem? @relation(fields: [problemId], references: [id], onDelete: Cascade)
+   751→  updateId  String?
+   752→  update    GkhUpdate?  @relation(fields: [updateId], references: [id], onDelete: Cascade)
+   753→  createdAt DateTime    @default(now())
+   754→}
+   755→
+   756→/// ШАГ 19 (ТЗ п.17). Жалоба на публикацию или обновление. Причины (ТЗ):
+   757→/// персональные данные; оскорбления; угрозы; спам; реклама; мошенничество;
+   758→/// не по теме; другое. Кнопок «Ложь»/«Фейк»/«Не согласен» НЕТ; количество
+   759→/// жалоб не показывается и не является голосованием — сигнал для модерации.
+   760→model GkhComplaint {
+   761→  id           String      @id @default(cuid())
+   762→  problemId    String?
+   763→  problem      GkhProblem? @relation(fields: [problemId], references: [id], onDelete: Cascade)
+   764→  updateId     String?
+   765→  update       GkhUpdate?  @relation(fields: [updateId], references: [id], onDelete: Cascade)
+   766→  category     String
+   767→  comment      String      @default("")
+   768→  reporterName String      @default("")
+   769→  reporterId   String?
+   770→  reporter     User?        @relation("UserGkhComplaints", fields: [reporterId], references: [id], onDelete: SetNull)
+   771→  aiVerdict    String      @default("")
+   772→  aiNote       String      @default("")
+   773→  resolved     Boolean     @default(false)
+   774→  createdAt    DateTime    @default(now())
+   775→
+   776→  // Жалоба привязана либо к problemId, либо к updateId — ID репортёра уникален
+   777→  // в рамках одного объекта жалобы. SQLite unique treats NULL как разные значения,
+   778→  // поэтому анонимные жалобы не подпадают под unique-констрейнт.
+   779→  @@index([reporterId])
+   780→  @@index([createdAt])
+   781→}
+   782→
+   783→/// ШАГ 26. «Знакомства» (/znakomstva) — самостоятельный раздел, единственный
+   784→/// публично анонимный раздел SakhMatrix. РОВНО ДВЕ категории (другие запрещены):
+   785→/// m4w «Мужчина ищет женщину», w4m «Женщина ищет мужчину».
+   786→/// Публичная анонимность (ТЗ): посетителю не показываются ник, имя, аватар,
+   787→/// пол автора и ссылка на профиль; при этом автор известен системе и модерации
+   788→/// (authorId + authorName хранятся, модерация видит автора в очереди).
+   789→/// Статусы: actual «Актуально» | stale «Неактуально» — неактуальные не удаляются:
+   790→/// остаются в разделе, показываются ниже актуальных серым.
+   791→/// Свои контакты автора в тексте разрешены; чужие — запрещены.
+   792→/// НЕТ комментариев/лайков/оценок/подписок/уведомлений/форумных тем.
+   793→model DatingPost {
+   794→  id           String        @id @default(cuid())
+   795→  category     String // m4w | w4m | friendship | person — вкладки Flat 2.0
+   796→  title        String
+   797→  body         String
+   798→  place        String        @default("") // город на Сахалине (Flat 2.0)
+   799→  status       String        @default("actual") // actual «Актуально» | stale «Неактуально»
+   800→  statusAt     DateTime      @default(now()) // время последней смены статуса (стабильная сортировка)
+   801→  authorId     String
+   802→  /// 2026-10-17: real author before bot substitution
+   803→  originalAuthorId String?
+   804→  author       User?    @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+   805→  /// Автор известен системе, ИИ-модерации и администратору (ТЗ);
+   806→  /// публично ник/имя/пол/аватар/профиль не показываются НИКОГДА.
+   807→  authorName   String
+   808→  aiStatus     String        @default("ok") // ok | hidden | human
+   809→  aiNote       String        @default("")
+   810→  hiddenReason String        @default("")
+   811→  isHiddenByAi Boolean       @default(false)
+   812→  needHuman    Boolean       @default(false)
+   813→  isDeleted    Boolean       @default(false)
+   814→  deletedAt    DateTime?
+   815→  editedAt     DateTime?
+   816→  createdAt    DateTime      @default(now())
+   817→  updatedAt    DateTime      @updatedAt
+   818→  photos       DatingPhoto[]
+   819→  complaints   DatingComplaint[]
+   820→}
+   821→
+   822→/// ШАГ 26. Фото объявления «Знакомства» — по желанию автора, до 5 штук.
+   823→model DatingPhoto {
+   824→  id        String      @id @default(cuid())
+   825→  url       String
+   826→  mime      String      @default("")
+   827→  size      Int         @default(0)
+   828→  postId    String?
+   829→  post      DatingPost? @relation(fields: [postId], references: [id], onDelete: Cascade)
+   830→  createdAt DateTime    @default(now())
+   831→}
+   832→
+   833→/// ШАГ 23 (восстановление). «Где дешевле» — самостоятельная страница
+   834→/// /gde-deshevle: жители сравнивают цены на КОНКРЕТНЫЙ товар. НЕ форум,
+   835→/// не рекламная площадка, не каталог магазинов. Главное правило (ТЗ п.2):
+   836→/// «Здесь сравнивают цену конкретного товара, а не спрашивают, где вообще
+   837→/// дешевле покупать». Одна публикация — один конкретный товар/модель (п.4).
+   838→/// Статусы (п.12): comparing «Сравниваю» | cheaper «Нашёл дешевле» |
+   839→/// irrelevant «Неактуально». Завершённые публикации сохраняются для поиска (п.28).
+   840→/// С форумом — максимум одна ОПЦИОНАЛЬНАЯ тема (п.15/16, уникальный topicId).
+   841→model CheapPost {
+   842→  id           String   @id @default(cuid())
+   843→  title        String
+   844→  text         String
+   845→  place        String   @default("") // необязательно: Южно-Сахалинск, Холмск, Корсаков, Долинск
+   846→  status       String   @default("comparing")
+   847→  statusAt     DateTime @default(now())
+   848→  /// ТЗ 2026-09-23 «Ответить на запрос»: сухой факт ответчика (цена, адрес,
+   849→  /// магазин). Статус карточки переходит в «fixed» — «Цена зафиксирована».
+   850→  answerText       String    @default("")
+   851→  answerAuthorName String    @default("")
+   852→  answeredAt       DateTime?
+   853→  authorId     String
+   854→  /// Аккаунт может быть удалён — публикация остаётся.
+   855→  author       User?    @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+   856→  authorName   String
+   857→  /// 2026-10-17: real author before bot substitution
+   858→  originalAuthorId String?
+   859→  topicId      Int?     @unique
+   860→  topic        Topic?   @relation(fields: [topicId], references: [id])
+   861→  aiStatus     String   @default("ok") // ok | hidden | human
+   862→  aiNote       String   @default("")
+   863→  hiddenReason String   @default("")
+   864→  isHiddenByAi Boolean  @default(false)
+   865→  needHuman    Boolean  @default(false)
+   866→  isDeleted    Boolean  @default(false)
+   867→  deletedAt    DateTime?
+   868→  editedAt     DateTime?
+   869→  createdAt    DateTime @default(now())
+   870→  updatedAt    DateTime @updatedAt
+   871→  complaints   CheapComplaint[]
+   872→  /// ТЗ 2026-09-23 «Ответить»: ответы на запрос — ПЛОСКИЙ СПИСОК внутри
+   873→  /// карточки; ответов может быть СКОЛЬКО УГОДНО; ответов на ответ и
+   874→  /// вложенности НЕТ (споры — только на форуме).
+   875→  answers      CheapAnswer[]
+   876→}
+   877→
+   878→/// ТЗ 2026-09-23 «Ответить»: один ответ на запрос «Где дешевле» (цена,
+   879→/// магазин, адрес). Список плоский, хронологический.
+   880→model CheapAnswer {
+   881→  id         String    @id @default(cuid())
+   882→  postId     String
+   883→  post       CheapPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+   884→  authorName String
+   885→  text       String
+   886→  createdAt  DateTime  @default(now())
+   887→
+   888→  @@index([postId])
+   889→}
+   890→
+   891→/// ШАГ 23. Жалоба на вопрос «Где дешевле» (ТЗ п.21 — ровно пять причин:
+   892→/// реклама; спам; мошенничество; личные данные; другое). Не голосование:
+   893→/// количество жалоб не показывается, публикацию сама по себе не удаляет.
+   894→model CheapComplaint {
+   895→  id           String      @id @default(cuid())
+   896→  postId       String
+   897→  post         CheapPost   @relation(fields: [postId], references: [id], onDelete: Cascade)
+   898→  category     String
+   899→  comment      String      @default("")
+   900→  reporterName String      @default("")
+   901→  reporterId   String?
+   902→  reporter     User?        @relation("UserCheapComplaints", fields: [reporterId], references: [id], onDelete: SetNull)
+   903→  aiVerdict    String      @default("")
+   904→  aiNote       String      @default("")
+   905→  resolved     Boolean     @default(false)
+   906→  createdAt    DateTime    @default(now())
+   907→
+   908→  @@unique([postId, reporterId])
+   909→  @@index([reporterId])
+   910→}
+   911→
+   912→/// ШАГ 20 (восстановление). «Рекомендую / Не рекомендую» — самостоятельная
+   913→/// страница /rekomenduyu: жители делятся ЛИЧНЫМ опытом об организациях,
+   914→/// компаниях, сервисах и местах Сахалина. Одна публикация — один субъект
+   915→/// (subject) и одна чёткая позиция: recommend «Рекомендую» |
+   916→/// notrecommend «Не рекомендую». Критика и негативный опыт — НЕ нарушение
+   917→/// (это суть раздела); реклама, скрытая реклама, заказные рекомендации,
+   918→/// спам и мошенничество — нарушение. Максимум одна форумная тема (topicId).
+   919→model RecPost {
+   920→  id           String   @id @default(cuid())
+   921→  subject      String // кого/что: организация, компания, сервис или место
+   922→  stance       String   @default("recommend") // recommend | notrecommend
+   923→  stanceAt     DateTime @default(now())
+   924→  title        String
+   925→  text         String
+   926→  place        String   @default("")
+   927→  /// ТЗ 2026-09-21 (Пункт 6 Манифеста): выделение конкретного человека в отзыве
+   928→  /// («Отдельно отмечу человека:…») — необязательно; выводится в карточке отдельным блоком.
+   929→  humanHighlight String @default("")
+   930→  /// ТЗ 2026-09-21 (Пункт 13 Манифеста): единственный официальный ответ
+   931→  /// организации (паттерн ЖКХ: только подтверждённый представитель, РОВНО ОДИН ответ).
+   932→  orgResponseText   String   @default("")
+   933→  orgResponseAt     DateTime?
+   934→  orgResponseById   String?
+   935→  orgResponseByName String   @default("")
+   936→  authorId     String
+   937→  /// Аккаунт может быть удалён — публикация остаётся.
+   938→  author       User?    @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+   939→  authorName   String
+   940→  topicId      Int?     @unique
+   941→  topic        Topic?   @relation(fields: [topicId], references: [id])
+   942→  aiStatus     String   @default("ok")
+   943→  aiNote       String   @default("")
+   944→  hiddenReason String   @default("")
+   945→  isHiddenByAi Boolean  @default(false)
+   946→  needHuman    Boolean  @default(false)
+   947→  isDeleted    Boolean  @default(false)
+   948→  deletedAt    DateTime?
+   949→  editedAt     DateTime?
+   950→  /// 29.09.2026: «Вопрос решён» — автор публикации отмечает, что проблема
+   951→  /// решена (видимость кнопки — только владелец сообщения). После отметки
+   952→  /// карточка визуально помечается решённой (бейдж «✓ Решено»).
+   953→  resolved     Boolean  @default(false)
+   954→  resolvedAt   DateTime?
+   955→  createdAt    DateTime @default(now())
+   956→  updatedAt    DateTime @updatedAt
+   957→  complaints   RecComplaint[]
+   958→  usefulVotes  RecUsefulVote[]
+   959→}
+   960→
+   961→/// ТЗ 2026-09-21: отметка «Полезный отзыв» — по одной на пользователя на публикацию
+   962→/// (@@unique — защита от накрутки); счётчик вычисляется через _count.
+   963→/// ТЗ 2026-09-24 (пользователь): кнопки «Рекомендую»/«Не рекомендую» рядом с
+   964→/// «Обсудить на форуме» — kind хранит голос читателя: "recommend" |
+   965→/// "notrecommend"; legacy-строки ("useful") считаются нейтральными и в
+   966→/// кнопки не попадают. Повторный клик по той же кнопке снимает голос,
+   967→/// клик по соседней — переключает.
+   968→model RecUsefulVote {
+   969→  id        String   @id @default(cuid())
+   970→  postId    String
+   971→  post      RecPost  @relation(fields: [postId], references: [id], onDelete: Cascade)
+   972→  userId    String
+   973→  kind      String   @default("useful")
+   974→  createdAt DateTime @default(now())
+   975→
+   976→  @@unique([postId, userId])
+   977→}
+   978→
+   979→/// ШАГ 20. Жалоба на публикацию «Рекомендую / Не рекомендую» — ровно пять
+   980→/// причин (реклама; спам; мошенничество; личные данные; другое).
+   981→model RecComplaint {
+   982→  id           String      @id @default(cuid())
+   983→  postId       String
+   984→  post         RecPost     @relation(fields: [postId], references: [id], onDelete: Cascade)
+   985→  category     String
+   986→  comment      String      @default("")
+   987→  reporterName String      @default("")
+   988→  reporterId   String?
+   989→  reporter     User?        @relation("UserRecComplaints", fields: [reporterId], references: [id], onDelete: SetNull)
+   990→  aiVerdict    String      @default("")
+   991→  aiNote       String      @default("")
+   992→  resolved     Boolean     @default(false)
+   993→  createdAt    DateTime    @default(now())
+   994→
+   995→  @@unique([postId, reporterId])
+   996→  @@index([reporterId])
+   997→}
+   998→
+   999→/// ТЗ 2026-09-23 «О работодателях» (Flat 2.0, Пункты 5/6/8/20 ТЗ №2).
+  1000→/// Самостоятельная страница /o-rabotodatelyah — фиксация СУХОГО, изолированного
+  1001→/// трудового опыта жителя (НЕ «чёрные списки», не коллективный вердикт).
+  1002→/// Карточка ТЗ: 📍 Компания (Город) · 📅 Период работы · Личный опыт ·
+  1003→/// Особое упоминание человека (принцип «Человек ≠ Организация») · дисклеймер ·
+  1004→/// кнопка «Обсудить на форуме» → рубрика «Карьера, бизнес ▸ Работодатели» (78).
+  1005→/// Позиции «Советую/Не советую» больше нет — только факт личного опыта.
+  1006→/// Максимум одна форумная тема (topicId).
+  1007→model EmpPost {
+  1008→  id            String   @id @default(cuid())
+  1009→  employer      String // официальное название ООО / ИП
+  1010→  /// Legacy-поля прежнего формата («Советую/Не советую») — оставлены для
+  1011→  /// совместимости БД, новый UI и API их не используют.
+  1012→  position      String   @default("")
+  1013→  stance        String   @default("")
+  1014→  stanceAt      DateTime?
+  1015→  title         String   @default("")
+  1016→  text          String   @default("")
+  1017→  place         String   @default("")
+  1018→  // --- Поля ТЗ 2026-09-23 (Flat 2.0) ---
+  1019→  city          String   @default("") // город: Южно-Сахалинск, Холмск, Корсаков…
+  1020→  workPeriod    String   @default("") // период работы: «май – август 2026 г.»
+  1021→  experience    String   @default("") // личный опыт — сухой факт
+  1022→  personMention String   @default("") // особое упоминание человека (необязательно)
+  1023→  authorId      String
+  1024→  /// Аккаунт может быть удалён — публикация остаётся.
+  1025→  author        User?    @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  1026→  authorName    String
+  1027→  /// 2026-10-17: real author before bot substitution
+  1028→  originalAuthorId String?
+  1029→  topicId       Int?     @unique
+  1030→  topic         Topic?   @relation(fields: [topicId], references: [id])
+  1031→  aiStatus      String   @default("ok")
+  1032→  aiNote        String   @default("")
+  1033→  hiddenReason  String   @default("")
+  1034→  isHiddenByAi  Boolean  @default(false)
+  1035→  needHuman     Boolean  @default(false)
+  1036→  isDeleted     Boolean  @default(false)
+  1037→  deletedAt     DateTime?
+  1038→  editedAt      DateTime?
+  1039→  /// 29.09.2026: официальный ответ организации (как в GkhProblem и RecPost).
+  1040→  orgResponseText   String   @default("")
+  1041→  orgResponseAt     DateTime?
+  1042→  orgResponseById   String?
+  1043→  orgResponseByName String   @default("")
+  1044→  createdAt     DateTime @default(now())
+  1045→  updatedAt     DateTime @updatedAt
+  1046→  complaints    EmpComplaint[]
+  1047→  // 2026-10-17: голоса читателей «Рекомендую» / «Не рекомендую».
+  1048→  empVotes    EmpVote[]
+  1049→}
+  1050→
+  1051→/// 2026-10-17: голоса читателей на карточках «О работодателях».
+  1052→/// kind хранит "recommend" | "notrecommend"; уникальный индекс [postId, userId]
+  1053→/// — один голос на пользователя. Повторный клик по той же кнопке снимает голос,
+  1054→/// клик по соседней — переключает.
+  1055→model EmpVote {
+  1056→  id        String   @id @default(cuid())
+  1057→  postId    String
+  1058→  post      EmpPost  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  1059→  userId    String
+  1060→  kind      String   @default("recommend") // recommend | notrecommend
+  1061→  createdAt DateTime @default(now())
+  1062→
+  1063→  @@unique([postId, userId])
+  1064→}
+  1065→
+  1066→
+  1067→/// ШАГ 25. Жалоба на отзыв «О работодателях» — ровно пять причин
+  1068→/// (реклама; спам; мошенничество; личные данные; другое).
+  1069→model EmpComplaint {
+  1070→  id           String      @id @default(cuid())
+  1071→  postId       String
+  1072→  post         EmpPost     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  1073→  category     String
+  1074→  comment      String      @default("")
+  1075→  reporterName String      @default("")
+  1076→  reporterId   String?
+  1077→  reporter     User?        @relation("UserEmpComplaints", fields: [reporterId], references: [id], onDelete: SetNull)
+  1078→  aiVerdict    String      @default("")
+  1079→  aiNote       String      @default("")
+  1080→  resolved     Boolean     @default(false)
+  1081→  createdAt    DateTime    @default(now())
+  1082→
+  1083→  @@unique([postId, reporterId])
+  1084→  @@index([reporterId])
+  1085→}
+  1086→
+  1087→/// ШАГ 26. Жалоба на объявление «Знакомства». Не голосование и не автоматическое
+  1088→/// нарушение: сигнал для модерации; ИИ перепроверяет объявление по жалобе.
+  1089→model DatingComplaint {
+  1090→  id           String      @id @default(cuid())
+  1091→  postId       String
+  1092→  post         DatingPost  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  1093→  category     String
+  1094→  comment      String      @default("")
+  1095→  reporterName String      @default("")
+  1096→  reporterId   String?
+  1097→  reporter     User?        @relation("UserDatingComplaints", fields: [reporterId], references: [id], onDelete: SetNull)
+  1098→  aiVerdict    String      @default("")
+  1099→  aiNote       String      @default("")
+  1100→  resolved     Boolean     @default(false)
+  1101→  createdAt    DateTime    @default(now())
+  1102→
+  1103→  @@unique([postId, reporterId])
+  1104→  @@index([reporterId])
+  1105→}
+  1106→
+  1107→/// ШАГ 22 (восстановление). «Объявления» /obyavleniya — доска объявлений
+  1108→/// жителей Сахалина. Восемь рубрик (другие запрещены): sell «Продам»,
+  1109→/// buy «Куплю», give «Отдам даром», services «Услуги», jobs «Работа»,
+  1110→/// realty «Недвижимость», transport «Транспорт», other «Разное».
+  1111→/// Одно объявление — один товар/услуга. Цена и контакты — необязательные
+  1112→/// поля (можно и в тексте). Суть раздела — объявления: продажа своих вещей
+  1113→/// и предложение своих услуг РАЗРЕШЕНЫ; мошенничество (предоплата переводом
+  1114→/// вперёд, фейковые товары), запрещённые к продаже товары, спам и чужие
+  1115→/// персональные данные — нарушение.
+  1116→/// Статусы: active «Актуально» | closed «Снято с публикации» (автор).
+  1117→/// НЕТ форумных тем/комментариев/лайков — связь покупателя и продавца
+  1118→/// напрямую по контактам из объявления.
+  1119→model AdListing {
+  1120→  id           String   @id @default(cuid())
+  1121→  rubric       String // sell | buy | give | services | jobs | realty | transport | other — ровно восемь
+  1122→  title        String
+  1123→  text         String
+  1124→  price        String   @default("") // необязательно: «5000 руб», «бесплатно», «от 1500 за час»
+  1125→  contact      String   @default("") // необязательно: телефон/email/способ связи — или прямо в тексте
+  1126→  place        String   @default("") // необязательно: Южно-Сахалинск, Холмск, Корсаков, Долинск
+  1127→  status       String   @default("active") // active «Актуально» | closed «Снято с публикации»
+  1128→  statusAt     DateTime @default(now())
+  1129→  authorId     String
+  1130→  /// 2026-10-17: real author before bot substitution
+  1131→  originalAuthorId String?
+  1132→  /// Аккаунт может быть удалён — объявление остаётся.
+  1133→  author       User?    @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  1134→  authorName   String
+  1135→  aiStatus     String   @default("ok") // ok | hidden | human
+  1136→  aiNote       String   @default("")
+  1137→  hiddenReason String   @default("")
+  1138→  isHiddenByAi Boolean  @default(false)
+  1139→  needHuman    Boolean  @default(false)
+  1140→  isDeleted    Boolean  @default(false)
+  1141→  deletedAt    DateTime?
+  1142→  editedAt     DateTime?
+  1143→  createdAt    DateTime @default(now())
+  1144→  updatedAt    DateTime @updatedAt
+  1145→  media        AdMedia[]
+  1146→  complaints   AdComplaint[]
+  1147→}
+  1148→
+  1149→/// ШАГ 22. Фото объявления — по желанию автора, до 5 штук.
+  1150→/// Файлы в public/media/ads/, метаданные здесь (postId=null до прикрепления).
+  1151→model AdMedia {
+  1152→  id        String     @id @default(cuid())
+  1153→  url       String
+  1154→  mime      String     @default("")
+  1155→  size      Int        @default(0)
+  1156→  postId    String?
+  1157→  post      AdListing? @relation(fields: [postId], references: [id], onDelete: Cascade)
+  1158→  createdAt DateTime   @default(now())
+  1159→}
+  1160→
+  1161→/// ШАГ 22. Жалоба на объявление. Причины (ровно пять): спам; мошенничество;
+  1162→/// запрещённый товар; личные данные; другое. Реклама НЕ причина — объявления
+  1163→/// сами по себе являются рекламой своих товаров/услуг. Не голосование:
+  1164→/// количество жалоб не показывается, объявление само по себе не удаляет.
+  1165→model AdComplaint {
+  1166→  id           String      @id @default(cuid())
+  1167→  postId       String
+  1168→  post         AdListing   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  1169→  category     String
+  1170→  comment      String      @default("")
+  1171→  reporterName String      @default("")
+  1172→  reporterId   String?
+  1173→  reporter     User?        @relation("UserAdComplaints", fields: [reporterId], references: [id], onDelete: SetNull)
+  1174→  aiVerdict    String      @default("")
+  1175→  aiNote       String      @default("")
+  1176→  resolved     Boolean     @default(false)
+  1177→  createdAt    DateTime    @default(now())
+  1178→
+  1179→  @@unique([postId, reporterId])
+  1180→  @@index([reporterId])
+  1181→}
+  1182→
+  1183→/// СТАДИЯ 2 (Шаг 6): реальные курсы покупки/продажи НАЛИЧНОЙ валюты
+  1184→/// в кассах банков Южно-Сахалинска. Одна строка = банк × валюта в
+  1185→/// очередном парсинге (каждая серия строк несёт один batch — время
+  1186→/// запуска парсера; панель показывает свежайшую серию целиком).
+  1187→model CurrencyRate {
+  1188→  id          String    @id @default(cuid())
+  1189→  batch       DateTime
+  1190→  bank        String
+  1191→  currency    String
+  1192→  buy         Float?
+  1193→  sell        Float?
+  1194→  refreshedAt DateTime?
+  1195→  source      String    @default("banki.ru")
+  1196→  createdAt   DateTime  @default(now())
+  1197→
+  1198→  @@index([batch])
+  1199→}
+  1200→
+  1201→/// «ТЕАТР БОТОВ» (2026-10-12): очередь премодерации рерайченных постов.
+  1202→/// Источник поста — парсер (TG/biz65) ИЛИ админ (вводит тему вручную).
+  1203→/// Каждый пост — одна реплика одного бота в одной теме форума.
+  1204→/// Status flow: pending → approved → published (или rejected → regenerated).
+  1205→model BotQueue {
+  1206→  id                String    @id @default(cuid())
+  1207→  botUserId         String
+  1208→  botUser           User      @relation("BotQueueBotUser", fields: [botUserId], references: [id], onDelete: Cascade)
+  1209→  botNickname       String
+  1210→  text              String
+  1211→  sourceText        String    @default("")
+  1212→  topicId           Int?
+  1213→  topic             Topic?    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  1214→  parentMessageId   String?
+  1215→  rubricId          Int?
+  1216→  topicTitle        String?
+  1217→  scheduledAt       DateTime?
+  1218→  status            String    @default("pending")
+  1219→  publishedMessageId String?
+  1220→  rejectReason      String    @default("")
+  1221→  meta              String    @default("{}")
+  1222→  order             Int       @default(0)
+  1223→  batchId           String    @default("")
+  1224→  createdAt         DateTime  @default(now())
+  1225→  updatedAt         DateTime  @updatedAt
+  1226→
+  1227→  @@index([status, scheduledAt])
+  1228→  @@index([botUserId])
+  1229→  @@index([topicId])
+  1230→  @@index([batchId])
+  1231→}
+  1232→
+  1233→/// 2026-10-15: AUTO-BOTS — очередь авто-ответов ботов на публикации юзера.
+  1234→/// Создаётся при публикации темы в любом из 10 разделов.
+  1235→/// Локальный скрипт (z-ai CLI) читает очередь, генерирует ответ через LLM,
+  1236→/// публикует как WhereToBuyAnswer / ObyavleniyaAnswer / и т.д.
+  1237→model BotReplyQueue {
+  1238→  id              String    @id @default(cuid())
+  1239→  section         String    // "wheretobuy" | "obyavleniya" | "gkh" | "help" | "recommend" | "employers" | "gdedeshevle" | "overheard" | "znakomstva" | "startup"
+  1240→  postId          String    // ID of the publication in the section
+  1241→  topicTitle      String    @default("")
+  1242→  topicText       String    @default("")
+  1243→  authorId        String    // original author (usually a bot)
+  1244→  authorNickname  String
+  1245→  botId           String    // bot who will reply
+  1246→  botNickname     String
+  1247→  botGender       String    @default("unspecified")
+  1248→  scheduledAt     DateTime
+  1249→  status          String    @default("pending") // pending → published | failed
+  1250→  replyText       String    @default("")
+  1251→  publishedAt     DateTime?
+  1252→  error           String    @default("")
+  1253→  createdAt       DateTime  @default(now())
+  1254→  updatedAt       DateTime  @updatedAt
+  1255→
+  1256→  @@index([status, scheduledAt])
+  1257→  @@index([section, postId])
+  1258→}
+  1259→
+  1260→
