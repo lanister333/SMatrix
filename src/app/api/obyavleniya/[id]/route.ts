@@ -82,22 +82,17 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     }
 
     // action === "edit"
-    const rubric = String(body.rubric ?? "").trim();
-    const title = String(body.title ?? "").trim();
+    // 2026-11-01: flat-board отправляет category + text + place + contact (без rubric/title)
+    // Если rubric не указан — используем существующий
+    const rubric = String(body.rubric ?? body.category ?? "").trim();
     const text = String(body.text ?? body.body ?? "").trim();
-    const price = String(body.price ?? "").trim().slice(0, 80);
     const contact = String(body.contact ?? "").trim().slice(0, 200);
     const place = String(body.place ?? "").trim().slice(0, 80);
 
-    if (!AD_RUBRIC_KEYS.has(rubric)) {
-      return NextResponse.json(
-        { error: "Выберите одну из восьми рубрик" },
-        { status: 400 }
-      );
-    }
-    if (title.length < 5 || title.length > 150) {
-      return NextResponse.json({ error: "Заголовок должен быть от 5 до 150 символов" }, { status: 400 });
-    }
+    // title: если не указан — генерируем из текста
+    const title = String(body.title ?? "").trim() || text.split(/[.!?;\n]/)[0].slice(0, 150) || "Объявление";
+    const price = String(body.price ?? "").trim().slice(0, 80);
+
     if (text.length < 10 || text.length > 8000) {
       return NextResponse.json({ error: "Текст объявления: от 10 до 8000 символов" }, { status: 400 });
     }

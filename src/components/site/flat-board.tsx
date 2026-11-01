@@ -165,6 +165,7 @@ export default function FlatBoard(props: FlatBoardProps) {
   const [city, setCity] = useState("");
   const [text, setText] = useState("");
   const [photos, setPhotos] = useState<{ url: string; alt: string }[]>([]);
+  const [editId, setEditId] = useState<string | null>(null);
   // 2026-10-20: отдельное поле контактов для связи (как в AdsPage).
   const [contact, setContact] = useState("");
   // Двухшаговая форма ТЗ: поля объявления → шаг СМС-верификации.
@@ -234,6 +235,11 @@ export default function FlatBoard(props: FlatBoardProps) {
     setFormTab(tab);
     setErr("");
     setNote("");
+    setEditId(null);
+    setCity("");
+    setText("");
+    setPhotos([]);
+    setContact("");
     if (props.controlledOpen) {
       props.onOpenChange?.(true);
     } else {
@@ -295,11 +301,13 @@ export default function FlatBoard(props: FlatBoardProps) {
       // Склеиваем текст + markdown фото
       const photosPart = photos.length > 0 ? "\n" + photosToMarkdown(photos) : "";
       const fullText = (text.trim() + photosPart).trim();
-      const r = await fetch(props.apiPath, {
-        method: "POST",
+      const isEdit = !!editId;
+      const r = await fetch(isEdit ? `${props.apiPath}/${editId}` : props.apiPath, {
+        method: isEdit ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           token,
+          ...(isEdit ? { action: "edit" } : {}),
           [props.postKey]: formTab,
           place: city.trim(),
           text: fullText,
@@ -320,6 +328,7 @@ export default function FlatBoard(props: FlatBoardProps) {
       setCity("");
       setText("");
       setPhotos([]);
+      setEditId(null);
       setContact("");
       setPhone("");
       setCode("");
@@ -508,6 +517,23 @@ export default function FlatBoard(props: FlatBoardProps) {
                   (it.authorId != null && props.user.id === it.authorId) ||
                   (it.originalAuthorId != null && props.user.id === it.originalAuthorId)
                 ) && (
+                  <>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      // Заполняем форму данными объявления для редактирования
+                      setFormTab(it.tab);
+                      setCity(it.place || "");
+                      setText(it.body || "");
+                      setContact(it.contact || "");
+                      setPhotos([]);
+                      setFormOpen(true);
+                      setEditId(it.id);
+                    }}
+                    style={{ cursor: "pointer", background: "none", border: "none", color: "#0a5caa", padding: "4px 8px", fontFamily: "inherit", fontSize: "12px", fontWeight: 600, textDecoration: "underline", marginTop: 4 }}
+                  >
+                    Редактировать
+                  </button>
                   <button
                     type="button"
                     onClick={async () => {
@@ -528,6 +554,7 @@ export default function FlatBoard(props: FlatBoardProps) {
                   >
                     Удалить
                   </button>
+                  </>
                 )}
               </article>
             );
