@@ -26,6 +26,8 @@ import { discussOnForum } from "@/lib/discuss";
 import { findPhoneNumbers } from "@/lib/moderation/premoderation";
 import { findEmotionalLabels, WTB_HINT_FORUM_BUTTON_LABEL } from "@/lib/moderation/wheretobuy-hint-premoderation";
 import { nickGenderClass } from "@/lib/nick-gender";
+import { UploadPhotoButton } from "@/components/forum/upload-photo-button";
+import { PhotoPreview, photosToMarkdown, markdownToPhotos, stripPhotoMarkdown } from "@/components/forum/photo-preview";
 
 /** ТЗ 2026-09-23 «Ответить»: один ответ в плоском списке на карточке. */
 interface WtbAnswerItem {
@@ -501,7 +503,8 @@ function WhereToBuyFormModal(props: {
 }) {
   const isEdit = !!props.editItem;
   const [title, setTitle] = useState(props.editItem?.title ?? "");
-  const [text, setText] = useState(props.editItem?.text ?? "");
+  const [text, setText] = useState(() => stripPhotoMarkdown(props.editItem?.text ?? ""));
+  const [photos, setPhotos] = useState<{ url: string; alt: string }[]>(() => markdownToPhotos(props.editItem?.text ?? ""));
   const [place, setPlace] = useState(props.editItem?.place ?? "");
   const [busy, setBusy] = useState(false);
   const [botNick, setBotNick] = useState<string | null>(null);
@@ -529,9 +532,12 @@ function WhereToBuyFormModal(props: {
     }
     setBusy(true);
     try {
+      // Склеиваем текст + markdown фото
+      const photosPart = photos.length > 0 ? "\n" + photosToMarkdown(photos) : "";
+      const fullText = (text.trim() + photosPart).trim();
       const payload: Record<string, unknown> = isEdit
-        ? { token: props.token, action: "edit", title: title.trim(), text: text.trim(), place: place.trim() }
-        : { token: props.token, title: title.trim(), text: text.trim(), place: place.trim() };
+        ? { token: props.token, action: "edit", title: title.trim(), text: fullText, place: place.trim() }
+        : { token: props.token, title: title.trim(), text: fullText, place: place.trim() };
       if (confirmSimilar) payload.confirmSimilar = true;
       const r = await fetch(isEdit ? `/api/wheretobuy/${props.editItem!.id}` : "/api/wheretobuy", {
         method: isEdit ? "PATCH" : "POST",
@@ -612,6 +618,10 @@ function WhereToBuyFormModal(props: {
               placeholder="Уточните модель, артикул, размер, цвет или комплектацию. Можно сразу написать, как с вами связаться…"
               style={{ minHeight: 120 }}
             />
+            <PhotoPreview
+              photos={photos}
+              onRemove={(url) => setPhotos((prev) => prev.filter((p) => p.url !== url))}
+            />
           </div>
           <div className="sk-modal-row">
             <label htmlFor="wb-f-place">Место — необязательно</label>
@@ -644,6 +654,11 @@ function WhereToBuyFormModal(props: {
           {err && <div className="sk-modal-err">{err}</div>}
           <div className="sk-modal-actions">
             <span style={{ fontSize: 13, color: "#475569", marginRight: 8 }}>🤖 От имени: <b style={{ color: "#0a5caa" }}>{botNick || "..."} </b></span>
+            <UploadPhotoButton
+              token={props.token}
+              notify={(m) => setErr(m)}
+              onUploaded={(url, alt) => setPhotos((prev) => [...prev, { url, alt }])}
+            />
             <button className="sk-btn-classic" disabled={busy} onClick={() => submit(!!similar)}>
               {busy ? "Проверка…" : similar ? "Всё равно опубликовать" : isEdit ? "Сохранить" : "Опубликовать"}
             </button>
