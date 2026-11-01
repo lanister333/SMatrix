@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { EP_RULES, EP_RULES_INTRO } from "@/components/site/employers-publications";
+import { EP_RULES, EP_RULES_INTRO } from "@/lib/employers-rules";
 
 export const metadata: Metadata = {
   title: "Правила публикации — О работодателях — SakhMatrix",
