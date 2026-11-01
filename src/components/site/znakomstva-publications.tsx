@@ -117,6 +117,7 @@ export default function LoveSakhPage(props: {
 
   // Форма публикации: гость → строка ТЗ; авторизованный → чистая форма.
   const [formOpen, setFormOpen] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
   const [guestHint, setGuestHint] = useState(false);
   const [formTab, setFormTab] = useState(DATING_CATEGORIES[0]?.key ?? "m4w");
   const [city, setCity] = useState("");
@@ -214,9 +215,22 @@ export default function LoveSakhPage(props: {
       return;
     }
     setGuestHint(false);
+    setEditId(null);
+    setCity("");
+    setText("");
     setFormOpen(true);
     setFormTab(tab);
     setErr("");
+  };
+
+  const openEdit = (it: LsItem) => {
+    setEditId(it.id);
+    setFormTab(it.category || tab);
+    setCity(it.place || "");
+    setText(it.body || "");
+    setGuestHint(false);
+    setErr("");
+    setFormOpen(true);
   };
 
   const changeText = (v: string) => {
@@ -234,8 +248,9 @@ export default function LoveSakhPage(props: {
     if (!hasContact(text)) return setErr(CONTACT_ERROR);
     setBusy(true);
     try {
-      const r = await fetch("/api/znakomstva", {
-        method: "POST",
+      const isEdit = !!editId;
+      const r = await fetch(isEdit ? `/api/znakomstva/${editId}` : "/api/znakomstva", {
+        method: isEdit ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           token: props.token,
@@ -246,8 +261,8 @@ export default function LoveSakhPage(props: {
       });
       const d = await r.json();
       if (!r.ok) throw Error(d.error || "Не удалось опубликовать анкету.");
-      // Успех: форма закрывается, поля чистятся, анкета падает наверх ленты.
       setFormOpen(false);
+      setEditId(null);
       setCity("");
       setText("");
       setNote(d.note || "Анкета опубликована. Спасибо!");
@@ -395,7 +410,7 @@ export default function LoveSakhPage(props: {
             </div>
             <div style={{ marginTop: 10 }}>
               <button className="sk-btn-classic" data-ls-publish="1" disabled={busy} onClick={publish} style={{ borderRadius: 0 }}>
-                {busy ? "Публикация…" : "Опубликовать"}
+                {busy ? "Публикация…" : editId ? "Сохранить" : "Опубликовать"}
               </button>
             </div>
             {err && (
@@ -475,13 +490,14 @@ export default function LoveSakhPage(props: {
                       форуме» на странице Знакомств НЕТ — общение идёт
                       напрямую по контактам из текста карточки. */}
                 {props.user && props.user.id && (props.user.role === "owner" || props.user.role === "admin" || props.user.role === "moderator" || (it.authorId != null && props.user.id === it.authorId) || (it.originalAuthorId != null && props.user.id === it.originalAuthorId)) && (
-
-                  <button type="button" onClick={async () => { if (!window.confirm("Удалить?")) return; try { const r = await fetch(`/api/znakomstva/${it.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: props.token, action: "delete" }) }); const d = await r.json(); if (!r.ok) { props.notify(d.error || "Ошибка"); return; } props.notify("Удалено"); load(); } catch { props.notify("Сеть недоступна"); } }} style={{ cursor: "pointer", background: "none", border: "none", color: "#c08080", padding: "4px 8px", fontFamily: "inherit", fontSize: "12px", fontWeight: 600, textDecoration: "underline" }}>
-
-                    Удалить
-
+                  <>
+                  <button type="button" onClick={() => openEdit(it)} style={{ cursor: "pointer", background: "none", border: "none", color: "#0a5caa", padding: "4px 8px", fontFamily: "inherit", fontSize: "12px", fontWeight: 600, textDecoration: "underline" }}>
+                    Редактировать
                   </button>
-
+                  <button type="button" onClick={async () => { if (!window.confirm("Удалить?")) return; try { const r = await fetch(`/api/znakomstva/${it.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: props.token, action: "delete" }) }); const d = await r.json(); if (!r.ok) { props.notify(d.error || "Ошибка"); return; } props.notify("Удалено"); load(); } catch { props.notify("Сеть недоступна"); } }} style={{ cursor: "pointer", background: "none", border: "none", color: "#c08080", padding: "4px 8px", fontFamily: "inherit", fontSize: "12px", fontWeight: 600, textDecoration: "underline" }}>
+                    Удалить
+                  </button>
+                  </>
                 )}
 
                 </article>

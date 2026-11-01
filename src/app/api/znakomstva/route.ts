@@ -140,6 +140,7 @@ async function withMeta(rows: FeedRow[], viewerId?: string) {
       createdAt: r.createdAt,
       photos: byPost.get(r.id) ?? [],
       isMine,
+      ...(isMine ? { authorId: r.authorId, originalAuthorId: r.originalAuthorId } : {}),
       ...(isMine ? { isHiddenByAi: r.isHiddenByAi, hiddenReason: r.hiddenReason, needHuman: r.needHuman } : {}),
     };
   });
