@@ -563,7 +563,7 @@ export default function FlatBoard(props: FlatBoardProps) {
                         props.onReload?.();
                       } catch { props.notify("Сеть недоступна"); }
                     }}
-                    style={{ cursor: "pointer", background: "none", border: "none", color: "#dc2626", padding: "4px 8px", fontFamily: "inherit", fontSize: "12px", fontWeight: 600, textDecoration: "underline", marginTop: 4 }}
+                    style={{ cursor: "pointer", background: "none", border: "none", color: "#0a5caa", padding: "4px 8px", fontFamily: "inherit", fontSize: "12px", fontWeight: 600, textDecoration: "underline", marginTop: 4 }}
                   >
                     Удалить
                   </button>
