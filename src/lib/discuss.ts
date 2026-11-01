@@ -63,8 +63,9 @@ export async function discussOnForum(
     }
 
     // Успешный ответ — редирект на созданную/существующую тему.
+    // replace — не оставляет промежуточную страницу в истории браузера.
     if (d.redirect && typeof d.redirect === "string") {
-      window.location.href = d.redirect;
+      window.location.replace(d.redirect);
     }
   } catch {
     alert("Сеть недоступна — попробуйте ещё раз через несколько секунд");
