@@ -554,20 +554,8 @@ export default function FlatBoard(props: FlatBoardProps) {
           data-flat-form="1"
           style={{ marginTop: 12, background: "#fff", border: FLAT_BORDER, borderRadius: 0, padding: "12px" }}
         >
-            {/* Выбор одной из вкладок (переключатель). */}
-            <div data-flat-form-tabs="1" style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              {props.tabs.map((t) => (
-                <button
-                  key={t.key}
-                  type="button"
-                  data-flat-form-tab={t.key}
-                  style={tabBtn(formTab === t.key)}
-                  onClick={() => setFormTab(t.key)}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
+            {/* 2026-11-01: вкладки убраны из формы — дублировали фильтр сверху.
+                При создании объявления используется текущая вкладка (formTab). */}
 
             {/* Поле «Город»: выпадающий список сахалинских городов + свободный ввод. */}
             <div style={{ marginTop: 10 }}>
