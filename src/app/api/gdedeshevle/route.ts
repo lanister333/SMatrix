@@ -366,14 +366,8 @@ export async function POST(req: NextRequest) {
     // Очевидное нарушение скрыто — мягкая лестница санкций (общий механизм сайта).
     // Подозрение само по себе пользователя не блокирует (ТЗ п.20).
     let sanction: Record<string, unknown> | null = null;
-    if (outcome.action === "hide" && outcome.source === "ai") {
-      const violation = await handleConfirmedViolation({
-        userId: user.id,
-        category: outcome.category ?? "other",
-        reason: outcome.hiddenReason ?? "нарушение правил раздела «Где дешевле»",
-      });
-      sanction = { ...violation.sanction, note: violation.note, needsHumanDecision: violation.needsHumanDecision };
-    }
+    // 2026-11-01: автоматические санкции отключены — только админ выдаёт санкции вручную
+    // if (outcome.action === "hide" && outcome.source === "ai") { ... }
 
     const note =
       outcome.action === "hide"
