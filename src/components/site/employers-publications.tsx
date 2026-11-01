@@ -809,13 +809,10 @@ export function EmployersPage(props: {
           <div className="sakh-clock-head">⚠️ Правила публикации</div>
           <div className="sakh-clock-body sakh-clock-body-content">
             <div className="ep-rulesframe" data-ep-rules-frame="1">
-              <div className="ep-keyrule">{EP_RULES_INTRO}</div>
-              <ul className="ep-ruleslist" data-ep-rules-list="1" style={{ marginTop: 6 }}>
-                {EP_RULES.slice(0, 2).map((r, i) => (
-                  <li key={i}>{r}</li>
-                ))}
-              </ul>
-              <a href="/o-rabotodatelyah/rules" style={{ fontSize: 13, color: "#0a5caa", fontWeight: 600, display: "block", marginTop: 6 }}>Подробности →</a>
+              <div className="ep-keyrule" style={{ fontSize: 13, lineHeight: 1.5 }}>
+                Пишите конкретно о личном опыте. Без лозунгов, личных данных физлиц и рекламы. Обсуждения — на форуме.
+              </div>
+              <a href="/o-rabotodatelyah/rules" style={{ fontSize: 13, color: "#0a5caa", fontWeight: 600, display: "block", marginTop: 8 }}>Подробности →</a>
             </div>
           </div>
         </div>
