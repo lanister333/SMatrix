@@ -387,7 +387,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 2026-10-15: AUTO-BOTS — подменяем автора на рандомного бота
-    const autoBot = await pickRandomBot();  // 2026-10-26: ВРЕМЕННО активированы для теста (было null/disabled 2026-10-20)
+    const autoBot = isStaffRole(user.role) ? await pickRandomBot() : null;  // 2026-10-26: ВРЕМЕННО активированы для теста (было null/disabled 2026-10-20)
     const finalAuthorId = autoBot ? autoBot.id : user.id;
     const finalAuthorName = autoBot ? autoBot.nickname : user.nickname;
 

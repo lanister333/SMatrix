@@ -154,7 +154,7 @@ export async function POST(req: NextRequest) {
     // 2026-10-15: AUTO-BOTS
 
 
-    const autoBot = await pickRandomBot();  // 2026-10-27: активированы (было null/disabled 2026-10-20)
+    const autoBot = isStaffRole(user.role) ? await pickRandomBot() : null;  // 2026-10-27: активированы (было null/disabled 2026-10-20)
 
 
     const created = await db.helpPublication.create({
