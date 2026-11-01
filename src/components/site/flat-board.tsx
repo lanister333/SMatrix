@@ -147,6 +147,10 @@ type FeedItem = {
   /** 2026-10-01: ТЗ — контакт обязателен; показываем его отдельной
    *  выделенной строкой под текстом карточки (не прячем в мета). */
   contact?: string;
+  /** 2026-11-01: для кнопок редактирования/удаления */
+  authorId?: string;
+  originalAuthorId?: string;
+  tab?: string;
 };
 
 const PAGE_SIZE = 50;
@@ -197,11 +201,15 @@ export default function FlatBoard(props: FlatBoardProps) {
           body: String(x.body ?? x.text ?? ""),
           place: String(x.place ?? ""),
           /* ТЗ 2026-09-23: ник автора (без аватара) или «Аноним». */
-          nick: String(x.nick ?? ""),
+          nick: String(x.nick ?? x.authorName ?? ""),
           status: String(x.status ?? "actual"),
           createdAt: String(x.createdAt ?? ""),
           /* 2026-10-01: контакт обязателен — берём из contact (Ads API). */
           contact: x.contact ? String(x.contact) : "",
+          /* 2026-11-01: для кнопок редактирования/удаления */
+          authorId: x.authorId ? String(x.authorId) : undefined,
+          originalAuthorId: x.originalAuthorId ? String(x.originalAuthorId) : undefined,
+          tab: x.rubric ? String(x.rubric) : x.category ? String(x.category) : undefined,
         }));
         setItems((prev) => (opts.append && prev ? [...prev, ...rows] : rows));
         setPage(p);
