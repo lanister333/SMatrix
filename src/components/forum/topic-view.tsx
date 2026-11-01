@@ -1110,7 +1110,7 @@ export default function TopicView(props: {
               (старым, новым, будущим) ретроактивно. */}
           <span className="t-title-text">
             <strong style={{ fontWeight: 700, display: "block", fontSize: "1em", lineHeight: 1.4 }}>
-              {renderMentions(messages.find((m) => m.num === 1)?.body || (topic.title as string), mentionAuthors, props.onOpenProfile, (url, alt) => setLightbox({ url, alt }))}
+              {messages.find((m) => m.num === 1)?.body || (topic.title as string)}
             </strong>
             {topic.isPinned && <span className="sk-tstatus pinned">Закреплена</span>}
             {topic.isArchived ? (

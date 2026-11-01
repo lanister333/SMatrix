@@ -26,8 +26,6 @@ import { discussOnForum } from "@/lib/discuss";
 import { findPhoneNumbers } from "@/lib/moderation/premoderation";
 import { findEmotionalLabels, WTB_HINT_FORUM_BUTTON_LABEL } from "@/lib/moderation/wheretobuy-hint-premoderation";
 import { nickGenderClass } from "@/lib/nick-gender";
-import { MarkdownText, PhotoPreview, photosToMarkdown, markdownToPhotos, stripPhotoMarkdown } from "@/components/forum/photo-preview";
-import { UploadPhotoButton } from "@/components/forum/upload-photo-button";
 
 /** ТЗ 2026-09-23 «Ответить»: один ответ в плоском списке на карточке. */
 interface CdAnswerItem {
@@ -297,7 +295,7 @@ function CheapRow(props: {
       <div className="cd-q">
         <span className="cd-qlabel">Вопрос:</span> {item.title}
       </div>
-      {item.text && <div className="cd-qtext"><MarkdownText text={item.text} /></div>}
+      {item.text && <div className="cd-qtext">{item.text}</div>}
 
       {own && item.isHiddenByAi && (
         <div className="cd-hiddennote">
@@ -458,8 +456,7 @@ function CheapFormModal(props: {
 }) {
   const isEdit = !!props.editItem;
   const [title, setTitle] = useState(props.editItem?.title ?? "");
-  const [text, setText] = useState(() => stripPhotoMarkdown(props.editItem?.text ?? ""));
-  const [photos, setPhotos] = useState<{ url: string; alt: string }[]>(() => markdownToPhotos(props.editItem?.text ?? ""));
+  const [text, setText] = useState(props.editItem?.text ?? "");
   const [place, setPlace] = useState(props.editItem?.place ?? "");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
@@ -492,12 +489,9 @@ function CheapFormModal(props: {
     }
     setBusy(true);
     try {
-      // Склеиваем текст + markdown фото
-      const photosPart = photos.length > 0 ? "\n" + photosToMarkdown(photos) : "";
-      const fullText = (text.trim() + photosPart).trim();
       const payload: Record<string, unknown> = isEdit
-        ? { token: props.token, action: "edit", title: title.trim(), text: fullText, place: place.trim() }
-        : { token: props.token, title: title.trim(), text: fullText, place: place.trim() };
+        ? { token: props.token, action: "edit", title: title.trim(), text: text.trim(), place: place.trim() }
+        : { token: props.token, title: title.trim(), text: text.trim(), place: place.trim() };
       if (confirmSimilar) payload.confirmSimilar = true;
       const r = await fetch(isEdit ? `/api/gdedeshevle/${props.editItem!.id}` : "/api/gdedeshevle", {
         method: isEdit ? "PATCH" : "POST",
@@ -567,10 +561,6 @@ function CheapFormModal(props: {
               placeholder="Уточните модель, артикул, размер, цвет или комплектацию. Можно сразу написать, как с вами связаться…"
               style={{ minHeight: 120 }}
             />
-            <PhotoPreview
-              photos={photos}
-              onRemove={(url) => setPhotos((prev) => prev.filter((p) => p.url !== url))}
-            />
           </div>
           <div className="sk-modal-row">
             <label htmlFor="cd-f-place">Место — необязательно</label>
@@ -603,11 +593,7 @@ function CheapFormModal(props: {
           {err && <div className="sk-modal-err">{err}</div>}
           <div className="sk-modal-actions">
             <span style={{ fontSize: 13, color: "#475569", marginRight: 8 }}>🤖 От имени: <b style={{ color: "#0a5caa" }}>{botNick || "..."} </b></span>
-            <UploadPhotoButton
-              token={props.token}
-              notify={(m) => setErr(m)}
-              onUploaded={(url, alt) => setPhotos((prev) => [...prev, { url, alt }])}
-            />
+            
             <button className="sk-btn-classic" disabled={busy} onClick={() => submit(!!similar)}>
               {busy ? "Проверка…" : similar ? "Всё равно опубликовать" : isEdit ? "Сохранить" : "Опубликовать"}
             </button>

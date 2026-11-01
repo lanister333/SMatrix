@@ -11,22 +11,36 @@ interface Props {
 
 /**
  * Кнопка «📷 Фото» — простая загрузка изображения в сообщение.
- * Использует <label> + <input type=file> (нативный способ, работает на всех
- * мобильных браузерах, в отличие от input.click() из JS).
+ * По клику открывается выбор файла, после загрузки URL передаётся
+ * через колбэк onUploaded (БЕЗ вставки markdown в textarea).
+ *
+ * Markdown для отправки собирается родительским компонентом из
+ * списка загруженных фото — чтобы пользователь не видел код в textarea.
+ *
+ * Используется в:
+ *  - Модалке «Новая тема»
+ *  - Быстром ответе в теме
+ *  - Редактировании сообщения
  */
 export function UploadPhotoButton({ token, onUploaded, notify }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
 
-  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    e.target.value = "";
-    if (!file || !token) {
-      alert("Нет файла или токена. file=" + !!file + " token=" + !!token);
+  const handleClick = () => {
+    if (!token) {
+      notify?.("Чтобы загрузить фото — войдите в аккаунт.");
       return;
     }
+    if (busy) return;
+    inputRef.current?.click();
+  };
 
-    alert("Выбран файл: " + file.name + " (" + file.size + " байт, " + file.type + ")");
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    // Сбросить input чтобы можно было выбрать тот же файл снова
+    e.target.value = "";
+    if (!file || !token) return;
+
     setBusy(true);
     try {
       const formData = new FormData();
@@ -37,16 +51,14 @@ export function UploadPhotoButton({ token, onUploaded, notify }: Props) {
       });
       const data = await r.json();
       if (!r.ok) {
-        alert("Ошибка API: " + (data.error || r.status));
         notify?.(data.error || "Не удалось загрузить фото.");
         return;
       }
-      alert("Загружено: " + data.url);
+      // Передаём URL и alt — родитель сам хранит список фото
       const alt = file.name.replace(/\.[^.]+$/, "").slice(0, 50) || "фото";
       onUploaded(data.url, alt);
       notify?.("Фото загружено.");
-    } catch (err) {
-      alert("Исключение: " + (err instanceof Error ? err.message : String(err)));
+    } catch {
       notify?.("Сеть недоступна — попробуйте ещё раз.");
     } finally {
       setBusy(false);
@@ -54,39 +66,36 @@ export function UploadPhotoButton({ token, onUploaded, notify }: Props) {
   };
 
   return (
-    <label
-      style={{
-        background: "transparent",
-        border: "1px solid #cbd5e1",
-        borderRadius: 6,
-        padding: "4px 10px",
-        fontSize: 13,
-        cursor: busy ? "wait" : "pointer",
-        opacity: busy ? 0.6 : 1,
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 4,
-        color: "#1E3A5F",
-        fontWeight: 600,
-        userSelect: "none",
-      }}
-    >
-      {busy ? "Загрузка…" : "📷 Фото"}
+    <>
+      <button
+        type="button"
+        onClick={handleClick}
+        disabled={busy}
+        title="Добавить фото"
+        style={{
+          background: "transparent",
+          border: "1px solid #cbd5e1",
+          borderRadius: 6,
+          padding: "4px 10px",
+          fontSize: 13,
+          cursor: busy ? "wait" : "pointer",
+          opacity: busy ? 0.6 : 1,
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 4,
+          color: "#1E3A5F",
+          fontWeight: 600,
+        }}
+      >
+        {busy ? "Загрузка…" : "📷 Фото"}
+      </button>
       <input
         ref={inputRef}
         type="file"
         accept="image/jpeg,image/png,image/webp,image/gif"
         onChange={handleFile}
-        disabled={busy || !token}
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          opacity: 0,
-          overflow: "hidden",
-          pointerEvents: "none",
-        }}
+        style={{ display: "none" }}
       />
-    </label>
+    </>
   );
 }
