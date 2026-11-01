@@ -265,6 +265,10 @@ export default function App() {
   const initialRubric = initialParams?.get("rubric");
   const initialView = initialTopic ? "forum" : (initialScope || initialRubric) ? "forum" : (initialParams?.get("view") === "forum" ? "forum" : "home");
   const [view, setView] = useState(initialView);
+  // Серверный рендер отдаёт view="home" (нет window). На клиенте — правильный view.
+  // Пока гидратация не завершена — показываем пустой экран, чтобы не было вспышки.
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => { setHydrated(true); }, []);
   const { user, token, login, logout } = useAuth();
   // ШАГ 27: запрос из навигационного поиска «Поиск по форуму...» для view="search"
   const [searchQ, setSearchQ] = useState("");
@@ -745,6 +749,12 @@ export default function App() {
   // ШАГ 27: главная по согласованному макету — свой центральный и правый столбцы;
   // профиль пользователя (?user=Ник) при этом остаётся в обычной раскладке
   const isHome = view === "home" && !profileNick && !topicId;
+
+  // 2026-11-01: пока гидратация не завершена и view отличается от "home" —
+  // показываем пустой экран (без вспышки главной страницы).
+  if (!hydrated && initialView !== "home") {
+    return <div style={{ minHeight: "100vh", background: "#f8fafc" }} />;
+  }
 
   return (
     <div className={`sm-page flex min-h-screen flex-col ${isStaffRole(user?.role) ? "is-admin" : ""}`}>
