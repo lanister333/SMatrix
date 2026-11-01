@@ -6,7 +6,16 @@
 
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY || "");
+// 2026-11-02: ленивая инициализация — Resend SDK кидает ошибку при пустом ключе
+// во время build (когда env ещё не загружен). Создаём клиента только при реальном вызове.
+let _resend: Resend | null = null;
+function getResend(): Resend {
+  if (!_resend) {
+    const key = process.env.RESEND_API_KEY || "";
+    _resend = new Resend(key || "re_dummy_build_only");
+  }
+  return _resend;
+}
 const FROM = process.env.RESEND_FROM || "onboarding@resend.dev";
 const SELF_URL = process.env.SELF_URL || "http://81.177.49.189";
 
@@ -22,7 +31,7 @@ const TEST_EMAIL = "suerowich@gmail.com";
 
 export async function sendEmail(opts: SendEmailOptions): Promise<boolean> {
   try {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResend().emails.send({
       from: FROM,
       to: TEST_EMAIL,  // всегда на email владельца (бесплатный режим Resend)
       subject: `[${opts.to}] ${opts.subject}`,
