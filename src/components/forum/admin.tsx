@@ -471,7 +471,7 @@ const AI_ACTION_LABELS: Record<string, string> = {
 const ADMIN_ACTIONS: { key: string; label: string; color: string; confirm?: boolean }[] = [
   { key: "publish", label: "Оставить", color: "#16a34a" },
   { key: "hide", label: "Скрыть", color: "#d97706" },
-  { key: "delete", label: "Удалить", color: "#0a5caa", confirm: true },
+  { key: "delete", label: "Удалить", color: "#c08080", confirm: true },
   { key: "warn", label: "Предупредить", color: "#eab308", confirm: true },
   { key: "limit", label: "Ограничить", color: "#f97316", confirm: true },
   { key: "ban", label: "Заблокировать", color: "#991b1b", confirm: true },
