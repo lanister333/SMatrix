@@ -337,9 +337,6 @@ export function GkhPage(props: {
     if (!formDate) {
       return setErr("Укажите дату начала проблемы (с какого числа наблюдается)");
     }
-    if (formActions.trim().length < 10) {
-      return setErr("Опишите предпринятые действия: куда звонили или писали и какой статус. Поле обязательное — без него публикация не проходит");
-    }
     setBusy(true);
     try {
       const r = await fetch("/api/gkh", {
@@ -581,7 +578,7 @@ export function GkhPage(props: {
             {/* Шаг 3: предпринятые действия — ОБЯЗАТЕЛЬНОЕ поле. */}
             <div className="gkf-step" data-gkf-step3="1">
               <label className="gkf-steplabel" htmlFor="gkf-actions">
-                3. Предпринятые действия <span className="gkf-step-hint">Куда уже звонили / писали и какой статус — обязательное поле</span>
+                3. Предпринятые действия <span className="gkf-step-hint">Куда уже звонили / писали и какой статус — необязательно</span>
               </label>
               <textarea
                 id="gkf-actions"
