@@ -21,7 +21,6 @@ export async function POST(req: NextRequest) {
         { status: 429 }
       );
     }
-    const body = await req.json();
     const text = String(body.text ?? "").trim();
     const contact = String(body.contact ?? "").trim().slice(0, 200);
     if (text.length < 20) {
