@@ -257,7 +257,14 @@ function Sidebar(props: {
 }
 
 export default function App() {
-  const [view, setView] = useState("home");
+  // 2026-11-01: инициализация из URL — чтобы при переходе на /?topic=1234
+  // не было вспышки главной страницы. Сразу показываем тему форума.
+  const initialParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+  const initialTopic = initialParams?.get("topic");
+  const initialScope = initialParams?.get("scope");
+  const initialRubric = initialParams?.get("rubric");
+  const initialView = initialTopic ? "forum" : (initialScope || initialRubric) ? "forum" : (initialParams?.get("view") === "forum" ? "forum" : "home");
+  const [view, setView] = useState(initialView);
   const { user, token, login, logout } = useAuth();
   // ШАГ 27: запрос из навигационного поиска «Поиск по форуму...» для view="search"
   const [searchQ, setSearchQ] = useState("");
@@ -276,9 +283,9 @@ export default function App() {
   const [rubricFilter, setRubricFilter] = useState<{ slug: string; name: string } | null>(null);
   const [rubrics, setRubrics] = useState<Rubric[]>([]);
   const [mobileMenu, setMobileMenu] = useState(false);
-  const [topicId, setTopicId] = useState<number | null>(null);
-  const [jumpMsg, setJumpMsg] = useState<number | null>(null);
-  const [profileNick, setProfileNick] = useState<string | null>(null);
+  const [topicId, setTopicId] = useState<number | null>(initialTopic ? parseInt(initialTopic, 10) : null);
+  const [jumpMsg, setJumpMsg] = useState<number | null>(initialParams?.get("msg") ? parseInt(initialParams.get("msg")!, 10) : null);
+  const [profileNick, setProfileNick] = useState<string | null>(initialParams?.get("user") || null);
   const [resetToken, setResetToken] = useState<string | null>(null);
   // ШАГ 11: санкции текущего пользователя + цель апелляции
   const [restriction, setRestriction] = useState<SanctionInfoLite | null>(null);
