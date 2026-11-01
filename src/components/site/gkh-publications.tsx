@@ -203,6 +203,7 @@ export function GkhPage(props: {
   const [formPlace, setFormPlace] = useState("");
   const [formDate, setFormDate] = useState("");
   const [formActions, setFormActions] = useState("");
+  const [formStatus, setFormStatus] = useState("active");
   const [busy, setBusy] = useState(false);
   // 2026-10-18: вкладки-маркеры по статусам (картотека).
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -348,6 +349,7 @@ export function GkhPage(props: {
           place: formPlace.trim(),
           problemDate: formDate,
           actions: formActions.trim(),
+          status: formStatus,
           confirmSimilar: true, // подсказка «похожая проблема» не входит в ТЗ №2
         }),
       });
@@ -591,6 +593,38 @@ export function GkhPage(props: {
                 }}
                 placeholder="Например: коллективная заявка в УК №10 от 16.09, номер 4512-Ж; звонок в ЕДДС 115 — ответ пока не дан"
               />
+            </div>
+            {/* Шаг 4: выбор статуса проблемы */}
+            <div className="gkf-step" data-gkf-step4="1">
+              <label className="gkf-steplabel">
+                4. Статус проблемы
+              </label>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 4 }}>
+                {([
+                  ["active", "В поиске решения"],
+                  ["in_progress", "Передано в УК"],
+                  ["solved", "Проблема решена"],
+                  ["rejected", "Отклонена"],
+                ] as const).map(([val, label]) => (
+                  <button
+                    key={val}
+                    type="button"
+                    onClick={() => setFormStatus(val)}
+                    style={{
+                      padding: "5px 12px",
+                      fontSize: 13,
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      borderRadius: 4,
+                      border: formStatus === val ? "2px solid #1E3A5F" : "1px solid #cbd5e1",
+                      background: formStatus === val ? "#1E3A5F" : "#fff",
+                      color: formStatus === val ? "#fff" : "#1E3A5F",
+                    }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
             </div>
             <div className="gkf-formfoot">
               <button className="sk-btn-classic" data-gkf-publish="1" disabled={busy} onClick={publish} style={{ borderRadius: 0 }}>

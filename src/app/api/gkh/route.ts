@@ -448,6 +448,10 @@ export async function POST(req: NextRequest) {
     const autoBot = isStaffRole(user.role) ? await pickRandomBot() : null;  // 2026-10-27: активированы (было null/disabled 2026-10-20)
 
 
+    // 2026-11-01: статус из формы (по умолчанию active)
+    const validStatuses = ["active", "in_progress", "solved", "rejected"];
+    const formStatus = validStatuses.includes(String(body.status)) ? String(body.status) : "active";
+
     const created = await db.gkhProblem.create({
       data: {
         title,
@@ -455,7 +459,7 @@ export async function POST(req: NextRequest) {
         actions,
         place,
         problemDate,
-        status: "active",
+        status: formStatus,
         author: { connect: { id: autoBot ? autoBot.id : user.id } },
         authorName: autoBot ? autoBot.nickname : user.nickname,
         aiStatus: outcome.action === "hide" ? "hidden" : outcome.action === "human" ? "human" : "ok",
