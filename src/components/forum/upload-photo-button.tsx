@@ -21,8 +21,12 @@ export function UploadPhotoButton({ token, onUploaded, notify }: Props) {
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = "";
-    if (!file || !token) return;
+    if (!file || !token) {
+      alert("Нет файла или токена. file=" + !!file + " token=" + !!token);
+      return;
+    }
 
+    alert("Выбран файл: " + file.name + " (" + file.size + " байт, " + file.type + ")");
     setBusy(true);
     try {
       const formData = new FormData();
@@ -33,13 +37,16 @@ export function UploadPhotoButton({ token, onUploaded, notify }: Props) {
       });
       const data = await r.json();
       if (!r.ok) {
+        alert("Ошибка API: " + (data.error || r.status));
         notify?.(data.error || "Не удалось загрузить фото.");
         return;
       }
+      alert("Загружено: " + data.url);
       const alt = file.name.replace(/\.[^.]+$/, "").slice(0, 50) || "фото";
       onUploaded(data.url, alt);
       notify?.("Фото загружено.");
-    } catch {
+    } catch (err) {
+      alert("Исключение: " + (err instanceof Error ? err.message : String(err)));
       notify?.("Сеть недоступна — попробуйте ещё раз.");
     } finally {
       setBusy(false);
