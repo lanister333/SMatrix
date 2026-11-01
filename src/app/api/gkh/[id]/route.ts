@@ -299,16 +299,15 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     }
 
     // action === "edit" — правка автором (ТЗ п.7), с повторной ИИ-проверкой.
-    const title = String(body.title ?? "").trim();
     const text = String(body.text ?? body.body ?? "").trim();
+    // title генерируется автоматически из текста (как при создании)
+    const firstSentence = text.split(/[.!?;\n]/)[0].trim();
+    const title = firstSentence.length > 5 ? firstSentence.slice(0, 150) : text.slice(0, 150);
     const place = String(body.place ?? "").trim().slice(0, 120);
     const problemDate = String(body.problemDate ?? "").trim().slice(0, 10);
     const photos: string[] = Array.isArray(body.photos) ? body.photos.map(String).slice(0, GKH_MAX_PHOTOS) : [];
     const video: string | null = body.video ? String(body.video) : null;
 
-    if (title.length < 5 || title.length > 150) {
-      return NextResponse.json({ error: "Заголовок должен быть от 5 до 150 символов" }, { status: 400 });
-    }
     if (text.length < 10 || text.length > 8000) {
       return NextResponse.json({ error: "Текст проблемы: от 10 до 8000 символов" }, { status: 400 });
     }
