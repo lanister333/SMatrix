@@ -530,13 +530,18 @@ export default function FlatBoard(props: FlatBoardProps) {
                     type="button"
                     onClick={() => {
                       // Заполняем форму данными объявления для редактирования
-                      setFormTab(it.tab);
+                      setFormTab(it.tab || props.tabs[0]?.key || "");
                       setCity(it.place || "");
                       setText(it.body || "");
                       setContact(it.contact || "");
                       setPhotos([]);
-                      setFormOpen(true);
                       setEditId(it.id);
+                      // controlled-режим: открываем через onOpenChange
+                      if (props.controlledOpen) {
+                        props.onOpenChange?.(true);
+                      } else {
+                        setFormOpen(true);
+                      }
                     }}
                     style={{ cursor: "pointer", background: "none", border: "none", color: "#0a5caa", padding: "4px 8px", fontFamily: "inherit", fontSize: "12px", fontWeight: 600, textDecoration: "underline", marginTop: 4 }}
                   >
