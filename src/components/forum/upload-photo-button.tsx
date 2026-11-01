@@ -11,33 +11,15 @@ interface Props {
 
 /**
  * Кнопка «📷 Фото» — простая загрузка изображения в сообщение.
- * По клику открывается выбор файла, после загрузки URL передаётся
- * через колбэк onUploaded (БЕЗ вставки markdown в textarea).
- *
- * Markdown для отправки собирается родительским компонентом из
- * списка загруженных фото — чтобы пользователь не видел код в textarea.
- *
- * Используется в:
- *  - Модалке «Новая тема»
- *  - Быстром ответе в теме
- *  - Редактировании сообщения
+ * Использует <label> + <input type=file> (нативный способ, работает на всех
+ * мобильных браузерах, в отличие от input.click() из JS).
  */
 export function UploadPhotoButton({ token, onUploaded, notify }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
 
-  const handleClick = () => {
-    if (!token) {
-      notify?.("Чтобы загрузить фото — войдите в аккаунт.");
-      return;
-    }
-    if (busy) return;
-    inputRef.current?.click();
-  };
-
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    // Сбросить input чтобы можно было выбрать тот же файл снова
     e.target.value = "";
     if (!file || !token) return;
 
@@ -54,7 +36,6 @@ export function UploadPhotoButton({ token, onUploaded, notify }: Props) {
         notify?.(data.error || "Не удалось загрузить фото.");
         return;
       }
-      // Передаём URL и alt — родитель сам хранит список фото
       const alt = file.name.replace(/\.[^.]+$/, "").slice(0, 50) || "фото";
       onUploaded(data.url, alt);
       notify?.("Фото загружено.");
@@ -66,36 +47,32 @@ export function UploadPhotoButton({ token, onUploaded, notify }: Props) {
   };
 
   return (
-    <>
-      <button
-        type="button"
-        onClick={handleClick}
-        disabled={busy}
-        title="Добавить фото"
-        style={{
-          background: "transparent",
-          border: "1px solid #cbd5e1",
-          borderRadius: 6,
-          padding: "4px 10px",
-          fontSize: 13,
-          cursor: busy ? "wait" : "pointer",
-          opacity: busy ? 0.6 : 1,
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 4,
-          color: "#1E3A5F",
-          fontWeight: 600,
-        }}
-      >
-        {busy ? "Загрузка…" : "📷 Фото"}
-      </button>
+    <label
+      style={{
+        background: "transparent",
+        border: "1px solid #cbd5e1",
+        borderRadius: 6,
+        padding: "4px 10px",
+        fontSize: 13,
+        cursor: busy ? "wait" : "pointer",
+        opacity: busy ? 0.6 : 1,
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 4,
+        color: "#1E3A5F",
+        fontWeight: 600,
+        userSelect: "none",
+      }}
+    >
+      {busy ? "Загрузка…" : "📷 Фото"}
       <input
         ref={inputRef}
         type="file"
         accept="image/jpeg,image/png,image/webp,image/gif"
         onChange={handleFile}
+        disabled={busy || !token}
         style={{ display: "none" }}
       />
-    </>
+    </label>
   );
 }
