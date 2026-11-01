@@ -47,6 +47,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/components/site/chrome";
 import { renderContacts } from "@/lib/contact-check";
 import { nickGenderClass } from "@/lib/nick-gender";
+import { UploadPhotoButton } from "@/components/forum/upload-photo-button";
+import { PhotoPreview, photosToMarkdown } from "@/components/forum/photo-preview";
 
 export interface FlatTab {
   key: string;
@@ -162,6 +164,7 @@ export default function FlatBoard(props: FlatBoardProps) {
   const [formTab, setFormTab] = useState(props.tabs[0]?.key ?? "");
   const [city, setCity] = useState("");
   const [text, setText] = useState("");
+  const [photos, setPhotos] = useState<{ url: string; alt: string }[]>([]);
   // 2026-10-20: отдельное поле контактов для связи (как в AdsPage).
   const [contact, setContact] = useState("");
   // Двухшаговая форма ТЗ: поля объявления → шаг СМС-верификации.
@@ -289,6 +292,9 @@ export default function FlatBoard(props: FlatBoardProps) {
     }
     setBusy(true);
     try {
+      // Склеиваем текст + markdown фото
+      const photosPart = photos.length > 0 ? "\n" + photosToMarkdown(photos) : "";
+      const fullText = (text.trim() + photosPart).trim();
       const r = await fetch(props.apiPath, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -296,7 +302,7 @@ export default function FlatBoard(props: FlatBoardProps) {
           token,
           [props.postKey]: formTab,
           place: city.trim(),
-          text: text.trim(),
+          text: fullText,
           contact: contact.trim(),
           /* ТЗ 2026-09-23: в прямой публикации (dating) СМС-полей нет; они
              уходят только в прежнем двухшаговом режиме (блок «Объявления»,
@@ -313,6 +319,7 @@ export default function FlatBoard(props: FlatBoardProps) {
       setStage("form");
       setCity("");
       setText("");
+      setPhotos([]);
       setContact("");
       setPhone("");
       setCode("");
@@ -616,6 +623,10 @@ export default function FlatBoard(props: FlatBoardProps) {
                   fontFamily: "inherit",
                 }}
               />
+              <PhotoPreview
+                photos={photos}
+                onRemove={(url) => setPhotos((prev) => prev.filter((p) => p.url !== url))}
+              />
 
               {/* 2026-10-20: отдельное поле «Контакты для связи» с рамкой,
                   стилистика как у textarea выше. Контакт сохраняется в БД
@@ -649,7 +660,7 @@ export default function FlatBoard(props: FlatBoardProps) {
             {stage === "form" ? (
               props.publishMode === "direct" ? (
                 /* ТЗ 2026-09-23 «Знакомства»: публикация напрямую, без СМС. */
-                <div style={{ marginTop: 10 }}>
+                <div style={{ marginTop: 10, display: "flex", gap: 8, alignItems: "center" }}>
                   <button
                     className="sk-btn-classic"
                     data-flat-publish="1"
@@ -659,6 +670,11 @@ export default function FlatBoard(props: FlatBoardProps) {
                   >
                     {busy ? "Публикация…" : "Опубликовать"}
                   </button>
+                  <UploadPhotoButton
+                    token={token}
+                    notify={(m) => setErr(m)}
+                    onUploaded={(url, alt) => setPhotos((prev) => [...prev, { url, alt }])}
+                  />
                 </div>
               ) : (
                 <div style={{ marginTop: 10 }}>
