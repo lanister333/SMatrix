@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="190" height="75" viewBox="0 0 190 75">
+  <rect width="190" height="75" fill="#F8FAFC"/>
+  <rect x="0.5" y="0.5" width="189" height="74" fill="none" stroke="#E9ECEF" stroke-width="1"/>
+  <text x="95" y="34" font-family="system-ui, Arial, sans-serif" font-size="14" font-weight="700" fill="#004A8F" text-anchor="middle">ЭкоСахалин</text>
+  <text x="95" y="52" font-family="system-ui, Arial, sans-serif" font-size="10" font-weight="400" fill="#56657a" text-anchor="middle">Экологическое движение</text>
+  <text x="95" y="64" font-family="system-ui, Arial, sans-serif" font-size="9" font-weight="400" fill="#A0AAB0" text-anchor="middle">Сахалинская область</text>
+</svg>

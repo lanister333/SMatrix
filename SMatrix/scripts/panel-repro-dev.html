@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>panel-repro</title></head>
+<body style="margin:0">
+<div id="status" style="padding:8px;font-family:monospace;background:#ff0">waiting for iframe load...</div>
+<iframe id="f" src="http://localhost:3000/" style="width:100%;height:700px;border:1px solid #000"></iframe>
+<script>
+  const f = document.getElementById('f');
+  const t0 = Date.now();
+  const st = document.getElementById('status');
+  f.addEventListener('load', () => { st.textContent = 'IFRAME LOAD FIRED at ' + (Date.now()-t0) + 'ms'; });
+  setTimeout(() => { if (st.textContent.startsWith('waiting')) st.textContent = 'IFRAME LOAD NOT FIRED after 20s'; }, 20000);
+</script>
+</body>
+</html>

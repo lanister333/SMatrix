@@ -1,0 +1,2902 @@
+(globalThis.TURBOPACK || (globalThis.TURBOPACK = [])).push(["object" == typeof document ? document.currentScript : void 0, 52683, e => {
+    "use strict";
+    var s = e.i(43476),
+        a = e.i(71645);
+
+    function l() {
+        return (0, s.jsx)("header", {
+            className: "w-full",
+            style: {
+                background: "var(--sm-turquoise)",
+                borderBottom: "2px solid var(--sm-navy)"
+            },
+            children: (0, s.jsxs)("div", {
+                className: "mx-auto flex max-w-[1280px] flex-col gap-3 px-4 py-5 md:flex-row md:items-end md:justify-between md:gap-8",
+                children: [(0, s.jsxs)("div", {
+                    className: "min-w-0",
+                    children: [(0, s.jsxs)("h1", {
+                        className: "sm-masthead-title text-[52px] sm:text-[64px] md:text-[76px]",
+                        itemProp: "name",
+                        children: [(0, s.jsxs)("span", {
+                            className: "sm-masthead-sakh",
+                            children: ["S", (0, s.jsx)("span", {
+                                className: "sm-masthead-low",
+                                children: "akh"
+                            })]
+                        }), (0, s.jsxs)("span", {
+                            className: "sm-masthead-matrix",
+                            children: ["M", (0, s.jsx)("span", {
+                                className: "sm-masthead-low",
+                                children: "atrix"
+                            })]
+                        })]
+                    }), (0, s.jsx)("p", {
+                        className: "mt-3 font-serif text-[17px] italic text-[#063D38] md:text-[19px]",
+                        style: {
+                            fontFamily: 'Georgia, "Times New Roman", serif'
+                        },
+                        children: "Спроси у города — город ответит."
+                    })]
+                }), (0, s.jsxs)("div", {
+                    className: "shrink-0 text-left md:max-w-[380px] md:text-right",
+                    children: [(0, s.jsx)("div", {
+                        className: "text-[16px] font-bold uppercase tracking-wide text-[#0A2E2B] md:text-[17px]",
+                        children: "Сахалинская матрица взаимопомощи"
+                    }), (0, s.jsx)("p", {
+                        className: "mt-1 text-[13.5px] leading-snug text-[#083D3A]",
+                        children: "Независимый форум-портал для жителей острова: советы, рекомендации мастеров, дороги, рыбалка и жизнь Сахалина. Спроси — и город ответит."
+                    })]
+                })]
+            })
+        })
+    }
+    let n = [{
+            key: "home",
+            label: "Главная"
+        }, {
+            key: "forum",
+            label: "Форум"
+        }, {
+            key: "ads",
+            label: "Объявления"
+        }, {
+            key: "info",
+            label: "Практическая информация"
+        }, {
+            key: "directory",
+            label: "Справочник"
+        }, {
+            key: "useful",
+            label: "Полезное"
+        }],
+        t = [{
+            key: "rules",
+            label: "Правила форума"
+        }, {
+            key: "appeal",
+            label: "Обращение к администратору"
+        }, {
+            key: "about",
+            label: "О проекте"
+        }, {
+            key: "admin",
+            label: "Админ-раздел"
+        }];
+
+    function i({
+        current: e,
+        isAdmin: l,
+        onNavigate: i
+    }) {
+        let [r, c] = (0, a.useState)(!1), o = (0, a.useRef)(null);
+        (0, a.useEffect)(() => {
+            let e = e => {
+                o.current && !o.current.contains(e.target) && c(!1)
+            };
+            return document.addEventListener("click", e), () => document.removeEventListener("click", e)
+        }, []);
+        let d = t.some(s => s.key === e),
+            m = t.filter(e => "admin" !== e.key || l);
+        return (0, s.jsx)("nav", {
+            className: "sm-mainnav w-full",
+            "aria-label": "Главная навигация портала",
+            children: (0, s.jsxs)("div", {
+                className: "mx-auto flex max-w-[1280px] items-stretch overflow-x-auto px-0 md:overflow-visible",
+                children: [n.map(a => (0, s.jsx)("button", {
+                    className: `sm-mainnav-link ${e===a.key?"active":""}`,
+                    onClick: () => i(a.key),
+                    children: a.label
+                }, a.key)), (0, s.jsxs)("div", {
+                    className: "relative",
+                    ref: o,
+                    children: [(0, s.jsxs)("button", {
+                        className: `sm-mainnav-link ${d?"active":""} border-r-0`,
+                        onClick: () => c(e => !e),
+                        "aria-expanded": r,
+                        "aria-haspopup": "menu",
+                        children: ["Ещё ", (0, s.jsx)("span", {
+                            "aria-hidden": "true",
+                            children: "▾"
+                        })]
+                    }), r && (0, s.jsx)("div", {
+                        role: "menu",
+                        className: "absolute right-0 z-50 min-w-[280px] border-2 border-[#1E3A5F] bg-white shadow-lg",
+                        children: m.map(e => (0, s.jsx)("button", {
+                            role: "menuitem",
+                            className: "block w-full px-4 py-2.5 text-left text-[15px] font-semibold text-[#1E3A5F] hover:bg-[#EEF3F8]",
+                            onClick: () => {
+                                c(!1), i(e.key)
+                            },
+                            children: e.label
+                        }, e.key))
+                    })]
+                })]
+            })
+        })
+    }
+    let r = "sm_auth",
+        c = "sm_favorites";
+
+    function o(e) {
+        return ("string" == typeof e ? new Date(e) : e).toLocaleDateString("ru-RU", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "2-digit"
+        })
+    }
+
+    function d(e) {
+        let s = "string" == typeof e ? new Date(e) : e;
+        return s.toLocaleDateString("ru-RU", {
+            day: "2-digit",
+            month: "2-digit"
+        }) + " " + s.toLocaleTimeString("ru-RU", {
+            hour: "2-digit",
+            minute: "2-digit"
+        })
+    }
+    let m = [{
+        cls: "red",
+        b1: "World Class",
+        b2: "797-999"
+    }, {
+        cls: "gray1",
+        b1: "Дизайн Куле",
+        b2: "ул. Есенина 15-А"
+    }, {
+        cls: "gray2",
+        b1: "Шиномонтаж и Балансировка колес",
+        b2: ""
+    }, {
+        cls: "yellow",
+        b1: "Внимание!",
+        b2: "Изготовление дубликатов номеров"
+    }];
+
+    function h(e) {
+        let s = "string" == typeof e ? new Date(e) : e,
+            a = new Date;
+        return s.getFullYear() === a.getFullYear() && s.getMonth() === a.getMonth() && s.getDate() === a.getDate() ? s.toLocaleTimeString("ru-RU", {
+            hour: "2-digit",
+            minute: "2-digit"
+        }) : o(s)
+    }
+
+    function u(e) {
+        return e.toLocaleString("ru-RU")
+    }
+
+    function x({
+        name: e,
+        gender: a,
+        onOpen: l,
+        className: n
+    }) {
+        return (0, s.jsx)("a", {
+            className: `sk-nick g-${"male"===a||"female"===a?a:"neutral"}${n?` ${n}`:""}`,
+            title: `Профиль: ${e}`,
+            onClick: s => {
+                s.stopPropagation(), l && l(e)
+            },
+            children: e
+        })
+    }
+
+    function p() {
+        let [e, n] = (0, a.useState)("home"), {
+            user: t,
+            token: o,
+            login: d,
+            logout: h
+        } = function() {
+            let [e, s] = (0, a.useState)(null), [l, n] = (0, a.useState)(null), [t, i] = (0, a.useState)(!1);
+            (0, a.useEffect)(() => {
+                let e = !1;
+                return Promise.resolve().then(() => {
+                    if (!e) {
+                        try {
+                            let e = localStorage.getItem(r);
+                            if (e) {
+                                let a = JSON.parse(e);
+                                a.token && a.user && (n(a.token), s(a.user), fetch(`/api/auth/me?token=${encodeURIComponent(a.token)}`).then(e => e.ok ? e.json() : Promise.reject()).then(e => s(e.user)).catch(() => {
+                                    localStorage.removeItem(r), n(null), s(null)
+                                }))
+                            }
+                        } catch {}
+                        i(!0)
+                    }
+                }), () => {
+                    e = !0
+                }
+            }, []);
+            let c = (0, a.useCallback)((e, a) => {
+                    localStorage.setItem(r, JSON.stringify({
+                        token: e,
+                        user: a
+                    })), n(e), s(a)
+                }, []),
+                o = (0, a.useCallback)(() => {
+                    l && fetch(`/api/auth/me?token=${encodeURIComponent(l)}`, {
+                        method: "DELETE"
+                    }).catch(() => {}), localStorage.removeItem(r), n(null), s(null)
+                }, [l]);
+            return {
+                user: e,
+                token: l,
+                ready: t,
+                login: c,
+                logout: o
+            }
+        }(), u = function() {
+            let [e, s] = (0, a.useState)([]);
+            (0, a.useEffect)(() => {
+                let e = !1;
+                return Promise.resolve().then(() => {
+                    if (!e) try {
+                        let e = localStorage.getItem(c);
+                        e && s(JSON.parse(e))
+                    } catch {}
+                }), () => {
+                    e = !0
+                }
+            }, []);
+            let l = (0, a.useCallback)(a => {
+                    var l;
+                    s(l = e.includes(a) ? e.filter(e => e !== a) : [...e, a]), localStorage.setItem(c, JSON.stringify(l))
+                }, [e]),
+                n = (0, a.useCallback)(s => e.includes(s), [e]);
+            return {
+                ids: e,
+                toggle: l,
+                has: n
+            }
+        }(), [x, p] = (0, a.useState)(!1), [N, f] = (0, a.useState)(!1), [v, w] = (0, a.useState)(""), [y, C] = (0, a.useState)("new"), [I, L] = (0, a.useState)(null), [D, B] = (0, a.useState)([]), [M, U] = (0, a.useState)(!1), J = (0, a.useCallback)(e => {
+            w(e), window.setTimeout(() => w(""), 3500)
+        }, []), q = (0, a.useRef)([]), H = (0, a.useCallback)(() => {
+            let e = new URLSearchParams(window.location.search),
+                s = e.get("scope");
+            C(s && ["new", "popular", "active", "mine", "participated", "favorites", "unanswered", "archive"].includes(s) ? s : "new");
+            let a = e.get("rubric") || "";
+            if (a) {
+                let e = q.current.flatMap(e => [e, ...e.children]).find(e => e.slug === a);
+                L(e ? {
+                    slug: e.slug,
+                    name: e.name
+                } : null)
+            } else L(null);
+            let l = e.get("topic");
+            if (l) {
+                ee(null), W(parseInt(l)), n("forum"), X(parseInt(e.get("msg") || "") || null);
+                return
+            }
+            let t = e.get("user");
+            if (t) {
+                W(null), X(null), ee(t);
+                return
+            }
+            ee(null), W(null), X(null), n(e.get("view") || "home")
+        }, []);
+        (0, a.useEffect)(() => (H(), window.addEventListener("popstate", H), () => window.removeEventListener("popstate", H)), [H]), (0, a.useEffect)(() => {
+            let e = new URLSearchParams(window.location.search),
+                s = e.get("verify"),
+                a = e.get("reset");
+            s ? fetch(`/api/auth/verify?token=${encodeURIComponent(s)}`).then(async e => {
+                let s = await e.json();
+                if (!e.ok) throw Error(s.error || "Не удалось подтвердить email");
+                return s
+            }).then(e => {
+                d(e.user.token, e.user), J("Email подтверждён — добро пожаловать на форум!")
+            }).catch(e => J(e instanceof Error ? e.message : "Не удалось подтвердить email")).finally(() => window.history.replaceState(null, "", "/")) : a && (ea(a), window.history.replaceState(null, "", "/"))
+        }, [d, J]), (0, a.useEffect)(() => {
+            if (0 === D.length) return;
+            q.current = D;
+            let e = new URLSearchParams(window.location.search).get("rubric");
+            if (e) {
+                let s = D.flatMap(e => [e, ...e.children]).find(s => s.slug === e);
+                L(s ? {
+                    slug: s.slug,
+                    name: s.name
+                } : null)
+            }
+        }, [D]);
+        let G = (0, a.useCallback)(e => {
+                W(null), X(null), ee(null), n(e);
+                let s = "home" === e ? "/" : `/?view=${e}`;
+                window.history.pushState(null, "", s), window.scrollTo(0, 0)
+            }, []),
+            _ = (0, a.useCallback)(() => {
+                W(null), X(null), ee(null), C("new"), L(null), window.history.pushState(null, "", "/"), window.scrollTo(0, 0)
+            }, []),
+            z = (0, a.useCallback)(() => {
+                let e = new URLSearchParams;
+                "new" !== en.current && e.set("scope", en.current), et.current && e.set("rubric", et.current.slug);
+                let s = e.toString();
+                return s ? `&${s}` : ""
+            }, []),
+            K = (0, a.useCallback)(e => {
+                n("forum"), W(e), X(null), window.history.pushState(null, "", `/?topic=${e}${z()}`), window.scrollTo(0, 0)
+            }, [z]),
+            V = (0, a.useCallback)((e, s) => {
+                n("forum"), W(e), X(s), window.history.pushState(null, "", `/?topic=${e}${s?`&msg=${s}`:""}${z()}`), window.scrollTo(0, 0)
+            }, [z]),
+            [Y, W] = (0, a.useState)(null),
+            [Q, X] = (0, a.useState)(null),
+            [Z, ee] = (0, a.useState)(null),
+            [es, ea] = (0, a.useState)(null),
+            el = (0, a.useCallback)(e => {
+                W(null), X(null), ee(e), window.history.pushState(null, "", `/?user=${encodeURIComponent(e)}`), window.scrollTo(0, 0)
+            }, []),
+            en = (0, a.useRef)("new"),
+            et = (0, a.useRef)(null);
+        (0, a.useEffect)(() => {
+            en.current = y
+        }, [y]), (0, a.useEffect)(() => {
+            et.current = I
+        }, [I]);
+        let ei = (0, a.useCallback)(() => !!t || (p(!0), !1), [t]),
+            er = (0, a.useCallback)(e => {
+                if (("mine" === e || "participated" === e) && !t) {
+                    U(!1), p(!0);
+                    return
+                }
+                C(e), L(null), W(null), X(null), ee(null), U(!1), window.history.pushState(null, "", "new" === e ? "/" : `/?scope=${e}`), window.scrollTo(0, 0)
+            }, [t]),
+            ec = (0, a.useCallback)(e => {
+                C("new"), L(e), W(null), X(null), ee(null), U(!1), window.history.pushState(null, "", e ? `/?rubric=${encodeURIComponent(e.slug)}` : "/"), window.scrollTo(0, 0)
+            }, []);
+        return (0, a.useEffect)(() => {
+            0 === D.length && fetch("/api/bootstrap").then(e => e.json()).then(e => B(e.rubrics || [])).catch(() => {})
+        }, []), (0, s.jsxs)("div", {
+            className: "sm-page flex min-h-screen flex-col",
+            children: [(0, s.jsx)(l, {}), (0, s.jsx)(i, {
+                current: e,
+                isAdmin: t?.role === "admin",
+                onNavigate: G
+            }), (0, s.jsxs)("div", {
+                className: "sk",
+                style: {
+                    minHeight: 0,
+                    flex: "1 0 auto"
+                },
+                children: [(0, s.jsxs)("div", {
+                    className: "sk-topbar",
+                    children: [(0, s.jsx)("button", {
+                        "aria-label": "Открыть меню",
+                        onClick: () => U(!0),
+                        children: "☰ Меню"
+                    }), (0, s.jsx)("span", {
+                        className: "tb-title",
+                        children: "Форум"
+                    }), (0, s.jsx)("button", {
+                        className: "tb-home",
+                        "aria-label": "На главную страницу",
+                        onClick: () => G("home"),
+                        children: "Главная"
+                    })]
+                }), M && (0, s.jsx)("div", {
+                    className: "sk-menu-backdrop",
+                    onClick: () => U(!1)
+                }), (0, s.jsx)("div", {
+                    className: "sk-shell",
+                    children: (0, s.jsxs)("div", {
+                        className: "sk-layout",
+                        children: [(0, s.jsx)(j, {
+                            rubrics: D,
+                            user: t,
+                            scope: y,
+                            rubricFilter: I,
+                            open: M,
+                            onScope: er,
+                            onRubric: ec,
+                            onAddTopic: () => {
+                                U(!1), ei() && f(!0)
+                            },
+                            onNeedAuth: () => {
+                                U(!1), p(!0)
+                            },
+                            onLogout: () => {
+                                h(), U(!1)
+                            },
+                            onGoAdmin: () => {
+                                U(!1), G("admin")
+                            },
+                            onOpenProfile: el
+                        }), (0, s.jsx)("div", {
+                            className: "sk-col-main",
+                            children: Z && !Y ? (0, s.jsx)(T, {
+                                nick: Z,
+                                onOpenTopic: K,
+                                onOpenTopicAt: V,
+                                onGoForumHome: _
+                            }) : "home" === e || "forum" === e ? Y ? (0, s.jsx)(b, {
+                                topicId: Y,
+                                user: t,
+                                token: o,
+                                favorites: u,
+                                jumpMsg: Q,
+                                backParams: z(),
+                                onJumpDone: () => X(null),
+                                onBack: () => {
+                                    let e, s;
+                                    return W(null), X(null), e = new URLSearchParams, "new" !== y && e.set("scope", y), I && e.set("rubric", I.slug), s = e.toString(), void window.history.pushState(null, "", s ? `/?${s}` : "/")
+                                },
+                                onGoForumHome: _,
+                                onOpenRubric: ec,
+                                onNeedAuth: () => p(!0),
+                                onNewTopic: () => {
+                                    ei() && f(!0)
+                                },
+                                onOpenProfile: el,
+                                notify: J
+                            }) : (0, s.jsx)(g, {
+                                scope: y,
+                                onScope: er,
+                                rubricFilter: I,
+                                user: t,
+                                token: o,
+                                favorites: u,
+                                onOpenTopic: K,
+                                onOpenTopicAt: V,
+                                onAddTopic: () => ei() ? f(!0) : void 0,
+                                onNeedAuth: () => p(!0),
+                                onOpenRubric: ec,
+                                onOpenProfile: el
+                            }) : "rules" === e ? (0, s.jsx)($, {
+                                onOpenTopic: K
+                            }) : "appeal" === e ? (0, s.jsx)(O, {
+                                notify: J
+                            }) : "about" === e ? (0, s.jsx)(P, {}) : "admin" === e ? (0, s.jsx)(F, {
+                                token: o,
+                                user: t,
+                                notify: J,
+                                onNeedAuth: () => p(!0)
+                            }) : (0, s.jsx)(R, {
+                                view: e,
+                                onForum: () => G("forum")
+                            })
+                        }), (0, s.jsxs)("aside", {
+                            className: "sk-col-right",
+                            children: [(0, s.jsx)(k, {
+                                onOpenTopic: K
+                            }), m.map((e, a) => (0, s.jsxs)("div", {
+                                className: `sk-banner ${e.cls}`,
+                                children: [(0, s.jsx)("span", {
+                                    className: "b1",
+                                    children: e.b1
+                                }), e.b2 && (0, s.jsx)("span", {
+                                    className: "b2",
+                                    children: e.b2
+                                })]
+                            }, a))]
+                        })]
+                    })
+                }), (0, s.jsx)("footer", {
+                    className: "sk-footer",
+                    children: (0, s.jsxs)("div", {
+                        className: "inner",
+                        children: [(0, s.jsx)("span", {
+                            children: "© 2026 SakhMatrix — Сахалинская матрица взаимопомощи · ИИ-модерация · вход по email"
+                        }), (0, s.jsx)("span", {
+                            children: "Спроси у города — город ответит."
+                        })]
+                    })
+                })]
+            }), x && (0, s.jsx)(S, {
+                onClose: () => p(!1),
+                onLogin: (e, s) => {
+                    d(e, s), J(`Вы вошли как ${s.nickname}`)
+                }
+            }), es && (0, s.jsx)(E, {
+                token: es,
+                onClose: () => ea(null),
+                onLogin: (e, s) => {
+                    d(e, s), J("Пароль изменён. Вы вошли на форум")
+                }
+            }), N && o && (0, s.jsx)(A, {
+                token: o,
+                initialRubric: I,
+                onClose: () => f(!1),
+                onCreated: e => {
+                    f(!1), K(e), J("Тема опубликована")
+                }
+            }), v && (0, s.jsx)("div", {
+                className: "fixed bottom-4 left-1/2 z-[90] -translate-x-1/2 border-2 border-[#1E3A5F] bg-white px-4 py-2 text-[14px] font-semibold text-[#1E3A5F] shadow-lg",
+                children: v
+            })]
+        })
+    }
+
+    function j(e) {
+        let {
+            rubrics: l,
+            user: n,
+            scope: t,
+            rubricFilter: i
+        } = e, [r, c] = (0, a.useState)(null), o = l.find(e => e.isService), d = o?.children?.find(e => e.name.toLowerCase().includes("модератору"));
+        return (0, s.jsxs)("aside", {
+            className: `sk-col-left ${e.open?"open":""}`,
+            children: [(0, s.jsxs)("div", {
+                className: "sk-sideblock",
+                children: [(0, s.jsx)("a", {
+                    className: "sk-addtopic",
+                    onClick: e.onAddTopic,
+                    children: "Добавить тему »"
+                }), (0, s.jsx)("div", {
+                    className: "sk-userline",
+                    children: n ? (0, s.jsxs)(s.Fragment, {
+                        children: ["Вы вошли как:", " ", (0, s.jsx)(x, {
+                            name: n.nickname,
+                            gender: n.gender,
+                            onOpen: e.onOpenProfile,
+                            title: "Ваш публичный профиль"
+                        }), " ", (0, s.jsx)("a", {
+                            onClick: e.onLogout,
+                            children: "[выйти]"
+                        })]
+                    }) : (0, s.jsxs)(s.Fragment, {
+                        children: ["Вы не вошли. ", (0, s.jsx)("a", {
+                            onClick: e.onNeedAuth,
+                            children: "Вход / регистрация"
+                        })]
+                    })
+                }), (0, s.jsx)("a", {
+                    className: "sk-homebtn",
+                    onClick: () => e.onScope("new"),
+                    children: "Главная"
+                })]
+            }), (0, s.jsxs)("div", {
+                className: "sk-sideblock",
+                children: [(0, s.jsxs)("div", {
+                    className: "sk-blocktitle",
+                    children: [(0, s.jsx)("span", {
+                        className: "tri",
+                        children: "▼"
+                    }), "Навигация"]
+                }), (0, s.jsx)("ul", {
+                    className: "sk-navlist",
+                    children: [{
+                        key: "new",
+                        label: "Новые сообщения"
+                    }, {
+                        key: "popular",
+                        label: "Популярные темы"
+                    }, {
+                        key: "active",
+                        label: "Активные темы"
+                    }, {
+                        key: "mine",
+                        label: "Мои темы"
+                    }, {
+                        key: "participated",
+                        label: "Мои сообщения"
+                    }, {
+                        key: "favorites",
+                        label: "Избранное"
+                    }, {
+                        key: "archive",
+                        label: "Архив тем"
+                    }].map(a => (0, s.jsx)("li", {
+                        children: (0, s.jsx)("a", {
+                            className: t !== a.key || i ? "" : "active",
+                            onClick: () => e.onScope(a.key),
+                            children: a.label
+                        })
+                    }, a.key))
+                })]
+            }), (0, s.jsxs)("div", {
+                className: "sk-sideblock",
+                children: [(0, s.jsxs)("div", {
+                    className: "sk-blocktitle",
+                    children: [(0, s.jsx)("span", {
+                        className: "tri",
+                        children: "▼"
+                    }), "Рубрики форума"]
+                }), (0, s.jsx)("ul", {
+                    className: "sk-navlist",
+                    children: l.filter(e => !e.isService).map(a => (0, s.jsxs)("li", {
+                        className: "sk-rubric-row",
+                        children: [(0, s.jsxs)("button", {
+                            className: `sk-rubric-name ${i?.slug===a.slug?"active":""}`,
+                            onClick: () => {
+                                if (i?.slug === a.slug) {
+                                    e.onRubric(null), c(null);
+                                    return
+                                }
+                                e.onRubric({
+                                    slug: a.slug,
+                                    name: a.name
+                                }), c(r === a.slug ? null : a.slug)
+                            },
+                            children: [a.name, a.children.length > 0 && (0, s.jsx)("span", {
+                                className: `arr ${r===a.slug?"open":""}`,
+                                children: "▶"
+                            })]
+                        }), r === a.slug && a.children.length > 0 && (0, s.jsx)("ul", {
+                            className: "sk-sublist",
+                            children: a.children.map(l => (0, s.jsx)("li", {
+                                children: (0, s.jsx)("button", {
+                                    className: i?.slug === l.slug ? "active" : "",
+                                    onClick: () => e.onRubric({
+                                        slug: l.slug,
+                                        name: `${a.name} → ${l.name}`
+                                    }),
+                                    children: l.name
+                                })
+                            }, l.id))
+                        })]
+                    }, a.id))
+                })]
+            }), (0, s.jsxs)("div", {
+                className: "sk-sideblock",
+                children: [(0, s.jsxs)("div", {
+                    className: "sk-blocktitle",
+                    children: [(0, s.jsx)("span", {
+                        className: "tri",
+                        children: "▼"
+                    }), "Служебный раздел"]
+                }), (0, s.jsxs)("ul", {
+                    className: "sk-navlist",
+                    children: [d ? (0, s.jsx)("li", {
+                        children: (0, s.jsx)("a", {
+                            className: i?.slug === d.slug ? "active" : "",
+                            onClick: () => e.onRubric({
+                                slug: d.slug,
+                                name: d.name
+                            }),
+                            children: "Предложения и вопросы модератору"
+                        })
+                    }) : null, e.user?.role === "admin" && (0, s.jsx)("li", {
+                        children: (0, s.jsx)("a", {
+                            onClick: e.onGoAdmin,
+                            children: "ИИ-модерация и защита"
+                        })
+                    })]
+                })]
+            })]
+        })
+    }
+
+    function k(e) {
+        let [l, n] = (0, a.useState)([]);
+        (0, a.useEffect)(() => {
+            fetch("/api/topics?scope=pinned&perPage=8").then(async e => e.ok ? e.json() : {
+                topics: []
+            }).then(e => n(e.topics || [])).catch(() => n([]))
+        }, []);
+        let t = l.find(e => e.title.toLowerCase().startsWith("правила"));
+        return (0, s.jsxs)(s.Fragment, {
+            children: [(0, s.jsxs)("div", {
+                className: "sk-sidezone",
+                children: [(0, s.jsxs)("div", {
+                    className: "sk-blocktitle",
+                    children: [(0, s.jsx)("span", {
+                        className: "tri",
+                        children: "▼"
+                    }), "Закреплённые темы"]
+                }), (0, s.jsxs)("ul", {
+                    className: "sk-navlist sk-pinned",
+                    children: [0 === l.length && (0, s.jsx)("li", {
+                        className: "sk-pinned-empty",
+                        children: "Пока нет закреплённых тем"
+                    }), l.map(a => (0, s.jsxs)("li", {
+                        children: [(0, s.jsx)("a", {
+                            onClick: () => e.onOpenTopic(a.id),
+                            children: a.title
+                        }), (0, s.jsxs)("span", {
+                            className: "sk-pinned-meta",
+                            children: [a.answers, " отв. · ", u(a.views), " просм. · ", o(a.lastActivityAt)]
+                        })]
+                    }, a.id))]
+                })]
+            }), (0, s.jsxs)("div", {
+                className: "sk-sidezone",
+                children: [(0, s.jsxs)("div", {
+                    className: "sk-blocktitle",
+                    children: [(0, s.jsx)("span", {
+                        className: "tri",
+                        children: "▼"
+                    }), "Правила форума"]
+                }), (0, s.jsxs)("ul", {
+                    className: "sk-ruleslist",
+                    children: [(0, s.jsx)("li", {
+                        children: "Без оскорблений и переходов на личности"
+                    }), (0, s.jsx)("li", {
+                        children: "Реклама — только в разделе «Товары и услуги» и без спама"
+                    }), (0, s.jsx)("li", {
+                        children: "Политика — вне форума"
+                    }), (0, s.jsx)("li", {
+                        children: "Один вопрос — одна тема, дубли удаляются"
+                    }), (0, s.jsx)("li", {
+                        children: "За порядком следит ИИ-модерация: нарушения скрываются, решения можно обжаловать"
+                    })]
+                }), t && (0, s.jsx)("a", {
+                    className: "sk-ruleslink",
+                    onClick: () => e.onOpenTopic(t.id),
+                    children: "Читать правила полностью »"
+                })]
+            })]
+        })
+    }
+
+    function g(e) {
+        let {
+            user: l,
+            token: n,
+            favorites: t,
+            scope: i,
+            rubricFilter: r
+        } = e, [c, d] = (0, a.useState)(""), [m, h] = (0, a.useState)([]), [p, j] = (0, a.useState)(0), [k, g] = (0, a.useState)(1), [b, f] = (0, a.useState)(1), [v, w] = (0, a.useState)(!0), [y, C] = (0, a.useState)(""), [S, E] = (0, a.useState)(null), [T, A] = (0, a.useState)(!1), [$, O] = (0, a.useState)({});
+        (0, a.useEffect)(() => {
+            let e = {};
+            for (let s of m) try {
+                let a = parseInt(localStorage.getItem(`sk_seen_${s.id}`) || "", 10),
+                    l = s.answers + 1 - a;
+                a >= 1 && l > 0 && (e[s.id] = l)
+            } catch {}
+            O(e)
+        }, [m]);
+        let [P, F] = (0, a.useState)(""), R = `${i}|${r?.slug??""}`;
+        P !== R && (F(R), g(1), E(null), d(""));
+        let I = async () => {
+            let e = c.trim();
+            if (e.length < 2) return void E([]);
+            A(!0);
+            try {
+                let s = await fetch("/api/search?q=" + encodeURIComponent(e)),
+                    a = await s.json();
+                E(a.results || [])
+            } catch {
+                E([])
+            } finally {
+                A(!1)
+            }
+        }, L = (0, a.useRef)(0), D = (0, a.useCallback)(() => {
+            let e = ++L.current;
+            if (("mine" === i || "participated" === i) && !n || "favorites" === i && 0 === t.ids.length) {
+                h([]), j(0), f(1), w(!1), C("");
+                return
+            }
+            w(!0), C("");
+            let s = new URLSearchParams({
+                page: String(k),
+                perPage: "25"
+            });
+            c.trim() && s.set("q", c.trim()), "popular" === i && s.set("sort", "popular"), "unanswered" === i && s.set("sort", "unanswered"), "active" === i && s.set("scope", "active"), "mine" === i && n && (s.set("scope", "mine"), s.set("token", n)), "participated" === i && n && (s.set("scope", "participated"), s.set("token", n)), "favorites" === i && s.set("ids", t.ids.join(",")), "archive" === i && s.set("scope", "archive"), r && s.set("rubric", r.slug), fetch(`/api/topics?${s}`).then(async e => {
+                let s = await e.json();
+                if (!e.ok) throw Error(s.error || "Ошибка загрузки");
+                return s
+            }).then(s => {
+                e === L.current && (h(s.topics || []), j(s.total || 0), f(s.pages || 1))
+            }).catch(s => {
+                e === L.current && C(s.message)
+            }).finally(() => {
+                e === L.current && w(!1)
+            })
+        }, [i, k, c, n, t.ids, r]);
+        (0, a.useEffect)(() => {
+            let e = window.setTimeout(D, 0);
+            return () => window.clearTimeout(e)
+        }, [D]);
+        let B = "new" === i ? "Последние темы" : "popular" === i ? "Популярные темы" : "unanswered" === i ? "Без ответа" : "active" === i ? "Активные темы" : "mine" === i ? "Мои темы" : "participated" === i ? "Мои сообщения" : "favorites" === i ? "Избранное" : "archive" === i ? "Архив форума" : "Форум",
+            M = r ? r.name : B,
+            U = 0 === p ? 0 : (k - 1) * 25 + 1,
+            J = Math.min(25 * k, p);
+        return (0, s.jsxs)(s.Fragment, {
+            children: [(0, s.jsxs)("div", {
+                className: "sk-forumhead",
+                children: [(0, s.jsx)("div", {
+                    className: "fh-title",
+                    children: "Форум Сахалина"
+                }), (0, s.jsx)("div", {
+                    className: "fh-desc",
+                    children: "Обсуждаем жизнь Сахалина, задаём вопросы, делимся опытом и помогаем друг другу."
+                })]
+            }), (0, s.jsx)("div", {
+                className: "sk-mainheader",
+                children: M
+            }), (0, s.jsxs)("div", {
+                className: "sk-toolbar",
+                children: [(0, s.jsxs)("div", {
+                    className: "sk-tabs",
+                    children: [(0, s.jsx)("button", {
+                        className: "new" !== i || r ? "" : "active",
+                        onClick: () => e.onScope("new"),
+                        children: "Все темы"
+                    }), (0, s.jsx)("span", {
+                        className: "sep",
+                        children: "|"
+                    }), (0, s.jsx)("button", {
+                        className: "popular" === i ? "active" : "",
+                        onClick: () => e.onScope("popular"),
+                        children: "Популярные"
+                    }), (0, s.jsx)("span", {
+                        className: "sep",
+                        children: "|"
+                    }), (0, s.jsx)("button", {
+                        className: "unanswered" === i ? "active" : "",
+                        onClick: () => e.onScope("unanswered"),
+                        children: "Без ответа"
+                    })]
+                }), (0, s.jsx)("span", {
+                    style: {
+                        flex: 1
+                    }
+                }), (0, s.jsxs)("form", {
+                    style: {
+                        display: "flex",
+                        gap: 6,
+                        alignItems: "center"
+                    },
+                    onSubmit: e => {
+                        e.preventDefault(), I()
+                    },
+                    children: [(0, s.jsx)("input", {
+                        type: "text",
+                        value: c,
+                        onChange: e => d(e.target.value),
+                        placeholder: "Поиск по названиям тем и сообщениям…"
+                    }), (0, s.jsx)("button", {
+                        className: "sk-btn-classic",
+                        style: {
+                            margin: 0,
+                            padding: "2px 10px",
+                            fontSize: 12
+                        },
+                        type: "submit",
+                        children: "Найти"
+                    }), (0, s.jsx)("button", {
+                        className: "sk-btn-classic",
+                        style: {
+                            margin: 0,
+                            padding: "2px 10px",
+                            fontSize: 12
+                        },
+                        type: "button",
+                        onClick: e.onAddTopic,
+                        children: "+ Новая тема"
+                    })]
+                })]
+            }), r && (0, s.jsxs)("div", {
+                className: "sk-note",
+                children: ["Рубрика: ", (0, s.jsx)("b", {
+                    children: r.name
+                }), " — ", (0, s.jsx)("a", {
+                    onClick: () => e.onScope("new"),
+                    children: "сбросить фильтр"
+                })]
+            }), "mine" !== i && "participated" !== i || n ? null !== S ? T ? (0, s.jsx)("div", {
+                className: "sk-loading",
+                children: "Идёт поиск…"
+            }) : (0, s.jsxs)("div", {
+                className: "sk-searchres",
+                children: [(0, s.jsxs)("div", {
+                    className: "sk-searchres-head",
+                    children: ["Поиск «", c.trim(), "» — найдено: ", (0, s.jsx)("b", {
+                        children: S.length
+                    }), " · ", (0, s.jsx)("a", {
+                        onClick: () => {
+                            E(null), d(""), g(1)
+                        },
+                        children: "вернуться к темам"
+                    })]
+                }), 0 === S.length ? (0, s.jsx)("div", {
+                    className: "sk-loading",
+                    children: "Ничего не найдено. Поиск ведётся по словам в названиях тем и тексте сообщений — попробуйте часть слова, например «краб»."
+                }) : S.map((a, l) => (0, s.jsxs)("div", {
+                    className: "sk-searchrow",
+                    onClick: () => e.onOpenTopicAt(a.topicId, a.messageNum),
+                    children: [(0, s.jsxs)("div", {
+                        className: "sr-title",
+                        children: [(0, s.jsx)("a", {
+                            children: a.title
+                        }), null != a.messageNum ? (0, s.jsxs)("span", {
+                            className: "sr-badge",
+                            children: ["сообщение №", a.messageNum]
+                        }) : (0, s.jsx)("span", {
+                            className: "sr-badge sr-badge-title",
+                            children: "в названии темы"
+                        }), a.isArchived && (0, s.jsx)("span", {
+                            className: "sr-badge sr-badge-lifecycle",
+                            children: "В архиве"
+                        }), !a.isArchived && a.isClosed && (0, s.jsx)("span", {
+                            className: "sr-badge sr-badge-lifecycle closed",
+                            children: "Закрыта"
+                        })]
+                    }), "message" === a.type && (0, s.jsx)("div", {
+                        className: "sr-snippet",
+                        children: a.snippet
+                    }), (0, s.jsxs)("div", {
+                        className: "sr-meta",
+                        children: [a.rubricName, a.rubricName && " · ", (0, s.jsx)(x, {
+                            name: a.author,
+                            gender: a.authorGender,
+                            onOpen: e.onOpenProfile
+                        })]
+                    })]
+                }, `${a.topicId}-${a.messageNum??"t"}-${l}`))]
+            }) : v ? (0, s.jsx)("div", {
+                className: "sk-loading",
+                children: "Загрузка тем…"
+            }) : y ? y.includes("Войдите") ? (0, s.jsx)(N, {
+                scope: i,
+                onNeedAuth: e.onNeedAuth
+            }) : (0, s.jsx)("div", {
+                className: "sk-error",
+                children: y
+            }) : 0 === m.length ? (0, s.jsx)("div", {
+                className: "sk-loading",
+                children: "archive" === i ? "Архив пуст. Темы автоматически уходят в архив, если с последнего сообщения прошло больше года." : (0, s.jsxs)(s.Fragment, {
+                    children: ["Тем не найдено. ", "favorites" === i && "Добавляйте темы в избранное кнопкой «☆ Добавить в избранное» внутри темы."]
+                })
+            }) : (0, s.jsxs)(s.Fragment, {
+                children: [(0, s.jsxs)("div", {
+                    className: "sk-listhead",
+                    children: [(0, s.jsx)("div", {
+                        children: "Тема"
+                    }), (0, s.jsx)("div", {
+                        className: "col-author",
+                        children: "Автор"
+                    }), (0, s.jsx)("div", {
+                        className: "num",
+                        children: "Ответы"
+                    }), (0, s.jsx)("div", {
+                        className: "num col-views",
+                        children: "Просмотры"
+                    }), (0, s.jsx)("div", {
+                        children: "Последнее"
+                    })]
+                }), m.map(a => (0, s.jsxs)("div", {
+                    className: `sk-row ${a.isPinned?"pinned":""}`,
+                    children: [(0, s.jsxs)("div", {
+                        className: "r-title",
+                        children: [(0, s.jsx)("a", {
+                            onClick: () => e.onOpenTopic(a.id),
+                            children: a.title
+                        }), a.isPinned && (0, s.jsx)("span", {
+                            className: "sk-status-badge pin",
+                            children: "Закреплена"
+                        }), a.isArchived ? (0, s.jsx)("span", {
+                            className: "sk-status-badge archived",
+                            children: "В архиве"
+                        }) : a.isClosed && (0, s.jsx)("span", {
+                            className: "sk-status-badge closed",
+                            children: "Закрыта"
+                        }), $[a.id] ? (0, s.jsx)("span", {
+                            className: "sk-newbadge",
+                            title: `Новых сообщений: ${$[a.id]} (с вашего последнего посещения)`,
+                            children: "Новое"
+                        }) : null, (0, s.jsx)("span", {
+                            className: "r-sub",
+                            children: (0, s.jsxs)("a", {
+                                onClick: s => {
+                                    s.stopPropagation(), e.onOpenRubric({
+                                        slug: a.rubricSlug || "",
+                                        name: a.subName ? `${a.rubricName} → ${a.subName}` : a.rubricName
+                                    })
+                                },
+                                children: [a.rubricName, a.subName ? ` → ${a.subName}` : ""]
+                            })
+                        })]
+                    }), (0, s.jsx)("div", {
+                        className: "r-author",
+                        children: (0, s.jsx)(x, {
+                            name: a.author,
+                            gender: a.authorGender,
+                            onOpen: e.onOpenProfile
+                        })
+                    }), (0, s.jsx)("div", {
+                        className: "r-num",
+                        children: a.answers
+                    }), (0, s.jsx)("div", {
+                        className: "r-num r-views",
+                        children: u(a.views)
+                    }), (0, s.jsxs)("div", {
+                        className: "r-last",
+                        children: [(0, s.jsx)(x, {
+                            name: a.lastAuthor,
+                            gender: a.lastAuthorGender,
+                            onOpen: e.onOpenProfile
+                        }), (0, s.jsx)("span", {
+                            className: "r-time",
+                            children: o(a.lastActivityAt)
+                        })]
+                    })]
+                }, a.id)), (0, s.jsxs)("div", {
+                    className: "sk-pager",
+                    style: {
+                        marginTop: 10
+                    },
+                    children: [(0, s.jsxs)("span", {
+                        children: ["Темы ", U, " - ", J, " из ", (0, s.jsx)("b", {
+                            children: u(p)
+                        })]
+                    }), b > 1 && (0, s.jsxs)("span", {
+                        className: "pg-pages",
+                        children: [(0, s.jsx)("span", {
+                            children: "страницы:"
+                        }), Array.from({
+                            length: Math.min(b, 12)
+                        }, (e, s) => s + 1).map(e => e === k ? (0, s.jsx)("span", {
+                            className: "pg-cur",
+                            children: e
+                        }, e) : (0, s.jsx)("a", {
+                            className: "pg-num",
+                            onClick: () => g(e),
+                            children: e
+                        }, e)), b > 12 && (0, s.jsx)("span", {
+                            children: "…"
+                        })]
+                    })]
+                })]
+            }) : (0, s.jsx)(N, {
+                scope: i,
+                onNeedAuth: e.onNeedAuth
+            })]
+        })
+    }
+
+    function N({
+        scope: e,
+        onNeedAuth: a
+    }) {
+        return (0, s.jsxs)("div", {
+            className: "sk-authneed",
+            children: [(0, s.jsx)("div", {
+                className: "an-title",
+                children: "mine" === e ? "Мои темы — вход на форум" : "Мои сообщения — вход на форум"
+            }), (0, s.jsxs)("p", {
+                children: ["Этот раздел собирает ", "mine" === e ? "темы, которые вы создавали" : "темы, где вы оставляли сообщения", ". Доступен только авторизованным пользователям — войдите по email или зарегистрируйтесь (email и пароль), это займёт меньше минуты."]
+            }), (0, s.jsx)("button", {
+                className: "sk-btn-classic",
+                onClick: a,
+                children: "Войти или зарегистрироваться"
+            })]
+        })
+    }
+
+    function b(e) {
+        let {
+            topicId: l,
+            token: n,
+            favorites: t
+        } = e, [i, r] = (0, a.useState)(null), [c, o] = (0, a.useState)([]), [m, p] = (0, a.useState)(!0), [j, k] = (0, a.useState)(""), [g, N] = (0, a.useState)(null), [b, w] = (0, a.useState)(!1), [C, S] = (0, a.useState)(""), [E, T] = (0, a.useState)(!1), [A, $] = (0, a.useState)(null), [O, P] = (0, a.useState)(50), [F, R] = (0, a.useState)(0), [I, L] = (0, a.useState)(""), [D, B] = (0, a.useState)(null), [M, U] = (0, a.useState)(0), [J, q] = (0, a.useState)(0), H = (0, a.useRef)(null), [G, _] = (0, a.useState)(null), [z, K] = (0, a.useState)(() => e.jumpMsg ? Math.max(1, Math.ceil(e.jumpMsg / 50)) : 1), [V, Y] = (0, a.useState)(1), W = (0, a.useRef)(0), Q = (0, a.useCallback)(() => {
+            let e = ++W.current;
+            p(!0);
+            let s = !1;
+            try {
+                let e = `sk_viewed_${l}`;
+                (s = !sessionStorage.getItem(e)) && sessionStorage.setItem(e, "1")
+            } catch {
+                s = !1
+            }
+            fetch(`/api/topics/${l}?page=${z}${s?"&view=1":""}`).then(async e => {
+                let s = await e.json();
+                if (!e.ok) {
+                    let a = Error(s.error || "Тема не найдена");
+                    throw a.status = e.status, a
+                }
+                return s
+            }).then(s => {
+                if (e === W.current) {
+                    _(null), r(s.topic), o(s.messages || []), Y(s.pages || 1), R(s.total || 0), s.perPage && P(s.perPage);
+                    try {
+                        let e = `sk_seen_${l}`;
+                        if (H.current !== l) {
+                            let a = parseInt(localStorage.getItem(e) || "", 10),
+                                n = s.total || 0;
+                            if (!a || a < 1) U(0), q(0);
+                            else {
+                                let e = Math.max(0, n - a);
+                                U(e), q(e > 0 ? n - e + 1 : 0)
+                            }
+                            localStorage.setItem(e, String(n)), H.current = l
+                        }
+                    } catch {
+                        U(0)
+                    }
+                }
+            }).catch(s => {
+                e === W.current && (r(null), _({
+                    msg: s instanceof Error ? s.message : "Тема не найдена",
+                    deleted: 410 === s.status
+                }))
+            }).finally(() => {
+                e === W.current && p(!1)
+            })
+        }, [l, z]);
+        (0, a.useEffect)(() => {
+            let e = window.setTimeout(Q, 0);
+            return () => window.clearTimeout(e)
+        }, [Q]);
+        let X = (0, a.useRef)(null),
+            Z = (0, a.useRef)(null),
+            ee = e => {
+                let s = () => {
+                    let s = e.getBoundingClientRect();
+                    if (s.height <= 0) return;
+                    let a = window.scrollY + s.top - Math.max(0, (window.innerHeight - s.height) / 2);
+                    window.scrollTo({
+                        top: Math.max(0, a),
+                        behavior: "smooth"
+                    })
+                };
+                s(), window.setTimeout(s, 350), e.classList.add("sk-msg-flash"), window.setTimeout(() => e.classList.remove("sk-msg-flash"), 2600)
+            };
+        (0, a.useEffect)(() => {
+            let s = e.jumpMsg ?? Z.current;
+            if (!s || m || 0 === c.length || X.current === s) return;
+            let a = document.querySelector(`[data-msgnum="${s}"]`);
+            a && (X.current = s, Z.current = null, ee(a), e.onJumpDone())
+        }, [e.jumpMsg, m, c.length, e.onJumpDone]);
+        let es = e => {
+                if (!e || e < 1) return;
+                let s = document.querySelector(`[data-msgnum="${e}"]`);
+                s ? ee(s) : (Z.current = e, X.current = null, K(Math.max(1, Math.ceil(e / (O || 50)))))
+            },
+            ea = async () => {
+                if (!e.user) return void e.onNeedAuth();
+                if (j.trim()) {
+                    w(!0);
+                    try {
+                        let s = await fetch(`/api/topics/${l}/messages`, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify({
+                                    body: j.trim(),
+                                    parentId: g?.id,
+                                    token: n
+                                })
+                            }),
+                            a = await s.json();
+                        if (!s.ok) throw Error(a.error || "Ошибка отправки");
+                        let t = a.message;
+                        t.isHiddenByAi ? e.notify("Опубликовано, но скрыто ИИ: " + (t.hiddenReason || "флуд") + ". Можно обжаловать через «Ещё → Обращение».") : e.notify("Сообщение опубликовано"), k(""), N(null);
+                        let i = a.message && a.message.num || null;
+                        if (i) {
+                            let e = Math.max(1, Math.ceil(i / (O || 50)));
+                            e !== z && K(e), Z.current = i, X.current = null, q(0);
+                            try {
+                                localStorage.setItem(`sk_seen_${l}`, String(i))
+                            } catch {}
+                        }(E || C.trim()) && (T(!1), S("")), Q()
+                    } catch (s) {
+                        e.notify(s instanceof Error ? s.message : "Ошибка отправки")
+                    } finally {
+                        w(!1)
+                    }
+                }
+            }, el = E && C.trim() ? c.filter(e => !e.isDeleted && !e.isHiddenByAi && e.body.toLowerCase().includes(C.trim().toLowerCase())) : c, en = async s => {
+                if (window.confirm(`Удалить сообщение №${s.num}?`)) try {
+                    let a = await fetch(`/api/messages/${s.id}`, {
+                            method: "DELETE",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                token: n
+                            })
+                        }),
+                        l = await a.json();
+                    if (!a.ok) throw Error(l.error || "Ошибка удаления");
+                    e.notify("Сообщение удалено"), Q()
+                } catch (s) {
+                    e.notify(s instanceof Error ? s.message : "Ошибка удаления")
+                }
+            }, et = t.has(i?.id ?? -1);
+        if (m && !i) return (0, s.jsx)("div", {
+            className: "sk-loading",
+            children: "Загрузка темы…"
+        });
+        if (!i) return (0, s.jsxs)(s.Fragment, {
+            children: [(0, s.jsx)("div", {
+                className: "sk-mainheader",
+                children: "Обсуждение темы"
+            }), G?.deleted ? (0, s.jsxs)("div", {
+                className: "sk-deadtopic",
+                children: [(0, s.jsx)("div", {
+                    className: "dt-title",
+                    children: "Эта тема больше недоступна."
+                }), (0, s.jsx)("div", {
+                    className: "dt-sub",
+                    children: "Тема была удалена автором или модератором. Остальные темы форума доступны в общем списке — поиск работает как обычно."
+                }), (0, s.jsx)("a", {
+                    className: "sk-backlink",
+                    onClick: e.onBack,
+                    children: "« К списку тем"
+                }), (0, s.jsx)("span", {
+                    className: "dt-sep",
+                    children: "·"
+                }), (0, s.jsx)("a", {
+                    className: "sk-backlink",
+                    style: {
+                        marginLeft: 0
+                    },
+                    onClick: e.onGoForumHome,
+                    children: "На главную форума"
+                })]
+            }) : (0, s.jsxs)(s.Fragment, {
+                children: [(0, s.jsxs)("div", {
+                    className: "sk-loading",
+                    children: [G?.msg || "Тема не найдена.", " "]
+                }), (0, s.jsx)("a", {
+                    className: "sk-backlink",
+                    onClick: e.onBack,
+                    children: "« К списку тем"
+                })]
+            })]
+        });
+        let ei = F || i.answers + 1,
+            er = !i.isClosed && !i.isArchived,
+            ec = e.user?.role === "admin",
+            eo = !!(e.user && i.author && i.author === e.user.nickname),
+            ed = async (s, a, t) => {
+                try {
+                    let i = await fetch(`/api/topics/${l}`, {
+                            method: "PATCH",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                action: s,
+                                token: n
+                            })
+                        }),
+                        r = await i.json();
+                    if (!i.ok) throw Error(r.error || "Не удалось выполнить действие");
+                    e.notify(a), t ? t() : Q()
+                } catch (s) {
+                    e.notify(s instanceof Error ? s.message : "Не удалось выполнить действие")
+                }
+            }, em = c.length ? c[0].num : 0, eh = c.length ? c[c.length - 1].num : 0, eu = E && C.trim() ? (0, s.jsxs)(s.Fragment, {
+                children: ["Найдено: ", (0, s.jsx)("b", {
+                    children: el.length
+                })]
+            }) : (0, s.jsxs)(s.Fragment, {
+                children: ["Ответы ", em, " - ", eh, " из ", (0, s.jsx)("b", {
+                    children: u(ei)
+                })]
+            }), ex = Array.from({
+                length: Math.min(V, 12)
+            }, (e, s) => s + 1), ep = () => (0, s.jsxs)("div", {
+                className: "sk-pager",
+                children: [(0, s.jsx)("span", {
+                    children: eu
+                }), V > 1 && !C.trim() && (0, s.jsxs)("span", {
+                    className: "pg-pages",
+                    children: [(0, s.jsx)("span", {
+                        children: "страницы:"
+                    }), ex.map(e => e === z ? (0, s.jsx)("span", {
+                        className: "pg-cur",
+                        children: e
+                    }, e) : (0, s.jsx)("a", {
+                        className: "pg-num",
+                        onClick: () => K(e),
+                        children: e
+                    }, e)), V > 12 && (0, s.jsx)("span", {
+                        children: "…"
+                    })]
+                }), !C.trim() && (0, s.jsxs)("span", {
+                    className: "pg-goto",
+                    children: [(0, s.jsx)("span", {
+                        children: "перейти к №"
+                    }), (0, s.jsx)("input", {
+                        value: I,
+                        onChange: e => L(e.target.value.replace(/[^0-9]/g, "")),
+                        onKeyDown: e => {
+                            "Enter" === e.key && I && (es(parseInt(I)), L(""))
+                        },
+                        "aria-label": "Перейти к сообщению по номеру"
+                    }), (0, s.jsx)("a", {
+                        onClick: () => {
+                            I && (es(parseInt(I)), L(""))
+                        },
+                        children: "»"
+                    })]
+                })]
+            }), ej = a => (0, s.jsx)(f, {
+                m: a,
+                user: e.user,
+                favDone: et,
+                isNew: J > 0 && a.num >= J,
+                canReply: er,
+                onOpenProfile: e.onOpenProfile,
+                onReply: () => {
+                    e.user ? (N(a), document.getElementById("reply-form")?.scrollIntoView({
+                        behavior: "smooth"
+                    })) : e.onNeedAuth()
+                },
+                onComplain: () => $(a),
+                onFav: () => {
+                    t.toggle(i.id), e.notify(et ? "Удалено из избранного" : "Тема добавлена в избранное")
+                },
+                onPermalink: () => {
+                    window.history.pushState(null, "", `/?topic=${i.id}&msg=${a.num}${e.backParams||""}`), es(a.num)
+                },
+                onEdit: () => B(a),
+                onDelete: () => en(a)
+            }), ek = E && !!C.trim(), eg = e => {
+                let a = el.filter(s => (s.parentId ?? null) === e);
+                return 0 === a.length ? null : a.map(e => {
+                    let a = eg(e.id);
+                    return (0, s.jsxs)("div", {
+                        children: [ej(e), a && (0, s.jsx)("div", {
+                            className: "sk-children",
+                            "data-depth": e.depth + 1,
+                            children: a
+                        })]
+                    }, e.id)
+                })
+            };
+        return (0, s.jsxs)(s.Fragment, {
+            children: [(0, s.jsxs)("div", {
+                className: "sk-crumbs",
+                children: [(0, s.jsx)("a", {
+                    onClick: e.onGoForumHome,
+                    title: "На главную страницу форума",
+                    children: "Форум"
+                }), (0, s.jsx)("span", {
+                    className: "sep",
+                    children: "→"
+                }), i.rubricName ? (0, s.jsxs)(s.Fragment, {
+                    children: [(0, s.jsx)("a", {
+                        onClick: () => e.onOpenRubric({
+                            slug: i.rubricSlug || "",
+                            name: i.rubricName
+                        }),
+                        children: i.rubricName
+                    }), (0, s.jsx)("span", {
+                        className: "sep",
+                        children: "→"
+                    })]
+                }) : null, i.subName ? (0, s.jsxs)(s.Fragment, {
+                    children: [(0, s.jsx)("a", {
+                        onClick: () => e.onOpenRubric({
+                            slug: i.subSlug || "",
+                            name: `${i.rubricName} → ${i.subName}`
+                        }),
+                        children: i.subName
+                    }), (0, s.jsx)("span", {
+                        className: "sep",
+                        children: "→"
+                    })]
+                }) : null, (0, s.jsx)("span", {
+                    className: "cur",
+                    children: i.title
+                })]
+            }), (0, s.jsxs)("div", {
+                className: "sk-topicbox",
+                children: [(0, s.jsxs)("div", {
+                    className: "t-title",
+                    children: [i.title, i.isPinned && (0, s.jsx)("span", {
+                        className: "sk-tstatus pinned",
+                        children: "Закреплена"
+                    }), i.isArchived ? (0, s.jsx)("span", {
+                        className: "sk-tstatus archived",
+                        children: "В архиве"
+                    }) : i.isClosed && (0, s.jsx)("span", {
+                        className: "sk-tstatus closed",
+                        children: "Тема закрыта"
+                    })]
+                }), (0, s.jsxs)("div", {
+                    className: "t-meta",
+                    children: ["Автор: ", (0, s.jsx)(x, {
+                        name: i.author,
+                        gender: i.authorGender,
+                        onOpen: e.onOpenProfile
+                    }), " · создана ", d(i.createdAt), " ·", " ", "просмотров: ", u(i.views), " · ответов: ", u(i.answers), " ·", " ", "обновлено: ", h(i.lastActivityAt)]
+                })]
+            }), i.isArchived && (0, s.jsxs)("div", {
+                className: "sk-archive-note",
+                children: [(0, s.jsx)("b", {
+                    children: "Тема в архиве."
+                }), " Обсуждение закрыто из-за неактуальности. Если вопрос снова актуален —", " ", (0, s.jsx)("a", {
+                    onClick: e.onNewTopic,
+                    children: "создайте новую тему"
+                }), "."]
+            }), (0, s.jsxs)("div", {
+                className: "sk-topicactions",
+                children: [(0, s.jsx)("button", {
+                    className: "sk-btn-answer",
+                    onClick: () => {
+                        i.isArchived ? e.notify("Тема в архиве — обсуждение закрыто. Создайте новую тему, если вопрос снова актуален") : i.isClosed ? e.notify("Тема закрыта для новых сообщений") : e.user ? document.getElementById("reply-form")?.scrollIntoView({
+                            behavior: "smooth"
+                        }) : e.onNeedAuth()
+                    },
+                    children: "Ответить"
+                }), M > 0 && (0, s.jsxs)("button", {
+                    onClick: () => {
+                        if (!(M <= 0)) {
+                            es(ei - M + 1);
+                            try {
+                                localStorage.setItem(`sk_seen_${l}`, String(ei))
+                            } catch {}
+                            U(0)
+                        }
+                    },
+                    title: `К первому непрочитанному — сообщение №${ei-M+1}`,
+                    children: ["→ Новые сообщения (", M, ")"]
+                }), (0, s.jsx)("button", {
+                    className: et ? "done" : "",
+                    onClick: () => {
+                        t.toggle(i.id), e.notify(et ? "Удалено из избранного" : "Добавлено в избранное")
+                    },
+                    children: et ? "★ В избранном" : "☆ Добавить в избранное"
+                }), (0, s.jsx)("button", {
+                    onClick: () => T(e => !e),
+                    children: "Поиск по теме"
+                }), ec && !i.isArchived && (i.isClosed ? (0, s.jsx)("button", {
+                    onClick: () => {
+                        window.confirm("Открыть тему снова? Пользователи смогут писать новые сообщения.") && ed("open", "Тема снова открыта — можно писать сообщения")
+                    },
+                    title: "Открыть тему снова — разрешить новые сообщения",
+                    children: "Открыть тему"
+                }) : (0, s.jsx)("button", {
+                    onClick: () => {
+                        window.confirm("Закрыть тему? Читать её сможет каждый, но новые сообщения будут запрещены. Открыть снова сможет модератор.") && ed("close", "Тема закрыта — новые сообщения запрещены")
+                    },
+                    title: "Закрыть тему: читать можно, новые сообщения запрещены",
+                    children: "Закрыть тему"
+                })), (ec || eo) && (0, s.jsx)("button", {
+                    className: "sk-topicdel",
+                    onClick: () => {
+                        window.confirm("Удалить тему? Она исчезнет из списков и поиска, а ссылки на неё будут открывать страницу «Эта тема больше недоступна».") && ed("delete", "Тема удалена", () => e.onBack())
+                    },
+                    title: "Удалить тему: ссылки на неё откроют страницу «Эта тема больше недоступна»",
+                    children: "Удалить тему"
+                })]
+            }), E && (0, s.jsxs)("div", {
+                className: "sk-note",
+                children: ["Поиск внутри темы: ", " ", (0, s.jsx)("input", {
+                    value: C,
+                    onChange: e => S(e.target.value),
+                    onKeyDown: e => {
+                        if ("Enter" !== e.key) return;
+                        let s = C.trim().toLowerCase();
+                        if (!s) return;
+                        let a = c.find(e => !e.isDeleted && !e.isHiddenByAi && e.body.toLowerCase().includes(s));
+                        a && es(a.num)
+                    },
+                    placeholder: "Что ищем… Enter — к первому найденному",
+                    style: {
+                        width: "60%"
+                    }
+                }), " ", (0, s.jsx)("a", {
+                    onClick: () => {
+                        T(!1), S("")
+                    },
+                    children: "закрыть"
+                })]
+            }), (0, s.jsx)(ep, {}), ek ? [...el].sort((e, s) => e.num - s.num).map(e => (0, s.jsx)("div", {
+                children: ej(e)
+            }, e.id)) : eg(null), (0, s.jsx)(ep, {}), (0, s.jsxs)("div", {
+                className: "sk-qr",
+                id: "reply-form",
+                children: [(0, s.jsx)("div", {
+                    className: "sk-qr-label",
+                    children: "Быстрый ответ в теме:"
+                }), i.isArchived ? (0, s.jsxs)("div", {
+                    className: "sk-archive-note",
+                    style: {
+                        marginBottom: 0
+                    },
+                    children: [(0, s.jsx)("b", {
+                        children: "Тема в архиве."
+                    }), " Обсуждение закрыто из-за неактуальности. Если вопрос снова актуален —", " ", (0, s.jsx)("a", {
+                        onClick: e.onNewTopic,
+                        children: "создайте новую тему"
+                    }), "."]
+                }) : i.isClosed ? (0, s.jsx)("div", {
+                    className: "sk-note",
+                    children: "Тема закрыта для новых сообщений."
+                }) : (0, s.jsxs)(s.Fragment, {
+                    children: [g && (0, s.jsxs)("div", {
+                        className: "sk-qr-target",
+                        children: ["Ответ для ", g.author, " (№", g.num, ")", " ", (0, s.jsx)("button", {
+                            onClick: () => N(null),
+                            children: "отменить ×"
+                        })]
+                    }), (0, s.jsx)("textarea", {
+                        value: j,
+                        onChange: e => k(e.target.value),
+                        placeholder: "Напишите ваше мнение…",
+                        maxLength: 1e4
+                    }), (0, s.jsx)("div", {
+                        className: "sk-charcount",
+                        children: j.length > 9e3 && (0, s.jsxs)("span", {
+                            className: j.length > 9500 ? "over" : "",
+                            children: [j.length, "/10000"]
+                        })
+                    }), (0, s.jsxs)("div", {
+                        children: [(0, s.jsx)("button", {
+                            className: "sk-btn-classic",
+                            disabled: b || !j.trim(),
+                            onClick: ea,
+                            children: b ? "Проверка ИИ…" : "Отправить мнение"
+                        }), !e.user && (0, s.jsx)("span", {
+                            style: {
+                                fontSize: 11,
+                                color: "#AA3333",
+                                marginLeft: 10
+                            },
+                            children: "Чтобы писать на форуме, войдите или зарегистрируйтесь — ссылка в левой колонке."
+                        })]
+                    })]
+                })]
+            }), (0, s.jsx)("a", {
+                className: "sk-backlink",
+                onClick: e.onBack,
+                children: "« К списку тем"
+            }), A && (0, s.jsx)(y, {
+                message: A,
+                onClose: () => $(null),
+                onDone: s => {
+                    $(null), e.notify(s)
+                }
+            }), D && (0, s.jsx)(v, {
+                message: D,
+                token: n,
+                onClose: () => B(null),
+                onDone: s => {
+                    B(null), e.notify(s), Q()
+                },
+                onFail: s => e.notify(s)
+            })]
+        })
+    }
+
+    function f({
+        m: e,
+        user: a,
+        favDone: l,
+        isNew: n,
+        canReply: t,
+        onOpenProfile: i,
+        onReply: r,
+        onComplain: c,
+        onFav: o,
+        onPermalink: m,
+        onEdit: u,
+        onDelete: p
+    }) {
+        if (e.isDeleted) return (0, s.jsx)("div", {
+            className: "sk-msg sk-msg-deleted",
+            "data-msgnum": e.num,
+            children: "moderator" === e.deletedBy ? `Сообщение №${e.num} удалено модератором.` : `Сообщение №${e.num} удалено автором`
+        });
+        if (e.isHiddenByAi) return (0, s.jsxs)("div", {
+            className: "sk-msg-aihidden",
+            children: ["Сообщение №", e.num, " скрыто ИИ-модерацией (", e.hiddenReason || "нарушение", "). Автор может обжаловать решение через «Ещё → Обращение»."]
+        });
+        let j = !!(a && a.nickname && e.author === a.nickname);
+        return (0, s.jsxs)("div", {
+            className: "sk-msg",
+            "data-msgnum": e.num,
+            children: [(0, s.jsxs)("div", {
+                className: "sk-msg-head",
+                children: [(0, s.jsxs)("a", {
+                    className: "sk-msg-num",
+                    onClick: m,
+                    title: "Ссылка на это сообщение",
+                    children: ["#", e.num]
+                }), (0, s.jsx)(x, {
+                    name: e.author,
+                    gender: e.authorGender,
+                    onOpen: i,
+                    className: "sk-msg-author"
+                }), (0, s.jsx)("span", {
+                    className: "sk-msg-time",
+                    children: h(e.createdAt)
+                }), n && (0, s.jsx)("span", {
+                    className: "sk-msg-new",
+                    title: "Появилось после вашего последнего посещения темы",
+                    children: "Новое"
+                }), e.editedAt && (0, s.jsx)("span", {
+                    className: "sk-msg-time",
+                    style: {
+                        fontSize: 10
+                    },
+                    title: `Изменено: ${d(e.editedAt)}`,
+                    children: "изменено"
+                }), e.parentAuthor && (0, s.jsxs)("span", {
+                    className: "sk-msg-parent",
+                    title: `Ответ на сообщение пользователя ${e.parentAuthor}`,
+                    children: ["↳ ответ ", (0, s.jsx)(x, {
+                        name: e.parentAuthor,
+                        gender: e.parentAuthorGender,
+                        onOpen: i
+                    })]
+                }), e.aiNote && (0, s.jsxs)("span", {
+                    className: "sk-ai-badge",
+                    title: e.aiNote,
+                    children: ["🛡 ИИ: ", e.aiNote]
+                }), (0, s.jsx)("span", {
+                    className: "sk-msg-spacer"
+                }), t && (0, s.jsx)("button", {
+                    className: "sk-btn-reply",
+                    onClick: r,
+                    title: `Ответить на сообщение №${e.num}`,
+                    children: "Ответить"
+                }), (0, s.jsx)("button", {
+                    className: "sk-flood-btn",
+                    onClick: c,
+                    children: "Пожаловаться"
+                }), (0, s.jsx)("button", {
+                    className: `sk-flood-btn sk-fav-btn ${l?"done":""}`,
+                    onClick: o,
+                    title: "Сохранить тему в избранном (не подписка)",
+                    children: l ? "★ В избранном" : "☆ В избранное"
+                }), j && (0, s.jsx)("button", {
+                    className: "sk-flood-btn",
+                    onClick: u,
+                    children: "Редактировать"
+                }), j && (0, s.jsx)("button", {
+                    className: "sk-flood-btn sk-msg-del",
+                    onClick: p,
+                    children: "Удалить"
+                })]
+            }), (0, s.jsx)("div", {
+                className: "sk-msg-body",
+                children: e.body
+            })]
+        })
+    }
+
+    function v({
+        message: e,
+        token: l,
+        onClose: n,
+        onDone: t,
+        onFail: i
+    }) {
+        let [r, c] = (0, a.useState)(e.body), [o, d] = (0, a.useState)(!1), m = async () => {
+            if (!r.trim()) return void i("Введите текст сообщения");
+            d(!0);
+            try {
+                let s = await fetch(`/api/messages/${e.id}`, {
+                        method: "PATCH",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            token: l,
+                            body: r.trim()
+                        })
+                    }),
+                    a = await s.json();
+                if (!s.ok) throw Error(a.error || "Не удалось сохранить. Проверьте связь и попробуйте ещё раз.");
+                t("Сообщение обновлено")
+            } catch (e) {
+                i(e instanceof Error ? e.message : "Не удалось сохранить. Проверьте связь и попробуйте ещё раз.")
+            } finally {
+                d(!1)
+            }
+        };
+        return (0, s.jsx)("div", {
+            className: "sk-modal-overlay",
+            onClick: n,
+            children: (0, s.jsxs)("div", {
+                className: "sk-modal",
+                onClick: e => e.stopPropagation(),
+                children: [(0, s.jsxs)("div", {
+                    className: "sk-modal-title",
+                    children: [(0, s.jsxs)("span", {
+                        children: ["Редактировать сообщение №", e.num]
+                    }), (0, s.jsx)("button", {
+                        className: "sk-modal-x",
+                        onClick: n,
+                        "aria-label": "Закрыть",
+                        children: "×"
+                    })]
+                }), (0, s.jsxs)("div", {
+                    className: "sk-modal-body",
+                    children: [(0, s.jsx)("textarea", {
+                        value: r,
+                        onChange: e => c(e.target.value),
+                        maxLength: 1e4,
+                        style: {
+                            width: "100%",
+                            minHeight: 150,
+                            border: "1px solid #9DB0C4",
+                            padding: 8,
+                            fontFamily: "inherit",
+                            fontSize: 13,
+                            boxSizing: "border-box",
+                            resize: "vertical"
+                        }
+                    }), (0, s.jsx)("div", {
+                        className: "sk-charcount",
+                        children: r.length > 9e3 && (0, s.jsxs)("span", {
+                            className: r.length > 9500 ? "over" : "",
+                            children: [r.length, "/10000"]
+                        })
+                    }), (0, s.jsx)("div", {
+                        className: "sk-modal-hint",
+                        children: "Текст повторно пройдёт проверку ИИ-модерации."
+                    }), (0, s.jsxs)("div", {
+                        className: "sk-modal-actions",
+                        children: [(0, s.jsx)("button", {
+                            className: "sk-btn-classic",
+                            disabled: o || !r.trim(),
+                            onClick: m,
+                            children: o ? "Сохранение…" : "Сохранить"
+                        }), (0, s.jsx)("button", {
+                            className: "right",
+                            onClick: n,
+                            children: "Отмена"
+                        })]
+                    })]
+                })]
+            })
+        })
+    }
+    let w = [
+        ["insult", "Оскорбление / травля"],
+        ["threat", "Угроза"],
+        ["spam", "Спам / реклама"],
+        ["fraud", "Мошенничество"],
+        ["personal_data", "Персональные данные"],
+        ["forbidden", "Запрещённый контент"],
+        ["other", "Другое"]
+    ];
+
+    function y({
+        message: e,
+        onClose: l,
+        onDone: n
+    }) {
+        let [t, i] = (0, a.useState)(""), [r, c] = (0, a.useState)(""), [o, d] = (0, a.useState)(!1), m = async () => {
+            if (t) {
+                d(!0);
+                try {
+                    let s = await fetch(`/api/messages/${e.id}/complaint`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                category: t,
+                                comment: r
+                            })
+                        }),
+                        a = await s.json();
+                    if (!s.ok) throw Error(a.error);
+                    n(a.note || "Жалоба отправлена")
+                } catch (e) {
+                    n(e instanceof Error ? e.message : "Ошибка отправки")
+                } finally {
+                    d(!1)
+                }
+            }
+        };
+        return (0, s.jsx)("div", {
+            className: "sk-modal-overlay",
+            onClick: l,
+            children: (0, s.jsxs)("div", {
+                className: "sk-modal",
+                onClick: e => e.stopPropagation(),
+                children: [(0, s.jsxs)("div", {
+                    className: "sk-modal-title",
+                    children: [(0, s.jsxs)("span", {
+                        children: ["Пожаловаться на сообщение №", e.num]
+                    }), (0, s.jsx)("button", {
+                        className: "sk-modal-x",
+                        onClick: l,
+                        "aria-label": "Закрыть",
+                        children: "×"
+                    })]
+                }), (0, s.jsxs)("div", {
+                    className: "sk-modal-body",
+                    children: [(0, s.jsx)("div", {
+                        className: "sk-kind-selector",
+                        children: w.map(([e, a]) => (0, s.jsx)("button", {
+                            type: "button",
+                            className: `sk-kind-chip ${t===e?"active-warn":""}`,
+                            onClick: () => i(e),
+                            children: a
+                        }, e))
+                    }), (0, s.jsx)("div", {
+                        className: "sk-modal-row",
+                        children: (0, s.jsx)("input", {
+                            value: r,
+                            onChange: e => c(e.target.value),
+                            placeholder: "Комментарий (необязательно)"
+                        })
+                    }), (0, s.jsxs)("div", {
+                        className: "sk-modal-actions",
+                        children: [(0, s.jsx)("span", {
+                            className: "sk-modal-hint",
+                            style: {
+                                margin: 0,
+                                flex: 1
+                            },
+                            children: "Жалоба не удаляет сообщение сама — его проверит ИИ и администратор."
+                        }), (0, s.jsx)("button", {
+                            className: "sk-btn-classic",
+                            style: {
+                                marginTop: 0
+                            },
+                            disabled: !t || o,
+                            onClick: m,
+                            children: o ? "Отправка…" : "Отправить жалобу"
+                        })]
+                    })]
+                })]
+            })
+        })
+    }
+    let C = ["Девичья фамилия матери", "Кличка первого домашнего животного", "Название вашей первой школы", "Город, где вы родились", "Марка первого автомобиля", "Ваше любимое блюдо"];
+
+    function S({
+        onClose: e,
+        onLogin: l
+    }) {
+        let [n, t] = (0, a.useState)("login"), [i, r] = (0, a.useState)(!1), [c, o] = (0, a.useState)(""), [d, m] = (0, a.useState)(!1), [h, u] = (0, a.useState)(""), [x, p] = (0, a.useState)(""), [j, k] = (0, a.useState)({
+            nickname: "",
+            email: "",
+            password: "",
+            password2: "",
+            gender: "unspecified",
+            question: C[0],
+            answer: ""
+        }), [g, N] = (0, a.useState)(null), [b, f] = (0, a.useState)(""), [v, w] = (0, a.useState)(""), [y, S] = (0, a.useState)(""), [E, T] = (0, a.useState)(""), A = (0, a.useCallback)(() => {
+            f(""), fetch("/api/auth/captcha").then(e => e.json()).then(e => N({
+                id: e.id,
+                question: e.question
+            })).catch(() => N(null))
+        }, []);
+        (0, a.useEffect)(() => {
+            "register" !== n || g || A()
+        }, [n, g, A]);
+        let $ = async () => {
+            r(!0), o(""), m(!1);
+            try {
+                let s = await fetch("/api/auth/login", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            email: h,
+                            password: x
+                        })
+                    }),
+                    a = await s.json();
+                if (!s.ok) throw a.needVerify && m(!0), Error(a.error || "Ошибка входа");
+                l(a.user.token, a.user), e()
+            } catch (e) {
+                o(e instanceof Error ? e.message : "Ошибка")
+            } finally {
+                r(!1)
+            }
+        }, O = async () => {
+            r(!0), o("");
+            try {
+                let e = await fetch("/api/auth/resend", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            email: h
+                        })
+                    }),
+                    s = await e.json();
+                if (!e.ok) throw Error(s.error || "Ошибка");
+                o(""), w(s.verifyPath || ""), t("register"), window.setTimeout(() => t("done-verify"), 0)
+            } catch (e) {
+                o(e instanceof Error ? e.message : "Ошибка")
+            } finally {
+                r(!1)
+            }
+        }, P = async () => {
+            r(!0), o("");
+            try {
+                let e = await fetch("/api/auth/register", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            nickname: j.nickname.trim(),
+                            email: j.email.trim(),
+                            password: j.password,
+                            password2: j.password2,
+                            gender: j.gender,
+                            question: j.question,
+                            answer: j.answer,
+                            captchaId: g?.id || "",
+                            captchaAnswer: b
+                        })
+                    }),
+                    s = await e.json();
+                if (!e.ok) throw Error(s.error || "Ошибка регистрации");
+                w(s.verifyPath || ""), t("done-verify")
+            } catch (e) {
+                o(e instanceof Error ? e.message : "Ошибка"), A()
+            } finally {
+                r(!1)
+            }
+        }, F = async () => {
+            r(!0), o(""), T("");
+            try {
+                let e = await fetch("/api/auth/recover", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            email: y.trim()
+                        })
+                    }),
+                    s = await e.json();
+                if (!e.ok) throw Error(s.error || "Ошибка");
+                T(s.resetPath || "ok")
+            } catch (e) {
+                o(e instanceof Error ? e.message : "Ошибка")
+            } finally {
+                r(!1)
+            }
+        }, R = e => s => k(a => ({
+            ...a,
+            [e]: s.target.value
+        }));
+        return (0, s.jsx)("div", {
+            className: "sk-modal-overlay",
+            onClick: e,
+            children: (0, s.jsxs)("div", {
+                className: "sk-modal sk-modal-auth",
+                onClick: e => e.stopPropagation(),
+                children: [(0, s.jsxs)("div", {
+                    className: "sk-modal-title",
+                    children: [(0, s.jsx)("span", {
+                        children: "Вход на форум"
+                    }), (0, s.jsx)("button", {
+                        className: "sk-modal-x",
+                        onClick: e,
+                        "aria-label": "Закрыть",
+                        children: "×"
+                    })]
+                }), (0, s.jsxs)("div", {
+                    className: "sk-modal-body",
+                    children: ["done-verify" !== n && (0, s.jsxs)("div", {
+                        className: "sk-auth-tabs",
+                        children: [(0, s.jsx)("button", {
+                            className: "login" === n ? "active" : "",
+                            onClick: () => {
+                                t("login"), o("")
+                            },
+                            children: "Вход"
+                        }), (0, s.jsx)("button", {
+                            className: "register" === n ? "active" : "",
+                            onClick: () => {
+                                t("register"), o("")
+                            },
+                            children: "Регистрация"
+                        })]
+                    }), "login" === n && (0, s.jsxs)(s.Fragment, {
+                        children: [(0, s.jsxs)("div", {
+                            className: "sk-modal-row",
+                            children: [(0, s.jsx)("label", {
+                                children: "Email:"
+                            }), (0, s.jsx)("input", {
+                                type: "email",
+                                value: h,
+                                onChange: e => u(e.target.value),
+                                placeholder: "you@example.ru",
+                                autoComplete: "email"
+                            })]
+                        }), (0, s.jsxs)("div", {
+                            className: "sk-modal-row",
+                            children: [(0, s.jsx)("label", {
+                                children: "Пароль:"
+                            }), (0, s.jsx)("input", {
+                                type: "password",
+                                value: x,
+                                onChange: e => p(e.target.value),
+                                placeholder: "Ваш пароль",
+                                autoComplete: "current-password"
+                            })]
+                        }), (0, s.jsx)("button", {
+                            className: "sk-btn-classic",
+                            style: {
+                                marginTop: 0
+                            },
+                            disabled: i || !h.trim() || !x,
+                            onClick: $,
+                            children: i ? "Вход…" : "Войти"
+                        }), (0, s.jsx)("div", {
+                            className: "sk-modal-links",
+                            children: (0, s.jsx)("a", {
+                                onClick: () => {
+                                    t("recover"), o(""), T("")
+                                },
+                                children: "Забыли пароль?"
+                            })
+                        }), d && (0, s.jsxs)("div", {
+                            className: "sk-modal-demo",
+                            children: ["Email не подтверждён.", " ", (0, s.jsx)("a", {
+                                onClick: O,
+                                children: "Отправить письмо подтверждения ещё раз"
+                            })]
+                        }), (0, s.jsx)("p", {
+                            className: "sk-modal-hint",
+                            children: "Писать могут только авторизованные пользователи. Нет аккаунта — регистрация занимает меньше минуты."
+                        })]
+                    }), "register" === n && (0, s.jsxs)(s.Fragment, {
+                        children: [(0, s.jsxs)("div", {
+                            className: "sk-modal-row",
+                            children: [(0, s.jsx)("label", {
+                                children: "Ник (публичный):"
+                            }), (0, s.jsx)("input", {
+                                value: j.nickname,
+                                onChange: R("nickname"),
+                                placeholder: "Как вас будут видеть на форуме",
+                                maxLength: 20
+                            })]
+                        }), (0, s.jsxs)("div", {
+                            className: "sk-modal-row",
+                            children: [(0, s.jsx)("label", {
+                                children: "Email:"
+                            }), (0, s.jsx)("input", {
+                                type: "email",
+                                value: j.email,
+                                onChange: R("email"),
+                                placeholder: "you@example.ru",
+                                autoComplete: "email"
+                            })]
+                        }), (0, s.jsxs)("div", {
+                            className: "sk-modal-row",
+                            children: [(0, s.jsx)("label", {
+                                children: "Пароль (от 8 символов, буквы и цифры):"
+                            }), (0, s.jsx)("input", {
+                                type: "password",
+                                value: j.password,
+                                onChange: R("password"),
+                                autoComplete: "new-password"
+                            })]
+                        }), (0, s.jsxs)("div", {
+                            className: "sk-modal-row",
+                            children: [(0, s.jsx)("label", {
+                                children: "Повторите пароль:"
+                            }), (0, s.jsx)("input", {
+                                type: "password",
+                                value: j.password2,
+                                onChange: R("password2"),
+                                autoComplete: "new-password"
+                            })]
+                        }), (0, s.jsxs)("div", {
+                            className: "sk-modal-row",
+                            children: [(0, s.jsx)("label", {
+                                children: "Пол (только цвет вашего ника, нигде не подписывается):"
+                            }), (0, s.jsxs)("div", {
+                                className: "sk-gender-row",
+                                role: "radiogroup",
+                                "aria-label": "Пол",
+                                children: [(0, s.jsxs)("label", {
+                                    children: [(0, s.jsx)("input", {
+                                        type: "radio",
+                                        name: "gender",
+                                        checked: "male" === j.gender,
+                                        onChange: () => k(e => ({
+                                            ...e,
+                                            gender: "male"
+                                        }))
+                                    }), " Мужчина"]
+                                }), (0, s.jsxs)("label", {
+                                    children: [(0, s.jsx)("input", {
+                                        type: "radio",
+                                        name: "gender",
+                                        checked: "female" === j.gender,
+                                        onChange: () => k(e => ({
+                                            ...e,
+                                            gender: "female"
+                                        }))
+                                    }), " Женщина"]
+                                }), (0, s.jsxs)("label", {
+                                    children: [(0, s.jsx)("input", {
+                                        type: "radio",
+                                        name: "gender",
+                                        checked: "unspecified" === j.gender,
+                                        onChange: () => k(e => ({
+                                            ...e,
+                                            gender: "unspecified"
+                                        }))
+                                    }), " Не указан"]
+                                })]
+                            })]
+                        }), (0, s.jsxs)("div", {
+                            className: "sk-modal-row",
+                            children: [(0, s.jsxs)("label", {
+                                children: ["CAPTCHA: ", (0, s.jsx)("b", {
+                                    children: g?.question || "…"
+                                }), " ", (0, s.jsx)("a", {
+                                    onClick: A,
+                                    title: "Обновить вопрос",
+                                    children: "[обновить]"
+                                })]
+                            }), (0, s.jsx)("input", {
+                                value: b,
+                                onChange: e => f(e.target.value),
+                                placeholder: "Ответ числом",
+                                inputMode: "numeric"
+                            })]
+                        }), (0, s.jsxs)("div", {
+                            className: "sk-modal-row",
+                            children: [(0, s.jsx)("label", {
+                                children: "Контрольный вопрос (для защиты аккаунта):"
+                            }), (0, s.jsx)("select", {
+                                value: j.question,
+                                onChange: R("question"),
+                                children: C.map(e => (0, s.jsx)("option", {
+                                    value: e,
+                                    children: e
+                                }, e))
+                            }), (0, s.jsx)("input", {
+                                value: j.answer,
+                                onChange: R("answer"),
+                                placeholder: "Ответ на контрольный вопрос",
+                                style: {
+                                    marginTop: 6
+                                }
+                            })]
+                        }), (0, s.jsx)("button", {
+                            className: "sk-btn-classic",
+                            style: {
+                                marginTop: 0
+                            },
+                            disabled: i || !j.nickname.trim() || !j.email.trim() || !j.password || !j.password2 || !b.trim() || !j.answer.trim(),
+                            onClick: P,
+                            children: i ? "Регистрация…" : "Зарегистрироваться"
+                        }), (0, s.jsx)("p", {
+                            className: "sk-modal-hint",
+                            children: "После регистрации мы отправим на email письмо со ссылкой подтверждения. Вход — только после подтверждения."
+                        })]
+                    }), "done-verify" === n && (0, s.jsxs)("div", {
+                        className: "sk-mail-done",
+                        children: [(0, s.jsx)("div", {
+                            className: "md-title",
+                            children: "Письмо отправлено"
+                        }), (0, s.jsxs)("p", {
+                            children: ["Мы отправили на ", (0, s.jsx)("b", {
+                                children: j.email.trim()
+                            }), " письмо со ссылкой подтверждения. Откройте его — и аккаунт активируется автоматически."]
+                        }), v && (0, s.jsxs)("div", {
+                            className: "sk-modal-demo",
+                            children: ["Демо-режим: почтовый шлюз не подключён, ваше письмо —", " ", (0, s.jsx)("a", {
+                                href: v,
+                                children: "открыть ссылку подтверждения"
+                            })]
+                        }), (0, s.jsx)("button", {
+                            className: "sk-btn-classic",
+                            onClick: () => {
+                                t("login"), o("")
+                            },
+                            children: "К окну входа"
+                        })]
+                    }), "recover" === n && !E && (0, s.jsxs)(s.Fragment, {
+                        children: [(0, s.jsx)("p", {
+                            className: "sk-modal-hint",
+                            style: {
+                                marginTop: 0
+                            },
+                            children: "Введите email, указанный при регистрации — пришлём ссылку для смены пароля."
+                        }), (0, s.jsxs)("div", {
+                            className: "sk-modal-row",
+                            children: [(0, s.jsx)("label", {
+                                children: "Email:"
+                            }), (0, s.jsx)("input", {
+                                type: "email",
+                                value: y,
+                                onChange: e => S(e.target.value),
+                                placeholder: "you@example.ru"
+                            })]
+                        }), (0, s.jsx)("button", {
+                            className: "sk-btn-classic",
+                            style: {
+                                marginTop: 0
+                            },
+                            disabled: i || !y.trim(),
+                            onClick: F,
+                            children: i ? "Отправка…" : "Отправить ссылку восстановления"
+                        })]
+                    }), "recover" === n && E && (0, s.jsxs)("div", {
+                        className: "sk-mail-done",
+                        children: [(0, s.jsx)("div", {
+                            className: "md-title",
+                            children: "Письмо отправлено"
+                        }), (0, s.jsxs)("p", {
+                            children: ["Ссылка для смены пароля отправлена на ", (0, s.jsx)("b", {
+                                children: y.trim()
+                            }), " (действует 1 час)."]
+                        }), "ok" !== E && (0, s.jsxs)("div", {
+                            className: "sk-modal-demo",
+                            children: ["Демо-режим: почтовый шлюз не подключён, ваше письмо —", " ", (0, s.jsx)("a", {
+                                href: E,
+                                children: "открыть ссылку восстановления"
+                            })]
+                        }), (0, s.jsx)("button", {
+                            className: "sk-btn-classic",
+                            onClick: () => {
+                                t("login"), T(""), o("")
+                            },
+                            children: "К окну входа"
+                        })]
+                    }), c && (0, s.jsx)("div", {
+                        className: "sk-modal-err",
+                        children: c
+                    })]
+                })]
+            })
+        })
+    }
+
+    function E({
+        token: e,
+        onClose: l,
+        onLogin: n
+    }) {
+        let [t, i] = (0, a.useState)(""), [r, c] = (0, a.useState)(""), [o, d] = (0, a.useState)(!1), [m, h] = (0, a.useState)(""), u = async () => {
+            d(!0), h("");
+            try {
+                let s = await fetch("/api/auth/reset", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            token: e,
+                            password: t,
+                            password2: r
+                        })
+                    }),
+                    a = await s.json();
+                if (!s.ok) throw Error(a.error || "Ошибка");
+                n(a.user.token, a.user), l()
+            } catch (e) {
+                h(e instanceof Error ? e.message : "Ошибка")
+            } finally {
+                d(!1)
+            }
+        };
+        return (0, s.jsx)("div", {
+            className: "sk-modal-overlay",
+            onClick: l,
+            children: (0, s.jsxs)("div", {
+                className: "sk-modal",
+                onClick: e => e.stopPropagation(),
+                children: [(0, s.jsxs)("div", {
+                    className: "sk-modal-title",
+                    children: [(0, s.jsx)("span", {
+                        children: "Новый пароль"
+                    }), (0, s.jsx)("button", {
+                        className: "sk-modal-x",
+                        onClick: l,
+                        "aria-label": "Закрыть",
+                        children: "×"
+                    })]
+                }), (0, s.jsxs)("div", {
+                    className: "sk-modal-body",
+                    children: [(0, s.jsx)("p", {
+                        className: "sk-modal-hint",
+                        style: {
+                            marginTop: 0
+                        },
+                        children: "Ссылка из письма подтверждена. Задайте новый пароль (от 8 символов, буквы и цифры)."
+                    }), (0, s.jsxs)("div", {
+                        className: "sk-modal-row",
+                        children: [(0, s.jsx)("label", {
+                            children: "Новый пароль:"
+                        }), (0, s.jsx)("input", {
+                            type: "password",
+                            value: t,
+                            onChange: e => i(e.target.value),
+                            autoComplete: "new-password"
+                        })]
+                    }), (0, s.jsxs)("div", {
+                        className: "sk-modal-row",
+                        children: [(0, s.jsx)("label", {
+                            children: "Повторите пароль:"
+                        }), (0, s.jsx)("input", {
+                            type: "password",
+                            value: r,
+                            onChange: e => c(e.target.value),
+                            autoComplete: "new-password"
+                        })]
+                    }), (0, s.jsx)("button", {
+                        className: "sk-btn-classic",
+                        style: {
+                            marginTop: 0
+                        },
+                        disabled: o || !t || !r,
+                        onClick: u,
+                        children: o ? "Сохранение…" : "Сохранить пароль и войти"
+                    }), m && (0, s.jsx)("div", {
+                        className: "sk-modal-err",
+                        children: m
+                    })]
+                })]
+            })
+        })
+    }
+
+    function T({
+        nick: e,
+        onOpenTopic: l,
+        onOpenTopicAt: n,
+        onGoForumHome: t
+    }) {
+        let [i, r] = (0, a.useState)(null), [c, m] = (0, a.useState)(""), [h, p] = (0, a.useState)(!0);
+        if ((0, a.useEffect)(() => {
+                let s = !1,
+                    a = async () => {
+                        p(!0), m(""), r(null);
+                        try {
+                            let a = await fetch(`/api/users/${encodeURIComponent(e)}`),
+                                l = await a.json();
+                            if (!a.ok) throw Error(l.error || "Пользователь не найден");
+                            s || r(l)
+                        } catch (e) {
+                            s || m(e instanceof Error ? e.message : "Пользователь не найден")
+                        } finally {
+                            s || p(!1)
+                        }
+                    }, l = window.setTimeout(a, 0);
+                return () => {
+                    s = !0, window.clearTimeout(l)
+                }
+            }, [e]), h) return (0, s.jsx)("div", {
+            className: "sk-loading",
+            children: "Загрузка профиля…"
+        });
+        if (c || !i) return (0, s.jsxs)("div", {
+            className: "sk-error",
+            children: [c || "Пользователь не найден", " — ", (0, s.jsx)("a", {
+                onClick: t,
+                children: "на главную форума"
+            })]
+        });
+        let j = i.user;
+        return (0, s.jsxs)(s.Fragment, {
+            children: [(0, s.jsxs)("div", {
+                className: "sk-crumbs",
+                children: [(0, s.jsx)("a", {
+                    onClick: t,
+                    title: "На главную страницу форума",
+                    children: "Форум"
+                }), (0, s.jsx)("span", {
+                    className: "sep",
+                    children: "→"
+                }), (0, s.jsx)("span", {
+                    className: "cur",
+                    children: "Профиль"
+                })]
+            }), (0, s.jsxs)("div", {
+                className: "sk-profilebox",
+                children: [(0, s.jsxs)("div", {
+                    className: "pb-head",
+                    children: [(0, s.jsx)(x, {
+                        name: j.nickname,
+                        gender: j.gender,
+                        className: "pb-nick"
+                    }), (0, s.jsxs)("span", {
+                        className: "pb-reg",
+                        children: ["На форуме с ", o(j.createdAt)]
+                    })]
+                }), (0, s.jsxs)("div", {
+                    className: "pb-counts",
+                    children: ["Тем: ", (0, s.jsx)("b", {
+                        children: i.topicsCount
+                    }), " · Сообщений: ", (0, s.jsx)("b", {
+                        children: i.messagesCount
+                    })]
+                })]
+            }), (0, s.jsx)("div", {
+                className: "sk-mainheader",
+                children: "Темы пользователя"
+            }), 0 === i.topics.length ? (0, s.jsx)("div", {
+                className: "sk-loading",
+                children: "Пользователь пока не создавал тем."
+            }) : (0, s.jsxs)("div", {
+                className: "sk-profilelist",
+                children: [i.topics.map(e => (0, s.jsxs)("div", {
+                    className: "prow",
+                    onClick: () => l(e.id),
+                    children: [(0, s.jsxs)("div", {
+                        className: "prow-title",
+                        children: [(0, s.jsx)("a", {
+                            children: e.title
+                        }), e.isArchived && (0, s.jsx)("span", {
+                            className: "sk-status-badge archived",
+                            children: "В архиве"
+                        }), !e.isArchived && e.isClosed && (0, s.jsx)("span", {
+                            className: "sk-status-badge closed",
+                            children: "Закрыта"
+                        })]
+                    }), (0, s.jsxs)("div", {
+                        className: "prow-meta",
+                        children: [e.rubricName && (0, s.jsxs)(s.Fragment, {
+                            children: [e.rubricName, " · "]
+                        }), "создана ", o(e.createdAt), " · ответов: ", e.answers, " · просмотров: ", u(e.views)]
+                    })]
+                }, e.id)), i.topicsCount > i.topicsShown && (0, s.jsxs)("div", {
+                    className: "prow-more",
+                    children: ["Показаны последние ", i.topicsShown, " тем из ", i.topicsCount, "."]
+                })]
+            }), (0, s.jsx)("div", {
+                className: "sk-mainheader",
+                children: "Сообщения пользователя"
+            }), 0 === i.messages.length ? (0, s.jsx)("div", {
+                className: "sk-loading",
+                children: "Пользователь пока не оставлял сообщений."
+            }) : (0, s.jsxs)("div", {
+                className: "sk-profilelist",
+                children: [i.messages.map(e => (0, s.jsxs)("div", {
+                    className: "prow",
+                    onClick: () => n(e.topicId, e.num),
+                    children: [(0, s.jsxs)("div", {
+                        className: "prow-title",
+                        children: [(0, s.jsx)("a", {
+                            children: e.topicTitle
+                        }), (0, s.jsxs)("span", {
+                            className: "sr-badge",
+                            children: ["сообщение №", e.num]
+                        })]
+                    }), (0, s.jsx)("div", {
+                        className: "prow-snippet",
+                        children: e.snippet
+                    }), (0, s.jsx)("div", {
+                        className: "prow-meta",
+                        children: d(e.createdAt)
+                    })]
+                }, e.id)), i.messagesCount > i.messagesShown && (0, s.jsxs)("div", {
+                    className: "prow-more",
+                    children: ["Показаны последние ", i.messagesShown, " сообщений из ", i.messagesCount, "."]
+                })]
+            })]
+        })
+    }
+
+    function A({
+        token: e,
+        onClose: l,
+        onCreated: n,
+        initialRubric: t
+    }) {
+        let [i, r] = (0, a.useState)([]), [c, o] = (0, a.useState)(null), [d, m] = (0, a.useState)(""), [h, u] = (0, a.useState)(""), [x, p] = (0, a.useState)(!1), [j, k] = (0, a.useState)("");
+        (0, a.useEffect)(() => {
+            fetch("/api/bootstrap").then(e => e.json()).then(e => {
+                let s = e.rubrics || [];
+                if (r(s), t) {
+                    let e = s.flatMap(e => [e, ...e.children]),
+                        a = e.find(e => e.slug === t.slug) || e.find(e => e.name === t.name);
+                    a && o(a.id)
+                }
+            }).catch(() => {})
+        }, []);
+        let g = async () => {
+            if (!c) return void k("Выберите раздел, в котором публикуется тема");
+            if (d.trim().length < 5) return void k("Заголовок слишком короткий — минимум 5 символов");
+            if (!h.trim()) return void k("Напишите текст сообщения — это суть темы");
+            p(!0), k("");
+            try {
+                let s = await fetch("/api/topics", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            rubricId: c,
+                            title: d.trim(),
+                            body: h.trim(),
+                            token: e
+                        })
+                    }),
+                    a = await s.json();
+                if (!s.ok) throw Error(a.error || "Не удалось опубликовать. Проверьте связь и попробуйте ещё раз.");
+                n(a.id)
+            } catch (e) {
+                k(e instanceof Error ? e.message : "Не удалось опубликовать. Проверьте связь и попробуйте ещё раз."), p(!1)
+            }
+        }, N = i.filter(e => !e.isService).flatMap(e => [{
+            id: e.id,
+            label: e.name
+        }, ...e.children.map(s => ({
+            id: s.id,
+            label: `${e.name} → ${s.name}`
+        }))]), b = N.find(e => e.id === c);
+        return (0, s.jsx)("div", {
+            className: "sk-modal-overlay",
+            onClick: x ? void 0 : l,
+            children: (0, s.jsxs)("div", {
+                className: "sk-modal wide",
+                onClick: e => e.stopPropagation(),
+                children: [(0, s.jsxs)("div", {
+                    className: "sk-modal-title",
+                    children: [(0, s.jsx)("span", {
+                        children: "Новая тема"
+                    }), (0, s.jsx)("button", {
+                        className: "sk-modal-x",
+                        onClick: l,
+                        "aria-label": "Закрыть",
+                        disabled: x,
+                        children: "×"
+                    })]
+                }), (0, s.jsxs)("div", {
+                    className: "sk-modal-body",
+                    children: [(0, s.jsxs)("div", {
+                        className: "sk-modal-row",
+                        children: [(0, s.jsx)("label", {
+                            children: "Раздел:"
+                        }), (0, s.jsx)("div", {
+                            className: "sk-modal-rubric",
+                            children: b ? (0, s.jsx)("span", {
+                                className: "sk-rubric-current",
+                                children: b.label
+                            }) : (0, s.jsx)("span", {
+                                className: "sk-rubric-current none",
+                                children: "раздел не выбран"
+                            })
+                        }), (0, s.jsxs)("select", {
+                            value: c ?? "",
+                            onChange: e => o(parseInt(e.target.value) || null),
+                            children: [(0, s.jsx)("option", {
+                                value: "",
+                                children: "— выберите раздел —"
+                            }), N.map(e => (0, s.jsx)("option", {
+                                value: e.id,
+                                children: e.label
+                            }, e.id))]
+                        })]
+                    }), (0, s.jsxs)("div", {
+                        className: "sk-modal-row",
+                        children: [(0, s.jsx)("label", {
+                            children: "Заголовок:"
+                        }), (0, s.jsx)("input", {
+                            value: d,
+                            onChange: e => m(e.target.value),
+                            maxLength: 150,
+                            placeholder: "О чём тема? (от 5 до 150 символов)"
+                        }), (0, s.jsx)("div", {
+                            className: "sk-charcount",
+                            children: (0, s.jsxs)("span", {
+                                className: d.length > 140 ? "over" : "",
+                                children: [d.length, "/150"]
+                            })
+                        })]
+                    }), (0, s.jsxs)("div", {
+                        className: "sk-modal-row",
+                        children: [(0, s.jsx)("label", {
+                            children: "Сообщение:"
+                        }), (0, s.jsx)("textarea", {
+                            value: h,
+                            onChange: e => u(e.target.value),
+                            maxLength: 2e4,
+                            rows: 10,
+                            placeholder: "Опишите вопрос или ситуацию подробно — так проще получить дельный ответ.",
+                            style: {
+                                minHeight: 220,
+                                resize: "vertical"
+                            }
+                        }), (0, s.jsx)("div", {
+                            className: "sk-charcount",
+                            children: (0, s.jsxs)("span", {
+                                className: h.length > 18e3 ? "over" : "",
+                                children: [h.length, "/20000"]
+                            })
+                        })]
+                    }), j && (0, s.jsx)("div", {
+                        className: "sk-modal-err",
+                        children: j
+                    }), (0, s.jsxs)("div", {
+                        className: "sk-modal-actions",
+                        children: [(0, s.jsx)("button", {
+                            className: "sk-btn-classic",
+                            style: {
+                                marginTop: 0
+                            },
+                            onClick: l,
+                            disabled: x,
+                            children: "Отмена"
+                        }), (0, s.jsx)("button", {
+                            className: "sk-btn-classic right",
+                            style: {
+                                marginTop: 0
+                            },
+                            disabled: x || !c || d.trim().length < 5 || !h.trim(),
+                            onClick: g,
+                            children: x ? "Проверяем и публикуем…" : "Опубликовать"
+                        })]
+                    }), (0, s.jsx)("div", {
+                        className: "sk-modal-hint",
+                        style: {
+                            marginTop: 6
+                        },
+                        children: "Тема будет доступна сразу после публикации и проверки ИИ-модерацией. Права на редактирование и удаление — только у автора темы."
+                    })]
+                })]
+            })
+        })
+    }
+
+    function $({
+        onOpenTopic: e
+    }) {
+        return (0, s.jsxs)("div", {
+            className: "sm-frame-2 mx-auto max-w-[800px]",
+            children: [(0, s.jsx)("div", {
+                className: "sm-frame-title",
+                children: "Правила форума"
+            }), (0, s.jsxs)("div", {
+                className: "space-y-3 p-4 text-[15px]",
+                children: [(0, s.jsx)("p", {
+                    children: "Полные правила форума закреплены в служебной теме. Ознакомьтесь перед созданием тем и сообщений."
+                }), (0, s.jsx)("button", {
+                    className: "sm-btn sm-btn-primary px-4 py-2",
+                    onClick: () => e(2),
+                    children: "Открыть тему «Правила форума»"
+                })]
+            })]
+        })
+    }
+
+    function O({
+        notify: e
+    }) {
+        let [l, n] = (0, a.useState)(""), [t, i] = (0, a.useState)(""), [r, c] = (0, a.useState)(!1), o = async () => {
+            c(!0);
+            try {
+                let s = await fetch("/api/appeals", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            text: l.trim(),
+                            contact: t.trim()
+                        })
+                    }),
+                    a = await s.json();
+                if (!s.ok) throw Error(a.error);
+                n(""), i(""), e(a.note || "Обращение отправлено")
+            } catch (s) {
+                e(s instanceof Error ? s.message : "Ошибка")
+            } finally {
+                c(!1)
+            }
+        };
+        return (0, s.jsxs)("div", {
+            className: "sm-frame-2 mx-auto max-w-[720px]",
+            children: [(0, s.jsx)("div", {
+                className: "sm-frame-title",
+                children: "Обращение к администратору"
+            }), (0, s.jsxs)("div", {
+                className: "space-y-2.5 p-4",
+                children: [(0, s.jsx)("p", {
+                    className: "text-[14px] text-[#64748B]",
+                    children: "Обжалование решений ИИ/модерации, вопросы и предложения. Минимум 20 символов."
+                }), (0, s.jsx)("textarea", {
+                    value: l,
+                    onChange: e => n(e.target.value),
+                    rows: 5,
+                    placeholder: "Опишите ситуацию…",
+                    className: "w-full border border-[#1E3A5F] px-2.5 py-2 text-[15px] outline-none focus:bg-[#F2F6FA]"
+                }), (0, s.jsx)("input", {
+                    value: t,
+                    onChange: e => i(e.target.value),
+                    placeholder: "Контакт для ответа (необязательно)",
+                    className: "w-full border border-[#1E3A5F] px-2.5 py-2 text-[14.5px] outline-none focus:bg-[#F2F6FA]"
+                }), (0, s.jsx)("button", {
+                    className: "sm-btn sm-btn-primary px-5 py-2",
+                    disabled: r || l.trim().length < 20,
+                    onClick: o,
+                    children: r ? "Отправка…" : "Отправить обращение"
+                })]
+            })]
+        })
+    }
+
+    function P() {
+        return (0, s.jsxs)("div", {
+            className: "sm-frame-2 mx-auto max-w-[800px]",
+            children: [(0, s.jsx)("div", {
+                className: "sm-frame-title",
+                children: "О проекте"
+            }), (0, s.jsxs)("div", {
+                className: "space-y-3 p-4 text-[15px]",
+                children: [(0, s.jsxs)("p", {
+                    children: [(0, s.jsx)("b", {
+                        children: "SakhMatrix"
+                    }), " — Сахалинская матрица взаимопомощи: независимый форум-портал для жителей острова."]
+                }), (0, s.jsx)("p", {
+                    children: "Здесь спрашивают и отвечают: рекомендации мастеров, дороги и транспорт, рыбалка, ЖКХ, цены, жизнь Сахалина. Девиз проекта — «Спроси у города — город ответит»."
+                }), (0, s.jsx)("p", {
+                    children: "На портале действуют правила общения: без оскорблений, спама и запрещённого контента. Сообщения проверяет ИИ-модерация, спорные решения рассматривает администратор."
+                })]
+            })]
+        })
+    }
+
+    function F({
+        token: e,
+        user: l,
+        notify: n,
+        onNeedAuth: t
+    }) {
+        let [i, r] = (0, a.useState)([]), [c, o] = (0, a.useState)(""), [d, m] = (0, a.useState)(""), h = (0, a.useCallback)(() => {
+            if (!e) return;
+            let s = new URLSearchParams({
+                token: e,
+                limit: "60"
+            });
+            d.trim() && s.set("q", d.trim()), fetch(`/api/moderation?${s}`).then(async e => {
+                let s = await e.json();
+                if (!e.ok) throw Error(s.error);
+                return s
+            }).then(e => r(e.entries || [])).catch(e => o(e.message))
+        }, [e, d]);
+        if ((0, a.useEffect)(() => {
+                let e = window.setTimeout(h, 0);
+                return () => window.clearTimeout(e)
+            }, [h]), !l) return (0, s.jsxs)("div", {
+            className: "sm-frame-2 mx-auto max-w-[520px] p-6 text-center",
+            children: [(0, s.jsx)("p", {
+                className: "text-[15px]",
+                children: "Админ-раздел. Требуется вход администратора."
+            }), (0, s.jsx)("button", {
+                className: "sm-btn sm-btn-primary mt-3 px-4 py-2",
+                onClick: t,
+                children: "Войти"
+            })]
+        });
+        if ("admin" !== l.role) return (0, s.jsx)("div", {
+            className: "sm-frame-2 mx-auto max-w-[520px] p-6 text-center text-[15px]",
+            children: "Доступно только администратору."
+        });
+        let u = async (s, a, l) => {
+            if (!e) return;
+            let t = await fetch("/api/admin/decide", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        type: s,
+                        id: a,
+                        decision: l,
+                        token: e
+                    })
+                }),
+                i = await t.json();
+            n(t.ok ? `Решение применено: ${l}` : i.error || "Ошибка"), h()
+        };
+        return (0, s.jsxs)("div", {
+            className: "sm-frame-2 mx-auto max-w-[980px]",
+            children: [(0, s.jsx)("div", {
+                className: "sm-frame-title",
+                children: "Журнал модерации"
+            }), (0, s.jsxs)("div", {
+                className: "border-b border-[#C9D4E2] p-2",
+                children: [(0, s.jsxs)("div", {
+                    className: "flex gap-2",
+                    children: [(0, s.jsx)("input", {
+                        value: d,
+                        onChange: e => m(e.target.value),
+                        placeholder: "Поиск по журналу…",
+                        className: "flex-1 border border-[#1E3A5F] px-2.5 py-1.5 text-[14px] outline-none"
+                    }), (0, s.jsx)("button", {
+                        className: "sm-btn",
+                        onClick: h,
+                        children: "Обновить"
+                    })]
+                }), c && (0, s.jsx)("p", {
+                    className: "mt-2 text-[13.5px] text-[#B22335]",
+                    children: c
+                })]
+            }), (0, s.jsxs)("ul", {
+                className: "divide-y divide-[#D8DEE7]",
+                children: [0 === i.length && (0, s.jsx)("li", {
+                    className: "p-4 text-center text-[14px] text-[#64748B]",
+                    children: "Записей нет."
+                }), i.map(e => (0, s.jsxs)("li", {
+                    className: "px-3 py-2.5 text-[14px]",
+                    children: [(0, s.jsxs)("div", {
+                        className: "flex flex-wrap items-center gap-2",
+                        children: [(0, s.jsx)("b", {
+                            children: e.author
+                        }), (0, s.jsxs)("span", {
+                            className: "text-[12.5px] text-[#64748B]",
+                            children: ["в теме «", e.topic.title, "»"]
+                        }), e.isHiddenByAi && (0, s.jsxs)("span", {
+                            className: "border border-[#1E3A5F] px-1.5 text-[11px] font-bold",
+                            children: ["скрыто ИИ: ", e.hiddenReason]
+                        }), e.isDeleted && (0, s.jsx)("span", {
+                            className: "border border-[#1E3A5F] bg-[#F2F6FA] px-1.5 text-[11px] font-bold",
+                            children: "удалено"
+                        }), e.needHuman && (0, s.jsx)("span", {
+                            className: "border border-[#B22335] px-1.5 text-[11px] font-bold text-[#B22335]",
+                            children: "требуется решение администратора"
+                        }), e.complaintsCount > 0 && (0, s.jsxs)("span", {
+                            className: "text-[12px] text-[#B22335]",
+                            children: ["жалоб: ", e.complaintsCount]
+                        })]
+                    }), e.aiNote && (0, s.jsxs)("div", {
+                        className: "mt-0.5 text-[12.5px] text-[#64748B]",
+                        children: ["ИИ: ", e.aiNote]
+                    }), (0, s.jsx)("p", {
+                        className: "mt-1 line-clamp-2 text-[14.5px]",
+                        children: e.body
+                    }), (0, s.jsxs)("div", {
+                        className: "mt-1.5 flex flex-wrap gap-1.5",
+                        children: [(0, s.jsx)("button", {
+                            className: "sm-btn",
+                            onClick: () => u("message", e.id, "publish"),
+                            children: "опубликовать"
+                        }), (0, s.jsx)("button", {
+                            className: "sm-btn",
+                            onClick: () => u("message", e.id, "hide"),
+                            children: "скрыть"
+                        }), (0, s.jsx)("button", {
+                            className: "sm-btn",
+                            onClick: () => u("message", e.id, "delete"),
+                            children: "удалить"
+                        })]
+                    })]
+                }, e.id))]
+            })]
+        })
+    }
+
+    function R({
+        view: e,
+        onForum: a
+    }) {
+        let l = {
+            ads: "Объявления",
+            info: "Практическая информация",
+            directory: "Справочник",
+            useful: "Полезное"
+        };
+        return (0, s.jsxs)("div", {
+            className: "sm-frame-2 mx-auto max-w-[720px]",
+            children: [(0, s.jsx)("div", {
+                className: "sm-frame-title",
+                children: l[e] || "Раздел"
+            }), (0, s.jsxs)("div", {
+                className: "space-y-3 p-6 text-center text-[15px]",
+                children: [(0, s.jsxs)("p", {
+                    children: ["Раздел «", l[e], "» готовится к запуску в рамках поэтапной доработки портала."]
+                }), (0, s.jsx)("p", {
+                    className: "text-[14px] text-[#64748B]",
+                    children: "Сейчас работает форум — основа SakhMatrix."
+                }), (0, s.jsx)("button", {
+                    className: "sm-btn sm-btn-primary px-5 py-2",
+                    onClick: a,
+                    children: "Перейти на форум"
+                })]
+            })]
+        })
+    }
+    e.s(["default", () => p], 52683)
+}]);
