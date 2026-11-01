@@ -71,6 +71,9 @@ interface LsItem {
   nick: string;
   status: string;
   createdAt: string;
+  /** 2026-11-01: для кнопок редактирования/удаления */
+  authorId?: string;
+  originalAuthorId?: string;
 }
 
 const PAGE_SIZE = 15;
@@ -160,6 +163,7 @@ export default function LoveSakhPage(props: {
       });
       if (qq) sp.set("q", qq);
       if (pp) sp.set("place", pp);
+      if (props.token) sp.set("token", props.token);
       try {
         const r = await fetch(`/api/znakomstva?${sp.toString()}`);
         const d = await r.json();
@@ -171,6 +175,8 @@ export default function LoveSakhPage(props: {
           nick: String(x.nick ?? ""),
           status: String(x.status ?? "actual"),
           createdAt: String(x.createdAt ?? ""),
+          authorId: x.authorId ? String(x.authorId) : undefined,
+          originalAuthorId: x.originalAuthorId ? String(x.originalAuthorId) : undefined,
         }));
         setItems(rows);
         setTotal(Number(d.total ?? rows.length));

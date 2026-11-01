@@ -159,7 +159,9 @@ export async function GET(req: NextRequest) {
     const page = Math.max(1, parseInt(sp.get("page") ?? "1", 10) || 1);
     const pageSize = Math.min(50, Math.max(1, parseInt(sp.get("pageSize") ?? "20", 10) || 20));
 
-    const viewer = mine ? await userByToken(token) : null;
+    // 2026-11-01: viewer определяется всегда (не только при mine=1)
+    // — нужно для isMine → authorId/originalAuthorId в ответе
+    const viewer = await userByToken(token);
 
     if (mine) {
       if (!viewer) {
@@ -203,7 +205,7 @@ export async function GET(req: NextRequest) {
     const total = filtered.length;
     const start = (page - 1) * pageSize;
     const pageRows = filtered.slice(start, start + pageSize);
-    const out = await withMeta(pageRows);
+    const out = await withMeta(pageRows, viewer?.id);
 
     return NextResponse.json({
       posts: out,
