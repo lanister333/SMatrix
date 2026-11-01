@@ -204,6 +204,7 @@ export function GkhPage(props: {
   const [formDate, setFormDate] = useState("");
   const [formActions, setFormActions] = useState("");
   const [formStatus, setFormStatus] = useState("active");
+  const [editId, setEditId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   // 2026-10-18: вкладки-маркеры по статусам (картотека).
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -322,6 +323,25 @@ export function GkhPage(props: {
     setGuestHint(false);
     setRewrite(false);
     setErr("");
+    setEditId(null);
+    setFormText("");
+    setFormPlace("");
+    setFormDate("");
+    setFormActions("");
+    setFormStatus("active");
+    setFormOpen(true);
+  };
+
+  const openEdit = (item: GkhItem) => {
+    setEditId(item.id);
+    setFormText(item.text);
+    setFormPlace(item.place);
+    setFormDate(item.problemDate);
+    setFormActions(item.actions || "");
+    setFormStatus(item.status);
+    setGuestHint(false);
+    setRewrite(false);
+    setErr("");
     setFormOpen(true);
   };
 
@@ -340,17 +360,19 @@ export function GkhPage(props: {
     }
     setBusy(true);
     try {
-      const r = await fetch("/api/gkh", {
-        method: "POST",
+      const isEdit = !!editId;
+      const r = await fetch(isEdit ? `/api/gkh/${editId}` : "/api/gkh", {
+        method: isEdit ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           token: props.token,
+          ...(isEdit ? { action: "edit" } : {}),
           text: formText.trim(),
           place: formPlace.trim(),
           problemDate: formDate,
           actions: formActions.trim(),
           status: formStatus,
-          confirmSimilar: true, // подсказка «похожая проблема» не входит в ТЗ №2
+          confirmSimilar: true,
         }),
       });
       const d = await r.json();
@@ -531,6 +553,9 @@ export function GkhPage(props: {
         {/* Форма из 3 ОБЯЗАТЕЛЬНЫХ шагов (только для вошедших). */}
         {formOpen && props.token && (
           <div className="gkf-form" data-gkf-form="1">
+            <div style={{ fontSize: 16, fontWeight: 700, color: "#1E3A5F", marginBottom: 10 }}>
+              {editId ? "Редактировать проблему" : "Зафиксировать проблему"}
+            </div>
             {/* Шаг 1: суть проблемы без лозунгов. */}
             <div className="gkf-step" data-gkf-step1="1">
               <label className="gkf-steplabel" htmlFor="gkf-text">
@@ -628,7 +653,7 @@ export function GkhPage(props: {
             </div>
             <div className="gkf-formfoot">
               <button className="sk-btn-classic" data-gkf-publish="1" disabled={busy} onClick={publish} style={{ borderRadius: 0 }}>
-                {busy ? "Публикация…" : "Опубликовать"}
+                {busy ? "Публикация…" : editId ? "Сохранить" : "Опубликовать"}
               </button>
             </div>
             {/* ИИ-фильтр лозунгов (ТЗ №2 п.17): дословное сообщение,
@@ -797,9 +822,14 @@ export function GkhPage(props: {
                     </button>
 
                     {props.user && props.user.id && (props.user.role === "owner" || props.user.role === "admin" || props.user.role === "moderator" || (it.authorId != null && props.user.id === it.authorId) || (it.originalAuthorId != null && props.user.id === it.originalAuthorId)) && (
+                      <>
+                      <button type="button" onClick={() => openEdit(it)} style={{ cursor: "pointer", background: "none", border: "none", color: "#0a5caa", padding: "6px 10px", fontFamily: "inherit", fontSize: "13px", fontWeight: 600, textDecoration: "underline" }}>
+                        Редактировать
+                      </button>
                       <button type="button" onClick={async () => { if (!window.confirm("Удалить жалобу?")) return; try { const r = await fetch(`/api/gkh/${it.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: props.token, action: "delete" }) }); const d = await r.json(); if (!r.ok) { props.notify(d.error || "Ошибка"); return; } props.notify("Жалоба удалена"); load(); } catch { props.notify("Сеть недоступна"); } }} style={{ cursor: "pointer", background: "none", border: "none", color: "#dc2626", padding: "6px 10px", fontFamily: "inherit", fontSize: "13px", fontWeight: 600, textDecoration: "underline" }}>
                         Удалить
                       </button>
+                      </>
                     )}
                   </div>
                 </article>
