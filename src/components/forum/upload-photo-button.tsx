@@ -71,7 +71,14 @@ export function UploadPhotoButton({ token, onUploaded, notify }: Props) {
         accept="image/jpeg,image/png,image/webp,image/gif"
         onChange={handleFile}
         disabled={busy || !token}
-        style={{ display: "none" }}
+        style={{
+          position: "absolute",
+          width: 1,
+          height: 1,
+          opacity: 0,
+          overflow: "hidden",
+          pointerEvents: "none",
+        }}
       />
     </label>
   );
