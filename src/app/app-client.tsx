@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import type React from "react";
 import { FolderOpen, MessageSquare } from "lucide-react";
 import {
@@ -258,11 +259,15 @@ function Sidebar(props: {
 
 export default function App({ initialSearchParams = {} }: { initialSearchParams?: Record<string, string> }) {
   // 2026-11-01: инициализация из SSR searchParams — чтобы при переходе на /?topic=1234
-  // не было вспышки главной страницы. Сервер сразу отдаёт правильный view.
-  const initialTopic = initialSearchParams.topic;
-  const initialScope = initialSearchParams.scope;
-  const initialRubric = initialSearchParams.rubric;
-  const initialView = initialTopic ? "forum" : (initialScope || initialRubric) ? "forum" : (initialSearchParams.view === "forum" ? "forum" : "home");
+  // не было вспышки главной страницы. Сервер сразу рендерит правильный view.
+  // useSearchParams работает при SSR в Next.js 16 (читает из контекста запроса).
+  const searchParams = useSearchParams();
+  const spTopic = searchParams?.get("topic") || initialSearchParams.topic;
+  const spScope = searchParams?.get("scope") || initialSearchParams.scope;
+  const spRubric = searchParams?.get("rubric") || initialSearchParams.rubric;
+  const spView = searchParams?.get("view") || initialSearchParams.view;
+  const initialTopic = spTopic;
+  const initialView = initialTopic ? "forum" : (spScope || spRubric) ? "forum" : (spView === "forum" ? "forum" : "home");
   const [view, setView] = useState(initialView);
   const { user, token, login, logout } = useAuth();
   // ШАГ 27: запрос из навигационного поиска «Поиск по форуму...» для view="search"
