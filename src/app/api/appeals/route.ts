@@ -3,13 +3,19 @@ import { db } from "@/lib/db";
 import { handleApiError, rateLimit } from "@/lib/api";
 import { getClientIp } from "@/lib/security";
 import { notifyAdmin } from "@/lib/notifications";
+import { userByToken } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
-    // S-3 (аудит 2026-10-04): rate-limit на feedback-форму. Без auth —
-    // лимит по IP (5 обращений в час). Препятствует спаму appeals.
+    // S-3 (аудит 2026-10-04): rate-limit на feedback-форму.
+    // 2026-11-01: добавлена проверка token (необязательная — гости могут,
+    // но если token есть — лимит по user.id, а не IP).
+    const body = await req.json();
+    const token = String(body.token ?? "");
+    const user = token ? await userByToken(token) : null;
     const ip = getClientIp(req);
-    if (!rateLimit(`appeals-feedback:${ip}`, 5, 60 * 60 * 1000)) {
+    const limitKey = user ? `appeals:${user.id}` : `appeals:${ip}`;
+    if (!rateLimit(limitKey, 5, 60 * 60 * 1000)) {
       return NextResponse.json(
         { error: "Слишком много обращений. Попробуйте позже." },
         { status: 429 }
