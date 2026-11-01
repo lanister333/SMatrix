@@ -2,14 +2,12 @@
  * СТАДИЯ 2 (Шаг 7) + Шаг №7: сводки коммунальных отключений для панели
  * главной. Читает db/outages.json (его пишут планировщик src/instrumentation.ts
  * — РАЗ В 30 МИНУТ по Шагу №7 — и/или PHP-крон scripts/cron-outages.php).
- *
- * 2026-10-07: отдаём ВСЕ записи из кэша (раньше было строго 3) — пользователь
- * должен видеть все адреса плановых отключений, не только 3 последние.
- * Сортировка: по времени публикации по убыванию (свежие сверху).
- * Ручное обновление: POST /api/home/outages.
  */
 
 import { pickTopOutages, readOutages, runOutagesParse } from "@/lib/outages-parser";
+import { NextRequest, NextResponse } from "next/server";
+import { userByToken } from "@/lib/auth";
+import { isStaffRole } from "@/lib/admin";
 
 export const runtime = "nodejs";
 
@@ -18,8 +16,6 @@ export async function GET() {
   if (!data) {
     return Response.json({ source: "none", updated: "", items: [], errors: [] });
   }
-  // 2026-10-07: отдаём ВСЕ записи (pickTopOutages с большим лимитом).
-  // Сортировка по времени публикации по убыванию сохраняется.
   const items = pickTopOutages(data.items, data.items.length);
   return Response.json({
     source: items.length > 0 ? "aggregated" : "empty",
@@ -29,8 +25,13 @@ export async function GET() {
   });
 }
 
-export async function POST() {
-  // ручный/крон-запуск парсера (фоновые сборки дергают его по расписанию)
+export async function POST(req: NextRequest) {
+  // 2026-11-01: только админ может запускать парсинг
+  const token = req.nextUrl.searchParams.get("token") || "";
+  const user = await userByToken(token);
+  if (!user || !isStaffRole(user.role)) {
+    return NextResponse.json({ error: "Доступно только администратору" }, { status: 403 });
+  }
   const res = await runOutagesParse();
   return Response.json({ ok: res.ok, count: res.count });
 }
