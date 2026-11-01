@@ -753,7 +753,7 @@ li.sk-rubric-row{display:block}
 .sk-deadtopic .sk-backlink{margin:0;display:inline}
 .sk-deadtopic .dt-sep{color:#8296ab;margin:0 8px}
 .sk-topicactions .sk-topicdel{color:#8a5a5a}
-.sk-topicactions .sk-topicdel:hover{color:#b22335}
+.sk-topicactions .sk-topicdel:hover{color:#c08080}
 .sk-searchrow .sr-badge-lifecycle{color:#5b4a72;background:#efebf5;border:1px solid #cbbfe0;border-radius:2px;padding:0 4px;font-size:11.5px;font-weight:700}
 .sk-searchrow .sr-badge-lifecycle.closed{color:#4a5560;background:#eceff2;border-color:#c6cdd5}
 .sk-msg-num{color:#4a5b6d;cursor:pointer;font-size:12.5px;font-weight:700;text-decoration:none}
@@ -761,7 +761,7 @@ li.sk-rubric-row{display:block}
 .sk .sk-msg-parent{color:#0a5caa;cursor:pointer;background:#edf4fb;border:1px solid #c9daec;border-radius:2px;padding:0 6px;font-size:12px;font-weight:600;line-height:1.7;text-decoration:none;white-space:nowrap}
 .sk .sk-msg-parent:hover{color:#084c8b;text-decoration:underline}
 .sk-fav-btn.done{color:#b8860b;font-weight:700}
-.sk-msg-del:hover{color:#b3261e}
+.sk-msg-del:hover{color:#c08080}
 .sk-msg-deleted{color:#6a7686;background:#f4f6f8;border:1px dashed #b6c1cc;margin-bottom:7px;padding:5px 10px;font-size:12.5px;font-style:italic}
 .sk-pager .pg-goto{align-items:center;gap:5px;font-size:12.5px;display:flex}
 .sk-pager .pg-goto input{border:1px solid #2f9c8e;width:60px;padding:2px 6px;font-family:inherit;font-size:12.5px}
