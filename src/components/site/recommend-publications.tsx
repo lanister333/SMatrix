@@ -27,6 +27,7 @@ import SakhDatetimeBlock from "@/components/site/sakh-datetime-block";
 import type { ForumUser } from "@/lib/ui";
 import { discussOnForum } from "@/lib/discuss";
 import { nickGenderClass } from "@/lib/nick-gender";
+import { MarkdownText } from "@/components/forum/photo-preview";
 
 interface RecItem {
   id: string;
@@ -432,7 +433,7 @@ function RecRow(props: {
         <div className="rc-q">
           <span className="rc-qlabel">Отзыв:</span> <b className="rc-qsubject">{item.subject}</b>
         </div>
-        <p className="rc-qtext">{item.text}</p>
+        <p className="rc-qtext"><MarkdownText text={item.text} /></p>
 
         {/* Выделение конкретного человека по Пункту 6 Манифеста */}
         {!!item.humanHighlight && (

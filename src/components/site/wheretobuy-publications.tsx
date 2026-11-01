@@ -27,7 +27,7 @@ import { findPhoneNumbers } from "@/lib/moderation/premoderation";
 import { findEmotionalLabels, WTB_HINT_FORUM_BUTTON_LABEL } from "@/lib/moderation/wheretobuy-hint-premoderation";
 import { nickGenderClass } from "@/lib/nick-gender";
 import { UploadPhotoButton } from "@/components/forum/upload-photo-button";
-import { PhotoPreview, photosToMarkdown, markdownToPhotos, stripPhotoMarkdown } from "@/components/forum/photo-preview";
+import { PhotoPreview, photosToMarkdown, markdownToPhotos, stripPhotoMarkdown, MarkdownText } from "@/components/forum/photo-preview";
 
 /** ТЗ 2026-09-23 «Ответить»: один ответ в плоском списке на карточке. */
 interface WtbAnswerItem {
@@ -309,7 +309,7 @@ function WhereToBuyRow(props: {
       <div className="wb-q">
         <span className="wb-qlabel">Вопрос:</span> {item.title}
       </div>
-      {item.text && <div className="wb-qtext">{item.text}</div>}
+      {item.text && <div className="wb-qtext"><MarkdownText text={item.text} /></div>}
 
       {own && item.isHiddenByAi && (
         <div className="wb-hiddennote">
