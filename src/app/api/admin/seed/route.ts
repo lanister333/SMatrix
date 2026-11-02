@@ -47,6 +47,10 @@ interface SeedMessage {
   body: string;
   createdAt: string;
   parentIndex: number | null;
+  /** 2026-11-03: если true — это сообщение автора темы (тот же бот, что и автор).
+   *  Нужно, когда автор пишет несколько сообщений в своей теме (вопрос + ответы
+   *  «Спасибо» и т.п.) — все эти сообщения должны быть от одного и того же бота. */
+  isAuthor?: boolean;
 }
 
 interface SeedPayload {
@@ -147,6 +151,8 @@ export async function POST(req: NextRequest) {
     // 1. Подбираем ботов для всех уникальных авторов.
     // Автор темы = один бот (gender=authorGender).
     // Авторы сообщений — каждый раз новый бот (по gender), без повторений.
+    // 2026-11-03: если у сообщения isAuthor=true — это сообщение автора темы,
+    // используем того же бота (authorBot), не подбираем нового.
     const usedBotIds: string[] = [];
     const authorBot = await pickBotByGender(payload.authorGender, usedBotIds);
     if (!authorBot) {
@@ -156,6 +162,11 @@ export async function POST(req: NextRequest) {
     // Подбираем ботов для каждого сообщения (по гендеру, без повторов).
     const messageBots: { bot: { id: string; nickname: string; gender: string } | null; createdAt: Date; body: string; parentIndex: number | null }[] = [];
     for (const m of payload.messages) {
+      // Если это сообщение автора темы — используем того же бота.
+      if (m.isAuthor) {
+        messageBots.push({ bot: authorBot, createdAt: new Date(m.createdAt), body: m.body, parentIndex: m.parentIndex });
+        continue;
+      }
       const bot = await pickBotByGender(m.gender, usedBotIds);
       if (!bot) {
         return NextResponse.json({ error: `Не удалось подобрать бота для сообщения (gender=${m.gender})` }, { status: 500 });
