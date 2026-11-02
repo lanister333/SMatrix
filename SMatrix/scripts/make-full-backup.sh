@@ -8,19 +8,18 @@
 # зеркала/части из public (sakhmatrix-backup*), чтобы не упаковывать zip в zip.
 # После сборки: md5 + unzip -t; зеркало litterbox.catbox.moe (72ч) — вручную.
 set -euo pipefail
-cd /home/z/my-project/SMatrix
-OUT="/home/z/my-project/download/sakhmatrix-full-backup-$(date +%F).zip"
+cd /home/z/my-project
+OUT="download/sakhmatrix-full-backup-$(date +%F).zip"
 rm -f "$OUT"
 zip -qr "$OUT" \
   src prisma scripts tests public reverse examples mini-services db upload \
   package.json bun.lock bunfig.toml tsconfig.json next-env.d.ts next.config.ts \
   postcss.config.mjs eslint.config.mjs components.json tailwind.config.ts \
   Caddyfile .gitignore HANDOFF.md worklog.md README-NEW-SESSION.md \
-  NEW_SESSION_MESSAGE.txt GIT_HISTORY.txt NEW_SESSION_CONTEXT.md \
+  NEW_SESSION_MESSAGE.txt GIT_HISTORY.txt \
   -x 'upload/*.zip' \
   -x 'public/sakhmatrix-backup*' \
-  -x 'scripts/shots/*' -x 'scripts/*.png' -x 'scripts/*.webm' -x 'scripts/*.mp4' \
-  -x '*/node_modules/*' -x '*/.next/*' -x '*/.git/*'
+  -x 'scripts/shots/*' -x 'scripts/*.png' -x 'scripts/*.webm' -x 'scripts/*.mp4'
 echo "=== $OUT ==="
 ls -la "$OUT"
 echo "=== files: $(unzip -l "$OUT" | tail -1)"
