@@ -1,10 +1,11 @@
 # SMatrix — Контекст для новой сессии
 
 **Дата создания:** 2026-11-02
-**Последний коммит:** `6982797` — fix: email.ts — ленивая инициализация Resend
+**Последний коммит:** `a827a77` — feat: универсальный /api/admin/seed + страница /admin/seed
 **Проект:** Сахалинский локальный портал (реплика старого Sakh.com)
 **Репозиторий:** https://github.com/lanister333/SMatrix (branch: main)
 **Рабочая директория:** `/home/z/my-project/SMatrix/`
+**Прод-сервер:** `157.22.252.127` (HTTP/HTTPS, ранее был `81.177.49.189`)
 
 ---
 
@@ -117,6 +118,35 @@ SMatrix/
 - `src/lib/email.ts` — ленивая инициализация Resend (фикс билда)
 - ⚠️ В `sendEmail()` стоит хардкод `to: TEST_EMAIL = "suerowich@gmail.com"` — письма не доходят до пользователей. Нужно убрать после настройки Resend + домена.
 
+### Импорт тем через /admin/seed (2026-11-02)
+- `src/app/admin/seed/page.tsx` — страница с формой для заливки JSON
+- `src/app/api/admin/seed/route.ts` — универсальный POST-эндпоинт
+- **Зачем:** на проде нет SSH-доступа из песочницы, БД в `.gitignore`.
+  Чтобы залить тему с ответами на прод, ассистент формирует JSON,
+  заказчик открывает `/admin/seed` (залогинившись как админ) → вставляет JSON → жмёт кнопку.
+- **Авторизация:** `userByToken` + `isStaffRole` (нужен логин admin@sakhmatrix.ru)
+- **Идемпотентность:** повторный запуск с тем же title не дублирует тему
+- **Формат payload** (см. в коде `route.ts`):
+  ```json
+  {
+    "section": "wheretobuy",
+    "title": "...",
+    "bodyText": "...",
+    "postType": "service",
+    "place": "",
+    "createdAt": "2026-10-28T12:00:00+11:00",
+    "authorGender": "female",
+    "messages": [
+      { "gender": "male", "body": "...", "createdAt": "...", "parentIndex": null },
+      { "gender": "female", "body": "...", "createdAt": "...", "parentIndex": 0 }
+    ]
+  }
+  ```
+- **Боты:** подбираются автоматически через `pickRandomBot()` (по гендеру, без повторов в одной теме)
+- **Дерево ответов:** `parentIndex` ссылается на индекс в массиве messages (0-based). `null` = ответ на тему.
+- **Рубрики:** для `section=wheretobuy` автоматически `rubricId=132` (wheretobuy-discuss)
+- **Тест:** тема «Подскажите толкового сантехника для частного дома» (topicId=1045) на проде создана через этот механизм
+
 ---
 
 ## ⚠️ Известные проблемы (НЕ критические)
@@ -145,11 +175,17 @@ SMatrix/
 
 ## 🔐 Секреты и доступы
 
-- **GitHub:** репозиторий `lanister333/SMatrix`, push через REST API (токен в скрипте `gh-push-via-api.py`)
-- **Production сервер:** `81.177.49.189` (SSH доступ у заказчика)
-- **DB:** `/home/z/my-project/SMatrix/db/custom.db` (SQLite, в .gitignore)
+- **GitHub:** репозиторий `lanister333/SMatrix`, push через `git push` (нужен PAT от заказчика).
+  Токен НЕ хранить в коде/`.env` — присылать заказчику в чат на каждую сессию.
+  ⚠️ **ВАЖНО:** после сессии токен обязательно ротировать на https://github.com/settings/tokens
+  (т.к. был передан в чат).
+- **Production сервер:** `157.22.252.127` (ранее `81.177.49.189`). SSH доступ у заказчика.
+- **DB:** `/home/z/my-project/SMatrix/db/custom.db` (SQLite, в .gitignore).
+  Локальный снапшот от 12.10.2026 (`db/custom.db.snapshot-20261012-211330`) устарел.
+  Актуальная БД только на проде. **Для данных используй `/admin/seed`** (см. выше).
 - **Uploads (прод):** `/opt/smatrix/uploads/` (на сервере, вне standalone)
-- **Auto-deploy webhook:** порт 9000 на проде
+- **Auto-deploy webhook:** порт 9000 на проде (слушает push-события GitHub, тянет main, билдит, рестартует)
+- **Admin login на проде:** `admin@sakhmatrix.ru` / `admin` (для входа через браузер, используется `/admin/seed`)
 - **`.env`** (нужен на сервере, в .gitignore):
   ```
   DATABASE_URL=file:/home/z/my-project/SMatrix/db/custom.db
@@ -169,7 +205,7 @@ SMatrix/
 4. **Git — только ручной `git add` конкретных файлов** (фон-процессы коммят db).
 5. **Кнопка "Удалить" — нежно-красная `#c08080`** (не ядовитная).
 6. **После правок CSS:** `rm -rf .next` + чистый рестарт.
-7. **Push в GitHub** — только через `python3 /home/z/my-project/scripts/gh-push-via-api.py`.
+7. **Push в GitHub** — через `git push` с PAT (токен присылает заказчик, **ротировать после каждой сессии**).
 8. **Prisma 6** — использовать `author: { connect: { id } }`, не `authorId`.
 9. **Z-AI SDK** — обязательно `model: "glm-4.5-flash"` (без него возвращает undefined).
 10. **`pickRandomBot()`** — обязательно `await` (иначе Promise truthy).
@@ -184,20 +220,35 @@ SMatrix/
 | Prisma 6 не принимает `authorId` напрямую | `author: { connect: { id: userId } }` |
 | `pickRandomBot()` без await → user.id undefined | `const bot = await pickRandomBot()` |
 | Z-AI SDK возвращает undefined | Добавить `model: "glm-4.5-flash"` |
-| gh-push-via-api.py создаёт empty commits | Использовать `sha^..sha` для diff (уже исправлено) |
 | ComplaintModal crash: `botNick is not defined` | Убрать строку |
 | localStorage избранного не фильтруется | `scope=favorites` в URL |
 | Вспышка главной при переходе на форум | `searchParams` — Promise в Next.js 16, нужен `await` |
 | Upload файлы удалялись при deploy | `/opt/smatrix/uploads/` вне standalone |
 | `input.click()` не работает на мобильных | `<label>` + `opacity:0` |
 | `new Resend("")` падает при build | Ленивая инициализация `getResend()` |
+| Локальная БД устарела (снапшот 12.10) | Для данных на проде использовать `/admin/seed` (не git push БД) |
+| На проде нет SSH из песочницы | Эндпоинт `/api/admin/seed` + страница `/admin/seed` для заливки данных |
+| Снапшот БД не содержит новых колонок Prisma | После клонирования: `DATABASE_URL=... bun run db:push` (применить схему) |
+| git push падает с 401 в песочнице | Заказчик присылает PAT → `git push https://USER:TOKEN@github.com/...` |
 
 ---
 
 ## 📝 Первое сообщение в новой сессии
 
 Отправь заказчику:
-> "Я загрузил контекст проекта SMatrix. Текущий статус: код в GitHub (последний коммит `6982797`), сайт работает на `http://81.177.49.189` (HTTP, без HTTPS). Запланирован переезд на новый VPS с настройкой HTTPS и регистрацией по почте через Resend. Что делаем дальше?"
+> "Я загрузил контекст проекта SMatrix. Текущий статус: код в GitHub (последний коммит `a827a77`), сайт работает на `http://157.22.252.127`. На проде есть эндпоинт `/api/admin/seed` + страница `/admin/seed` для заливки тем через JSON (без SSH). Готов принимать задачи — кидай текст темы с ответами."
+
+Если заказчик кидает текст темы для заливки на прод:
+1. Делаешь лёгкий рерайт текста темы и каждого ответа (сохраняя факты, имена, цифры, телефоны).
+2. Определяешь гендер каждого автора по контексту / нику.
+3. Сохраняешь древовидную структуру ответов (кто на кого ответил).
+4. Формируешь JSON в формате `SeedPayload` (см. `/api/admin/seed/route.ts`).
+5. Отправляешь JSON заказчику. Заказчик открывает `/admin/seed`, вставляет JSON, жмёт кнопку.
+6. Заказчик присылает ответ (topicId, messages). Проверяешь что 11 сообщений создано.
+
+**Боты:** подбираются автоматически из пула `bot+*@theatre.local` через `pickRandomBot()`.
+
+**Даты:** реальные из оригинала, в ISO с offset `+11:00` (Сахалинское время).
 
 ---
 
@@ -210,5 +261,7 @@ SMatrix/
 - `src/lib/auth.ts` — аутентификация
 - `src/lib/admin.ts` — проверка ролей
 - `src/lib/security.ts` — утилиты безопасности
-- `scripts/gh-push-via-api.py` — push в GitHub
+- `src/lib/auto-bots.ts` — `pickRandomBot()` для заливки тем
+- `src/app/api/admin/seed/route.ts` — эндпоинт заливки тем (для новых сессий)
+- `src/app/admin/seed/page.tsx` — HTML-страница с формой заливки
 - `scripts/autodeploy/` — webhook для авто-деплоя
