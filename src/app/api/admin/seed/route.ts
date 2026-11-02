@@ -61,15 +61,34 @@ interface SeedPayload {
   messages: SeedMessage[];
 }
 
-/** Найти бота нужного гендера, исключая уже использованных. */
+/** Найти бота нужного гендера, исключая уже использованных.
+ *  2026-11-03: исправлена логика — раньше pickBotByGender делал 5 рандомных
+ *  попыток pickRandomBot, и каждый раз добавляла бота в excludeIds, даже если
+ *  гендер не совпал. Это работало плохо: если женщин 13 из 63, то вероятность
+ *  найти женщину за 5 попыток ~0.5%. Теперь берём всех ботов нужного гендера
+ *  из БД, фильтруем excludeIds, выбираем случайного. */
 async function pickBotByGender(gender: "male" | "female", excludeIds: string[]) {
-  for (let i = 0; i < 5; i++) {
-    const cand = await pickRandomBot(excludeIds);
-    if (!cand) return null;
-    excludeIds.push(cand.id);
-    if (cand.gender === gender) return cand;
-  }
-  return null;
+  const users = await db.user.findMany({
+    where: {
+      email: { contains: "@theatre.local" },
+      gender,
+      id: { notIn: excludeIds },
+    },
+    select: { id: true, nickname: true, gender: true, bio: true },
+  });
+  const bots = users.filter((u) => {
+    if (!u.bio) return false;
+    try {
+      const meta = JSON.parse(u.bio);
+      return meta.role === "theatre_bot" && !meta.deleted;
+    } catch {
+      return false;
+    }
+  });
+  if (bots.length === 0) return null;
+  const picked = bots[Math.floor(Math.random() * bots.length)];
+  excludeIds.push(picked.id);
+  return picked;
 }
 
 /** Проверка идемпотентности: тема с таким заголовком уже есть в нужной рубрике. */
