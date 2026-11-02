@@ -9450,6 +9450,9 @@ div[style*="background-color: rgb(0, 74, 143)"] {
 }
 
 /* === Fix mobile v2: перебить white-space:nowrap и flex:none === */
+/* 2026-11-02: для wb-title/cd-title — nowrap + уменьшенный шрифт, чтобы
+   заголовок «Где купить / где заказать услугу» помещался в одну строку
+   на мобильных (было font-size:28px + white-space:normal → переносилось). */
 @media (max-width: 768px) {
   .wb-title,
   .cd-title {
@@ -9457,9 +9460,12 @@ div[style*="background-color: rgb(0, 74, 143)"] {
     flex: 1 1 100% !important;
     flex-basis: 100% !important;
     flex-wrap: wrap !important;
-    white-space: normal !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
     margin-bottom: 4px !important;
     display: block !important;
+    font-size: 18px !important;
   }
 }
 
