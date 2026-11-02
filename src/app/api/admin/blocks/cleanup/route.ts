@@ -6,10 +6,10 @@
  * самостоятельных спецразделах SakhMatrix.
  *
  * Удаляет в разделах:
- *   - Obyavleniya      → AdListing + AdMedia + AdComplaint + Topic + Message
+ *   - Obyavleniya      → AdListing + AdMedia + AdComplaint (БЕЗ темы форума — у раздела нет topicId)
  *   - WhereToBuy       → WhereToBuyPost + WhereToBuyAnswer + WhereToBuyComplaint + Topic + Message
  *   - CheapPost        → CheapPost + CheapAnswer + CheapComplaint + Topic + Message
- *   - DatingPost       → DatingPost + DatingPhoto + DatingComplaint
+ *   - DatingPost       → DatingPost + DatingPhoto + DatingComplaint (БЕЗ темы форума — у раздела нет topicId)
  *   - EmpPost          → EmpPost + EmpVote + EmpComplaint + Topic + Message
  *   - OverheardPost    → OverheardPost + OverheardComplaint + Topic + Message
  *   - RecPost          → RecPost + RecUsefulVote + RecComplaint + Topic + Message
@@ -56,8 +56,9 @@ export async function POST(req: NextRequest) {
 
     const result = await db.$transaction(async (tx) => {
       // 1. Собрать все topicId, связанные со спецразделами.
-      const [adTopicIds, wtbTopicIds, cheapTopicIds, empTopicIds, ohTopicIds, recTopicIds, gkhTopicIds, helpTopicIds] = await Promise.all([
-        tx.adListing.findMany({ where: { topicId: { not: null } }, select: { topicId: true } }),
+      // ВНИМАНИЕ: AdListing и DatingPost НЕ имеют topicId (эти разделы
+      // работают без форума). Их не запрашиваем по topicId.
+      const [wtbTopicIds, cheapTopicIds, empTopicIds, ohTopicIds, recTopicIds, gkhTopicIds, helpTopicIds] = await Promise.all([
         tx.whereToBuyPost.findMany({ where: { topicId: { not: null } }, select: { topicId: true } }),
         tx.cheapPost.findMany({ where: { topicId: { not: null } }, select: { topicId: true } }),
         tx.empPost.findMany({ where: { topicId: { not: null } }, select: { topicId: true } }),
@@ -67,7 +68,7 @@ export async function POST(req: NextRequest) {
         tx.helpPublication.findMany({ where: { topicId: { not: null } }, select: { topicId: true } }),
       ]);
       const topicIds = new Set<number>();
-      for (const arr of [adTopicIds, wtbTopicIds, cheapTopicIds, empTopicIds, ohTopicIds, recTopicIds, gkhTopicIds, helpTopicIds]) {
+      for (const arr of [wtbTopicIds, cheapTopicIds, empTopicIds, ohTopicIds, recTopicIds, gkhTopicIds, helpTopicIds]) {
         for (const r of arr) if (r.topicId != null) topicIds.add(r.topicId);
       }
       const topicIdList = Array.from(topicIds);
