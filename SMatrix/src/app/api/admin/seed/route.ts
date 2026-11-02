@@ -309,5 +309,154 @@ export async function POST(req: NextRequest) {
 
 // GET — заглушка для тестирования доступности.
 export async function GET() {
-  return NextResponse.json({ ok: true, endpoint: "/api/admin/seed", method: "POST" });
+  return NextResponse.json({ ok: true, endpoint: "/api/admin/seed", methods: "POST, DELETE" });
+}
+
+/**
+ * DELETE /api/admin/seed
+ * body: { token: "...", mode: "cleanup-test" }
+ *
+ * Удаляет все тестовые темы и публикации, ОСТАВЛЯЕТ:
+ *   - закреплённые темы (isPinned=true) и сообщения в них
+ *   - пользователей (включая ботов)
+ *   - рубрики и системные данные (сессии, токены)
+ *
+ * Удаляет:
+ *   - все Topic где isPinned=false (сообщения удаляются Cascade)
+ *   - все WhereToBuyPost (которые не привязаны к закреплённой теме — но обычно все)
+ *   - все OverheardPost, GkhProblem, CheapPost, RecPost, EmpPost, HelpPublication
+ *   - все BotQueue (очередь авто-ответов ботов)
+ *   - все Complaint, ModerationHistory (жалобы на удалённые сообщения)
+ *
+ * Возвращает счётчики удалённого.
+ */
+export async function DELETE(req: NextRequest) {
+  try {
+    const body = await req.json().catch(() => ({}));
+    const token: string | undefined = body.token;
+    const mode: string = body.mode ?? "cleanup-test";
+
+    if (!token) {
+      return NextResponse.json({ error: "Не передан token" }, { status: 400 });
+    }
+    const user = await userByToken(token);
+    if (!user) {
+      return NextResponse.json({ error: "Сессия не найдена — перезайдите" }, { status: 401 });
+    }
+    if (!isStaffRole(user.role)) {
+      return NextResponse.json({ error: "Доступно только администратору" }, { status: 403 });
+    }
+    if (mode !== "cleanup-test") {
+      return NextResponse.json({ error: "Неизвестный mode. Поддерживается: cleanup-test" }, { status: 400 });
+    }
+
+    // Перед удалением — собираем ID тем которые ОСТАВЛЯЕМ (закреплённые).
+    const pinnedTopics = await db.topic.findMany({
+      where: { isPinned: true, deletedAt: null },
+      select: { id: true },
+    });
+    const pinnedTopicIds = pinnedTopics.map(t => t.id);
+
+    // WhereToBuyPost, привязанные к закреплённым темам — оставляем.
+    // Это подсказки «Где купить — перенесено с Главной» (если есть).
+    const pinnedWtbPosts = await db.whereToBuyPost.findMany({
+      where: { topicId: { in: pinnedTopicIds } },
+      select: { id: true },
+    });
+    const pinnedWtbIds = pinnedWtbPosts.map(p => p.id);
+
+    // Считаем что будем удалять.
+    const beforeCounts = {
+      topics: await db.topic.count({ where: { id: { notIn: pinnedTopicIds } } }),
+      topicsPinned: pinnedTopicIds.length,
+      messages: await db.message.count({ where: { topicId: { notIn: pinnedTopicIds } } }),
+      whereToBuyPosts: await db.whereToBuyPost.count({ where: { id: { notIn: pinnedWtbIds } } }),
+      overheardPosts: await db.overheardPost.count(),
+      gkhProblems: await db.gkhProblem.count(),
+      cheapPosts: await db.cheapPost.count(),
+      recPosts: await db.recPost.count(),
+      empPosts: await db.empPost.count(),
+      helpPublications: await db.helpPublication.count(),
+      botQueue: await db.botQueue.count(),
+      complaints: await db.complaint.count(),
+      moderationHistory: await db.moderationHistory.count(),
+    };
+
+    // Транзакция: удаляем всё тестовое в правильном порядке (чтобы не было
+    // проблем с FK). Cascade в схеме должен сработать, но удаляем явно.
+    await db.$transaction(async (tx) => {
+      // 1. Жалобы и история модерации (ссылаются на messages).
+      await tx.complaint.deleteMany({});
+      await tx.moderationHistory.deleteMany({});
+
+      // 2. Очередь ботов (ссылается на topics).
+      await tx.botQueue.deleteMany({});
+
+      // 3. Публикации спецразделов (там где связь с topicId через @unique).
+      //    Сначала обнуляем topicId у публикаций, привязанных к НЕ-закреплённым
+      //    темам, чтобы не было FK violation при удалении тем.
+      await tx.whereToBuyPost.updateMany({
+        where: { id: { notIn: pinnedWtbIds } },
+        data: { topicId: null },
+      });
+      await tx.overheardPost.updateMany({ data: { topicId: null } });
+      await tx.gkhProblem.updateMany({ data: { topicId: null } });
+      await tx.cheapPost.updateMany({ data: { topicId: null } });
+      await tx.recPost.updateMany({ data: { topicId: null } });
+      await tx.empPost.updateMany({ data: { topicId: null } });
+      await tx.helpPublication.updateMany({ data: { topicId: null } });
+
+      // 4. Удаляем сами публикации спецразделов (кроме WhereToBuyPost для закреплённых).
+      await tx.whereToBuyPost.deleteMany({ where: { id: { notIn: pinnedWtbIds } } });
+      await tx.overheardPost.deleteMany({});
+      await tx.gkhProblem.deleteMany({});
+      await tx.cheapPost.deleteMany({});
+      await tx.recPost.deleteMany({});
+      await tx.empPost.deleteMany({});
+      await tx.helpPublication.deleteMany({});
+
+      // 5. Удаляем НЕ-закреплённые темы. Messages удалятся Cascade.
+      await tx.topic.deleteMany({ where: { id: { notIn: pinnedTopicIds } } });
+    });
+
+    const afterCounts = {
+      topics: await db.topic.count(),
+      messages: await db.message.count(),
+      whereToBuyPosts: await db.whereToBuyPost.count(),
+      overheardPosts: await db.overheardPost.count(),
+      gkhProblems: await db.gkhProblem.count(),
+      cheapPosts: await db.cheapPost.count(),
+      recPosts: await db.recPost.count(),
+      empPosts: await db.empPost.count(),
+      helpPublications: await db.helpPublication.count(),
+      botQueue: await db.botQueue.count(),
+      complaints: await db.complaint.count(),
+      moderationHistory: await db.moderationHistory.count(),
+    };
+
+    return NextResponse.json({
+      ok: true,
+      mode: "cleanup-test",
+      deleted: {
+        topics: beforeCounts.topics,
+        messages: beforeCounts.messages,
+        whereToBuyPosts: beforeCounts.whereToBuyPosts,
+        overheardPosts: beforeCounts.overheardPosts,
+        gkhProblems: beforeCounts.gkhProblems,
+        cheapPosts: beforeCounts.cheapPosts,
+        recPosts: beforeCounts.recPosts,
+        empPosts: beforeCounts.empPosts,
+        helpPublications: beforeCounts.helpPublications,
+        botQueue: beforeCounts.botQueue,
+        complaints: beforeCounts.complaints,
+        moderationHistory: beforeCounts.moderationHistory,
+      },
+      kept: {
+        pinnedTopics: beforeCounts.topicsPinned,
+      },
+      after: afterCounts,
+    });
+  } catch (e) {
+    return handleApiError(e);
+  }
 }
