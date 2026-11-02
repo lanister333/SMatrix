@@ -5,6 +5,9 @@
  *
  * ВНИМАНИЕ: после применения на проде — удалить файл и закоммитить.
  *
+ * 2026-11-02: упрощён — вместо админского токена используется фиксированный
+ * одноразовый ключ в URL. Открыл ссылку — тема создана.
+ *
  * Логика: аналогична scripts/seed-topic-1-santehnik.ts, но интегрирована
  * в приложение и использует pickRandomBot() из src/lib/auto-bots.ts
  * (для совместимости с prod-БД, где боты помечены bio.role="theatre_bot").
@@ -12,13 +15,14 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { userByToken } from "@/lib/auth";
 import { handleApiError } from "@/lib/api";
-import { isStaffRole } from "@/lib/admin";
 import { pickRandomBot } from "@/lib/auto-bots";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
+
+// Одноразовый ключ. После применения — отозвать (удалить файл).
+const SEED_KEY = "seed-smatrix-2026";
 
 // Даты в Сахалинском времени (UTC+11), через ISO с offset.
 const T = (s: string) => new Date(s);
@@ -51,13 +55,9 @@ async function findExisting() {
 
 export async function GET(req: NextRequest) {
   try {
-    const token = req.nextUrl.searchParams.get("token");
-    const user = await userByToken(token);
-    if (!user) {
-      return NextResponse.json({ error: "Требуется вход на форум" }, { status: 401 });
-    }
-    if (!isStaffRole(user.role)) {
-      return NextResponse.json({ error: "Доступно только администратору" }, { status: 403 });
+    const key = req.nextUrl.searchParams.get("key");
+    if (key !== SEED_KEY) {
+      return NextResponse.json({ error: "Неверный ключ" }, { status: 403 });
     }
 
     // Идемпотентность: если уже создано — вернуть что есть.
