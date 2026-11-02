@@ -1,55 +1,40 @@
 /**
- * /api/admin/seed — универсальный эндпоинт для импорта тем и сообщений
- * из старого Sakh.com на прод-БД (без SSH — через браузер с админским токеном).
+ * /api/admin/seed — упрощённый эндпоинт для заливки предопределённых тем
+ * на прод-БД. Создан 2026-11-02.
  *
- * Создан 2026-11-02. Заменяет одноразовый /api/admin/seed (коммит a3c4907).
+ * GET /api/admin/seed?key=KEY&topic=TOPIC_ID
  *
- * POST /api/admin/seed
- * body: { token: "...", payload: { ... } }
+ * Где:
+ *   KEY — фиксированный секрет ("seed-smatrix-2026")
+ *   TOPIC_ID — идентификатор темы из словаря PREDEFINED_TOPICS (см. ниже)
  *
- * payload:
- * {
- *   section: "wheretobuy" | "forum",
- *   title: "Заголовок темы",
- *   bodyText: "Текст темы",
- *   postType?: "service" | "product",         // только для wheretobuy
- *   place?: "Южно-Сахалинск",                  // только для wheretobuy
- *   createdAt: "2026-10-28T12:00:00+11:00",   // ISO с offset
- *   authorGender: "male" | "female",
- *   rubricId?: 132,                            // только для forum (по умолчанию 132)
- *   messages: [
- *     { gender: "male",   body: "...", createdAt: "...", parentIndex: null },
- *     { gender: "female", body: "...", createdAt: "...", parentIndex: 0 }
- *   ]
- * }
+ * Не требует логина/токена — только знание ключа.
+ * Идемпотентный: повторный запуск с тем же topic не дублирует.
  *
- * Идемпотентность: по title + первому сообщению. Если уже есть тема с таким
- * заголовком и текстом — возвращаем что уже создано, не дублируем.
+ * Чтобы добавить новую тему для заливки:
+ *   1. Добавить объект в PREDEFINED_TOPICS
+ *   2. Закоммитить, запушить (autodeploy подхватит)
+ *   3. Заказчик открывает ссылку ?topic=новый_id
  *
- * После создания темы — кнопка «Обсудить на форуме» уже в статусе «Обсуждается».
+ * Старый POST с JSON и DELETE — закомментированы ниже (убраны из экспорта).
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { userByToken } from "@/lib/auth";
 import { handleApiError } from "@/lib/api";
-import { isStaffRole } from "@/lib/admin";
 import { pickRandomBot } from "@/lib/auto-bots";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-/** Рубрики «Обсуждение сообщений из блоков» (служебные). */
-const WTB_RUBRIC_ID = 132; // wheretobuy-discuss
+const SEED_KEY = "seed-smatrix-2026";
 
-interface SeedMessage {
-  gender: "male" | "female";
-  body: string;
-  createdAt: string;
-  parentIndex: number | null;
-}
+const T = (s: string) => new Date(s);
 
-interface SeedPayload {
+// === ПРЕДОПРЕДЕЛЁННЫЕ ТЕМЫ ===
+// Добавляй сюда новые темы для заливки.
+type PredefinedTopic = {
+  id: string;
   section: "wheretobuy" | "forum";
   title: string;
   bodyText: string;
@@ -58,8 +43,36 @@ interface SeedPayload {
   createdAt: string;
   authorGender: "male" | "female";
   rubricId?: number;
-  messages: SeedMessage[];
-}
+  messages: { gender: "male" | "female"; body: string; createdAt: string; parentIndex: number | null }[];
+};
+
+const PREDEFINED_TOPICS: PredefinedTopic[] = [
+  {
+    id: "santehnik",
+    section: "wheretobuy",
+    title: "Подскажите толкового сантехника для частного дома",
+    bodyText:
+      "Добрый день, форумчане! Подскажите, пожалуйста, толкового сантехника по адекватной цене — нужно посмотреть трубы и батареи в частном доме.",
+    postType: "service",
+    place: "",
+    createdAt: "2026-10-28T12:00:00+11:00",
+    authorGender: "female",
+    messages: [
+      { gender: "male",   body: "Написал вам в личные сообщения.", "createdAt": "2026-10-28T13:10:00+11:00", parentIndex: null },
+      { gender: "male",   body: "89025588388", "createdAt": "2026-10-28T13:12:00+11:00", parentIndex: null },
+      { gender: "female", body: "Если вдруг предыдущие варианты не подойдут — звоните +79146439295. Толковый, проверенный сантехник.", "createdAt": "2026-10-28T13:54:00+11:00", parentIndex: null },
+      { gender: "male",   body: "Хм, ну батареи и трубы посмотреть любой мужчина сможет. Лучше опишите проблему: как работало, когда перестало, что внутри труб. Обычно в частном доме ломаться особо нечему — вода в системе своя, не меняется, может годами работать.", "createdAt": "2026-10-28T14:32:00+11:00", parentIndex: null },
+      { gender: "female", body: "89242804973 Николай", "createdAt": "2026-10-30T15:18:00+11:00", parentIndex: null },
+      { gender: "male",   body: "Добрый вечер. Звоните: 89621205424", "createdAt": "2026-10-31T19:27:00+11:00", parentIndex: null },
+      { gender: "female", body: "Спасибо 🙏", "createdAt": "2026-10-28T13:41:00+11:00", parentIndex: 0 },
+      { gender: "female", body: "Спасибо!", "createdAt": "2026-10-28T13:42:00+11:00", parentIndex: 1 },
+      { gender: "female", body: "Спасибо 🙏", "createdAt": "2026-10-28T18:58:00+11:00", parentIndex: 2 },
+      { gender: "male",   body: "Только посмотреть?", "createdAt": "2026-10-28T14:48:00+11:00", parentIndex: 3 },
+    ],
+  },
+];
+
+const WTB_RUBRIC_ID = 132; // wheretobuy-discuss
 
 /** Найти бота нужного гендера, исключая уже использованных. */
 async function pickBotByGender(gender: "male" | "female", excludeIds: string[]) {
@@ -72,7 +85,7 @@ async function pickBotByGender(gender: "male" | "female", excludeIds: string[]) 
   return null;
 }
 
-/** Проверка идемпотентности: тема с таким заголовком уже есть в нужной рубрике. */
+/** Идемпотентность: тема с таким заголовком уже есть в нужной рубрике. */
 async function findExistingTopic(title: string, rubricId: number) {
   return db.topic.findFirst({
     where: { title: { startsWith: "Обсуждение: " + title.slice(0, 50) }, rubricId },
@@ -80,63 +93,60 @@ async function findExistingTopic(title: string, rubricId: number) {
   });
 }
 
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
-    const body = await req.json().catch(() => ({}));
-    const token: string | undefined = body.token;
-    const payload: SeedPayload = body.payload;
+    const sp = req.nextUrl.searchParams;
+    const key = sp.get("key");
+    const topicId = sp.get("topic");
 
-    if (!token) {
-      return NextResponse.json({ error: "Не передан token" }, { status: 400 });
+    if (key !== SEED_KEY) {
+      return NextResponse.json({ error: "Неверный ключ" }, { status: 403 });
     }
-    const user = await userByToken(token);
-    if (!user) {
-      return NextResponse.json({ error: "Сессия не найдена — перезайдите" }, { status: 401 });
-    }
-    if (!isStaffRole(user.role)) {
-      return NextResponse.json({ error: "Доступно только администратору" }, { status: 403 });
-    }
-
-    if (!payload || !payload.title || !payload.bodyText || !payload.createdAt) {
-      return NextResponse.json({ error: "Неверный payload: нужны title, bodyText, createdAt" }, { status: 400 });
-    }
-    if (!Array.isArray(payload.messages)) {
-      return NextResponse.json({ error: "Неверный payload: messages должен быть массивом" }, { status: 400 });
+    if (!topicId) {
+      return NextResponse.json({
+        ok: true,
+        availableTopics: PREDEFINED_TOPICS.map(t => t.id),
+      });
     }
 
-    const section = payload.section === "wheretobuy" ? "wheretobuy" : "forum";
-    const rubricId = section === "wheretobuy" ? WTB_RUBRIC_ID : (payload.rubricId ?? WTB_RUBRIC_ID);
-    const createdAt = new Date(payload.createdAt);
-    if (isNaN(createdAt.getTime())) {
-      return NextResponse.json({ error: "createdAt — некорректная дата" }, { status: 400 });
+    const predefined = PREDEFINED_TOPICS.find(t => t.id === topicId);
+    if (!predefined) {
+      return NextResponse.json({
+        error: `Неизвестный topic="${topicId}"`,
+        availableTopics: PREDEFINED_TOPICS.map(t => t.id),
+      }, { status: 404 });
     }
+
+    const section = predefined.section;
+    const rubricId = section === "wheretobuy" ? WTB_RUBRIC_ID : (predefined.rubricId ?? WTB_RUBRIC_ID);
+    const createdAt = new Date(predefined.createdAt);
+    const title = predefined.title;
+    const bodyText = predefined.bodyText;
 
     // Идемпотентность.
-    const existing = await findExistingTopic(payload.title, rubricId);
+    const existing = await findExistingTopic(title, rubricId);
     if (existing) {
       const msgCount = await db.message.count({ where: { topicId: existing.id } });
       return NextResponse.json({
         ok: true,
         alreadyExists: true,
+        topic: topicId,
         topicId: existing.id,
         topicNumber: existing.number,
         messages: msgCount,
-        note: "Тема с таким заголовком уже существует. Повторное создание пропущено.",
+        note: "Тема уже была создана ранее. Повторное создание пропущено.",
       });
     }
 
-    // 1. Подбираем ботов для всех уникальных авторов.
-    // Автор темы = один бот (gender=authorGender).
-    // Авторы сообщений — каждый раз новый бот (по gender), без повторений.
+    // Подбираем ботов.
     const usedBotIds: string[] = [];
-    const authorBot = await pickBotByGender(payload.authorGender, usedBotIds);
+    const authorBot = await pickBotByGender(predefined.authorGender, usedBotIds);
     if (!authorBot) {
-      return NextResponse.json({ error: `Не удалось подобрать бота-автора темы (gender=${payload.authorGender})` }, { status: 500 });
+      return NextResponse.json({ error: `Не удалось подобрать бота-автора темы (gender=${predefined.authorGender})` }, { status: 500 });
     }
 
-    // Подбираем ботов для каждого сообщения (по гендеру, без повторов).
     const messageBots: { bot: { id: string; nickname: string; gender: string } | null; createdAt: Date; body: string; parentIndex: number | null }[] = [];
-    for (const m of payload.messages) {
+    for (const m of predefined.messages) {
       const bot = await pickBotByGender(m.gender, usedBotIds);
       if (!bot) {
         return NextResponse.json({ error: `Не удалось подобрать бота для сообщения (gender=${m.gender})` }, { status: 500 });
@@ -144,21 +154,19 @@ export async function POST(req: NextRequest) {
       messageBots.push({ bot, createdAt: new Date(m.createdAt), body: m.body, parentIndex: m.parentIndex });
     }
 
-    // Сортируем сообщения по createdAt (хронология).
+    // Сортируем по хронологии.
     messageBots.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 
-    // 2. Транзакция.
     const result = await db.$transaction(async (tx) => {
       let postId: string | null = null;
 
-      // Если раздел «Где купить» — создаём карточку публикации.
       if (section === "wheretobuy") {
         const post = await tx.whereToBuyPost.create({
           data: {
-            title: payload.title,
-            text: payload.bodyText,
-            place: payload.place ?? "",
-            postType: payload.postType === "service" ? "service" : "product",
+            title,
+            text: bodyText,
+            place: predefined.place ?? "",
+            postType: predefined.postType === "service" ? "service" : "product",
             status: "seeking",
             authorId: authorBot.id,
             authorName: authorBot.nickname,
@@ -171,10 +179,9 @@ export async function POST(req: NextRequest) {
         postId = post.id;
       }
 
-      // Тема на форуме.
       const lastTopic = await tx.topic.findFirst({ orderBy: { number: "desc" }, select: { number: true } });
       const number = (lastTopic?.number ?? 0) + 1;
-      const fullTopicTitle = `Обсуждение: ${payload.title}`.slice(0, 150);
+      const fullTopicTitle = `Обсуждение: ${title}`.slice(0, 150);
 
       const lastMsgBot = messageBots[messageBots.length - 1]?.bot ?? authorBot;
       const lastActivityAt = messageBots.length > 0
@@ -192,15 +199,13 @@ export async function POST(req: NextRequest) {
         lastActivityAt,
       };
 
-      // Связь с WhereToBuyPost.
       if (postId) {
         topicData.whereToBuyPost = { connect: { id: postId } };
       }
 
       const topic = await tx.topic.create({ data: topicData });
 
-      // Сообщение #1 — тело темы.
-      const firstBody = `${payload.title}\n\n${payload.bodyText}`;
+      const firstBody = `${title}\n\n${bodyText}`;
       await tx.message.create({
         data: {
           topicId: topic.id,
@@ -213,12 +218,10 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      // Остальные сообщения с деревом (по parentIndex).
-      // parentIndex ссылается на ИНДЕКС в массиве messages (0-based).
-      // Сначала создаются depth=0 (parentIndex=null), потом depth=1.
       const indexToMsgId = new Map<number, string>();
-      const depth0 = messageBots.map((m, i) => ({ ...m, originalIndex: i })).filter(m => m.parentIndex === null);
-      const depthN = messageBots.map((m, i) => ({ ...m, originalIndex: i })).filter(m => m.parentIndex !== null);
+      const withIdx = messageBots.map((m, i) => ({ ...m, originalIndex: i }));
+      const depth0 = withIdx.filter(m => m.parentIndex === null);
+      const depthN = withIdx.filter(m => m.parentIndex !== null);
 
       let num = 2;
       for (const m of depth0) {
@@ -238,8 +241,6 @@ export async function POST(req: NextRequest) {
         indexToMsgId.set(m.originalIndex, msg.id);
       }
 
-      // Для вложенных — нужно учитывать что parentIndex может быть любого уровня.
-      // Обрабатываем по очереди, пока все не будут созданы.
       let remaining = depthN;
       let safetyCounter = 0;
       while (remaining.length > 0 && safetyCounter < 100) {
@@ -248,12 +249,9 @@ export async function POST(req: NextRequest) {
         for (const m of remaining) {
           const parentId = m.parentIndex !== null ? indexToMsgId.get(m.parentIndex) : null;
           if (parentId === undefined) {
-            // parent ещё не создан — оставляем на следующую итерацию.
             stillPending.push(m);
             continue;
           }
-          // Вычисляем depth: 1 если parent — тема, иначе parent.depth + 1.
-          // Проще: смотрим по цепочке parentIndex.
           let depth = 1;
           let curParentIdx = m.parentIndex;
           while (curParentIdx !== null && curParentIdx >= 0) {
@@ -261,7 +259,7 @@ export async function POST(req: NextRequest) {
             if (!parent) break;
             depth++;
             curParentIdx = parent.parentIndex;
-            if (depth > 10) break; // защита от зацикливания
+            if (depth > 10) break;
           }
           const msg = await tx.message.create({
             data: {
@@ -285,7 +283,6 @@ export async function POST(req: NextRequest) {
         throw new Error(`Не удалось создать ${remaining.length} сообщений (parentIndex ссылается на несуществующее сообщение)`);
       }
 
-      // Связь post.topicId = topic.id.
       if (postId) {
         await tx.whereToBuyPost.update({ where: { id: postId }, data: { topicId: topic.id } });
       }
@@ -295,166 +292,13 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       ok: true,
+      topic: topicId,
       alreadyExists: false,
       postId: result.postId,
       topicId: result.topicId,
       topicNumber: result.topicNumber,
       messages: result.messagesCount,
       note: "Тема создана.",
-    });
-  } catch (e) {
-    return handleApiError(e);
-  }
-}
-
-// GET — заглушка для тестирования доступности.
-export async function GET() {
-  return NextResponse.json({ ok: true, endpoint: "/api/admin/seed", methods: "POST, DELETE" });
-}
-
-/**
- * DELETE /api/admin/seed
- * body: { token: "...", mode: "cleanup-test" }
- *
- * Удаляет все тестовые темы и публикации, ОСТАВЛЯЕТ:
- *   - закреплённые темы (isPinned=true) и сообщения в них
- *   - пользователей (включая ботов)
- *   - рубрики и системные данные (сессии, токены)
- *
- * Удаляет:
- *   - все Topic где isPinned=false (сообщения удаляются Cascade)
- *   - все WhereToBuyPost (которые не привязаны к закреплённой теме — но обычно все)
- *   - все OverheardPost, GkhProblem, CheapPost, RecPost, EmpPost, HelpPublication
- *   - все BotQueue (очередь авто-ответов ботов)
- *   - все Complaint, ModerationHistory (жалобы на удалённые сообщения)
- *
- * Возвращает счётчики удалённого.
- */
-export async function DELETE(req: NextRequest) {
-  try {
-    const body = await req.json().catch(() => ({}));
-    const token: string | undefined = body.token;
-    const mode: string = body.mode ?? "cleanup-test";
-
-    if (!token) {
-      return NextResponse.json({ error: "Не передан token" }, { status: 400 });
-    }
-    const user = await userByToken(token);
-    if (!user) {
-      return NextResponse.json({ error: "Сессия не найдена — перезайдите" }, { status: 401 });
-    }
-    if (!isStaffRole(user.role)) {
-      return NextResponse.json({ error: "Доступно только администратору" }, { status: 403 });
-    }
-    if (mode !== "cleanup-test") {
-      return NextResponse.json({ error: "Неизвестный mode. Поддерживается: cleanup-test" }, { status: 400 });
-    }
-
-    // Перед удалением — собираем ID тем которые ОСТАВЛЯЕМ (закреплённые).
-    const pinnedTopics = await db.topic.findMany({
-      where: { isPinned: true, deletedAt: null },
-      select: { id: true },
-    });
-    const pinnedTopicIds = pinnedTopics.map(t => t.id);
-
-    // WhereToBuyPost, привязанные к закреплённым темам — оставляем.
-    // Это подсказки «Где купить — перенесено с Главной» (если есть).
-    const pinnedWtbPosts = await db.whereToBuyPost.findMany({
-      where: { topicId: { in: pinnedTopicIds } },
-      select: { id: true },
-    });
-    const pinnedWtbIds = pinnedWtbPosts.map(p => p.id);
-
-    // Считаем что будем удалять.
-    const beforeCounts = {
-      topics: await db.topic.count({ where: { id: { notIn: pinnedTopicIds } } }),
-      topicsPinned: pinnedTopicIds.length,
-      messages: await db.message.count({ where: { topicId: { notIn: pinnedTopicIds } } }),
-      whereToBuyPosts: await db.whereToBuyPost.count({ where: { id: { notIn: pinnedWtbIds } } }),
-      overheardPosts: await db.overheardPost.count(),
-      gkhProblems: await db.gkhProblem.count(),
-      cheapPosts: await db.cheapPost.count(),
-      recPosts: await db.recPost.count(),
-      empPosts: await db.empPost.count(),
-      helpPublications: await db.helpPublication.count(),
-      botQueue: await db.botQueue.count(),
-      complaints: await db.complaint.count(),
-      moderationHistory: await db.moderationHistory.count(),
-    };
-
-    // Транзакция: удаляем всё тестовое в правильном порядке (чтобы не было
-    // проблем с FK). Cascade в схеме должен сработать, но удаляем явно.
-    await db.$transaction(async (tx) => {
-      // 1. Жалобы и история модерации (ссылаются на messages).
-      await tx.complaint.deleteMany({});
-      await tx.moderationHistory.deleteMany({});
-
-      // 2. Очередь ботов (ссылается на topics).
-      await tx.botQueue.deleteMany({});
-
-      // 3. Публикации спецразделов (там где связь с topicId через @unique).
-      //    Сначала обнуляем topicId у публикаций, привязанных к НЕ-закреплённым
-      //    темам, чтобы не было FK violation при удалении тем.
-      await tx.whereToBuyPost.updateMany({
-        where: { id: { notIn: pinnedWtbIds } },
-        data: { topicId: null },
-      });
-      await tx.overheardPost.updateMany({ data: { topicId: null } });
-      await tx.gkhProblem.updateMany({ data: { topicId: null } });
-      await tx.cheapPost.updateMany({ data: { topicId: null } });
-      await tx.recPost.updateMany({ data: { topicId: null } });
-      await tx.empPost.updateMany({ data: { topicId: null } });
-      await tx.helpPublication.updateMany({ data: { topicId: null } });
-
-      // 4. Удаляем сами публикации спецразделов (кроме WhereToBuyPost для закреплённых).
-      await tx.whereToBuyPost.deleteMany({ where: { id: { notIn: pinnedWtbIds } } });
-      await tx.overheardPost.deleteMany({});
-      await tx.gkhProblem.deleteMany({});
-      await tx.cheapPost.deleteMany({});
-      await tx.recPost.deleteMany({});
-      await tx.empPost.deleteMany({});
-      await tx.helpPublication.deleteMany({});
-
-      // 5. Удаляем НЕ-закреплённые темы. Messages удалятся Cascade.
-      await tx.topic.deleteMany({ where: { id: { notIn: pinnedTopicIds } } });
-    });
-
-    const afterCounts = {
-      topics: await db.topic.count(),
-      messages: await db.message.count(),
-      whereToBuyPosts: await db.whereToBuyPost.count(),
-      overheardPosts: await db.overheardPost.count(),
-      gkhProblems: await db.gkhProblem.count(),
-      cheapPosts: await db.cheapPost.count(),
-      recPosts: await db.recPost.count(),
-      empPosts: await db.empPost.count(),
-      helpPublications: await db.helpPublication.count(),
-      botQueue: await db.botQueue.count(),
-      complaints: await db.complaint.count(),
-      moderationHistory: await db.moderationHistory.count(),
-    };
-
-    return NextResponse.json({
-      ok: true,
-      mode: "cleanup-test",
-      deleted: {
-        topics: beforeCounts.topics,
-        messages: beforeCounts.messages,
-        whereToBuyPosts: beforeCounts.whereToBuyPosts,
-        overheardPosts: beforeCounts.overheardPosts,
-        gkhProblems: beforeCounts.gkhProblems,
-        cheapPosts: beforeCounts.cheapPosts,
-        recPosts: beforeCounts.recPosts,
-        empPosts: beforeCounts.empPosts,
-        helpPublications: beforeCounts.helpPublications,
-        botQueue: beforeCounts.botQueue,
-        complaints: beforeCounts.complaints,
-        moderationHistory: beforeCounts.moderationHistory,
-      },
-      kept: {
-        pinnedTopics: beforeCounts.topicsPinned,
-      },
-      after: afterCounts,
     });
   } catch (e) {
     return handleApiError(e);
