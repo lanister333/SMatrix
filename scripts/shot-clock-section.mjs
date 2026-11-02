@@ -1,0 +1,10 @@
+import { chromium } from "playwright";
+const browser = await chromium.launch();
+const page = await browser.newPage({ viewport: { width: 1600, height: 1000 } });
+await page.goto("http://127.0.0.1:3000/obyavleniya", { waitUntil: "domcontentloaded", timeout: 60000 });
+await page.waitForSelector("#sakh-time", { state: "visible", timeout: 30000 });
+await page.waitForTimeout(400);
+const aside = await page.$(".ad-col-right.right-column");
+await aside.screenshot({ path: "/home/z/my-project/download/clock-section-right-column.png" });
+console.log("OK: download/clock-section-right-column.png");
+await browser.close();

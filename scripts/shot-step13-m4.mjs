@@ -1,0 +1,16 @@
+import { chromium } from 'playwright';
+const browser = await chromium.launch();
+const m = await browser.newPage({ viewport: { width: 390, height: 844 } });
+await m.goto('http://localhost:3000/?view=rules', { waitUntil: 'networkidle' });
+await m.screenshot({ path: 'tool-results/s13-mobile-rules.png' });
+await m.goto('http://localhost:3000/?user=Админ', { waitUntil: 'networkidle' });
+await m.screenshot({ path: 'tool-results/s13-mobile-profile.png' });
+await m.goto('http://localhost:3000/?view=ads', { waitUntil: 'networkidle' });
+await m.screenshot({ path: 'tool-results/s13-mobile-ads.png' });
+const d = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+await d.goto('http://localhost:3000/?view=rules', { waitUntil: 'networkidle' });
+await d.screenshot({ path: 'tool-results/s13-desktop-rules.png' });
+await d.goto('http://localhost:3000/?view=about', { waitUntil: 'networkidle' });
+await d.screenshot({ path: 'tool-results/s13-desktop-about.png' });
+await browser.close();
+console.log('done');

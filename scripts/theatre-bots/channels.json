@@ -1,0 +1,117 @@
+[
+  {
+    "channel": "sakhalinforum",
+    "category": "Новости",
+    "rubricSlug": "podslyshano-discuss"
+  },
+  {
+    "channel": "forumsakhcom_auto",
+    "category": "Авто",
+    "rubricSlug": "avto-moto"
+  },
+  {
+    "channel": "forumsakhcom_travel",
+    "category": "Туризм",
+    "rubricSlug": "turizm-otdyh"
+  },
+  {
+    "channel": "forumsakhcom_biz",
+    "category": "Товары и услуги",
+    "rubricSlug": "tovary-i-uslugi"
+  },
+  {
+    "channel": "forumsakhcom_family",
+    "category": "Семья",
+    "rubricSlug": "otnosheniya"
+  },
+  {
+    "channel": "forumsakhcom_cook",
+    "category": "Кухня",
+    "rubricSlug": "kulinarnaya-kniga"
+  },
+  {
+    "channel": "forumsakhcom_med",
+    "category": "Медицина",
+    "rubricSlug": "zdorove"
+  },
+  {
+    "channel": "forumsakhcom_flirt",
+    "category": "Флирт",
+    "rubricSlug": "znakomstva-discuss"
+  },
+  {
+    "channel": "forumsakhcom_animals",
+    "category": "Животные",
+    "rubricSlug": "zhivotnye"
+  },
+  {
+    "channel": "forumsakhcom_all",
+    "category": "Общее",
+    "rubricSlug": "kluby-po-interesam"
+  },
+  {
+    "channel": "fishingsakh",
+    "category": "Рыбалка",
+    "rubricSlug": "rybalka-ohota"
+  },
+  {
+    "channel": "astv_ru",
+    "category": "Новости АСТВ",
+    "rubricSlug": "podslyshano-discuss"
+  },
+  {
+    "channel": "sakhalin_media",
+    "category": "Сахалин-Медиа",
+    "rubricSlug": "podslyshano-discuss"
+  },
+  {
+    "channel": "news_sakhalin",
+    "category": "News.Sakhalin",
+    "rubricSlug": "podslyshano-discuss"
+  },
+  {
+    "channel": "ysakhalinsk",
+    "category": "Официальный ЮС",
+    "rubricSlug": "podslyshano-discuss"
+  },
+  {
+    "channel": "sakhalin_stories",
+    "category": "Сахалинские истории",
+    "rubricSlug": "podslyshano-discuss"
+  },
+  {
+    "channel": "ostrova_65",
+    "category": "Острова",
+    "rubricSlug": "podslyshano-discuss"
+  },
+  {
+    "channel": "moykorsakov",
+    "category": "Корсаков",
+    "rubricSlug": "podslyshano-discuss"
+  },
+  {
+    "channel": "zadalnee",
+    "category": "ДАЛЬНЕЕ",
+    "rubricSlug": "podslyshano-discuss"
+  },
+  {
+    "channel": "okstimp",
+    "category": "Анива",
+    "rubricSlug": "podslyshano-discuss"
+  },
+  {
+    "channel": "sakhalin_smi",
+    "category": "Сахалин СМИ",
+    "rubricSlug": "podslyshano-discuss"
+  },
+  {
+    "channel": "FlatRentSakhalin",
+    "category": "Аренда жилья",
+    "rubricSlug": "nedvizhimost"
+  },
+  {
+    "channel": "moy_nevelsk",
+    "category": "Невельск",
+    "rubricSlug": "podslyshano-discuss"
+  }
+]
