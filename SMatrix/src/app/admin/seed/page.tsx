@@ -30,55 +30,6 @@ export default function AdminSeedPage() {
   const [result, setResult] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
-  const [cleanupLoading, setCleanupLoading] = useState(false);
-  const [cleanupResult, setCleanupResult] = useState<string>("");
-  const [cleanupError, setCleanupError] = useState<string>("");
-
-  async function readToken(): Promise<string | null> {
-    try {
-      const raw = localStorage.getItem(AUTH_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        return parsed.token || null;
-      }
-    } catch {
-      /* ignore */
-    }
-    return null;
-  }
-
-  async function handleCleanup() {
-    if (!confirm("Удалить все тестовые темы и публикации? Закреплённые темы останутся. Это действие необратимо.")) {
-      return;
-    }
-    setCleanupLoading(true);
-    setCleanupError("");
-    setCleanupResult("");
-
-    const token = await readToken();
-    if (!token) {
-      setCleanupError("Не найден token в localStorage. Залогинитесь как админ.");
-      setCleanupLoading(false);
-      return;
-    }
-
-    try {
-      const res = await fetch("/api/admin/seed", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, mode: "cleanup-test" }),
-      });
-      const data = await res.json();
-      setCleanupResult(JSON.stringify(data, null, 2));
-      if (!res.ok) {
-        setCleanupError(`HTTP ${res.status}`);
-      }
-    } catch (e: any) {
-      setCleanupError("Сетевая ошибка: " + (e?.message ?? String(e)));
-    } finally {
-      setCleanupLoading(false);
-    }
-  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -86,7 +37,18 @@ export default function AdminSeedPage() {
     setError("");
     setResult("");
 
-    const token = await readToken();
+    // Читаем токен из localStorage.
+    let token = "";
+    try {
+      const raw = localStorage.getItem(AUTH_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        token = parsed.token || "";
+      }
+    } catch {
+      /* ignore */
+    }
+
     if (!token) {
       setError("Не найден token в localStorage. Залогинитесь как админ на сайте и вернитесь.");
       setLoading(false);
@@ -125,50 +87,6 @@ export default function AdminSeedPage() {
     <div style={{ maxWidth: 800, margin: "20px auto", padding: 16, fontFamily: "system-ui, sans-serif" }}>
       <h1 style={{ fontSize: 22, marginBottom: 16 }}>Импорт темы на форум</h1>
 
-      {/* BLOCK: Cleanup test data */}
-      <div style={{ marginBottom: 24, padding: 16, background: "#fff5f5", border: "1px solid #c08080", borderRadius: 4 }}>
-        <h2 style={{ fontSize: 16, marginTop: 0, marginBottom: 8, color: "#800" }}>Очистка тестовых данных</h2>
-        <p style={{ fontSize: 13, color: "#666", marginBottom: 12 }}>
-          Удаляет все темы и публикации, кроме закреплённых (Правила, Быстрые подсказки).
-          Пользователи и рубрики остаются. Действие необратимо.
-        </p>
-        <button
-          onClick={handleCleanup}
-          disabled={cleanupLoading}
-          style={{
-            padding: "10px 20px",
-            background: cleanupLoading ? "#999" : "#c08080",
-            color: "#fff",
-            border: "none",
-            borderRadius: 4,
-            cursor: cleanupLoading ? "not-allowed" : "pointer",
-            fontWeight: 600,
-          }}
-        >
-          {cleanupLoading ? "Очищаю..." : "Очистить тестовые данные"}
-        </button>
-        {cleanupError && (
-          <div style={{ marginTop: 12, padding: 8, background: "#fee", border: "1px solid #c00", borderRadius: 4, fontSize: 13 }}>
-            <strong>Ошибка:</strong> {cleanupError}
-          </div>
-        )}
-        {cleanupResult && (
-          <pre style={{
-            marginTop: 12,
-            padding: 12,
-            background: "#f5f5f5",
-            border: "1px solid #ddd",
-            borderRadius: 4,
-            overflow: "auto",
-            fontFamily: "ui-monospace, monospace",
-            fontSize: 12,
-          }}>
-            {cleanupResult}
-          </pre>
-        )}
-      </div>
-
-      {/* BLOCK: Import topic via JSON */}
       <form onSubmit={handleSubmit}>
         <label style={{ display: "block", marginBottom: 8, fontWeight: 600 }}>
           JSON (вставьте сформированный JSON):
