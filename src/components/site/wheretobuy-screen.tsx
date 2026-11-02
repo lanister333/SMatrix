@@ -83,7 +83,7 @@ export default function WhereToBuyScreen() {
       <MainNav current="wheretobuy" isAdmin={isStaffRole(user?.role)} onNavigate={goNav} />
       <div className="sk" style={{ minHeight: 0, flex: "1 0 auto" }}>
         <div className="sk-topbar">
-          <span className="tb-title">Где купить</span>
+          <span className="tb-title">Где купить / где заказать услугу</span>
         </div>
         <div className="sk-shell">
           {/* Три колонки раздела: навигация раздела | лента вопросов | правила */}

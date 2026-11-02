@@ -1024,7 +1024,7 @@ export function WhereToBuyPage(props: {
                 Раньше (после правки 2026-10-03) nav и кнопка были вынесены ПОД
                 текст описания — это расходилось с «Где дешевле» и пользователь
                 просил одинаковую структуру. */}
-            <div className="wb-title">Где купить</div>
+            <div className="wb-title">Где купить / где заказать услугу</div>
             <div className="wb-desc">Задайте вопрос о том, где на Сахалине купить конкретный товар.</div>
             <div className="wb-head-bar">
                             <div className="wb-head-right" style={{ gap: "12px", justifyContent: "flex-start", flexWrap: "wrap" }}>
