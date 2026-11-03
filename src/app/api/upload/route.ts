@@ -102,18 +102,24 @@ export async function POST(req: NextRequest) {
     }
 
     // 7. Сохраняем в /public/media/uploads/<yyyy>/<mm>/<random>.<ext>
+    // 2026-11-03: сохраняем в ОСНОВНОЙ /opt/smatrix/public (не в .next/standalone),
+    // потому что standalone-сервер раздает статику из основного public через
+    // copied public/. process.cwd() при запуске из standalone даёт standalone/,
+    // но нам нужен основной public. Используем env UPLOAD_PUBLIC_DIR если задан,
+    // иначе process.cwd()/public.
     const now = new Date();
     const yyyy = now.getFullYear().toString();
     const mm = (now.getMonth() + 1).toString().padStart(2, "0");
     const relDir = path.join("media", "uploads", yyyy, mm);
-    const absDir = path.join(process.cwd(), "public", relDir);
+    const publicRoot = process.env.UPLOAD_PUBLIC_DIR ?? path.join(process.cwd(), "public");
+    const absDir = path.join(publicRoot, relDir);
     await fs.mkdir(absDir, { recursive: true });
 
     const ext = EXT_BY_TYPE[file.type] ?? "jpg";
     const rand = crypto.randomBytes(8).toString("hex");
     const filename = `${rand}.${ext}`;
     const relPath = path.join(relDir, filename);
-    const absPath = path.join(process.cwd(), "public", relPath);
+    const absPath = path.join(publicRoot, relPath);
 
     await fs.writeFile(absPath, processedBuffer);
 
