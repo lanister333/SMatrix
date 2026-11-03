@@ -22,6 +22,7 @@ import SakhDatetimeBlock from "@/components/site/sakh-datetime-block";
 import type { ForumUser } from "@/lib/ui";
 import { sectionDiscussHref } from "@/lib/forum-links";
 import { nickGenderClass } from "@/lib/nick-gender";
+import { TextWithPhotos } from "@/components/site/text-with-photos";
 
 interface OverheardItem {
   id: string;
@@ -139,7 +140,7 @@ function OverheardRow(props: {
         {item.editedAt && " · изменено автором"}
       </div>
       <div className="oh-item-title">{item.title}</div>
-      <div className="oh-item-text">{item.text}</div>
+      <div className="oh-item-text"><TextWithPhotos text={item.text} /></div>
       {item.tag === "rumor" && (
         <p className="oh-rumor-warn">Информация не является официально подтверждённой и может содержать неточности.</p>
       )}

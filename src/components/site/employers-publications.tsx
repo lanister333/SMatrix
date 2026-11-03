@@ -82,6 +82,7 @@ const EP_GUEST_HINT =
 const EP_DISCLAIMER =
   "* Публикация отражает личный опыт автора. SakhMatrix предоставляет площадку и скрывает личные контакты физлиц.";
 import { EP_RULES_INTRO, EP_RULES } from "@/lib/employers-rules";
+import { TextWithPhotos } from "@/components/site/text-with-photos";
 
 /** Дата «23.09.2026» — компактная строка автора карточки. */
 function fmtDay(v: string): string {
@@ -636,7 +637,7 @@ export function EmployersPage(props: {
                   <div className="ep-card-row">
                     <span className="ep-rowlabel">Личный опыт:</span>
                     <div className="ep-card-text" data-ep-card-text={it.id}>
-                      {it.experience}
+                      <TextWithPhotos text={it.experience} />
                     </div>
                   </div>
                   {/* «Человек ≠ Организация» (Пункты 5/6 ТЗ №2): отдельно

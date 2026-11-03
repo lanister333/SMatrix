@@ -16,6 +16,7 @@ import type { ForumUser } from "@/lib/ui";
 import { hasContact, CONTACT_ERROR, renderContacts } from "@/lib/contact-check";
 import { nickGenderClass } from "@/lib/nick-gender";
 import { discussOnForum } from "@/lib/discuss";
+import { TextWithPhotos } from "@/components/site/text-with-photos";
 
 interface HelpItem {
   id: string;
@@ -137,7 +138,7 @@ function HelpCard(props: {
 
       <div className="help-item-body">
         <h4>{item.title}</h4>
-        <p>{item.text}</p>
+        <TextWithPhotos text={item.text} />
         {/* 2026-10-01: ТЗ — контакт обязателен; показываем его отдельной
             строкой под текстом, чтобы желающий помочь сразу видел способ
             связи. Данные берутся из поля contactData (не прячутся в тексте).

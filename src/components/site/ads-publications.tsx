@@ -18,6 +18,7 @@ import SakhDatetimeBlock from "@/components/site/sakh-datetime-block";
 import type { ForumUser } from "@/lib/ui";
 import { hasContact, CONTACT_ERROR, renderContacts } from "@/lib/contact-check";
 import { nickGenderClass } from "@/lib/nick-gender";
+import { TextWithPhotos } from "@/components/site/text-with-photos";
 
 interface AdMediaItem {
   id?: string;
@@ -175,7 +176,7 @@ function AdRow(props: {
           )}
         </div>
       )}
-      <div className="ad-item-text">{item.text}</div>
+      <div className="ad-item-text"><TextWithPhotos text={item.text} /></div>
       <div className="ad-foot">
         <div className="ad-footinfo">
           <div className="ad-item-meta">

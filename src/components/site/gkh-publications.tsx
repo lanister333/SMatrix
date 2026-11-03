@@ -170,6 +170,7 @@ const GKF_LOCATIONS = [
 
 /** «Правила публикации» — из src/lib/gkh-rules.ts (server-safe). */
 import { GKF_RULES_INTRO, GKF_RULES } from "@/lib/gkh-rules";
+import { TextWithPhotos } from "@/components/site/text-with-photos";
 
 export function GkhPage(props: {
   user: ForumUser | null;
@@ -715,7 +716,7 @@ export function GkhPage(props: {
                   <div className="gkf-card-row">
                     <span className="gkf-rowlabel">Проблема:</span>
                     <div className="gkf-card-text" data-gkf-card-text={it.id}>
-                      {it.text}
+                      <TextWithPhotos text={it.text} />
                     </div>
                   </div>
                   {/* Предпринятые действия: куда звонили/писали, номер заявки. */}

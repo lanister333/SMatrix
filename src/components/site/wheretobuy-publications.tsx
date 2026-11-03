@@ -26,6 +26,7 @@ import { discussOnForum } from "@/lib/discuss";
 import { findPhoneNumbers } from "@/lib/moderation/premoderation";
 import { findEmotionalLabels, WTB_HINT_FORUM_BUTTON_LABEL } from "@/lib/moderation/wheretobuy-hint-premoderation";
 import { nickGenderClass } from "@/lib/nick-gender";
+import { TextWithPhotos } from "@/components/site/text-with-photos";
 
 /** ТЗ 2026-09-23 «Ответить»: один ответ в плоском списке на карточке. */
 interface WtbAnswerItem {
@@ -307,7 +308,7 @@ function WhereToBuyRow(props: {
       <div className="wb-q">
         <span className="wb-qlabel">Вопрос:</span> {item.title}
       </div>
-      {item.text && <div className="wb-qtext">{item.text}</div>}
+      {item.text && <div className="wb-qtext"><TextWithPhotos text={item.text} /></div>}
 
       {own && item.isHiddenByAi && (
         <div className="wb-hiddennote">
