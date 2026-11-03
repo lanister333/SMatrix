@@ -1107,10 +1107,15 @@ export default function TopicView(props: {
         <div className="t-title">
           {/* 2026-10-13: заголовок topic.title удалён — вместо него показываем
               ТЕКСТ ТЕМЫ (body первого сообщения msg#1). Применяется ко всем темам
-              (старым, новым, будущим) ретроактивно. */}
+              (старым, новым, будущим) ретроактивно.
+              2026-11-03: используем renderMents для рендера markdown-фото
+              (иначе ![фото](url) виден как текст). */}
           <span className="t-title-text">
             <strong style={{ fontWeight: 700, display: "block", fontSize: "1em", lineHeight: 1.4 }}>
-              {messages.find((m) => m.num === 1)?.body || (topic.title as string)}
+              {(() => {
+                const firstBody = messages.find((m) => m.num === 1)?.body || (topic.title as string);
+                return renderMentions(firstBody, props.mentionAuthors, props.onOpenProfile, props.onImageClick);
+              })()}
             </strong>
             {topic.isPinned && <span className="sk-tstatus pinned">Закреплена</span>}
             {topic.isArchived ? (
