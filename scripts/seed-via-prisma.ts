@@ -73,6 +73,11 @@ interface SeedMessage {
   createdAt: string;
   parentIndex: number | null;
   isAuthor?: boolean;
+  /** 2026-11-03: ник автора сообщения. Если указан — бот подбирается ОДИН РАЗ
+   *  на уникальный ник и переиспользуется для всех сообщений того же ника.
+   *  Без этого поля скрипт подбирает нового уникального бота на каждое сообщение,
+   *  что быстро исчерпывает пул theatre-ботов (22 муж + 13 жен). */
+  author?: string;
 }
 
 interface SeedPayload {
@@ -162,6 +167,9 @@ async function main() {
   }
 
   // Подбираем ботов для каждого сообщения
+  // 2026-11-03: кеш author → bot, чтобы один автор получал одного бота
+  // на все свои сообщения (а не нового каждый раз).
+  const authorToBot = new Map<string, { id: string; nickname: string; gender: string }>();
   const messageBots: {
     bot: { id: string; nickname: string; gender: string };
     createdAt: Date;
@@ -178,12 +186,25 @@ async function main() {
       });
       continue;
     }
+    // Если указан author и уже есть бот для него — переиспользуем
+    if (m.author && authorToBot.has(m.author)) {
+      messageBots.push({
+        bot: authorToBot.get(m.author)!,
+        createdAt: new Date(m.createdAt),
+        body: m.body,
+        parentIndex: m.parentIndex,
+      });
+      continue;
+    }
     const bot = await pickBotByGender(m.gender, usedBotIds);
     if (!bot) {
       console.error(
         "Не удалось подобрать бота для сообщения (gender=" + m.gender + ")"
       );
       process.exit(1);
+    }
+    if (m.author) {
+      authorToBot.set(m.author, bot);
     }
     messageBots.push({
       bot,
