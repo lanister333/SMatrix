@@ -214,8 +214,10 @@ async function main() {
     });
   }
 
-  // Сортируем сообщения по createdAt (хронология)
-  messageBots.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+  // 2026-11-03: НЕ сортируем сообщения по createdAt — они уже идут в
+  // хронологическом порядке в payload, а сортировка ломает parentIndex
+  // (parentIndex ссылается на позицию в исходном массиве, а не в отсортированном).
+  // Если нужна сортировка — делать её до вычисления parentIndex в payload.
 
   // 2. Транзакция
   const result = await db.$transaction(async (tx) => {
