@@ -230,7 +230,12 @@ export async function POST(req: NextRequest) {
       const topic = await tx.topic.create({ data: topicData });
 
       // Сообщение #1 — тело темы.
-      const firstBody = `${payload.title}\n\n${payload.bodyText}`;
+      // 2026-11-03: если title и bodyText одинаковые — не дублируем текст,
+      // используем только bodyText (заголовок и так виден вверху страницы темы).
+      // Если title короче/отличается — склеиваем title + bodyText.
+      const firstBody = payload.title.trim() === payload.bodyText.trim()
+        ? payload.bodyText
+        : `${payload.title}\n\n${payload.bodyText}`;
       await tx.message.create({
         data: {
           topicId: topic.id,
