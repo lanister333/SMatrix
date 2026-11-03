@@ -132,13 +132,13 @@ export function Masthead(props: { settings: SiteSettings }) {
          прошлого шага — «немного»), тон и насыщенность сохранены
          (scripts/header-color-shift.mjs): #14b09d (L38%) → #16c5b0 (L43%),
          #0d8476 (L28%) → #0f9989 (L33%), #085951 (L19%) → #0a7066 (L24%). */
-      /* 2026-11-04 v3: средняя темнота (между v1 и v2) + реальная SVG-волна.
-         - Базовый градиент: #0c4a6e → #155e75 → #083344 (средний teal)
-         - Реальная SVG-волна через data URI (яркая бирюза, изогнутая линия)
-         - Световые блики для объёма */
+      /* 2026-11-04 v4: используем изображение-референс как фон шапки.
+         - background-image: /header-bg.jpg (абстрактный teal-градиент с волной)
+         - Полупрозрачный тёмный оверлей сверху для контраста логотипа
+         - Линейный градиент снизу для плавного перехода в nav-полосу */
       style={{
         background:
-          "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 200' preserveAspectRatio='none'><path d='M0,100 C200,20 400,180 600,100 C800,20 1000,180 1200,100 L1200,200 L0,200 Z' fill='%2322d3ee' fill-opacity='0.15'/><path d='M0,120 C200,40 400,200 600,120 C800,40 1000,200 1200,120 L1200,200 L0,200 Z' fill='%2306b6d4' fill-opacity='0.2'/><path d='M0,60 C300,140 600,20 900,80 C1050,110 1150,60 1200,80' stroke='%237dd3fc' stroke-width='3' fill='none' stroke-opacity='0.4'/></svg>\") center bottom/100% 200px no-repeat, radial-gradient(ellipse 70% 50% at 20% 30%, rgba(34, 211, 238, 0.3) 0%, rgba(34, 211, 238, 0) 60%), radial-gradient(ellipse 60% 40% at 80% 70%, rgba(6, 182, 212, 0.25) 0%, rgba(6, 182, 212, 0) 55%), linear-gradient(150deg, #0c4a6e 0%, #155e75 50%, #083344 100%)",
+          "linear-gradient(180deg, rgba(8, 51, 68, 0.3) 0%, rgba(8, 51, 68, 0.1) 40%, rgba(12, 74, 110, 0.4) 100%), url('/header-bg.jpg') center center/cover no-repeat, linear-gradient(150deg, #0c4a6e 0%, #155e75 50%, #083344 100%)",
       }}
     >
       {/* ЗАДАЧА 14 (рестайл ПК), Шаг 1.2: слоган (.header-slogan) и правый
