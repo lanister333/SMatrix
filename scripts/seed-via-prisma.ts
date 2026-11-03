@@ -78,6 +78,10 @@ interface SeedMessage {
    *  Без этого поля скрипт подбирает нового уникального бота на каждое сообщение,
    *  что быстро исчерпывает пул theatre-ботов (22 муж + 13 жен). */
   author?: string;
+  /** 2026-11-03: массив URL изображений (например ["/media/uploads/2026/11/abc.jpg"]).
+   *  Скрипт склеит их в markdown-синтаксис ![alt](url) и добавит в конец body
+   *  перед сохранением в БД — так фото отображаются в сообщении. */
+  images?: string[];
 }
 
 interface SeedPayload {
@@ -91,6 +95,15 @@ interface SeedPayload {
   rubricId?: number;
   extraFields?: Record<string, any>;
   messages?: SeedMessage[];
+  /** 2026-11-03: изображения для тела темы (массив URL).
+   *  Скрипт склеит их в markdown и добавит в конец bodyText. */
+  images?: string[];
+}
+
+/** Склеить массив URL изображений в markdown-синтаксис. */
+function imagesToMarkdown(images?: string[]): string {
+  if (!images || images.length === 0) return "";
+  return images.map((url) => `![фото](${url})`).join("\n");
 }
 
 /** Найти theatre-бота нужного гендера, исключая уже использованных. */
@@ -152,6 +165,13 @@ async function main() {
     process.exit(1);
   }
 
+  // 2026-11-03: если есть images на уровне темы — добавляем их в bodyText как markdown.
+  // Так фото появятся и в теле темы (Message #1), и в post.text (WhereToBuyPost и др.).
+  const topicImagesMd = imagesToMarkdown(payload.images);
+  if (topicImagesMd) {
+    payload.bodyText = (payload.bodyText + "\n" + topicImagesMd).trim();
+  }
+
   const messages = payload.messages ?? [];
 
   // 1. Подбираем ботов
@@ -177,11 +197,15 @@ async function main() {
     parentIndex: number | null;
   }[] = [];
   for (const m of messages) {
+    // 2026-11-03: если у сообщения есть images — добавляем их в body как markdown
+    const msgBody = m.images && m.images.length > 0
+      ? (m.body + "\n" + imagesToMarkdown(m.images)).trim()
+      : m.body;
     if (m.isAuthor) {
       messageBots.push({
         bot: authorBot,
         createdAt: new Date(m.createdAt),
-        body: m.body,
+        body: msgBody,
         parentIndex: m.parentIndex,
       });
       continue;
@@ -191,7 +215,7 @@ async function main() {
       messageBots.push({
         bot: authorToBot.get(m.author)!,
         createdAt: new Date(m.createdAt),
-        body: m.body,
+        body: msgBody,
         parentIndex: m.parentIndex,
       });
       continue;
@@ -209,7 +233,7 @@ async function main() {
     messageBots.push({
       bot,
       createdAt: new Date(m.createdAt),
-      body: m.body,
+      body: msgBody,
       parentIndex: m.parentIndex,
     });
   }
