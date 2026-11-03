@@ -16,6 +16,7 @@ import { AppealModal } from "@/components/forum/modals";
 import { UploadPhotoButton } from "@/components/forum/upload-photo-button";
 import { PhotoPreview, photosToMarkdown, markdownToPhotos, stripPhotoMarkdown } from "@/components/forum/photo-preview";
 import { EmojiButton } from "@/components/forum/emoji-picker";
+import { TwemojiText } from "@/components/forum/twemoji-text";
 import ForumThread from "@/components/forum/forum-thread";
 import CollapsibleComments from "@/components/forum/collapsible-comments";
 
@@ -99,9 +100,13 @@ function renderMarkdownImages(body: string): Array<{ type: "text"; text: string 
   return segments;
 }
 
-/** Прежняя логика renderMentions для текстового сегмента. */
+/** Прежняя логика renderMentions для текстового сегмента.
+ *  2026-11-04: добавлен TwemojiText для цветных emoji в сообщениях. */
 function renderMentionsInText(body: string, authors: Set<string>, onOpen: (nick: string) => void, segIdx: number): React.ReactNode {
-  if (!body.includes("@") || authors.size === 0) return body;
+  // Если нет упоминаний — рендерим через TwemojiText (цветные emoji)
+  if (!body.includes("@") || authors.size === 0) {
+    return <TwemojiText text={body} size={20} />;
+  }
   const parts: React.ReactNode[] = [];
   const re = /@([^\s,.;:!?]+)/g;
   let last = 0;
@@ -109,7 +114,9 @@ function renderMentionsInText(body: string, authors: Set<string>, onOpen: (nick:
   for (let mm = re.exec(body); mm; mm = re.exec(body)) {
     const nick = mm[1];
     if (!authors.has(nick)) continue;
-    parts.push(body.slice(last, mm.index));
+    if (mm.index > last) {
+      parts.push(<TwemojiText key={`txt-${segIdx}-${key++}`} text={body.slice(last, mm.index)} size={20} />);
+    }
     parts.push(
       <a key={`sk-mention-${segIdx}-${key++}`} className="sk-mention" title={`Профиль: ${nick}`} onClick={() => onOpen(nick)}>
         @{nick}
@@ -117,8 +124,12 @@ function renderMentionsInText(body: string, authors: Set<string>, onOpen: (nick:
     );
     last = mm.index + mm[0].length;
   }
-  if (last === 0) return body;
-  parts.push(body.slice(last));
+  if (last === 0) {
+    return <TwemojiText text={body} size={20} />;
+  }
+  if (last < body.length) {
+    parts.push(<TwemojiText key={`txt-${segIdx}-${key++}`} text={body.slice(last)} size={20} />);
+  }
   return parts;
 }
 

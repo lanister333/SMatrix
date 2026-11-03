@@ -1,6 +1,7 @@
 "use client";
 
 import { markdownToPhotos, stripPhotoMarkdown } from "@/components/forum/photo-preview";
+import { TwemojiText } from "@/components/forum/twemoji-text";
 
 interface Props {
   text: string;
@@ -30,7 +31,7 @@ export function TextWithPhotos({ text, maxWidth, onImageClick }: Props) {
     <>
       {textWithoutPhotos && (
         <p className="rc-qtext" style={{ whiteSpace: "pre-wrap", margin: 0 }}>
-          {textWithoutPhotos}
+          <TwemojiText text={textWithoutPhotos} size={20} />
         </p>
       )}
       {photos.length > 0 && (
