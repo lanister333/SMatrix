@@ -70,12 +70,9 @@ function useFavorites() {
   return { ids, toggle, has };
 }
 
-const BANNERS = [
-  { cls: "red", b1: "World Class", b2: "797-999" },
-  { cls: "gray1", b1: "Дизайн Куле", b2: "ул. Есенина 15-А" },
-  { cls: "gray2", b1: "Шиномонтаж и Балансировка колес", b2: "" },
-  { cls: "yellow", b1: "Внимание!", b2: "Изготовление дубликатов номеров" },
-];
+// 2026-11-03: рекламные баннеры в правой колонке форума УДАЛЕНЫ по запросу
+// пользователя. Раньше здесь был массив BANNERS с рекламой World Class,
+// Дизайн Куле, шиномонтажа и дубликатов номеров.
 
 function PinnedAndRules({ onOpenTopic: _onOpenTopic }: { onOpenTopic: (id: number) => void }) {
   // 2026-10-04 (просьба пользователя): блок «Закреплённые темы» УДАЛЁН —
@@ -901,12 +898,7 @@ export default function App({ initialSearchParams = {} }: { initialSearchParams?
                   /gde-deshevle, /rekomenduyu, /o-rabotodatelyah, /obyavleniya,
                   /poleznoe) работают как прежде — доступны через меню «Ещё»
                   в синей навигации и футер. */}
-              {BANNERS.map((b, i) => (
-                <div key={i} className={`sk-banner ${b.cls}`}>
-                  <span className="b1">{b.b1}</span>
-                  {b.b2 && <span className="b2">{b.b2}</span>}
-                </div>
-              ))}
+              {/* 2026-11-03: рекламные баннеры (BANNERS) УДАЛЕНЫ по запросу пользователя. */}
               </aside>
             )}
           </div>
