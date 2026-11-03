@@ -45,6 +45,7 @@ import HomeRight from "@/components/site/home-right";
 import DeferredIframe from "@/components/site/deferred-iframe";
 import { fmtRecent } from "@/lib/ui";
 import { nickGenderClass } from "@/lib/nick-gender";
+import { TextWithPhotos } from "@/components/site/text-with-photos";
 import type { TrafficReportsData } from "@/lib/roads-status";
 
 /** Ключи синей навигации → URL самостоятельных разделов / видов форума. */
@@ -160,7 +161,7 @@ export default function TrafficScreen() {
                       <b className={nickGenderClass(m.author)}>{m.author}</b>
                       <span>{fmtRecent(m.createdAt)}</span>
                     </div>
-                    <p className="trf-log-t">{m.body}</p>
+                    <TextWithPhotos text={m.body} />
                   </div>
                 ))}
                 <div className="mp-w-upd">Тег «Дороги» · последние сообщения форума</div>

@@ -13,6 +13,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { CATEGORY_LABELS, fmtDate, fmtDateTime, fmtNum, type ForumUser } from "@/lib/ui";
 import { nickGenderClass } from "@/lib/nick-gender";
+import { TextWithPhotos } from "@/components/site/text-with-photos";
+import { stripPhotoMarkdown } from "@/components/forum/photo-preview";
 import { BotTheatreSection } from "@/components/forum/admin-bot-theatre";
 
 const KIND_LABELS: Record<string, string> = {
@@ -767,7 +769,7 @@ function ModerationCheckCard(props: { messageId: string; token: string | null; n
           <a className="text-[12px] text-[#0A5CAA] underline" onClick={() => props.onOpenTopic(data.topic.id)}>тема: «{data.topic.title}»</a>
           {data.rubric && <span className="text-[12px] text-[#56657a]">рубрика: {data.rubric.name}</span>}
         </div>
-        <p className="text-[14px] leading-relaxed whitespace-pre-wrap">{m.body}</p>
+        <TextWithPhotos text={m.body} />
         {m.isHiddenByAi && <p className="mt-2 text-[12px] text-[#8a6d1a]">⚠️ Скрыто авто: {m.hiddenReason}</p>}
         {m.isDeleted && <p className="mt-2 text-[12px] text-[#B22335]">⚠️ Удалено</p>}
       </div>
@@ -781,7 +783,7 @@ function ModerationCheckCard(props: { messageId: string; token: string | null; n
               <div key={c.id} className={`p-2 text-[12.5px] ${c.isCurrent ? "border border-[#1E3A5F] bg-[#EEF3F8]" : "bg-[#F8FAFD]"}`}>
                 <b className={nickGenderClass(c.authorName)}>№{c.num} {c.authorName}</b>
                 {c.isCurrent && <span className="ml-2 text-[10px] text-[#1E3A5F] font-bold">← текущее</span>}
-                <p className="mt-0.5 text-[#334155]">{c.body}</p>
+                <div className="mt-0.5 text-[#334155]"><TextWithPhotos text={c.body} /></div>
               </div>
             ))}
           </div>
@@ -2028,7 +2030,7 @@ function DatingModerationBlock(props: { token: string | null; notify: (m: string
               {(q.hiddenReason || q.aiNote) && (
                 <div className="mt-0.5 text-[12px] text-[#56657a]">Причина: {q.hiddenReason || q.aiNote}</div>
               )}
-              <div className="mt-0.5 text-[12.5px] text-[#3d4a5c]">{q.body.slice(0, 220)}{q.body.length > 220 ? "…" : ""}</div>
+              <div className="mt-0.5 text-[12.5px] text-[#3d4a5c]">{stripPhotoMarkdown(q.body).slice(0, 220)}{q.body.length > 220 ? "…" : ""}</div>
               <div className="mt-1 flex flex-wrap gap-1.5">
                 {q.isHiddenByAi && (
                   <button className="sm-btn" onClick={() => act("restore-post", q.id)}>
@@ -2533,7 +2535,7 @@ function UsersSection(props: { token: string | null; isOwner: boolean; notify: (
                         «{m.topicTitle}»
                       </a>{" "}
                       <span className="text-[12px] text-[#56657a]">{fmtDateTime(m.createdAt)}</span>
-                      <div className="line-clamp-2 text-[#4a5b6d]">{m.body}</div>
+                      <div className="line-clamp-2 text-[#4a5b6d]">{stripPhotoMarkdown(m.body)}</div>
                     </li>
                   ))}
                 </ul>

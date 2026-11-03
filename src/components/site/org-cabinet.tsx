@@ -25,6 +25,7 @@ import { AuthModal } from "@/components/forum/modals";
 import { DEFAULT_SETTINGS, isStaffRole, MainNav, Masthead, SiteFooter, useAuth, type SiteSettings } from "@/components/site/chrome";
 import type { ForumUser } from "@/lib/ui";
 import { nickGenderClass } from "@/lib/nick-gender";
+import { TextWithPhotos } from "@/components/site/text-with-photos";
 
 interface CabinetPost {
   id: string;
@@ -197,7 +198,7 @@ function OrgCabinet(props: {
               <div className="item-user-meta">
                 <strong className={nickGenderClass(p.authorName)}>{p.authorName}</strong> • {badge} • <span className="date-text">{fmtReviewDate(p.createdAt)}</span>
               </div>
-              <p className="item-review-text">«{p.text}»</p>
+              <div className="item-review-text"><TextWithPhotos text={"«" + p.text + "»"} /></div>
               {/* Вместо формы ввода показывается уже опубликованный ответ */}
               <div className="cabinet-already-answered-block">
                 <strong>Ваш ответ (опубликован {fmtDots(p.orgResponseAt)}):</strong>
@@ -213,7 +214,7 @@ function OrgCabinet(props: {
               <div className="item-user-meta">
                 <strong className={nickGenderClass(p.authorName)}>{p.authorName}</strong> • {badge} • <span className="date-text">{fmtReviewDate(p.createdAt)}</span>
               </div>
-              <p className="item-review-text">«{p.text}»</p>
+              <div className="item-review-text"><TextWithPhotos text={"«" + p.text + "»"} /></div>
               {/* Интерактивная форма для ЕДИНСТВЕННОГО официального ответа (Пункт 13 Манифеста) */}
               <div className="cabinet-response-form-zone" id={`response-zone-${p.id}`}>
                 <form

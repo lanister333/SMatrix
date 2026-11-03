@@ -47,6 +47,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/components/site/chrome";
 import { renderContacts } from "@/lib/contact-check";
 import { nickGenderClass } from "@/lib/nick-gender";
+import { TextWithPhotos } from "@/components/site/text-with-photos";
 import { UploadPhotoButton } from "@/components/forum/upload-photo-button";
 import { PhotoPreview, photosToMarkdown } from "@/components/forum/photo-preview";
 
@@ -487,7 +488,7 @@ export default function FlatBoard(props: FlatBoardProps) {
                     fontFamily: "inherit",
                   }}
                 >
-                  {it.body}
+                  <TextWithPhotos text={it.body} />
                 </div>
                 {/* 2026-10-01: ТЗ — контакт обязателен. Показываем его
                     отдельной выделенной зелёной строкой под текстом, чтобы

@@ -40,6 +40,7 @@ import DeferredIframe from "@/components/site/deferred-iframe";
 import { CITY_GROUPS, type FullWeather } from "@/lib/weather-data";
 import { fmtRecent } from "@/lib/ui";
 import { nickGenderClass } from "@/lib/nick-gender";
+import { TextWithPhotos } from "@/components/site/text-with-photos";
 import type { RoadsData } from "@/lib/roads-taxonomy";
 
 /** Ключи синей навигации → URL самостоятельных разделов / видов форума. */
@@ -1379,7 +1380,7 @@ export default function WeatherScreen() {
                       <b className={nickGenderClass(m.author)}>{m.author}</b>
                       <span>{fmtRecent(m.createdAt)}</span>
                     </div>
-                    <p className="wth-pass-t">{m.body}</p>
+                    <TextWithPhotos text={m.body} />
                   </div>
                 ))}
                 <div className="mp-w-upd">Тег «Дороги» · последние сообщения форума</div>
