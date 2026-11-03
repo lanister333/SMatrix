@@ -578,11 +578,18 @@ async function main() {
             stillPending.push(m);
             continue;
           }
+          // 2026-11-03: вычисляем depth по цепочке parentIndex.
+          // depth-0 сообщение (parentIndex=null) → depth=0
+          // ответ на depth-0 → depth=1, ответ на depth-N → depth=N+1
           let depth = 1;
           let curParentIdx = m.parentIndex;
-          while (curParentIdx !== null && curParentIdx >= 0) {
+          while (curParentIdx !== null) {
             const parent = messageBots[curParentIdx];
             if (!parent) break;
+            if (parent.parentIndex === null) {
+              // parent — это depth-0 сообщение, мы уже на depth=1
+              break;
+            }
             depth++;
             curParentIdx = parent.parentIndex;
             if (depth > 10) break;
