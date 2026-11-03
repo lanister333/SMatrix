@@ -43,13 +43,14 @@
  *    тёмно-синий #1E3A5F, рамки #d4d4d8.
  */
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "@/components/site/chrome";
 import { renderContacts } from "@/lib/contact-check";
 import { nickGenderClass } from "@/lib/nick-gender";
 import { TextWithPhotos } from "@/components/site/text-with-photos";
 import { UploadPhotoButton } from "@/components/forum/upload-photo-button";
 import { PhotoPreview, photosToMarkdown } from "@/components/forum/photo-preview";
+import { EmojiButton } from "@/components/forum/emoji-picker";
 
 export interface FlatTab {
   key: string;
@@ -176,6 +177,8 @@ export default function FlatBoard(props: FlatBoardProps) {
   // Двухшаговая форма ТЗ: поля объявления → шаг СМС-верификации.
   const [stage, setStage] = useState<"form" | "sms">("form");
   const [phone, setPhone] = useState("");
+  // 2026-11-03: ref на textarea формы для вставки emoji
+  const textTextareaRef = useRef<HTMLTextAreaElement>(null);
   const [devCode, setDevCode] = useState("");
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
@@ -643,6 +646,7 @@ export default function FlatBoard(props: FlatBoardProps) {
                 {props.textareaLabel}
               </label>
               <textarea
+                ref={textTextareaRef}
                 id={`${props.boardId}-text`}
                 data-flat-text="1"
                 value={text}
@@ -715,6 +719,21 @@ export default function FlatBoard(props: FlatBoardProps) {
                     token={token}
                     notify={(m) => setErr(m)}
                     onUploaded={(url, alt) => setPhotos((prev) => [...prev, { url, alt }])}
+                  />
+                  <EmojiButton
+                    onPick={(emoji) => {
+                      const ta = textTextareaRef.current;
+                      if (!ta) { changeText(text + emoji); return; }
+                      const start = ta.selectionStart ?? text.length;
+                      const end = ta.selectionEnd ?? text.length;
+                      const next = text.slice(0, start) + emoji + text.slice(end);
+                      changeText(next);
+                      requestAnimationFrame(() => {
+                        ta.focus();
+                        const pos = start + emoji.length;
+                        ta.setSelectionRange(pos, pos);
+                      });
+                    }}
                   />
                 </div>
               ) : (

@@ -1,9 +1,33 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { ForumUser, Rubric } from "@/lib/ui";
 import { UploadPhotoButton } from "@/components/forum/upload-photo-button";
 import { PhotoPreview, photosToMarkdown } from "@/components/forum/photo-preview";
+import { EmojiButton } from "@/components/forum/emoji-picker";
+
+/** Вставить текст в textarea в позицию курсора (с сохранением фокуса). */
+function insertAtCursor(
+  textarea: HTMLTextAreaElement | null,
+  text: string,
+  setter: (v: string) => void,
+  current: string
+) {
+  if (!textarea) {
+    setter(current + text);
+    return;
+  }
+  const start = textarea.selectionStart ?? current.length;
+  const end = textarea.selectionEnd ?? current.length;
+  const next = current.slice(0, start) + text + current.slice(end);
+  setter(next);
+  // Восстановить фокус и позицию курсора после вставки
+  requestAnimationFrame(() => {
+    textarea.focus();
+    const pos = start + text.length;
+    textarea.setSelectionRange(pos, pos);
+  });
+}
 
 /**
  * ШАГ 11. Модалка «Оспорить решение» — апелляция на скрытие сообщения
@@ -731,6 +755,8 @@ export function NewTopicModal(props: {
   // 2026-10-20 Этап 3: «Писать от лица бота» — для owner/admin
   const [botAuthor, setBotAuthor] = useState<string>("");
   const [availableBots, setAvailableBots] = useState<string[]>([]);
+  // 2026-11-03: ref на textarea для вставки emoji в позицию курсора
+  const bodyTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Загрузка списка ботов (только для staff — см. API auto-bots/random)
   useEffect(() => {
@@ -857,6 +883,7 @@ export function NewTopicModal(props: {
           <div className="sk-modal-row">
             <label>Сообщение:</label>
             <textarea
+              ref={bodyTextareaRef}
               value={body}
               onChange={(e) => setBody(e.target.value)}
               maxLength={20000}
@@ -889,6 +916,9 @@ export function NewTopicModal(props: {
               token={props.token}
               notify={(m) => setError(m)}
               onUploaded={(url, alt) => setPhotos((prev) => [...prev, { url, alt }])}
+            />
+            <EmojiButton
+              onPick={(emoji) => insertAtCursor(bodyTextareaRef.current, emoji, setBody, body)}
             />
             <button className="sk-btn-classic" style={{ marginTop: 0 }} onClick={props.onClose} disabled={busy}>
               Отмена

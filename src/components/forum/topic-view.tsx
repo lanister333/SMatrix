@@ -15,8 +15,31 @@ import { nickGenderClass } from "@/lib/nick-gender";
 import { AppealModal } from "@/components/forum/modals";
 import { UploadPhotoButton } from "@/components/forum/upload-photo-button";
 import { PhotoPreview, photosToMarkdown, markdownToPhotos, stripPhotoMarkdown } from "@/components/forum/photo-preview";
+import { EmojiButton } from "@/components/forum/emoji-picker";
 import ForumThread from "@/components/forum/forum-thread";
 import CollapsibleComments from "@/components/forum/collapsible-comments";
+
+/** Вставить текст в textarea в позицию курсора. */
+function insertAtCursor(
+  textarea: HTMLTextAreaElement | null,
+  text: string,
+  setter: (v: string) => void,
+  current: string
+) {
+  if (!textarea) {
+    setter(current + text);
+    return;
+  }
+  const start = textarea.selectionStart ?? current.length;
+  const end = textarea.selectionEnd ?? current.length;
+  const next = current.slice(0, start) + text + current.slice(end);
+  setter(next);
+  requestAnimationFrame(() => {
+    textarea.focus();
+    const pos = start + text.length;
+    textarea.setSelectionRange(pos, pos);
+  });
+}
 
 interface SendSanction {
   kind: string;
@@ -382,6 +405,7 @@ function EditMsgModal(props: { message: Msg; token: string | null; onClose: () =
   const [text, setText] = useState(() => stripPhotoMarkdown(props.message.body));
   const [photos, setPhotos] = useState<{ url: string; alt: string }[]>(() => markdownToPhotos(props.message.body));
   const [busy, setBusy] = useState(false);
+  const editTextareaRef = useRef<HTMLTextAreaElement>(null);
   const save = async () => {
     const textPart = text.trim();
     const photosPart = photos.length > 0 ? "\n" + photosToMarkdown(photos) : "";
@@ -417,6 +441,7 @@ function EditMsgModal(props: { message: Msg; token: string | null; onClose: () =
         </div>
         <div className="sk-modal-body">
           <textarea
+            ref={editTextareaRef}
             value={text}
             onChange={(e) => setText(e.target.value)}
             maxLength={10000}
@@ -442,6 +467,9 @@ function EditMsgModal(props: { message: Msg; token: string | null; onClose: () =
               token={props.token}
               notify={props.onFail}
               onUploaded={(url, alt) => setPhotos((prev) => [...prev, { url, alt }])}
+            />
+            <EmojiButton
+              onPick={(emoji) => insertAtCursor(editTextareaRef.current, emoji, setText, text)}
             />
             <button className="right" onClick={props.onClose}>
               Отмена
@@ -552,6 +580,8 @@ export default function TopicView(props: {
   const [sending, setSending] = useState(false);
   const [inTopicSearch, setInTopicSearch] = useState(false);
   const [topicQ, setTopicQ] = useState("");
+  // 2026-11-03: ref на textarea быстрого ответа для вставки emoji
+  const replyTextareaRef = useRef<HTMLTextAreaElement>(null);
   const [complainMsg, setComplainMsg] = useState<Msg | null>(null);
   const [editMsg, setEditMsg] = useState<Msg | null>(null);
   const [appealMsg, setAppealMsg] = useState<Msg | null>(null);
@@ -1297,6 +1327,7 @@ export default function TopicView(props: {
               </div>
             )}
             <textarea
+              ref={replyTextareaRef}
               value={reply}
               onChange={(e) => setReply(e.target.value)}
               placeholder="Напишите ваше мнение…"
@@ -1317,6 +1348,9 @@ export default function TopicView(props: {
                 token={props.token}
                 notify={props.notify}
                 onUploaded={(url, alt) => setReplyPhotos((prev) => [...prev, { url, alt }])}
+              />
+              <EmojiButton
+                onPick={(emoji) => insertAtCursor(replyTextareaRef.current, emoji, setReply, reply)}
               />
               {/* 2026-10-02: текст «Чтобы писать на форуме, войдите или
                   зарегистрируйтесь — ссылка в левой колонке» удалён по
