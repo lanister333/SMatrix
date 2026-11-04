@@ -440,7 +440,7 @@ async function main() {
         select: { number: true },
       });
       const number = (lastTopic?.number ?? 0) + 1;
-      const fullTopicTitle = ("Обсуждение: " + payload.title).slice(0, 150);
+      const fullTopicTitle = payload.title.slice(0, 150);
 
       const lastMsgBot = messageBots[messageBots.length - 1]?.bot ?? authorBot;
       const lastActivityAt =

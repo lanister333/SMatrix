@@ -146,7 +146,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
 
         const last = await tx.topic.findFirst({ orderBy: { number: "desc" }, select: { number: true } });
         const number = (last?.number ?? 0) + 1;
-        const topicTitle = `Обсуждение: ${post.title}`.slice(0, 150);
+        const topicTitle = `${post.title}`.slice(0, 150);
 
         const topic = await tx.topic.create({
           data: {

@@ -98,7 +98,7 @@ async function pickBotByGender(gender: "male" | "female", excludeIds: string[]) 
 /** Проверка идемпотентности: тема с таким заголовком уже есть в нужной рубрике. */
 async function findExistingTopic(title: string, rubricId: number) {
   return db.topic.findFirst({
-    where: { title: { startsWith: "Обсуждение: " + title.slice(0, 50) }, rubricId },
+    where: { title: { startsWith: title.slice(0, 50) }, rubricId },
     select: { id: true, number: true },
   });
 }
@@ -204,7 +204,7 @@ export async function POST(req: NextRequest) {
       // Тема на форуме.
       const lastTopic = await tx.topic.findFirst({ orderBy: { number: "desc" }, select: { number: true } });
       const number = (lastTopic?.number ?? 0) + 1;
-      const fullTopicTitle = `Обсуждение: ${payload.title}`.slice(0, 150);
+      const fullTopicTitle = payload.title.slice(0, 150);
 
       const lastMsgBot = messageBots[messageBots.length - 1]?.bot ?? authorBot;
       const lastActivityAt = messageBots.length > 0
