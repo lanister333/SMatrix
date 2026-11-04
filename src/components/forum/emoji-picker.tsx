@@ -239,8 +239,8 @@ const CATEGORIES: { id: string; icon: string; name: string; emojis: EmojiItem[] 
 
 /** Получить URL SVG-картинки для emoji через Twemoji CDN. */
 function emojiUrl(emoji: string): string {
-  // twemoji.convert.toCodepoint возвращает кодовые точки emoji без U+
-  const code = twemoji.convert.toCodepoint(emoji);
+  // twemoji.convert.toCodePoint возвращает кодовые точки emoji без U+
+  const code = twemoji.convert.toCodePoint(emoji);
   return `https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/${code}.svg`;
 }
 

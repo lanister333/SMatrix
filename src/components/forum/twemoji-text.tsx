@@ -18,7 +18,7 @@ import twemoji from "twemoji";
 
 /** Получить URL SVG-картинки для emoji через Twemoji CDN. */
 function emojiUrl(emoji: string): string {
-  const code = twemoji.convert.toCodepoint(emoji);
+  const code = twemoji.convert.toCodePoint(emoji);
   return `https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/${code}.svg`;
 }
 
