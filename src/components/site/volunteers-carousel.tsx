@@ -262,22 +262,16 @@ export default function VolunteersCarousel() {
         href={p.url}
         target="_blank"
         rel="noopener noreferrer"
+        className="sakh-carousel-card"
         style={{
-          flex: '0 0 320px',
-          width: '320px',
-          minWidth: '320px',
-          height: '180px',
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: '14px',
+          // 2026-11-04: размеры через CSS-класс .sakh-carousel-card
+          // (адаптив на 15" через @media в globals.css).
+          // Inline-style только для декоративных свойств.
           ...bgStyle,
           borderRadius: '12px',
           textDecoration: 'none',
           boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
-          padding: '14px 16px',
           boxSizing: 'border-box',
-          flexShrink: 0,
           position: 'relative',
           overflow: 'hidden'
         }}
@@ -345,11 +339,11 @@ export default function VolunteersCarousel() {
                 }}
               />
             )}
-            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, minWidth: 0 }}>
-              <span style={{ color: p.textColor, fontSize: '20px', fontWeight: 800, textTransform: 'uppercase', lineHeight: '1.1', letterSpacing: '0.5px' }}>{p.name}</span>
-              <span style={{ color: p.subColor, fontSize: '12px', fontWeight: 600, marginTop: '6px', lineHeight: '1.3' }}>{p.sub}</span>
+            <div className="sakh-carousel-text">
+              <span className="sakh-carousel-name" style={{ color: p.textColor }}>{p.name}</span>
+              <span className="sakh-carousel-sub" style={{ color: p.subColor }}>{p.sub}</span>
               {p.siteLabel && (
-                <span style={{ color: p.textColor, fontSize: '11px', fontWeight: 500, marginTop: '10px', opacity: 0.85 }}>{p.siteLabel}</span>
+                <span className="sakh-carousel-site" style={{ color: p.textColor }}>{p.siteLabel}</span>
               )}
             </div>
           </>

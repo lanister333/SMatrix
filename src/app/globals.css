@@ -293,30 +293,14 @@ body{background:#E8EAEB}
   .wth-metric{padding:4px 6px !important}
   .wth-metric small{font-size:9.5px !important}
   .wth-metric b{font-size:12px !important}
-  /* VolunteersCarousel: на 15" (1024-1439) уменьшить карточки 320x180 → 240x140 */
-  .sakh-marquee-track a{flex:0 0 240px !important;width:240px !important;min-width:240px !important;height:140px !important;padding:10px 12px !important}
-  /* 2026-11-04: фикс пустоты в блоке погоды на 15" мониторах —
-     специфичный селектор перебивает общий .mp-w-frame{height:180px}.
-     Уменьшаем iframe и контейнер, чтобы не было пустоты если meteoblue
-     не загрузился. */
+  /* VolunteersCarousel: на 15" (1024-1439) уменьшить карточки через CSS-классы */
+  .sakh-carousel-card{flex:0 0 240px !important;width:240px !important;min-width:240px !important;height:140px !important;padding:10px 12px !important;gap:10px !important}
+  .sakh-carousel-card img{width:80px !important;height:80px !important}
+  .sakh-carousel-name{font-size:14px !important}
+  .sakh-carousel-sub{font-size:10px !important;margin-top:4px !important}
+  .sakh-carousel-site{font-size:9px !important;margin-top:6px !important}
   section[aria-label="Погода на Сахалине"] .mp-weather{height:180px !important}
   section[aria-label="Погода на Сахалине"] .mp-w-frame{height:200px !important;margin-top:-30px !important}
-  /* 2026-10-29: убраны width/height/border-radius/object-fit !important
-     для .sakh-marquee-track img — теперь inline-style в renderCard управляет
-     размером и формой. Раньше override принудительно делал все логотипы
-     круглыми 100x100 (border-radius:50% + object-fit:cover), что ломало
-     горизонтальный логотип Радости жизни (2022x567) — обрезало его в круг.
-     Inline-style: квадратные логотипы -> borderRadius:50% (круг), размер
-     110x110 (или индивидуальный через p.logoSize). Горизонтальный логотип ->
-     height:96px, width:auto, maxWidth:170px, object-fit:contain (без круга). */
-  .sakh-marquee-track a span{font-size:14px !important}
-  /* 2026-11-04: на 15" карточки 240x140 — уменьшить логотипы и текст,
-     чтобы не было сдвига. Inline-style логотипов 110px не меняется
-     CSS (specificity), поэтому через !important + явные селекторы. */
-  .sakh-marquee-track a img{width:80px !important;height:80px !important}
-  .sakh-marquee-track a > div > div > span:first-child{font-size:14px !important}
-  .sakh-marquee-track a > div > div > span:nth-child(2){font-size:10px !important;margin-top:4px !important}
-  .sakh-marquee-track a > div > div > span:nth-child(3){font-size:9px !important;margin-top:6px !important}
 }
 
 /* 2026-10-26: компенсировать 3px flex-расширения на 1024-1150,
@@ -5733,6 +5717,26 @@ div[style*="background-color: rgb(0, 74, 143)"] {
   -webkit-backface-visibility: hidden;
   /* Не задаём transform в CSS — JS задаёт его каждый кадр */
 }
+
+/* 2026-11-04: CSS-классы для карточек карусели (вместо inline-style).
+   Адаптив через @media — на 15" карточки меньше. */
+.sakh-carousel-card{
+  flex:0 0 320px;
+  width:320px;
+  min-width:320px;
+  height:180px;
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  gap:14px;
+  padding:14px 16px;
+  flex-shrink:0;
+}
+.sakh-carousel-card img{width:110px;height:110px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.sakh-carousel-text{display:flex;flex-direction:column;justify-content:center;flex:1;min-width:0}
+.sakh-carousel-name{font-size:20px;font-weight:800;text-transform:uppercase;line-height:1.1;letter-spacing:0.5px}
+.sakh-carousel-sub{font-size:12px;font-weight:600;margin-top:6px;line-height:1.3}
+.sakh-carousel-site{font-size:11px;font-weight:500;margin-top:10px;opacity:0.85}
 
 /* 2026-10-26: На ВСЕХ устройствах карусель использует JS requestAnimationFrame
    для плавного автоскролла. CSS-анимация убрана (нестабильна).
