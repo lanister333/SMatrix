@@ -2,7 +2,7 @@
 
 /**
  * HomeWeatherWidget — нативный компактный виджет «Прогноз по дням»
- * для правой колонки Главной (замена внешнему iframe meteoblue).
+ * для правой колонки Главной (замена внешнего iframe meteoblue).
  *
  * 2026-11-05: meteoblue iframe не загружался на Android-планшете
  * (Cloudflare bot-detection / SameSite=None cookies в iframe-контексте).
@@ -10,6 +10,10 @@
  * резерв met.no), отдающий 7-дневный прогноз с min/max температурами,
  * кодами погоды и labels. Без внешних зависимостей, работает на всех
  * устройствах.
+ *
+ * 2026-11-05 v2: SVG-иконки (codeIcon из @/lib/weather-icons) вместо emoji.
+ * 2026-11-05 v3: добавлены: текущая температура сверху, подпись погоды
+ *   под иконкой каждого дня, крупные иконки, цветные карточки.
  *
  * Источник: /api/home/weather (TTL 20 мин, кэш + fallback на met.no).
  */
@@ -34,10 +38,6 @@ interface WeatherData {
   days: WeatherDay[];
   updated: string;
 }
-
-/** Emoji-иконка — больше НЕ используется (заменена на detailные SVG из
- *  codeIcon). Оставлена как fallback на случай если SVG не отрендерится. */
-// function emojiForCode(code: number): string { ... }
 
 type State =
   | { kind: "loading" }
@@ -65,8 +65,6 @@ export default function HomeWeatherWidget() {
       })
       .catch(() => {
         if (cancelled) return;
-        // Retry once after 2s — иногда первый запрос после деплоя идёт
-        // в холодный кэш и таймаутится на медленном 3G планшета.
         window.setTimeout(() => {
           if (cancelled) return;
           fetch("/api/home/weather", { cache: "no-store" })
@@ -104,7 +102,6 @@ export default function HomeWeatherWidget() {
     return (
       <div className="mp-w-native mp-w-error">
         <span>Прогноз временно обновляется…</span>
-        {state.kind === "ok" && state.data?.updated ? null : null}
       </div>
     );
   }
@@ -116,6 +113,13 @@ export default function HomeWeatherWidget() {
       role="region"
       aria-label="Прогноз погоды по дням, Южно-Сахалинск"
     >
+      {/* Текущая температура + подпись (если есть) */}
+      {typeof data.temp === "number" ? (
+        <div className="mp-w-now">
+          <span className="mp-w-now-t">{data.temp > 0 ? "+" : ""}{data.temp}°</span>
+          {data.label ? <span className="mp-w-now-l">{data.label}</span> : null}
+        </div>
+      ) : null}
       <div className="mp-w-days">
         {data.days.map((d, i) => (
           <div key={`${d.day}-${d.date}-${i}`} className="mp-w-day" title={`${d.label}, ${d.tmax}° / ${d.tmin}°`}>
@@ -124,10 +128,11 @@ export default function HomeWeatherWidget() {
             <div className="mp-w-day-icon" aria-hidden="true">
               {codeIcon(d.code)}
             </div>
+            <div className="mp-w-day-label">{d.label}</div>
             <div className="mp-w-day-tmax">
-              <b>{d.tmax}°</b>
+              <b>{d.tmax > 0 ? "+" : ""}{d.tmax}°</b>
             </div>
-            <div className="mp-w-day-tmin">{d.tmin}°</div>
+            <div className="mp-w-day-tmin">{d.tmin > 0 ? "+" : ""}{d.tmin}°</div>
           </div>
         ))}
       </div>
