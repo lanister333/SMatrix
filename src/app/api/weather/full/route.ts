@@ -129,21 +129,13 @@ function metNoPoint(lat: number, lon: number): Promise<{ now: WeatherNow; hours:
         return null;
       }
       const today = sakhalinToday();
-      // 2026-11-05 FIX: фильтр по часам сравнивал СТРОКИ ("23" >= "23"),
-      // из-за чего при curHour=23 все часы следующего дня (00-22)
-      // фильтровались как "00" >= "23" → false. Результат: 10 карточек
-      // все с time="23:00". Теперь сравниваем full timestamp (ms).
-      const nowMs = Date.now();
       const curHour = sakhalinLocal(new Date().toISOString()).hh.slice(0, 2);
       const todayEntries = ts.filter((e) => e.time && sakhalinLocal(e.time).date === today);
       if (!todayEntries.length) return null;
       const det = (e: MetNoEntry) => e.data?.instant?.details ?? {};
       const allEntries = d.properties?.timeseries ?? [];
-      // Берём записи с текущего момента (с запасом 1ч назад для текущего часа)
-      // и следующие ~24ч. Сравнение через getTime() — корректно через день.
       const hours: WeatherHour[] = allEntries
-        .filter((e) => e.time && new Date(e.time).getTime() >= nowMs - 3600000)
-        .slice(0, 24)
+        .filter((e) => sakhalinLocal(e.time!).hh.slice(0, 2) >= curHour)
         .map((e) => {
           const x = det(e);
           return {
