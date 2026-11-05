@@ -3876,24 +3876,40 @@ section[aria-label="Погода на Сахалине"] .mp-w-days{
   gap:1px;padding:2px 2px 0;
   align-items:stretch;justify-content:space-between;
 }
-/* Карточка дня — цветной фон, рамка, rounded corners */
+/* Карточка дня — две зоны: день (верх) + ночь (низ), как в почасовом прогнозе */
 section[aria-label="Погода на Сахалине"] .mp-w-day{
   flex:1 1 0;min-width:0;
-  display:flex;flex-direction:column;align-items:center;text-align:center;
-  justify-content:space-between;
-  padding:4px 1px;gap:0;
-  background:linear-gradient(180deg,#c8dcec 0%,#a8c5e0 100%);
+  display:flex;flex-direction:column;
   border-right:1px solid #6a8fb0;
   position:relative;
+  overflow:hidden;
 }
 section[aria-label="Погода на Сахалине"] .mp-w-day:last-child{border-right:0}
-section[aria-label="Погода на Сахалине"] .mp-w-day:hover{background:linear-gradient(180deg,#b0c8e0 0%,#90b0d0 100%)}
+/* Дневная часть — ярко-голубой градиент (midday→day) */
+section[aria-label="Погода на Сахалине"] .mp-w-day-daypart{
+  flex:1 1 auto;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  justify-content:space-between;
+  padding:4px 1px 3px;gap:0;
+  background:linear-gradient(180deg,#5db9ff 0%,#2196f3 100%);
+}
+/* Ночная часть — тёмно-синий (twilight→night) */
+section[aria-label="Погода на Сахалине"] .mp-w-day-nightpart{
+  flex:0 0 auto;
+  display:flex;flex-direction:row;align-items:center;justify-content:center;
+  gap:3px;padding:3px 1px;
+  background:linear-gradient(180deg,#1a6fd4 0%,#123c6d 100%);
+  border-top:1px solid rgba(255,255,255,0.2);
+}
+section[aria-label="Погода на Сахалине"] .mp-w-night-icon{
+  font-size:10px;line-height:1;
+}
 section[aria-label="Погода на Сахалине"] .mp-w-day-name{
   font-size:11px;font-weight:700;line-height:1.15;
-  color:var(--sm-navy);
+  color:#fff;
 }
 section[aria-label="Погода на Сахалине"] .mp-w-day-date{
-  font-size:9.5px;line-height:1.1;color:#5a6b7d;
+  font-size:9.5px;line-height:1.1;color:rgba(255,255,255,0.85);
   margin-top:1px;
 }
 section[aria-label="Погода на Сахалине"] .mp-w-day-icon{
@@ -3910,12 +3926,11 @@ section[aria-label="Погода на Сахалине"] .mp-w-day-label{
   display:none;
 }
 section[aria-label="Погода на Сахалине"] .mp-w-day-tmax b{
-  font-size:13px;font-weight:800;color:var(--sm-navy);
+  font-size:13px;font-weight:800;color:#fff;
   line-height:1.1;display:block;
 }
 section[aria-label="Погода на Сахалине"] .mp-w-day-tmin{
-  font-size:11px;color:#5a6b7d;line-height:1.1;font-weight:600;
-  margin-top:1px;
+  font-size:11px;color:#fff;line-height:1.1;font-weight:700;
 }
 section[aria-label="Погода на Сахалине"] .mp-w-updated{
   flex:0 0 auto;
@@ -3987,21 +4002,35 @@ section[aria-label="Погода в Южно-Сахалинске"] .mp-w-days{
 }
 section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day{
   flex:1 1 0;min-width:0;
-  display:flex;flex-direction:column;align-items:center;text-align:center;
-  justify-content:space-between;
-  padding:8px 2px;gap:0;
-  background:linear-gradient(180deg,#c8dcec 0%,#a8c5e0 100%);
+  display:flex;flex-direction:column;
   border-right:1px solid #6a8fb0;
   position:relative;
+  overflow:hidden;
 }
 section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day:last-child{border-right:0}
-section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day:hover{background:linear-gradient(180deg,#b0c8e0 0%,#90b0d0 100%)}
+section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-daypart{
+  flex:1 1 auto;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  justify-content:space-between;
+  padding:8px 2px 4px;gap:0;
+  background:linear-gradient(180deg,#5db9ff 0%,#2196f3 100%);
+}
+section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-nightpart{
+  flex:0 0 auto;
+  display:flex;flex-direction:row;align-items:center;justify-content:center;
+  gap:5px;padding:5px 2px;
+  background:linear-gradient(180deg,#1a6fd4 0%,#123c6d 100%);
+  border-top:1px solid rgba(255,255,255,0.2);
+}
+section[aria-label="Погода в Южно-Сахалинске"] .mp-w-night-icon{
+  font-size:14px;line-height:1;
+}
 section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-name{
   font-size:14px;font-weight:700;line-height:1.15;
-  color:var(--sm-navy);
+  color:#fff;
 }
 section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-date{
-  font-size:11px;line-height:1.1;color:#5a6b7d;
+  font-size:11px;line-height:1.1;color:rgba(255,255,255,0.85);
   margin-top:2px;
 }
 section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-icon{
@@ -4015,12 +4044,11 @@ section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-la
   margin-top:2px;text-transform:lowercase;
 }
 section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-tmax b{
-  font-size:18px;font-weight:800;color:var(--sm-navy);
+  font-size:18px;font-weight:800;color:#fff;
   line-height:1.1;display:block;
 }
 section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-tmin{
-  font-size:14px;color:#5a6b7d;line-height:1.1;font-weight:600;
-  margin-top:2px;
+  font-size:14px;color:#fff;line-height:1.1;font-weight:700;
 }
 section[aria-label="Погода в Южно-Сахалинске"] .mp-w-updated{
   flex:0 0 auto;

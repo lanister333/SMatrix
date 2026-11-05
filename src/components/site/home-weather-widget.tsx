@@ -122,17 +122,22 @@ export default function HomeWeatherWidget() {
       ) : null}
       <div className="mp-w-days">
         {data.days.map((d, i) => (
-          <div key={`${d.day}-${d.date}-${i}`} className="mp-w-day" title={`${d.label}, ${d.tmax}° / ${d.tmin}°`}>
-            <div className="mp-w-day-name">{d.day}</div>
-            <div className="mp-w-day-date">{d.date}</div>
-            <div className="mp-w-day-icon" aria-hidden="true">
-              {codeIcon(d.code)}
+          <div key={`${d.day}-${d.date}-${i}`} className="mp-w-day" title={`${d.label}, днём ${d.tmax}° / ночью ${d.tmin}°`}>
+            <div className="mp-w-day-daypart">
+              <div className="mp-w-day-name">{d.day}</div>
+              <div className="mp-w-day-date">{d.date}</div>
+              <div className="mp-w-day-icon" aria-hidden="true">
+                {codeIcon(d.code)}
+              </div>
+              <div className="mp-w-day-label">{d.label}</div>
+              <div className="mp-w-day-tmax">
+                <b>{d.tmax > 0 ? "+" : ""}{d.tmax}°</b>
+              </div>
             </div>
-            <div className="mp-w-day-label">{d.label}</div>
-            <div className="mp-w-day-tmax">
-              <b>{d.tmax > 0 ? "+" : ""}{d.tmax}°</b>
+            <div className="mp-w-day-nightpart">
+              <span className="mp-w-night-icon" aria-hidden="true">🌙</span>
+              <span className="mp-w-day-tmin">{d.tmin > 0 ? "+" : ""}{d.tmin}°</span>
             </div>
-            <div className="mp-w-day-tmin">{d.tmin > 0 ? "+" : ""}{d.tmin}°</div>
           </div>
         ))}
       </div>
