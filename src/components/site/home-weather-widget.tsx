@@ -15,6 +15,7 @@
  */
 
 import { useEffect, useState } from "react";
+import { codeIcon } from "@/lib/weather-icons";
 
 interface WeatherDay {
   day: string;
@@ -34,18 +35,9 @@ interface WeatherData {
   updated: string;
 }
 
-/** Emoji-иконка по WMO weather code (open-meteo).
- *  Группы — как в codeLabel() из lib/weather-data.ts. */
-function emojiForCode(code: number): string {
-  if (code === 0) return "☀️";
-  if (code <= 2) return "⛅";
-  if (code === 3) return "☁️";
-  if (code === 45 || code === 48) return "🌫️";
-  if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return "🌧️";
-  if ((code >= 71 && code <= 77) || code === 85 || code === 86) return "🌨️";
-  if (code >= 95) return "⛈️";
-  return "⛅";
-}
+/** Emoji-иконка — больше НЕ используется (заменена на detailные SVG из
+ *  codeIcon). Оставлена как fallback на случай если SVG не отрендерится. */
+// function emojiForCode(code: number): string { ... }
 
 type State =
   | { kind: "loading" }
@@ -130,7 +122,7 @@ export default function HomeWeatherWidget() {
             <div className="mp-w-day-name">{d.day}</div>
             <div className="mp-w-day-date">{d.date}</div>
             <div className="mp-w-day-icon" aria-hidden="true">
-              {emojiForCode(d.code)}
+              {codeIcon(d.code)}
             </div>
             <div className="mp-w-day-tmax">
               <b>{d.tmax}°</b>
