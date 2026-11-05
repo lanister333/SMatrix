@@ -3945,16 +3945,18 @@ section[aria-label="Погода на Сахалине"] .mp-w-error{
   section[aria-label="Погода на Сахалине"] .mp-w-day-tmin{font-size:10px}
   section[aria-label="Погода на Сахалине"] .mp-w-updated{font-size:8.5px;padding:2px 4px 3px}
 }
-/* Телефон 360-414px */
+/* Телефон 360-414px — компактно, БЕЗ подписей погоды (они ломаются
+   на строки в узких ячейках), крупнее иконки */
 @media (max-width:480px){
   section[aria-label="Погода на Сахалине"] .mp-w-now-t{font-size:15px}
+  section[aria-label="Погода на Сахалине"] .mp-w-now-l{font-size:9px}
   section[aria-label="Погода на Сахалине"] .mp-w-day{padding:2px 0}
-  section[aria-label="Погода на Сахалине"] .mp-w-day-icon{font-size:24px;margin:2px 0 1px}
+  section[aria-label="Погода на Сахалине"] .mp-w-day-icon{font-size:28px;margin:2px 0 1px}
   section[aria-label="Погода на Сахалине"] .mp-w-day-name{font-size:10px}
   section[aria-label="Погода на Сахалине"] .mp-w-day-date{font-size:8.5px}
-  section[aria-label="Погода на Сахалине"] .mp-w-day-label{font-size:7.5px}
-  section[aria-label="Погода на Сахалине"] .mp-w-day-tmax b{font-size:11px}
-  section[aria-label="Погода на Сахалине"] .mp-w-day-tmin{font-size:9.5px}
+  section[aria-label="Погода на Сахалине"] .mp-w-day-label{display:none !important}
+  section[aria-label="Погода на Сахалине"] .mp-w-day-tmax b{font-size:12px}
+  section[aria-label="Погода на Сахалине"] .mp-w-day-tmin{font-size:10px}
 }
 
 /* 2026-11-05 v3: нативный виджет на /weather.php —
@@ -4049,11 +4051,13 @@ section[aria-label="Погода в Южно-Сахалинске"] .mp-w-error{
 @media (max-width:480px){
   section[aria-label="Погода в Южно-Сахалинске"] .mp-w-now-t{font-size:18px}
   section[aria-label="Погода в Южно-Сахалинске"] .mp-w-now-l{font-size:11px}
-  section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day{padding:4px 0}
-  section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-icon{font-size:30px;margin:3px 0 2px}
+  section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day{padding:3px 0}
+  section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-icon{font-size:32px;margin:3px 0 2px}
   section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-name{font-size:11px}
   section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-date{font-size:9.5px}
-  section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-label{font-size:8.5px}
+  /* Подписи погоды скрыты на телефоне — «переменная облачность» ломается
+     на строки в узких ячейках, создаёт视觉ный бардак */
+  section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-label{display:none !important}
   section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-tmax b{font-size:14px}
   section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-tmin{font-size:11px}
 }
