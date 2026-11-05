@@ -29,7 +29,7 @@
  * логотип-ссылка на главную, компактная мобильная навигация, футер.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { DEFAULT_SETTINGS, isStaffRole, MainNav, Masthead, SiteFooter, useAuth, type SiteSettings } from "@/components/site/chrome";
 // Шаг №4 (монолит): левая колонка — меню навигации и категорий форума
 // (как на Главной), правая — HomeRight (служебные блоки, погодные
@@ -37,8 +37,6 @@ import { DEFAULT_SETTINGS, isStaffRole, MainNav, Masthead, SiteFooter, useAuth, 
 import ForumSideNav from "@/components/site/left-nav";
 import HomeRight from "@/components/site/home-right";
 import DeferredIframe from "@/components/site/deferred-iframe";
-import HomeWeatherWidget from "@/components/site/home-weather-widget";
-import { codeIcon } from "@/lib/weather-icons";
 import { CITY_GROUPS, type FullWeather } from "@/lib/weather-data";
 import { fmtRecent } from "@/lib/ui";
 import { nickGenderClass } from "@/lib/nick-gender";
@@ -109,6 +107,212 @@ function tempClass(t: number | null): string {
   return "wth-t-neutral";
 }
 
+/** ТЗ «Почасовой прогноз» п.1: WMO-код open-meteo → SVG-иконка.
+ *  2026-10-23: заменены emoji на инлайн-SVG с объёмом (градиенты + тени).
+ *  SVG не зависит от системного emoji-шрифта — рендерится одинаково
+ *  на всех платформах (Windows/Mac/Linux/Android/iOS), без чёрного
+ *  контура Segoe UI Emoji. Размер — через font-size родителя (width="1em").
+ *  Метка источника рядом — title={h.label} («Ясно», «Дождь»…). */
+function codeIcon(code: number): ReactNode {
+  // 0 = Ясно (clear sky) — объёмное солнце с лучами
+  if (code === 0) {
+    return (
+      <svg viewBox="0 0 64 64" width="1em" height="1em" aria-hidden="true" focusable="false">
+        <defs>
+          <radialGradient id="wx-sun" cx="40%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#fff3a0" />
+            <stop offset="55%" stop-color="#ffc233" />
+            <stop offset="100%" stop-color="#e88a00" />
+          </radialGradient>
+        </defs>
+        <g stroke="#ffb300" stroke-width="4" stroke-linecap="round" opacity="0.95">
+          <line x1="32" y1="3" x2="32" y2="13" />
+          <line x1="32" y1="51" x2="32" y2="61" />
+          <line x1="3" y1="32" x2="13" y2="32" />
+          <line x1="51" y1="32" x2="61" y2="32" />
+          <line x1="11.5" y1="11.5" x2="18.5" y2="18.5" />
+          <line x1="45.5" y1="45.5" x2="52.5" y2="52.5" />
+          <line x1="52.5" y1="11.5" x2="45.5" y2="18.5" />
+          <line x1="18.5" y1="45.5" x2="11.5" y2="52.5" />
+        </g>
+        <circle cx="32" cy="32" r="13" fill="url(#wx-sun)" stroke="#d97a00" stroke-width="0.8" />
+        <circle cx="27" cy="27" r="3.5" fill="#fff7c0" opacity="0.85" />
+      </svg>
+    );
+  }
+  // 1-2 = Переменная облачность (sun + cloud, объёмные)
+  if (code <= 2) {
+    return (
+      <svg viewBox="0 0 64 64" width="1em" height="1em" aria-hidden="true" focusable="false">
+        <defs>
+          <radialGradient id="wx-sun2" cx="40%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#fff3a0" />
+            <stop offset="55%" stop-color="#ffc233" />
+            <stop offset="100%" stop-color="#e88a00" />
+          </radialGradient>
+          <linearGradient id="wx-cloud2" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#ffffff" />
+            <stop offset="60%" stop-color="#e3eaf2" />
+            <stop offset="100%" stop-color="#b8c5d3" />
+          </linearGradient>
+        </defs>
+        <g stroke="#ffb300" stroke-width="3" stroke-linecap="round" opacity="0.95">
+          <line x1="22" y1="3" x2="22" y2="9" />
+          <line x1="3" y1="22" x2="9" y2="22" />
+          <line x1="8" y1="8" x2="12.5" y2="12.5" />
+          <line x1="36" y1="8" x2="31.5" y2="12.5" />
+          <line x1="8" y1="36" x2="12.5" y2="31.5" />
+        </g>
+        <circle cx="22" cy="22" r="10" fill="url(#wx-sun2)" stroke="#d97a00" stroke-width="0.6" />
+        <circle cx="18" cy="19" r="2.5" fill="#fff7c0" opacity="0.85" />
+        <path d="M20 44 a11 11 0 0 1 11 -11 a13 13 0 0 1 13 11 a8 8 0 0 1 -1 16 H22 a8 8 0 0 1 -2 -16 z" fill="url(#wx-cloud2)" stroke="#8fa3b8" stroke-width="0.8" />
+        <path d="M22 44 a11 11 0 0 1 4 -8.5 a10 10 0 0 0 -4 8.5 a8 8 0 0 0 2 16 h-2 a8 8 0 0 1 -2 -16 z" fill="#ffffff" opacity="0.5" />
+      </svg>
+    );
+  }
+  // 3 = Облачно (объёмное облако)
+  if (code === 3) {
+    return (
+      <svg viewBox="0 0 64 64" width="1em" height="1em" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="wx-cloud3" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#e8eef4" />
+            <stop offset="60%" stop-color="#b6c4d2" />
+            <stop offset="100%" stop-color="#7c8a9d" />
+          </linearGradient>
+        </defs>
+        <path d="M18 42 a12 12 0 0 1 12 -12 a14 14 0 0 1 14 12 a9 9 0 0 1 -1 18 H19 a9 9 0 0 1 -1 -18 z" fill="url(#wx-cloud3)" stroke="#5a6b7d" stroke-width="0.8" />
+        <path d="M18 42 a12 12 0 0 1 5 -9 a11 11 0 0 0 -5 9 a9 9 0 0 0 2 18 h-2 a9 9 0 0 1 -1 -18 z" fill="#ffffff" opacity="0.4" />
+      </svg>
+    );
+  }
+  // 45/48 = Туман
+  if (code === 45 || code === 48) {
+    return (
+      <svg viewBox="0 0 64 64" width="1em" height="1em" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="wx-fog" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#ffffff" />
+            <stop offset="100%" stop-color="#a8b8c8" />
+          </linearGradient>
+        </defs>
+        <g stroke="url(#wx-fog)" stroke-width="5" stroke-linecap="round" opacity="0.85">
+          <line x1="8" y1="18" x2="56" y2="18" />
+          <line x1="4" y1="32" x2="52" y2="32" />
+          <line x1="12" y1="46" x2="60" y2="46" />
+        </g>
+      </svg>
+    );
+  }
+  // 51-67, 80-82 = Дождь
+  if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) {
+    return (
+      <svg viewBox="0 0 64 64" width="1em" height="1em" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="wx-cloud4" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#d8e0e8" />
+            <stop offset="60%" stop-color="#9aaabc" />
+            <stop offset="100%" stop-color="#6a7888" />
+          </linearGradient>
+          <linearGradient id="wx-drop" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#7cc3f0" />
+            <stop offset="100%" stop-color="#2a7ab8" />
+          </linearGradient>
+        </defs>
+        <path d="M18 34 a12 12 0 0 1 12 -12 a14 14 0 0 1 14 12 a9 9 0 0 1 -1 18 H19 a9 9 0 0 1 -1 -18 z" fill="url(#wx-cloud4)" stroke="#4a5868" stroke-width="0.8" />
+        <g fill="url(#wx-drop)">
+          <path d="M22 47 c-1.5 2 -2 4 -2 5 a3 3 0 0 0 6 0 c0 -1 -0.5 -3 -2 -5 a1 1 0 0 0 -2 0 z" />
+          <path d="M32 47 c-1.5 2 -2 4 -2 5 a3 3 0 0 0 6 0 c0 -1 -0.5 -3 -2 -5 a1 1 0 0 0 -2 0 z" />
+          <path d="M42 47 c-1.5 2 -2 4 -2 5 a3 3 0 0 0 6 0 c0 -1 -0.5 -3 -2 -5 a1 1 0 0 0 -2 0 z" />
+        </g>
+      </svg>
+    );
+  }
+  // 71-77, 85, 86 = Снег
+  if ((code >= 71 && code <= 77) || code === 85 || code === 86) {
+    return (
+      <svg viewBox="0 0 64 64" width="1em" height="1em" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="wx-cloud5" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#ffffff" />
+            <stop offset="60%" stop-color="#e3eaf2" />
+            <stop offset="100%" stop-color="#b8c5d3" />
+          </linearGradient>
+        </defs>
+        <path d="M18 34 a12 12 0 0 1 12 -12 a14 14 0 0 1 14 12 a9 9 0 0 1 -1 18 H19 a9 9 0 0 1 -1 -18 z" fill="url(#wx-cloud5)" stroke="#8fa3b8" stroke-width="0.8" />
+        <g fill="#5b9bd5" stroke="#2a6fa8" stroke-width="0.6">
+          <g transform="translate(22 50)">
+            <line x1="0" y1="-3" x2="0" y2="3" stroke="#2a6fa8" stroke-width="1.2" stroke-linecap="round" />
+            <line x1="-3" y1="0" x2="3" y2="0" stroke="#2a6fa8" stroke-width="1.2" stroke-linecap="round" />
+            <line x1="-2.1" y1="-2.1" x2="2.1" y2="2.1" stroke="#2a6fa8" stroke-width="1.2" stroke-linecap="round" />
+            <line x1="-2.1" y1="2.1" x2="2.1" y2="-2.1" stroke="#2a6fa8" stroke-width="1.2" stroke-linecap="round" />
+          </g>
+          <g transform="translate(32 54)">
+            <line x1="0" y1="-3" x2="0" y2="3" stroke="#2a6fa8" stroke-width="1.2" stroke-linecap="round" />
+            <line x1="-3" y1="0" x2="3" y2="0" stroke="#2a6fa8" stroke-width="1.2" stroke-linecap="round" />
+            <line x1="-2.1" y1="-2.1" x2="2.1" y2="2.1" stroke="#2a6fa8" stroke-width="1.2" stroke-linecap="round" />
+            <line x1="-2.1" y1="2.1" x2="2.1" y2="-2.1" stroke="#2a6fa8" stroke-width="1.2" stroke-linecap="round" />
+          </g>
+          <g transform="translate(42 50)">
+            <line x1="0" y1="-3" x2="0" y2="3" stroke="#2a6fa8" stroke-width="1.2" stroke-linecap="round" />
+            <line x1="-3" y1="0" x2="3" y2="0" stroke="#2a6fa8" stroke-width="1.2" stroke-linecap="round" />
+            <line x1="-2.1" y1="-2.1" x2="2.1" y2="2.1" stroke="#2a6fa8" stroke-width="1.2" stroke-linecap="round" />
+            <line x1="-2.1" y1="2.1" x2="2.1" y2="-2.1" stroke="#2a6fa8" stroke-width="1.2" stroke-linecap="round" />
+          </g>
+        </g>
+      </svg>
+    );
+  }
+  // 95+ = Гроза
+  if (code >= 95) {
+    return (
+      <svg viewBox="0 0 64 64" width="1em" height="1em" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="wx-cloud6" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#a8b4c4" />
+            <stop offset="60%" stop-color="#5a6b7d" />
+            <stop offset="100%" stop-color="#3a4654" />
+          </linearGradient>
+          <linearGradient id="wx-bolt" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#fff3a0" />
+            <stop offset="60%" stop-color="#ffc233" />
+            <stop offset="100%" stop-color="#e88a00" />
+          </linearGradient>
+        </defs>
+        <path d="M18 30 a12 12 0 0 1 12 -12 a14 14 0 0 1 14 12 a9 9 0 0 1 -1 18 H19 a9 9 0 0 1 -1 -18 z" fill="url(#wx-cloud6)" stroke="#2a3440" stroke-width="0.8" />
+        <path d="M32 32 l-7 14 h6 l-4 14 l14 -18 h-7 l5 -10 z" fill="url(#wx-bolt)" stroke="#d97a00" stroke-width="0.6" />
+      </svg>
+    );
+  }
+  // default = перем. облачность (как 1-2)
+  return (
+    <svg viewBox="0 0 64 64" width="1em" height="1em" aria-hidden="true" focusable="false">
+      <defs>
+        <radialGradient id="wx-sun-def" cx="40%" cy="35%" r="65%">
+          <stop offset="0%" stop-color="#fff3a0" />
+          <stop offset="55%" stop-color="#ffc233" />
+          <stop offset="100%" stop-color="#e88a00" />
+        </radialGradient>
+        <linearGradient id="wx-cloud-def" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#ffffff" />
+          <stop offset="60%" stop-color="#e3eaf2" />
+          <stop offset="100%" stop-color="#b8c5d3" />
+        </linearGradient>
+      </defs>
+      <g stroke="#ffb300" stroke-width="3" stroke-linecap="round" opacity="0.95">
+        <line x1="22" y1="3" x2="22" y2="9" />
+        <line x1="3" y1="22" x2="9" y2="22" />
+        <line x1="8" y1="8" x2="12.5" y2="12.5" />
+        <line x1="36" y1="8" x2="31.5" y2="12.5" />
+        <line x1="8" y1="36" x2="12.5" y2="31.5" />
+      </g>
+      <circle cx="22" cy="22" r="10" fill="url(#wx-sun-def)" stroke="#d97a00" stroke-width="0.6" />
+      <circle cx="18" cy="19" r="2.5" fill="#fff7c0" opacity="0.85" />
+      <path d="M20 44 a11 11 0 0 1 11 -11 a13 13 0 0 1 13 11 a8 8 0 0 1 -1 16 H22 a8 8 0 0 1 -2 -16 z" fill="url(#wx-cloud-def)" stroke="#8fa3b8" stroke-width="0.8" />
+      <path d="M22 44 a11 11 0 0 1 4 -8.5 a10 10 0 0 0 -4 8.5 a8 8 0 0 0 2 16 h-2 a8 8 0 0 1 -2 -16 z" fill="#ffffff" opacity="0.5" />
+    </svg>
+  );
+}
 
 /** ТЗ «Почасовой прогноз» п.4: класс цвета температуры по значению.
  *  +12…+15 cool (бирюзовый) · +16…+19 warm (зелёный) · +20…+24 hot
@@ -624,7 +828,7 @@ section.mp-panel[aria-label="Погода в Южно-Сахалинске"] .wt
   text-transform:uppercase;
   letter-spacing:.02em;
 }
-.wth-daily-box{border:1px solid #2196f3;background:#fff;padding:0;overflow:hidden}
+.wth-daily-box{border:1px solid #2196f3;background:#fff;padding:6px;overflow:hidden}
 .wth-daily-in{overflow:hidden}
 /* 15. ТЗ 2026-09-21 «ячейки обведи самой тонкой синей полосой»:
       ячейки лога «Обстановка на перевалах» — белые карточки с рамкой
@@ -732,7 +936,7 @@ section.mp-panel[aria-label="Погода в Южно-Сахалинске"] .wt
   margin:4px 0 2px !important;
   padding:2px 8px !important;
 }
-.wth-daily-box{padding:0 !important}
+.wth-daily-box{padding:3px !important}
 
 /* Ячейки лога «Обстановка на перевалах» — padding 7/10 → 3/8; margin 6 → 2 */
 section.mp-panel[aria-label="Оперативная обстановка на перевалах"] .wth-pass{
@@ -1051,21 +1255,18 @@ export default function WeatherScreen() {
                   count-4 давал 2 ряда с обрезом посреди иконок), размеры
                   задаёт эффект dailyBoxRef выше — виджет 1120px, масштаб
                   по ширине колонки, срез под ночными температурами. */}
-              {/* 2026-11-05: метка meteoblue заменена на нативный SMatrix-виджет
-                  (та же причина, что и на Главной: внешний iframe meteoblue
-                  не рендерился на Android-планшетах из-за Cloudflare
-                  bot-detection и SameSite=None cookies в iframe-контексте).
-                  Нативный виджет берёт данные из /api/home/weather (open-meteo
-                  + резерв met.no), отрисовывает 7-дневный прогноз с emoji-
-                  иконками и min/max температурами. Контейнер .wth-daily-box
-                  и .wth-daily-in остаются (CSS адаптирует виджет под них).
-                  dailyBoxRef выше — теперь dead-code (iframe нет), но
-                  безопасно: useEffect ищет iframe и ранним return выходит. */}
               <div className="mp-weather">
-                <div className="wth-daily-l">Прогноз по дням</div>
+                <div className="wth-daily-l">Прогноз по дням · meteoblue</div>
                 <div className="wth-daily-box">
                   <div ref={dailyBoxRef} className="wth-daily-in">
-                    <HomeWeatherWidget />
+                    <DeferredIframe
+                      className="mp-w-frame mp-w-frame-sm"
+                      src="https://www.meteoblue.com/ru/weather/widget/daily/yuzhno-sakhalinsk_russia_2119441?days=7"
+                      title="Прогноз по дням на 7 дней — виджет meteoblue"
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin"
+                    />
                   </div>
                 </div>
               </div>

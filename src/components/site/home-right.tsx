@@ -42,7 +42,6 @@ import { useEffect, useState } from "react";
 import { Info, Phone } from "lucide-react";
 import DeferredIframe from "@/components/site/deferred-iframe";
 import SakhDatetimeBlock from "@/components/site/sakh-datetime-block";
-import HomeWeatherWidget from "@/components/site/home-weather-widget";
 import { ballPlural, trafficEmoji } from "@/lib/traffic-ui";
 import { outageOrgBadge, outageWhenLabel } from "@/lib/outages-taxonomy";
 
@@ -257,13 +256,16 @@ export default function HomeRight() {
           <small>46.95°С 142.74°В 48м над уровнем моря</small>
         </div>
         <div className="mp-weather">
-          {/* 2026-11-05: метка meteoblue заменена на нативный SMatrix-виджет.
-              Причина: внешний iframe meteoblue не рендерился на Android-
-              планшетах (Cloudflare bot-detection / SameSite=None cookies в
-              iframe-контексте). Нативный виджет берёт данные из
-              /api/home/weather (open-meteo + резерв met.no), работает на
-              всех устройствах, без внешних зависимостей. */}
-          <HomeWeatherWidget />
+          {/* src откладывается до window.load: медленный/подвисший ответ
+              meteoblue в сети пользователя не должен удерживать событие
+              загрузки страницы (вечный спиннер панели предпросмотра). */}
+          <DeferredIframe
+            className="mp-w-frame"
+            src="https://www.meteoblue.com/ru/weather/widget/daily/yuzhno-sakhalinsk_russia_2119441"
+            title="Погода в Южно-Сахалинске — виджет meteoblue"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
         </div>
       </section>
 
