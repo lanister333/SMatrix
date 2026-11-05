@@ -3902,10 +3902,12 @@ section[aria-label="Погода на Сахалине"] .mp-w-day-icon{
   flex:1 1 auto;
   display:flex;align-items:center;justify-content:center;
 }
-/* Подпись погоды (Дождь/Снег/Облачно) — мелкая, под иконкой */
+/* Подпись погоды (Дождь/Снег/Облачно) — мелкая, под иконкой.
+   В сайдбаре (Погода на Сахалине) СКРЫТА: 220px на 7 ячеек = ~31px/ячейка,
+   подписи «переменная облачность» не помещаются и слипаются.
+   Подписи видны только в крупном виджете /weather.php (Погода в Южно-Сахалинске). */
 section[aria-label="Погода на Сахалине"] .mp-w-day-label{
-  font-size:8.5px;line-height:1.1;color:#2a6fa8;font-weight:600;
-  margin-top:1px;text-transform:lowercase;
+  display:none;
 }
 section[aria-label="Погода на Сахалине"] .mp-w-day-tmax b{
   font-size:13px;font-weight:800;color:var(--sm-navy);
