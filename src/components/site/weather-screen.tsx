@@ -624,7 +624,7 @@ section.mp-panel[aria-label="Погода в Южно-Сахалинске"] .wt
   text-transform:uppercase;
   letter-spacing:.02em;
 }
-.wth-daily-box{border:1px solid #2196f3;background:#fff;padding:6px;overflow:hidden}
+.wth-daily-box{border:1px solid #2196f3;background:#fff;padding:0;overflow:hidden}
 .wth-daily-in{overflow:hidden}
 /* 15. ТЗ 2026-09-21 «ячейки обведи самой тонкой синей полосой»:
       ячейки лога «Обстановка на перевалах» — белые карточки с рамкой
@@ -732,7 +732,7 @@ section.mp-panel[aria-label="Погода в Южно-Сахалинске"] .wt
   margin:4px 0 2px !important;
   padding:2px 8px !important;
 }
-.wth-daily-box{padding:3px !important}
+.wth-daily-box{padding:0 !important}
 
 /* Ячейки лога «Обстановка на перевалах» — padding 7/10 → 3/8; margin 6 → 2 */
 section.mp-panel[aria-label="Оперативная обстановка на перевалах"] .wth-pass{
