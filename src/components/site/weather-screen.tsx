@@ -37,6 +37,7 @@ import { DEFAULT_SETTINGS, isStaffRole, MainNav, Masthead, SiteFooter, useAuth, 
 import ForumSideNav from "@/components/site/left-nav";
 import HomeRight from "@/components/site/home-right";
 import DeferredIframe from "@/components/site/deferred-iframe";
+import HomeWeatherWidget from "@/components/site/home-weather-widget";
 import { CITY_GROUPS, type FullWeather } from "@/lib/weather-data";
 import { fmtRecent } from "@/lib/ui";
 import { nickGenderClass } from "@/lib/nick-gender";
@@ -1255,18 +1256,21 @@ export default function WeatherScreen() {
                   count-4 давал 2 ряда с обрезом посреди иконок), размеры
                   задаёт эффект dailyBoxRef выше — виджет 1120px, масштаб
                   по ширине колонки, срез под ночными температурами. */}
+              {/* 2026-11-05: метка meteoblue заменена на нативный SMatrix-виджет
+                  (та же причина, что и на Главной: внешний iframe meteoblue
+                  не рендерился на Android-планшетах из-за Cloudflare
+                  bot-detection и SameSite=None cookies в iframe-контексте).
+                  Нативный виджет берёт данные из /api/home/weather (open-meteo
+                  + резерв met.no), отрисовывает 7-дневный прогноз с emoji-
+                  иконками и min/max температурами. Контейнер .wth-daily-box
+                  и .wth-daily-in остаются (CSS адаптирует виджет под них).
+                  dailyBoxRef выше — теперь dead-code (iframe нет), но
+                  безопасно: useEffect ищет iframe и ранним return выходит. */}
               <div className="mp-weather">
-                <div className="wth-daily-l">Прогноз по дням · meteoblue</div>
+                <div className="wth-daily-l">Прогноз по дням</div>
                 <div className="wth-daily-box">
                   <div ref={dailyBoxRef} className="wth-daily-in">
-                    <DeferredIframe
-                      className="mp-w-frame mp-w-frame-sm"
-                      src="https://www.meteoblue.com/ru/weather/widget/daily/yuzhno-sakhalinsk_russia_2119441?days=7"
-                      title="Прогноз по дням на 7 дней — виджет meteoblue"
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin"
-                    />
+                    <HomeWeatherWidget />
                   </div>
                 </div>
               </div>

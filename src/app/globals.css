@@ -3942,6 +3942,90 @@ section[aria-label="Погода на Сахалине"] .mp-w-error{
   section[aria-label="Погода на Сахалине"] .mp-w-day-tmin{font-size:9px}
 }
 
+/* 2026-11-05: нативный виджет «Прогноз по дням» на /weather.php
+   (центральная колонка, секция «Погода в Южно-Сахалинске»).
+   Замена второго iframe meteoblue — тот же компонент <HomeWeatherWidget />,
+   но в более широком контексте. Стили переопределяют дефолтные значения
+   под крупную сетку центральной колонки (виджет на Главной — в правом
+   сайдбаре 220-300px, здесь — 600-900px). Контейнер .wth-daily-in имеет
+   max-height:200px (см. медиа-запрос ниже) — виджет вписывается.
+   Лейба «Прогноз по дням» (без meteoblue) — в .wth-daily-l, не трогаем. */
+section[aria-label="Погода в Южно-Сахалинске"] .mp-w-native{
+  width:100%;height:auto;min-height:180px;
+  display:flex;flex-direction:column;
+  background:#fff;
+  font-family:inherit;
+}
+section[aria-label="Погода в Южно-Сахалинске"] .mp-w-days{
+  display:flex;flex-direction:row;
+  flex:1 1 auto;min-height:0;
+  gap:1px;padding:4px 2px;
+  align-items:stretch;justify-content:space-between;
+}
+section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day{
+  flex:1 1 0;min-width:0;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  justify-content:space-between;
+  padding:6px 2px;gap:0;
+  border-right:1px solid #eef2f6;
+}
+section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day:last-child{border-right:0}
+section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-name{
+  font-size:14px;font-weight:700;line-height:1.15;
+  color:var(--sm-navy);
+}
+section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-date{
+  font-size:11px;line-height:1.1;color:#6a7888;
+  margin-top:2px;
+}
+section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-icon{
+  font-size:36px;line-height:1;
+  margin:6px 0;
+  flex:1 1 auto;
+  display:flex;align-items:center;justify-content:center;
+}
+section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-tmax b{
+  font-size:16px;font-weight:700;color:var(--sm-navy);
+  line-height:1.1;display:block;
+}
+section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-tmin{
+  font-size:13px;color:#8a97a3;line-height:1.1;
+  margin-top:2px;
+}
+section[aria-label="Погода в Южно-Сахалинске"] .mp-w-updated{
+  flex:0 0 auto;
+  font-size:10px;color:#a8b3bf;
+  text-align:center;padding:4px 4px 5px;
+  line-height:1.2;
+  border-top:1px solid #f0f3f6;
+  background:#fafbfc;
+}
+section[aria-label="Погода в Южно-Сахалинске"] .mp-w-loading,
+section[aria-label="Погода в Южно-Сахалинске"] .mp-w-error{
+  display:flex;align-items:center;justify-content:center;
+  width:100%;min-height:180px;
+  color:#6a7888;font-size:13px;text-align:center;
+  padding:30px 8px;
+  background:#fff;
+}
+/* На 1024-1679px (планшет landscape, 15"): чуть компактнее */
+@media (min-width:1024px) and (max-width:1679px){
+  section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-icon{font-size:30px;margin:4px 0}
+  section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-name{font-size:13px}
+  section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-date{font-size:10.5px}
+  section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-tmax b{font-size:15px}
+  section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-tmin{font-size:12px}
+}
+/* Телефон: компактнее */
+@media (max-width:480px){
+  section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day{padding:3px 0}
+  section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-icon{font-size:24px;margin:2px 0}
+  section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-name{font-size:11px}
+  section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-date{font-size:9.5px}
+  section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-tmax b{font-size:13px}
+  section[aria-label="Погода в Южно-Сахалинске"] .mp-w-day-tmin{font-size:11px}
+}
+
 /* Шаг 6: плотная таблица наличных курсов касс банков ЮС (агрегатор
    kovalut.ru). Колонки «Покупка»/«Продажа»; в ячейке — лучший курс
    и имя лучшего банка (крупнее — курс, мельче — банк). */
