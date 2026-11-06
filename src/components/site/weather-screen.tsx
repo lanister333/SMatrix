@@ -737,7 +737,7 @@ section.mp-panel[aria-label="Температура по районам Саха
 .sk .district-group-title{
   display:inline-block;
   background:#f4f8fb !important;
-  border-left:0 !important;
+  border:1px solid #3a9ca5 !important;
   color:#1f3a5f !important;
   font-size:12px !important;
   font-weight:600 !important;
