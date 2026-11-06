@@ -4311,11 +4311,11 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
    форума с тегом «Дороги» (roads-taxonomy). Новые элементы — базовые
    правила; мобильная плотность — только в media-блоке ниже.
    ============================================================ */
-.wth-body{padding:5px 8px !important}
+.wth-body{padding:0 8px 5px !important}
 /* .sk .wth-back УДАЛЕНО (2026-09-19, директива «Плашка = верх карточки»):
    заголовок «Погода» теперь .mp-paneltitle — отдельной плашки
    .sm-stub-home.wth-back в разметке больше нет (weather-screen.tsx). */
-.wth-now{display:flex;align-items:center;gap:10px;padding:2px 0 3px}
+.wth-now{display:flex;align-items:center;gap:10px;padding:0 0 2px}
 .wth-now-t{font-size:34px;font-weight:700;line-height:1;color:#1a2433;font-variant-numeric:tabular-nums}
 .wth-now-r{display:flex;flex-direction:column;gap:2px;min-width:0}
 .wth-now-l{font-size:13.5px;font-weight:700;color:#1a2433}
