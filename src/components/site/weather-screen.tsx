@@ -1208,7 +1208,7 @@ export default function WeatherScreen() {
                           </span>{" "}
                           {h.wind} м/с · {h.rumb}
                         </div>
-                        {h.time === nowHour ? <span className="hour-now">сейчас</span> : null}
+                        {h.time === nowHour ? null : null}
                       </div>
                       );
                     })}

@@ -4370,15 +4370,15 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
 .hour-cell.night{background:#123c6d}
 .hour-cell .hour-time{color:#1e3a5f}
 .hour-cell .hour-wind{color:#274b6d}
-.hour-cell:not(.current) .hour-time{color:#fff}
-.hour-cell:not(.current) .hour-wind{color:rgba(255,255,255,.85)}
-.hour-cell.midday:not(.current) .hour-time{color:#1e3a5f}
-.hour-cell.midday:not(.current) .hour-wind{color:#274b6d}
+.hour-cell .hour-time{color:#fff}
+.hour-cell .hour-wind{color:rgba(255,255,255,.85)}
+.hour-cell.midday .hour-time{color:#1e3a5f}
+.hour-cell.midday .hour-wind{color:#274b6d}
 /* hover: яркость заливки + светлая рамка (фон НЕ белеет) */
 .hour-cell:hover{filter:brightness(1.08)}
 /* текущий час — белая ячейка с двойным бирюзовым кольцом: выделяется
    среди насыщенного ряда, текст сохраняет обычные тёмные цвета */
-.hour-cell.current{background:#fff;border:2px solid #3a9ca5;box-shadow:none}
+.hour-cell.current{border:4px solid #3a9ca5;box-shadow:none}
 .hour-cell.current .hour-time{font-weight:700}
 .hour-cell.selected{border:none;box-shadow:none}
 .hour-now{position:absolute;top:calc(100% + 2px);left:50%;transform:translateX(-50%);background:#06cdbd;color:#0e2a44;font-size:10.5px;font-weight:700;line-height:1;padding:3px 9px;border-radius:8px;white-space:nowrap}
@@ -4400,9 +4400,9 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
    цветовых классов .hour-temp.* выше — больший вес (0,3,0) и порядок
    каскада гарантируют применение внутри ячеек почасовки */
 .hour-cell .hour-temp{display:block;margin:2px 0 0px;padding:0;border-radius:0;background:transparent;color:#1a2433;box-shadow:none}
-.hour-cell:not(.current):not(.midday) .hour-temp{color:#fff !important}
-.hour-cell.midday:not(.current) .hour-temp{color:#1a2433 !important}
-.hour-cell.current .hour-temp{color:#1a2433 !important}
+.hour-cell:not(.midday) .hour-temp{color:#fff !important}
+.hour-cell.midday .hour-temp{color:#1a2433 !important}
+
 .hour-cell .hour-temp.cold{background:transparent;color:#1e6fb8}
 .hour-cell .hour-temp.cool{background:transparent;color:#3a9ca5}
 .hour-cell .hour-temp.warm{background:transparent;color:#6bbf59}
