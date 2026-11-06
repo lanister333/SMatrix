@@ -5894,7 +5894,7 @@ div[style*="background-color: rgb(0, 74, 143)"] {
    ниже по файлу). */
 .sk .district-temp{font-size:16px;font-weight:700;color:#1f3a5f !important}
 /* Заголовок группы районов: светло-голубая плашка с бирюзовой полоской слева. */
-.sk .district-group-title{display:inline-block;font-size:12px;font-weight:600;color:#1f3a5f;background:#f4f8fb;border-left:3px solid #3a9ca5;padding:3px 10px;border-radius:3px;margin:10px 0 6px}
+.sk .district-group-title{display:inline-block;font-size:12px;font-weight:600;color:#1f3a5f;background:#f4f8fb;border-left:3px solid #3a9ca5;padding:2px 8px;border-radius:3px;margin:0 0 0}
 
 /* ==== ТЗ 2026-09-21 №3: виджет «Приливы и отливы» (/weather.php) ====
    Точка — залив Анива у порта Корсаков (marine open-meteo, Copernicus
