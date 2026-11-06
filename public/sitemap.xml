@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://sakhmatrix.ru/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>https://sakhmatrix.ru/forum</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://sakhmatrix.ru/weather.php</loc><changefreq>hourly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sakhmatrix.ru/gde-kupit</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://sakhmatrix.ru/obyavleniya</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://sakhmatrix.ru/podslyshano</loc><changefreq>daily</changefreq><priority>0.6</priority></url>
+  <url><loc>https://sakhmatrix.ru/gkh</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://sakhmatrix.ru/znakomstva</loc><changefreq>daily</changefreq><priority>0.5</priority></url>
+  <url><loc>https://sakhmatrix.ru/rekomenduyu</loc><changefreq>daily</changefreq><priority>0.6</priority></url>
+  <url><loc>https://sakhmatrix.ru/currency.php</loc><changefreq>hourly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://sakhmatrix.ru/disconnections.php</loc><changefreq>hourly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://sakhmatrix.ru/traffic.php</loc><changefreq>hourly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://sakhmatrix.ru/register</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://sakhmatrix.ru/login</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
+</urlset>
