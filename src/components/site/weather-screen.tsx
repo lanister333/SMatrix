@@ -741,9 +741,9 @@ section.mp-panel[aria-label="Температура по районам Саха
   color:#1f3a5f !important;
   font-size:12px !important;
   font-weight:600 !important;
-  padding:3px 10px !important;
+  padding:2px 8px !important;
   border-radius:0 !important;
-  margin:10px 0 6px !important;
+  margin:0 !important;
 }
 /* 9. ТЗ 2026-09-21: острые углы у ВСЕХ внутренних ячеек погодного
       сервиса (метрики Влажность/Давление/Ветер, ячейки почасовки,
