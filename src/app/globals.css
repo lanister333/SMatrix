@@ -5902,7 +5902,7 @@ div[style*="background-color: rgb(0, 74, 143)"] {
    минимализма сайдбара (белая, рамка #d6e4f0, шапка #1f3a5f по центру);
    здесь только строки экстремумов. Без @media и без анимаций. */
 .tides-list{display:flex;flex-direction:column}
-.tide-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:7px 10px;border:1px solid #2196f3;border-radius:6px;margin-bottom:6px;background:#fff}
+.tide-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:7px 10px;border:1px solid #2196f3;border-radius:0;margin-bottom:6px;background:#fff}
 .tide-row.tide-next{border-color:#1f3a5f}
 .tide-kind{font-size:13px;font-weight:700;color:#1f3a5f;white-space:nowrap}
 .tide-kind.low{color:#2a6fa8}
