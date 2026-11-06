@@ -52,6 +52,8 @@ export default function RootLayout({
           type="font/woff2"
           crossOrigin="anonymous"
         />
+        {/* Yandex Webmaster verification */}
+        <meta name="yandex-verification" content="f6d6f62dab337dcc" />
       </head>
       <body className="antialiased">
         {/* Яндекс.Метрика — счётчик 113691446.
