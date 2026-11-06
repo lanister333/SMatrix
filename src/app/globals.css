@@ -4403,11 +4403,11 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
 .hour-cell:not(.midday) .hour-temp{color:#fff !important}
 .hour-cell.midday .hour-temp{color:#1a2433 !important}
 
-.hour-cell .hour-temp.cold{background:transparent;color:#1e6fb8}
-.hour-cell .hour-temp.cool{background:transparent;color:#3a9ca5}
-.hour-cell .hour-temp.warm{background:transparent;color:#6bbf59}
-.hour-cell .hour-temp.hot{background:transparent;color:#e8a33d}
-.hour-cell .hour-temp.veryhot{background:transparent;color:#d9534f}
+.hour-cell .hour-temp.cold{background:transparent}
+.hour-cell .hour-temp.cool{background:transparent}
+.hour-cell .hour-temp.warm{background:transparent}
+.hour-cell .hour-temp.hot{background:transparent}
+.hour-cell .hour-temp.veryhot{background:transparent}
 .hour-humidity{display:inline-block;margin:0 0 0px;padding:2px 9px;border-radius:8px;font-size:11.5px;font-weight:700;line-height:1.35;color:#fff;}
 .hour-humidity.hum-low{background:#8a97a3}
 .hour-humidity.hum-mid{background:#3a9ca5}
