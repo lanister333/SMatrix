@@ -705,7 +705,7 @@ section.mp-panel[aria-label="Температура по районам Саха
   background:#fff !important;
   border:1px solid #2196f3 !important;
   border-radius:0 !important;
-  padding:10px 14px !important;
+  padding:3px 8px !important;
   box-shadow:none !important;
 }
 /* hover: рамка темнеет до #1a6fd4 — мгновенно, без анимаций
@@ -892,10 +892,10 @@ section.mp-panel[aria-label="Погода в Южно-Сахалинске"] .wt
   font-size:13px;
 }
 
-/* Строки районов — padding 10px 14px → 4px 10px */
+/* Строки районов — компактно: padding 3px 8px → 2px 6px */
 section.mp-panel[aria-label="Температура по районам Сахалина и Курил"] .wth-bub,
 .sk .district-row{
-  padding:4px 10px !important;
+  padding:2px 6px !important;
 }
 section.mp-panel[aria-label="Температура по районам Сахалина и Курил"] .wth-bub-n,
 .sk .district-name{
