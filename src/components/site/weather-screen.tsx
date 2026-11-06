@@ -895,7 +895,7 @@ section.mp-panel[aria-label="Погода в Южно-Сахалинске"] .wt
 /* Строки районов — компактно: padding 3px 8px → 2px 6px */
 section.mp-panel[aria-label="Температура по районам Сахалина и Курил"] .wth-bub,
 .sk .district-row{
-  padding:2px 6px !important;
+  padding:4px 8px !important;
 }
 section.mp-panel[aria-label="Температура по районам Сахалина и Курил"] .wth-bub-n,
 .sk .district-name{
