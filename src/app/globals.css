@@ -4311,21 +4311,21 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
    форума с тегом «Дороги» (roads-taxonomy). Новые элементы — базовые
    правила; мобильная плотность — только в media-блоке ниже.
    ============================================================ */
-.wth-body{padding:10px 12px}
+.wth-body{padding:4px 8px}
 /* .sk .wth-back УДАЛЕНО (2026-09-19, директива «Плашка = верх карточки»):
    заголовок «Погода» теперь .mp-paneltitle — отдельной плашки
    .sm-stub-home.wth-back в разметке больше нет (weather-screen.tsx). */
-.wth-now{display:flex;align-items:center;gap:10px;padding:2px 0 6px}
+.wth-now{display:flex;align-items:center;gap:10px;padding:1px 0 2px}
 .wth-now-t{font-size:34px;font-weight:700;line-height:1;color:#1a2433;font-variant-numeric:tabular-nums}
 .wth-now-r{display:flex;flex-direction:column;gap:2px;min-width:0}
 .wth-now-l{font-size:13.5px;font-weight:700;color:#1a2433}
 .wth-now-r small{font-size:11.5px;color:#56657a}
 .wth-now-icon{font-size:72px;line-height:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;vertical-align:middle}
 .wth-metrics{display:flex;gap:6px}
-.wth-metric{flex:1;background:#f2f6f9;border:1px solid #e1e8ee;border-radius:4px;padding:6px 7px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.wth-metric{flex:1;background:#f2f6f9;border:1px solid #e1e8ee;border-radius:4px;padding:3px 5px;display:flex;flex-direction:column;gap:2px;min-width:0}
 .wth-metric small{font-size:10.5px;color:#56657a;line-height:1.2}
 .wth-metric b{font-size:13px;line-height:1.2;color:#1a2433;font-variant-numeric:tabular-nums}
-.wth-hours-l{margin:8px 0 4px;font-size:11px;font-weight:700;color:#56657a;text-transform:uppercase;letter-spacing:.02em}
+.wth-hours-l{margin:4px 0 2px;font-size:11px;font-weight:700;color:#56657a;text-transform:uppercase;letter-spacing:.02em}
 /* ---- ТЗ «Почасовой прогноз на сегодня» (2026-09-19): редизайн ----
    snap-скролл ряд ячеек; в ячейке: время, иконка WMO, температура
    в цвете значения, бейдж влажности, ветер со стрелкой-поворотом;
@@ -4344,7 +4344,7 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
    12px → 8px. Утром, когда часов много, свободного места нет — лента
    как раньше уезжает в горизонтальный snap-скролл. Мобильный media-блок
    ниже возвращает фиксированные 88px — там ряд всегда скроллится */
-.hourly-forecast{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 0 26px;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:#c8d8e3 transparent}
+.hourly-forecast{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 0 10px;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:#c8d8e3 transparent}
 .hourly-forecast::-webkit-scrollbar{height:4px}
 .hourly-forecast::-webkit-scrollbar-thumb{background:#c8d8e3;border-radius:2px}
 .hourly-forecast::-webkit-scrollbar-track{background:transparent}
@@ -4432,7 +4432,7 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
 .wth-pass-h span{font-size:10.5px;color:#56657a;white-space:nowrap;font-variant-numeric:tabular-nums}
 .wth-pass-t{margin:2px 0 0;font-size:12px;color:#33415a;line-height:1.45;overflow-wrap:anywhere;word-break:break-word;max-width:100%}
 .wth-empty{padding:6px 9px;font-size:13px;color:#56657a}
-.wth-body .mp-w-upd{margin-top:6px}
+.wth-body .mp-w-upd{margin-top:2px}
 .wth-dirs .mp-w-upd{margin-top:4px}
 .wth-passes .mp-w-upd{margin-top:4px}
 
@@ -4785,19 +4785,19 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
      бабблы районов в 2 колонки, текст перевалов переносится по
      строкам (overflow-wrap:anywhere). Десктопу правила недоступны —
      живут только в этом media-блоке. ---- */
-  .wth-body{padding:6px}
+  .wth-body{padding:3px 4px}
   /* .sk .wth-back (мобильное) УДАЛЕНО 2026-09-19 — см. комментарий у десктопного блока .wth-body */
-  .wth-now{gap:8px;padding:0 0 4px}
+  .wth-now{gap:8px;padding:0 0 2px}
   .wth-now-icon{font-size:72px;line-height:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;vertical-align:middle}
   .wth-now-t{font-size:38px !important}
   .wth-now-icon{font-size:56px !important}
   .wth-now-l{font-size:12.5px}
   .wth-now-r small{font-size:10.5px}
   .wth-metrics{gap:4px}
-  .wth-metric{padding:5px 6px;gap:1px}
+  .wth-metric{padding:3px 5px;gap:1px}
   .wth-metric small{font-size:9.5px}
   .wth-metric b{font-size:12.5px !important} /* 2026-09-21: было 11.5px; !important против инлайн-15px десктопа */
-  .wth-hours-l{margin:6px 0 3px;font-size:10px}
+  .wth-hours-l{margin:3px 0 1px;font-size:10px}
   /* Почасовой прогноз на мобайле: 2026-09-21 «по часам увеличить» —
      ячейки крупнее (88px, иконка 24, температура 16), видно 3–4 штуки */
   .hourly-forecast{gap:8px;padding-bottom:24px}
