@@ -906,10 +906,10 @@ section.mp-panel[aria-label="Температура по районам Саха
   font-size:14px !important;
 }
 
-/* Заголовки групп (ЮГ/ЦЕНТР/...) — margin 10/6 → 3/1; padding 3/10 → 2/8 */
+/* Заголовки групп (ЮГ/ЦЕНТР/...) — margin 0; padding 2/8 */
 section.mp-panel[aria-label="Температура по районам Сахалина и Курил"] .wth-gt,
 .sk .district-group-title{
-  margin:3px 0 1px !important;
+  margin:0 0 0 !important;
   padding:2px 8px !important;
   font-size:11px !important;
 }
