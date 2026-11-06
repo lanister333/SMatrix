@@ -4312,6 +4312,7 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
    правила; мобильная плотность — только в media-блоке ниже.
    ============================================================ */
 .wth-body{padding:0 8px 5px !important}
+section[aria-label="Погода в Южно-Сахалинске"] > .card-header{padding-bottom:2px !important}
 /* .sk .wth-back УДАЛЕНО (2026-09-19, директива «Плашка = верх карточки»):
    заголовок «Погода» теперь .mp-paneltitle — отдельной плашки
    .sm-stub-home.wth-back в разметке больше нет (weather-screen.tsx). */
