@@ -4378,7 +4378,7 @@ section.mp-panel[aria-label="Телефоны экстренных служб"] 
 .hour-cell:hover{filter:brightness(1.08)}
 /* текущий час — белая ячейка с двойным бирюзовым кольцом: выделяется
    среди насыщенного ряда, текст сохраняет обычные тёмные цвета */
-.hour-cell.current{border:4px solid #3a9ca5;box-shadow:none}
+.hour-cell.current{border:6px solid #06cdbd;box-shadow:none}
 .hour-cell.current .hour-time{font-weight:700}
 .hour-cell.selected{border:none;box-shadow:none}
 .hour-now{position:absolute;top:calc(100% + 2px);left:50%;transform:translateX(-50%);background:#06cdbd;color:#0e2a44;font-size:10.5px;font-weight:700;line-height:1;padding:3px 9px;border-radius:8px;white-space:nowrap}
