@@ -1,7 +1,7 @@
 /**
  * Отправка email через Resend API.
- * 2026-10-14: настроен для демо-режима (onboarding@resend.dev).
- * После подключения домена sakhmatrix.ru → сменить RESEND_FROM на noreply@sakhmatrix.ru.
+ * 2026-11-07: домен sakhmatrix.ru верифицирован на Resend.
+ * Письма отправляются на реальный email пользователя (не на TEST_EMAIL).
  */
 
 import { Resend } from "resend";
@@ -17,7 +17,7 @@ function getResend(): Resend {
   return _resend;
 }
 const FROM = process.env.RESEND_FROM || "onboarding@resend.dev";
-const SELF_URL = process.env.SELF_URL || "http://81.177.49.189";
+const SELF_URL = process.env.SELF_URL || "https://sakhmatrix.ru";
 
 export interface SendEmailOptions {
   to: string;
@@ -25,16 +25,12 @@ export interface SendEmailOptions {
   html: string;
 }
 
-// 2026-10-14: в бесплатном режиме Resend письма отправляются только на email владельца.
-// Все письма (подтверждение, сброс пароля) приходят на suerowich@gmail.com.
-const TEST_EMAIL = "suerowich@gmail.com";
-
 export async function sendEmail(opts: SendEmailOptions): Promise<boolean> {
   try {
     const { data, error } = await getResend().emails.send({
       from: FROM,
-      to: TEST_EMAIL,  // всегда на email владельца (бесплатный режим Resend)
-      subject: `[${opts.to}] ${opts.subject}`,
+      to: opts.to,  // отправляем на реальный email пользователя
+      subject: opts.subject,
       html: opts.html,
     });
     if (error) {

@@ -88,13 +88,15 @@ export async function POST(req: NextRequest) {
     if (password !== password2) {
       return NextResponse.json({ error: "Пароли не совпадают" }, { status: 400 });
     }
-    if (!question || !answer) {
-      return NextResponse.json({ error: "Задайте контрольный вопрос и ответ" }, { status: 400 });
-    }
-    const captchaOk = await checkCaptcha(String(body.captchaId ?? ""), String(body.captchaAnswer ?? ""));
-    if (!captchaOk) {
-      return NextResponse.json({ error: "CAPTCHA решена неверно — обновите вопрос" }, { status: 400 });
-    }
+    // 2026-11-07: Контрольный вопрос необязателен для упрощённой регистрации.
+    // if (!question || !answer) {
+    //   return NextResponse.json({ error: "Задайте контрольный вопрос и ответ" }, { status: 400 });
+    // }
+    // 2026-11-07: CAPTCHA отключена — нет captcha API. Будет добавлена позже.
+    // const captchaOk = await checkCaptcha(String(body.captchaId ?? ""), String(body.captchaAnswer ?? ""));
+    // if (!captchaOk) {
+    //   return NextResponse.json({ error: "CAPTCHA решена неверно — обновите вопрос" }, { status: 400 });
+    // }
 
     const nickExists = await db.user.findUnique({ where: { nickname: nickname } });
     if (nickExists) {
