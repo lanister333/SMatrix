@@ -273,13 +273,28 @@ export default function ForumSideNav() {
               return (
                 /* ФИКС вертикальной раскладки рубрик: li — обычный блок;
                    flex-строка только .sk-rubric-header (иконка + название +
-                   стрелка), ul.sk-sublist — брат заголовка (опускается ВНИЗ). */
+                   стрелка), ul.sk-sublist — брат заголовка (опускается ВНИЗ).
+                   2026-11-07: если у рубрики есть подрубрики — клик по названию
+                   раскрывает/скрывает их (toggle), а не уходит на другую страницу.
+                   Навигация — через подрубрики внизу. Если подрубрик нет —
+                   клик по названию навигирует как обычно. */
                 <li key={r.id} className="sk-rubric-row">
                   <div className="sk-rubric-header">
                     <RIco size={13} strokeWidth={2.1} className="sk-navico" aria-hidden="true" />
-                    <a className="sk-rubric-name" href={`/?rubric=${encodeURIComponent(r.slug)}`}>
-                      {r.name}
-                    </a>
+                    {r.children.length > 0 ? (
+                      <button
+                        type="button"
+                        className="sk-rubric-name sk-rubric-toggle"
+                        aria-expanded={expanded === r.slug}
+                        onClick={() => setExpanded(expanded === r.slug ? null : r.slug)}
+                      >
+                        {r.name}
+                      </button>
+                    ) : (
+                      <a className="sk-rubric-name" href={`/?rubric=${encodeURIComponent(r.slug)}`}>
+                        {r.name}
+                      </a>
+                    )}
                     {r.children.length > 0 && (
                       <button
                         type="button"

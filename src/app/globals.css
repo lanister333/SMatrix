@@ -11024,3 +11024,6 @@ article button[style*="color: #dc2626"] {
 }
 
 .cache-bust-marker{content:"20261026-v2"}
+
+.sk-rubric-toggle{cursor:pointer;text-align:left;background:0 0;border:0;padding:1px 0;font-family:inherit;font-size:13.5px;color:#0a5caa;text-decoration:underline;flex:0 1 auto;min-width:0}
+.sk-rubric-toggle:hover{color:#c40000}
