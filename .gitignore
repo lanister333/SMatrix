@@ -11,12 +11,15 @@ dist/
 .env.local
 .env.*.local
 
-# Database (содержит пользователей и пароли!)
-db/*.db
+# Database
+# 2026-11-07: основной файл db/custom.db СОХРАНЯЕТСЯ в репозитории
+# по прямому указанию владельца (резервная копия БД на GitHub).
+# Журналы и бэкапы по-прежнему исключаются.
 db/*.db-journal
 db/*.db.bak*
 db/*.db.backup*
 db/*.bak*
+db/*.snapshot-*
 
 # Backups
 *.bak
