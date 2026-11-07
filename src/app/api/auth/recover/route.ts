@@ -50,8 +50,11 @@ export async function POST(req: NextRequest) {
     }
 
     // Ответ верный — создаём токен для сброса пароля
+    // 2026-11-07: ссылка ведёт на отдельную страницу /reset?token=...
+    // (раньше было /?reset=... — SPA-обработчик в app-client.tsx, но
+    // отдельная страница проще для пользователя и работает напрямую)
     const token = await createAuthToken(user.id, "reset");
-    const resetPath = `/?reset=${encodeURIComponent(token)}`;
+    const resetPath = `/reset?token=${encodeURIComponent(token)}`;
     const isStaff = user.role === "owner" || user.role === "admin" || user.role === "moderator";
     
     // Отправляем письмо через Resend (кроме staff — им сразу показываем ссылку)
