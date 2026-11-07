@@ -303,8 +303,8 @@ body{background:#E8EAEB}
   /* Главная иконка погоды — чуть меньше */
   .wth-now-icon{font-size:56px !important}
   .wth-now-t{font-size:32px !important}
-  /* Виджет meteoblue — ужимаем по высоте */
-  .mp-w-frame,.mp-w-frame-sm{height:180px !important}
+  /* Виджет meteoblue — ужимаем по высоте (но не сильно — нужно видеть прогноз) */
+  .mp-w-frame-sm{height:180px !important}
   /* Таблица валют в правой колонке — компактнее */
   .right-column table{font-size:11px !important}
   .right-column th,.right-column td{padding:2px 4px !important}
@@ -322,8 +322,13 @@ body{background:#E8EAEB}
   .sakh-carousel-name{font-size:14px !important}
   .sakh-carousel-sub{font-size:10px !important;margin-top:4px !important}
   .sakh-carousel-site{font-size:9px !important;margin-top:6px !important}
-  section[aria-label="Погода на Сахалине"] .mp-weather{height:180px !important}
-  section[aria-label="Погода на Сахалине"] .mp-w-frame{height:200px !important;margin-top:-30px !important}
+  /* 2026-11-07: правая колонка на 1024-1679px слишком узкая (~218px) для
+     виджета meteoblue — он обрезается и прогноз по дням не виден.
+     Раньше было height:180px/.mp-weather и 200px/-30px для iframe —
+     мало, видно только 2 дня. Поднимаю до 320px/.mp-weather и 360px
+     для iframe — теперь влезает 5-7 дней прогноза по дням. */
+  section[aria-label="Погода на Сахалине"] .mp-weather{height:320px !important}
+  section[aria-label="Погода на Сахалине"] .mp-w-frame{height:360px !important;margin-top:-30px !important}
 }
 
 /* 2026-10-26: компенсировать 3px flex-расширения на 1024-1150,
