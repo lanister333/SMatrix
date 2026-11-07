@@ -158,6 +158,13 @@ body{background:#E8EAEB}
 .sk-topbar button{color:#fff;cursor:pointer;background:0 0;border:0;border-radius:3px;min-height:40px;padding:8px 8px;font-family:inherit;font-size:14px;font-weight:700}
 .sk-topbar button:active{background:#3d5d82}
 .sk-topbar .tb-title{text-align:center;flex:1;font-size:15px;font-weight:700}
+/* 2026-11-07: кликабельный заголовок «Форум»/«Тема форума» в синей ленте —
+   pointer-events:auto переопределяет правило для ≤768px (там .tb-title имеет
+   pointer-events:none !important, чтобы не перекрывать кнопку «☰ Категории»).
+   cursor:pointer + подчёркивание при наведении дают визуальную подсказку. */
+.sk-topbar .tb-title.tb-title-clickable{pointer-events:auto !important;cursor:pointer}
+.sk-topbar .tb-title.tb-title-clickable:hover{text-decoration:underline}
+.sk-topbar .tb-title.tb-title-clickable:active{opacity:0.85}
 
 /* ЗАДАЧА 14, Шаг 3.1: фон оболочки контента прозрачен — сквозь неё видна
    серая подложка #E8EAEB, на которой выделяются белые карточки;

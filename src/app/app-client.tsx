@@ -789,9 +789,34 @@ export default function App({ initialSearchParams = {} }: { initialSearchParams?
               ☰ Категории
             </button>
           )}
-          <span className="tb-title">
-            {topicId ? "Тема форума" : view === "forum" ? "Форум" : view === "search" ? "Поиск" : view === "rules" ? "Правила" : view === "appeal" ? "Апелляция" : view === "about" ? "О проекте" : view === "admin" ? "Админка" : "Главная"}
-          </span>
+          {/* 2026-11-07: заголовок «Форум»/«Тема форума» в синей ленте кликабелен —
+              клик возвращает на главную форума (/?view=forum). Для других видов
+              (Поиск, Правила и т.д.) заголовок остаётся обычным текстом.
+              accessibility: role=button + tabIndex + Enter/Space через onKeyDown. */}
+          {(() => {
+            const titleText = topicId ? "Тема форума" : view === "forum" ? "Форум" : view === "search" ? "Поиск" : view === "rules" ? "Правила" : view === "appeal" ? "Апелляция" : view === "about" ? "О проекте" : view === "admin" ? "Админка" : "Главная";
+            const clickable = view === "forum";
+            return (
+              <span
+                className={`tb-title${clickable ? " tb-title-clickable" : ""}`}
+                {...(clickable
+                  ? {
+                      role: "button",
+                      tabIndex: 0,
+                      onClick: goForumHome,
+                      onKeyDown: (e: React.KeyboardEvent) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          goForumHome();
+                        }
+                      },
+                    }
+                  : {})}
+              >
+                {titleText}
+              </span>
+            );
+          })()}
         </div>
         {mobileMenu && <div className="sk-menu-backdrop" onClick={() => setMobileMenu(false)} />}
         <div className="sk-shell">
