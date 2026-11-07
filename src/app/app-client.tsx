@@ -127,6 +127,13 @@ function Sidebar(props: {
   const [expanded, setExpanded] = useState<string | null>(null);
   const service = rubrics.find((r) => r.isService);
   const modAsk = service?.children?.find((c) => c.name.toLowerCase().includes("модератору"));
+  // 2026-11-07 (мобайл-фикс): родитель активной подрубрики всегда раскрыт,
+  // чтобы пользователь видел в меню выбранный пункт (в т.ч. после URL-синхронизации
+  // или открытия мобильного меню). Дополнительно к ручному expanded-состоянию.
+  const parentOfActive = rubricFilter
+    ? rubrics.find((r) => r.children.some((c) => c.slug === rubricFilter.slug))
+    : null;
+  const isExpanded = (slug: string) => expanded === slug || parentOfActive?.slug === slug;
   return (
     <aside className={`sk-col-left left-column ${props.open ? "open" : ""}`}>
       {/* ШАГ 27: на главной строки «Добавить тему» и «Вы не вошли…» нет — вход/регистрация
@@ -185,25 +192,34 @@ function Sidebar(props: {
               <li key={r.id} className="sk-rubric-row">
                 <div className="sk-rubric-header">
                   <RIco size={13} strokeWidth={2.1} className="sk-navico" aria-hidden="true" />
+                  {/* 2026-11-07 (мобайл-фикс): клик по разделу с подрубриками
+                      ТОЛЬКО раскрывает/скрывает подрубрики внизу — НЕ навигирует
+                      и НЕ закрывает мобильное меню (как в left-nav.tsx).
+                      Без подрубрик — навигация как обычно. Если текущая рубрика
+                      уже выбрана — повторный клик её сбрасывает. */}
                   <button
                     className={`sk-rubric-name ${rubricFilter?.slug === r.slug ? "active" : ""}`}
+                    aria-expanded={r.children.length > 0 ? isExpanded(r.slug) : undefined}
                     onClick={() => {
+                      if (r.children.length > 0) {
+                        setExpanded(isExpanded(r.slug) ? null : r.slug);
+                        return;
+                      }
                       if (rubricFilter?.slug === r.slug) {
                         props.onRubric(null);
                         setExpanded(null);
                         return;
                       }
                       props.onRubric({ slug: r.slug, name: r.name });
-                      setExpanded(expanded === r.slug ? null : r.slug);
                     }}
                   >
                     {r.name}
                     {r.children.length > 0 && (
-                      <span className={`arr ${expanded === r.slug ? "open" : ""}`}>▶</span>
+                      <span className={`arr ${isExpanded(r.slug) ? "open" : ""}`}>▶</span>
                     )}
                   </button>
                 </div>
-                {expanded === r.slug && r.children.length > 0 && (
+                {isExpanded(r.slug) && r.children.length > 0 && (
                   <ul className="sk-sublist">
                     {r.children.map((c) => (
                       <li key={c.id}>
