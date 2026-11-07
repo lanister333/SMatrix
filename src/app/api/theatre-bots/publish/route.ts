@@ -34,7 +34,7 @@ export const runtime = "nodejs";
  */
 
 const THEATRE_BOTS_TOKEN = process.env.THEATRE_BOTS_TOKEN || "sakhmatrix-theatre-2026";
-const TARGET_RUBRIC_SLUG = "podslyshano-discuss";
+const TARGET_RUBRIC_SLUG = "gorodskaya-zhizn";
 
 interface PublishBody {
   token?: string;

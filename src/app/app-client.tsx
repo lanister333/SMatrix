@@ -26,7 +26,7 @@ import SakhDatetimeBlock from "@/components/site/sakh-datetime-block";
 import { ManifestTrust } from "@/components/site/manifest-trust";
 // ЗАДАЧА 14 (Шаг №4): иконки скоупов и рубрик — единый источник с левой
 // колонкой внутренних страниц (src/components/site/left-nav.tsx)
-import { ForumDiscussCard, SCOPE_ICONS, rubricIcon } from "@/components/site/left-nav";
+import { SCOPE_ICONS, rubricIcon } from "@/components/site/left-nav";
 
 /** ШАГ 11: информация о санкции из /api/sanctions/me. */
 interface SanctionInfoLite {

@@ -562,7 +562,7 @@ export function OverheardPage(props: {
   /**
    * Кнопка состояния форума — ЕДИНАЯ ЛОГИКА ТЗ 2026-09-23: переход по
    * относительной ссылке, работает и у гостя: тема связана →
-   * /forum/topic/<id>, темы нет → /forum/category/podslyshano-discuss —
+   * /forum/topic/<id>, темы нет → /forum/category/gorodskaya-zhizn —
    * соответствующая ветка обсуждений «Подслушано» (п.3/4/5 ТЗ).
    */
   const discuss = (item: OverheardItem) => {

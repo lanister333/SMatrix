@@ -93,8 +93,8 @@ export const SECTION_FORUM: Record<string, SectionForumTarget> = {
   },
   overheard: {
     label: "Городская жизнь ▸ Подслушано Сахалин",
-    rubricSlug: "podslyshano-discuss",
-    rubricName: "Подслушано Сахалин",
+    rubricSlug: "gorodskaya-zhizn",
+    rubricName: "Городская жизнь",
     parentName: "Городская жизнь",
   },
 };

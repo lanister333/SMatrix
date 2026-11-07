@@ -37,7 +37,7 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 export const OVERHEARD_RUBRIC_NAME = "Обсуждение сообщений из «Подслушано»";
-export const OVERHEARD_RUBRIC_SLUG = "podslyshano-discuss";
+export const OVERHEARD_RUBRIC_SLUG = "gorodskaya-zhizn";
 
 function isUniqueViolation(e: unknown): boolean {
   return typeof e === "object" && e !== null && "code" in e && (e as { code?: string }).code === "P2002";

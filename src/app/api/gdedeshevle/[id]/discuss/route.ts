@@ -36,12 +36,9 @@ import { getActiveRestriction } from "@/lib/moderation/sanctions";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-/** Родительская рубрика для обсуждений из самостоятельных блоков (ТЗ п.17). */
-export const BLOCKS_RUBRIC_NAME = "Обсуждение сообщений из блоков";
-export const BLOCKS_RUBRIC_SLUG = "blocks-discuss";
 /** Дочерняя рубрика раздела «Где дешевле» (ТЗ п.17). */
 export const CD_RUBRIC_NAME = "Где дешевле";
-export const CD_RUBRIC_SLUG = "gdedeshevle-discuss";
+export const CD_RUBRIC_SLUG = "tovary-i-uslugi--ceny";
 
 function isUniqueViolation(e: unknown): boolean {
   return typeof e === "object" && e !== null && "code" in e && (e as { code?: string }).code === "P2002";
@@ -143,18 +140,11 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
           };
         }
 
-        // Рубрики раздела (ТЗ п.17): родитель «Обсуждение сообщений из блоков»
-        // → ребёнок «Где дешевле». Создаются один раз, идемпотентно.
-        let parent = await tx.rubric.findFirst({ where: { OR: [{ slug: BLOCKS_RUBRIC_SLUG }, { name: BLOCKS_RUBRIC_NAME }] } });
-        if (!parent) {
-          parent = await tx.rubric.create({
-            data: { name: BLOCKS_RUBRIC_NAME, slug: BLOCKS_RUBRIC_SLUG, isService: true },
-          });
-        }
-        let rubric = await tx.rubric.findFirst({ where: { OR: [{ slug: CD_RUBRIC_SLUG }, { name: CD_RUBRIC_NAME, parentId: parent.id }] } });
+        // Рубрика форума (основная). 2026-11-07: убрано создание служебной *-discuss рубрики.
+        let rubric = await tx.rubric.findFirst({ where: { OR: [{ slug: CD_RUBRIC_SLUG }, { name: CD_RUBRIC_NAME }] } });
         if (!rubric) {
           rubric = await tx.rubric.create({
-            data: { name: CD_RUBRIC_NAME, slug: CD_RUBRIC_SLUG, isService: true, parentId: parent.id },
+            data: { name: CD_RUBRIC_NAME, slug: CD_RUBRIC_SLUG },
           });
         }
 

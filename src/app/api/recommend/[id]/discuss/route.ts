@@ -28,12 +28,9 @@ import { getActiveRestriction } from "@/lib/moderation/sanctions";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-/** Родительская рубрика для обсуждений из самостоятельных блоков. */
-export const BLOCKS_RUBRIC_NAME = "Обсуждение сообщений из блоков";
-export const BLOCKS_RUBRIC_SLUG = "blocks-discuss";
 /** Дочерняя рубрика раздела «Рекомендую / Не рекомендую». */
 export const RC_RUBRIC_NAME = "Рекомендую / Не рекомендую";
-export const RC_RUBRIC_SLUG = "recommend-discuss";
+export const RC_RUBRIC_SLUG = "tovary-i-uslugi--otzyvy-i-rekomendacii";
 
 function isUniqueViolation(e: unknown): boolean {
   return typeof e === "object" && e !== null && "code" in e && (e as { code?: string }).code === "P2002";
@@ -133,18 +130,11 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
           };
         }
 
-        // Рубрики раздела: родитель «Обсуждение сообщений из блоков»
-        // → ребёнок «Рекомендую / Не рекомендую». Идемпотентно.
-        let parent = await tx.rubric.findFirst({ where: { OR: [{ slug: BLOCKS_RUBRIC_SLUG }, { name: BLOCKS_RUBRIC_NAME }] } });
-        if (!parent) {
-          parent = await tx.rubric.create({
-            data: { name: BLOCKS_RUBRIC_NAME, slug: BLOCKS_RUBRIC_SLUG, isService: true },
-          });
-        }
-        let rubric = await tx.rubric.findFirst({ where: { OR: [{ slug: RC_RUBRIC_SLUG }, { name: RC_RUBRIC_NAME, parentId: parent.id }] } });
+        // Рубрика форума (основная). 2026-11-07: убрано создание служебной *-discuss рубрики.
+        let rubric = await tx.rubric.findFirst({ where: { OR: [{ slug: RC_RUBRIC_SLUG }, { name: RC_RUBRIC_NAME }] } });
         if (!rubric) {
           rubric = await tx.rubric.create({
-            data: { name: RC_RUBRIC_NAME, slug: RC_RUBRIC_SLUG, isService: true, parentId: parent.id },
+            data: { name: RC_RUBRIC_NAME, slug: RC_RUBRIC_SLUG },
           });
         }
 

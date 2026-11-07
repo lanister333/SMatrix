@@ -39,8 +39,9 @@ import { pickRandomBot } from "@/lib/auto-bots";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-/** Рубрики «Обсуждение сообщений из блоков» (служебные). */
-const WTB_RUBRIC_ID = 132; // wheretobuy-discuss
+/** Рубрика «Где купить» (основная рубрика форума — Товары и услуги → Где купить).
+ *  2026-11-07: перенесено со служебной wheretobuy-discuss (id=132, удалена) на основную. */
+const WTB_RUBRIC_ID = 118; // tovary-i-uslugi--gde-kupit
 
 interface SeedMessage {
   gender: "male" | "female";

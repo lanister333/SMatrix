@@ -39,12 +39,9 @@ import { GKH_STATUS_LABELS } from "@/lib/gkh";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-/** Родительская рубрика для обсуждений из самостоятельных блоков (ТЗ п.14). */
-export const BLOCKS_RUBRIC_NAME = "Обсуждение сообщений из блоков";
-export const BLOCKS_RUBRIC_SLUG = "blocks-discuss";
 /** Дочерняя рубрика раздела «ЖКХ и городские проблемы» (ТЗ п.14). */
 export const GKH_RUBRIC_NAME = "ЖКХ и городские проблемы";
-export const GKH_RUBRIC_SLUG = "gkh-discuss";
+export const GKH_RUBRIC_SLUG = "nedvizhimost--zhkh-i-upravlyayuschie-kompanii";
 
 function isUniqueViolation(e: unknown): boolean {
   return typeof e === "object" && e !== null && "code" in e && (e as { code?: string }).code === "P2002";
@@ -146,18 +143,11 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
           };
         }
 
-        // Рубрики раздела (ТЗ п.14): родитель «Обсуждение сообщений из блоков»
-        // → ребёнок «ЖКХ и городские проблемы». Создаются один раз, идемпотентно.
-        let parent = await tx.rubric.findFirst({ where: { OR: [{ slug: BLOCKS_RUBRIC_SLUG }, { name: BLOCKS_RUBRIC_NAME }] } });
-        if (!parent) {
-          parent = await tx.rubric.create({
-            data: { name: BLOCKS_RUBRIC_NAME, slug: BLOCKS_RUBRIC_SLUG, isService: true },
-          });
-        }
-        let rubric = await tx.rubric.findFirst({ where: { OR: [{ slug: GKH_RUBRIC_SLUG }, { name: GKH_RUBRIC_NAME, parentId: parent.id }] } });
+        // Рубрика форума (основная). 2026-11-07: убрано создание служебной *-discuss рубрики.
+        let rubric = await tx.rubric.findFirst({ where: { OR: [{ slug: GKH_RUBRIC_SLUG }, { name: GKH_RUBRIC_NAME }] } });
         if (!rubric) {
           rubric = await tx.rubric.create({
-            data: { name: GKH_RUBRIC_NAME, slug: GKH_RUBRIC_SLUG, isService: true, parentId: parent.id },
+            data: { name: GKH_RUBRIC_NAME, slug: GKH_RUBRIC_SLUG },
           });
         }
 

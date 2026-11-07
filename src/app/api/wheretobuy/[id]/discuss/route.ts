@@ -37,12 +37,9 @@ import { getActiveRestriction } from "@/lib/moderation/sanctions";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-/** Родительская рубрика для обсуждений из самостоятельных блоков (ТЗ п.12). */
-export const BLOCKS_RUBRIC_NAME = "Обсуждение сообщений из блоков";
-export const BLOCKS_RUBRIC_SLUG = "blocks-discuss";
-/** Дочерняя рубрика раздела «Где купить» (ТЗ п.12). */
+/** Дочерняя рубрика для обсуждений «Где купить» (основная рубрика форума). */
 export const WTB_RUBRIC_NAME = "Где купить";
-export const WTB_RUBRIC_SLUG = "wheretobuy-discuss";
+export const WTB_RUBRIC_SLUG = "tovary-i-uslugi--gde-kupit";
 
 function isUniqueViolation(e: unknown): boolean {
   return typeof e === "object" && e !== null && "code" in e && (e as { code?: string }).code === "P2002";
@@ -144,18 +141,14 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
           };
         }
 
-        // Рубрики раздела (ТЗ п.12): родитель «Обсуждение сообщений из блоков»
-        // → ребёнок «Где купить». Создаются один раз, идемпотентно.
-        let parent = await tx.rubric.findFirst({ where: { OR: [{ slug: BLOCKS_RUBRIC_SLUG }, { name: BLOCKS_RUBRIC_NAME }] } });
-        if (!parent) {
-          parent = await tx.rubric.create({
-            data: { name: BLOCKS_RUBRIC_NAME, slug: BLOCKS_RUBRIC_SLUG, isService: true },
-          });
-        }
-        let rubric = await tx.rubric.findFirst({ where: { OR: [{ slug: WTB_RUBRIC_SLUG }, { name: WTB_RUBRIC_NAME, parentId: parent.id }] } });
+        // Рубрика «Где купить» (основная рубрика форума — Товары и услуги → Где купить).
+        // 2026-11-07: убрано создание служебной родительской «Обсуждение сообщений из блоков» —
+        // темы теперь создаются прямо в основных рубриках форума, без отдельной *-discuss группы.
+        let rubric = await tx.rubric.findFirst({ where: { OR: [{ slug: WTB_RUBRIC_SLUG }, { name: WTB_RUBRIC_NAME }] } });
         if (!rubric) {
+          // На случай если рубрика была удалена — создаём как не-service
           rubric = await tx.rubric.create({
-            data: { name: WTB_RUBRIC_NAME, slug: WTB_RUBRIC_SLUG, isService: true, parentId: parent.id },
+            data: { name: WTB_RUBRIC_NAME, slug: WTB_RUBRIC_SLUG },
           });
         }
 

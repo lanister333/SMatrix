@@ -72,9 +72,9 @@ interface OverheardLite {
   tag?: string; // rumor | observation | message
   /**
    * ID связанной темы форума, если публикация уже привязана к теме
-   * в рубрике «Обсуждение сообщений из «Подслушано»» (podslyshano-discuss).
+   * в рубрике рубрике «Городская жизнь» (gorodskaya-zhizn).
    * Если есть — клик ведёт прямо в тему (/forum/topic/<id>);
-   * если нет — в список тем рубрики (/forum/category/podslyshano-discuss),
+   * если нет — в список тем рубрики (/forum/category/gorodskaya-zhizn),
    * где пользователь может сам создать тему обсуждения.
    */
   topicId?: number | null;
@@ -2210,7 +2210,7 @@ export default function HomeCenter(props: {
         requestAnimationFrame (см. useEffect выше). При наведении мыши —
         пауза. Клик по публикации ведёт в связанную тему форума, если у
         публикации есть topicId, иначе — в рубрику «Обсуждение сообщений
-        из «Подслушано»» (/forum/category/podslyshano-discuss). Если
+        из «Подслушано»» (/forum/category/gorodskaya-zhizn). Если
         публикаций нет — статичное сообщение «Пока нет публикаций…».
       */}
       <section className="mp-panel" aria-label="Подслушано Сахалин">
