@@ -1678,6 +1678,12 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
   .sk-shell{border:0;max-width:100%;padding:0}
   .sk-topbar{display:flex;position:sticky;top:0}
   .sk-layout{padding:0 10px;display:block}
+  /* 2026-11-08: Знакомства (последняя ячейка .mp-grid) залипали с Погодой
+     (.mp-panel) — у .mp-cell стоит margin-bottom:0 (gap:10px в grid
+     покрывает межячеечный зазор, но после сетки нет отступа). Добавляем
+     margin-bottom ко всей .mp-grid на мобильной — отделяет сетку блоков
+     (Нужна помощь, Рекомендую, ..., Знакомства) от следующего блока. */
+  .mp-grid{margin-bottom:10px !important}
   /* 2026-11-08: на мобильной скрываем TransportScheduleBlock из центра
      (он показывается дублём в правой колонке перед «Службы спасения»).
      Также скрываем SakhDatetimeBlock из правой колонки — показывается
