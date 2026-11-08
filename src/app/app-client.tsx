@@ -343,6 +343,8 @@ export default function App({ initialSearchParams = {} }: { initialSearchParams?
 
   const syncFromUrl = useCallback(() => {
     const sp = new URLSearchParams(window.location.search);
+    // 2026-11-09: отладка back-button
+    console.log("[syncFromUrl] URL:", window.location.search);
     const sc = sp.get("scope");
     setScope(sc && ["new", "popular", "active", "mine", "participated", "favorites", "unanswered", "archive"].includes(sc) ? sc : "new");
     const rub = sp.get("rubric") || "";
