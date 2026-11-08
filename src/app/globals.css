@@ -3564,6 +3564,10 @@ a.pl-entry-detail:hover{color:#0a5caa}
      вкладки FlatBoard, кнопки создания) «залипал» на левом краю экрана.
      Вертикальный padding 0 сохраняется — его дают дочерние секции. */
   .center-column{padding-left:8px !important;padding-right:8px !important}
+  /* 2026-11-08: то же для .right-column — иначе блоки правой колонки
+     (Погода, Курсы валют, и т.д.) на мобильной шире центральных блоков
+     (Нужна помощь, Знакомства, и т.д.) на 16px. Выравниваем по ширине. */
+  .right-column{padding-left:8px !important;padding-right:8px !important}
   /* 2026-10-01 (правка 2): FlatBoard вкладки-кнопки на мобайле — меньше
      по вертикали (padding 7/12 → 3/8, font 13.5 → 11.5) и явно
      выровнены по левому краю (justify-content:flex-start).
