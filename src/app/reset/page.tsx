@@ -52,7 +52,12 @@ function ResetForm() {
         return;
       }
       if (data.user?.token) {
+        // 2026-11-08: cookie + localStorage (как в /login) — иначе шапка сайта
+        // не видит залогиненного пользователя после смены пароля.
         document.cookie = `session=${data.user.token}; path=/; max-age=${30 * 24 * 60 * 60}; samesite=lax`;
+        try {
+          localStorage.setItem("sm_auth", JSON.stringify({ token: data.user.token, user: data.user }));
+        } catch {}
       }
       router.push("/");
     } catch {

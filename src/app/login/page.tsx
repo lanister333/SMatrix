@@ -15,7 +15,15 @@ export default function LoginPage() {
       const res = await fetch("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }) });
       const data = await res.json();
       if (!res.ok) { setError(data.error || "Ошибка входа"); setLoading(false); return; }
-      if (data.user?.token) document.cookie = `session=${data.user.token}; path=/; max-age=${30*24*60*60}; samesite=lax`;
+      if (data.user?.token) {
+        // 2026-11-08: cookie для сервера + localStorage для шапки сайта (useAuth в chrome.tsx
+        // читает localStorage "sm_auth", не cookie). Без localStorage шапка не видит
+        // залогиненного пользователя — показывает «Войти» вместо аватара.
+        document.cookie = `session=${data.user.token}; path=/; max-age=${30*24*60*60}; samesite=lax`;
+        try {
+          localStorage.setItem("sm_auth", JSON.stringify({ token: data.user.token, user: data.user }));
+        } catch {}
+      }
       router.push("/");
     } catch { setError("Сеть недоступна"); } finally { setLoading(false); }
   }
