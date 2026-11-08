@@ -103,7 +103,10 @@ export default function TransportScheduleBlock() {
   };
 
   const bodyStyle: React.CSSProperties = {
-    padding: "6px 9px 0",
+    // 2026-11-08: padding-bottom 0 → 6px — раньше рамка таблицы (tableStyle
+    // border 1px #1E3A5F) касалась нижней рамки карточки (cardStyle border
+    // 1px #4A688C). Теперь между ними зазор 6px, как сверху/слева/справа.
+    padding: "6px 9px 6px",
     backgroundColor: "#FFFFFF",
   };
 
