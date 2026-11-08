@@ -5043,8 +5043,8 @@ div[style*="background-color: rgb(0, 74, 143)"] {
 .sakh-clock-date{
   font-size:12px !important;
   font-weight:600 !important;
-  /* 2026-11-08: ещё темнее — var(--sm-rail) */
-  color:#249790 !important;
+  /* 2026-11-08: ещё темнее — тёмная бирюза */
+  color:#1a5e57 !important;
   margin:0 !important;
   padding:0 !important;
   line-height:1.2 !important;
@@ -5054,8 +5054,8 @@ div[style*="background-color: rgb(0, 74, 143)"] {
 .sakh-clock-time{
   font-size:19px !important;
   font-weight:700 !important;
-  /* 2026-11-08: ещё темнее — var(--sm-rail) */
-  color:#249790 !important;
+  /* 2026-11-08: ещё темнее — тёмная бирюза */
+  color:#1a5e57 !important;
   font-variant-numeric:tabular-nums !important;
   margin:0 !important;
   padding:0 !important;
