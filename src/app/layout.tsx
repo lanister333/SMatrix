@@ -56,6 +56,10 @@ export default function RootLayout({
         <meta name="yandex-verification" content="f6d6f62dab337dcc" />
         {/* Google Search Console verification */}
         <meta name="google-site-verification" content="1JnkctkTBjfpNV2BEuKETwfvLFfXJ5nvP4dSDliouvY" />
+        {/* 2026-11-08: favicon — избавляет от 404 на /favicon.ico в логах.
+            Логотип SakhMatrix (Z-символ на тёмно-графитовом фоне). */}
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/logo.svg" type="image/svg+xml" />
       </head>
       <body className="antialiased" suppressHydrationWarning>
         {/* Яндекс.Метрика — счётчик 113691446.
