@@ -191,8 +191,11 @@ body{background:#E8EAEB}
 /* 2026-11-08: дублирующий TransportScheduleBlock в правой колонке.
    На десктопе (≥901px) скрыт — основной стоит в конце центральной
    колонки. На мобильной показывается, основной скрывается
-   (.transport-mobile-hide в @media max-width:900px ниже). */
-.transport-mobile-only{display:none}
+   (.transport-mobile-hide в @media max-width:900px ниже).
+   2026-11-08 (v2): то же для SakhDatetimeBlock — .time-mobile-only
+   в начале центральной колонки (показ на мобильной), .time-mobile-hide
+   в правой колонке (скрытие на мобильной). */
+.transport-mobile-only,.time-mobile-only{display:none}
 /* ЗАДАЧА 14, Шаг 2: серая вертикальная линия между боковым меню и
    контентными карточками удалена на всех страницах */
 .sk-col-left{border-right:none;min-height:400px;padding-right:12px}
@@ -1676,11 +1679,13 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
   .sk-topbar{display:flex;position:sticky;top:0}
   .sk-layout{padding:0 10px;display:block}
   /* 2026-11-08: на мобильной скрываем TransportScheduleBlock из центра
-     (он показывается дублём в правой колонке перед «Службы спасения»). */
-  .transport-mobile-hide{display:none !important}
-  /* А мобильный дубль (.transport-mobile-only) показываем. На десктопе
-     — наоборот, через базовое правило .transport-mobile-only{display:none}. */
-  .transport-mobile-only{display:block !important}
+     (он показывается дублём в правой колонке перед «Службы спасения»).
+     Также скрываем SakhDatetimeBlock из правой колонки — показывается
+     дубль в самом верху центральной колонки. */
+  .transport-mobile-hide,.time-mobile-hide{display:none !important}
+  /* А мобильные дубли показываем. На десктопе — наоборот, через
+     базовое правило .transport-mobile-only,.time-mobile-only{display:none}. */
+  .transport-mobile-only,.time-mobile-only{display:block !important}
   /* СТАДИЯ 2 / ЗАДАЧА 1: на мобайле контейнер сетки Главной ведёт себя
      как прежде — блоковый, без авто-полей (auto margin отключает stretch
      flex-элемента .sk-shell и раздувает колонку до min-content),

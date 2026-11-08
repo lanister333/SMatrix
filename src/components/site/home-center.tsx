@@ -35,6 +35,7 @@ import {
 import { Nick, type TopicRow } from "@/lib/ui";
 import { forumCategoryHref, forumTopicHref } from "@/lib/forum-links";
 import TransportScheduleBlock from "@/components/site/transport-schedule-block";
+import SakhDatetimeBlock from "@/components/site/sakh-datetime-block";
 // Указ заказчика 2026-09-23 (скриншот «это удали», ТРЕТЬЕ снятие): панели
 // «Быстрые подсказки «Где купить»/«Где дешевле»» снова сняты с Главной —
 // импорты и монтирование удалены (низ центральной колонки). Подсистема
@@ -2200,6 +2201,12 @@ export default function HomeCenter(props: {
 
   return (
     <div className="mp-center">
+      {/* 2026-11-08: на мобильной (max-width:900px) блок «Время» должен быть
+          в самом верху. На десктопе этот экземпляр скрыт (.time-mobile-only),
+          основной стоит в начале правой колонки (home-right.tsx). */}
+      <div className="time-mobile-only">
+        <SakhDatetimeBlock />
+      </div>
       {/*
         7.1 «Подслушано Сахалин» — лента с автопрокруткой.
         2026-10-02 (мобайл): отступ от голубой шапки (sk-topbar) делается
