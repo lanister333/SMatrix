@@ -99,13 +99,26 @@ export async function POST(req: NextRequest) {
     const relPath = `/media/uploads/${year}/${month}/${filename}`;
 
     // 8. Сохранить файл
-    // Next.js standalone: process.cwd() = /opt/smatrix/.next/standalone
-    // public директория: process.cwd() + /public
-    const publicDir = join(process.cwd(), "public", "media", "uploads", String(year), month);
-    await mkdir(publicDir, { recursive: true });
-    const absPath = join(publicDir, filename);
+    // 2026-11-08: process.cwd() на проде возвращает /root (не WorkingDirectory
+    // из systemd). Используем абсолютный путь через env UPLOAD_DIR или fallback
+    // на /opt/smatrix/.next/standalone/public (стандартный путь на проде).
+    // Также копируем в /opt/smatrix/public (для следующего билда).
+    const baseDir = process.env.UPLOAD_DIR || "/opt/smatrix/.next/standalone/public";
+    const yearStr = String(year);
+    const uploadDir = join(baseDir, "media", "uploads", yearStr, month);
+    await mkdir(uploadDir, { recursive: true });
+    const absPath = join(uploadDir, filename);
     const arrayBuffer = await file.arrayBuffer();
     await writeFile(absPath, Buffer.from(arrayBuffer));
+
+    // Также сохранить в /opt/smatrix/public (для следующего deploy через
+    // cp -r public .next/standalone/ — чтобы файл пережил ребилд)
+    try {
+      const srcDir = "/opt/smatrix/public/media/uploads";
+      const srcPath = join(srcDir, yearStr, month, filename);
+      await mkdir(join(srcDir, yearStr, month), { recursive: true });
+      await writeFile(srcPath, Buffer.from(arrayBuffer));
+    } catch {} // не критично если не скопировалось
 
     return NextResponse.json({ url: relPath });
   } catch (e) {
