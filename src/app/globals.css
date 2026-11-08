@@ -319,6 +319,11 @@ body{background:#E8EAEB}
   /* VolunteersCarousel: на 15" (1024-1439) уменьшить карточки через CSS-классы */
   .sakh-carousel-card{flex:0 0 240px !important;width:240px !important;min-width:240px !important;height:140px !important;padding:10px 12px !important;gap:10px !important}
   .sakh-carousel-card img{width:80px !important;height:80px !important}
+  /* 2026-11-08: wrapper div вокруг логотипа с logoShiftUp (РОДНИК и др.)
+     имел inline width:140px; height:140px. CSS !important на img не действовал
+     на wrapper — оставался 140×140px, лого выглядел гигантским, текст
+     сплющен в узкую колонку. Переопределяем wrapper до 80×80 (как img). */
+  .sakh-carousel-card .sakh-carousel-logo-wrap{width:80px !important;height:80px !important}
   .sakh-carousel-name{font-size:14px !important}
   .sakh-carousel-sub{font-size:10px !important;margin-top:4px !important}
   .sakh-carousel-site{font-size:9px !important;margin-top:6px !important}

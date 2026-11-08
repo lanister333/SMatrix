@@ -287,7 +287,11 @@ export default function VolunteersCarousel() {
               // Результат: круг остаётся на месте, логотип сдвинут вверх,
               // верхняя часть логотипа обрезана, нижняя часть круга — белая
               // подложка (через backgroundColor:white на wrapper).
-              <div style={{
+              // 2026-11-08: добавлен className sakh-carousel-logo-wrap —
+              // чтобы CSS на 1024-1679px мог переопределить inline width/height
+              // (раньше CSS !important на img не действовал на wrapper, и wrapper
+              // оставался 140×140px на 15" мониторе — лого выглядел гигантским).
+              <div className="sakh-carousel-logo-wrap" style={{
                 width: `${p.logoSize || 110}px`,
                 height: `${p.logoSize || 110}px`,
                 borderRadius: '50%',
