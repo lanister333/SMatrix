@@ -585,7 +585,9 @@ export default function App({ initialSearchParams = {} }: { initialSearchParams?
       setView("forum");
       setTopicId(id);
       setJumpMsg(null);
-      window.history.pushState(null, "", `/?topic=${id}${backParams()}`);
+      // 2026-11-09: добавлен view=forum — при нажатии «Назад» syncFromUrl
+      //           точно определяет форум и не сбрасывает на главную.
+      window.history.pushState(null, "", `/?view=forum&topic=${id}${backParams()}`);
       window.scrollTo(0, 0);
     },
     [backParams]
@@ -596,7 +598,8 @@ export default function App({ initialSearchParams = {} }: { initialSearchParams?
       setView("forum");
       setTopicId(id);
       setJumpMsg(msg);
-      window.history.pushState(null, "", `/?topic=${id}${msg ? `&msg=${msg}` : ""}${backParams()}`);
+      // 2026-11-09: добавлен view=forum (аналогично openTopic)
+      window.history.pushState(null, "", `/?view=forum&topic=${id}${msg ? `&msg=${msg}` : ""}${backParams()}`);
       window.scrollTo(0, 0);
     },
     [backParams]
