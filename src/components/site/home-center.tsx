@@ -2352,8 +2352,13 @@ export default function HomeCenter(props: {
           блок «Время» (.sakh-clock): синяя шапка #1E3A5F, белое тело.
           Компактный, с вкладками (✈️ Авиа / 🚢 Вода / 🚂 ЖД).
           Источник: env YANDEX_RASP_KEY → реальные данные Яндекс.Расписаний;
-          иначе — демонстрационная заглушка с пометкой. */}
-      <TransportScheduleBlock />
+          иначе — демонстрационная заглушка с пометкой.
+          2026-11-08: обёрнут в .transport-mobile-hide — на мобильной
+          (max-width:900px) этот экземпляр скрыт, показывается дубль
+          из home-right.tsx перед «Службы спасения» (предпоследний блок). */}
+      <div className="transport-mobile-hide">
+        <TransportScheduleBlock />
+      </div>
     </div>
   );
 }

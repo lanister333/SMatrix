@@ -188,6 +188,11 @@ body{background:#E8EAEB}
    разделение только зазорами и фоновым контрастом */
 .sk-shell{background:transparent;border-left:none;border-right:none;flex-direction:column;flex:0 0 auto;width:100%;max-width:none;margin:0;padding:8px 10px 0;display:flex}
 .sk-layout{flex:0 0 auto;grid-template-columns:300px minmax(0,1fr) 300px;align-items:start;gap:12px;display:grid}
+/* 2026-11-08: дублирующий TransportScheduleBlock в правой колонке.
+   На десктопе (≥901px) скрыт — основной стоит в конце центральной
+   колонки. На мобильной показывается, основной скрывается
+   (.transport-mobile-hide в @media max-width:900px ниже). */
+.transport-mobile-only{display:none}
 /* ЗАДАЧА 14, Шаг 2: серая вертикальная линия между боковым меню и
    контентными карточками удалена на всех страницах */
 .sk-col-left{border-right:none;min-height:400px;padding-right:12px}
@@ -1670,6 +1675,12 @@ ul.hp-ruleslist{padding-left:14px;list-style:disc}
   .sk-shell{border:0;max-width:100%;padding:0}
   .sk-topbar{display:flex;position:sticky;top:0}
   .sk-layout{padding:0 10px;display:block}
+  /* 2026-11-08: на мобильной скрываем TransportScheduleBlock из центра
+     (он показывается дублём в правой колонке перед «Службы спасения»). */
+  .transport-mobile-hide{display:none !important}
+  /* А мобильный дубль (.transport-mobile-only) показываем. На десктопе
+     — наоборот, через базовое правило .transport-mobile-only{display:none}. */
+  .transport-mobile-only{display:block !important}
   /* СТАДИЯ 2 / ЗАДАЧА 1: на мобайле контейнер сетки Главной ведёт себя
      как прежде — блоковый, без авто-полей (auto margin отключает stretch
      flex-элемента .sk-shell и раздувает колонку до min-content),

@@ -42,6 +42,7 @@ import { useEffect, useState } from "react";
 import { Info, Phone } from "lucide-react";
 import DeferredIframe from "@/components/site/deferred-iframe";
 import SakhDatetimeBlock from "@/components/site/sakh-datetime-block";
+import TransportScheduleBlock from "@/components/site/transport-schedule-block";
 import { ballPlural, trafficEmoji } from "@/lib/traffic-ui";
 import { outageOrgBadge, outageWhenLabel } from "@/lib/outages-taxonomy";
 
@@ -446,6 +447,17 @@ export default function HomeRight() {
         />
         {traffic ? <div className="mp-w-upd">Обновлено: {traffic.updated}</div> : null}
       </section>
+
+      {/* 2026-11-08: на мобильной (max-width:900px) расписание транспорта
+          должно быть предпоследним блоком — перед «Службы спасения».
+          На десктопе этот экземпляр скрыт (.transport-mobile-only),
+          основной остаётся в конце центральной колонки home-center.tsx.
+          На мобильной — наоборот: основной скрыт (.transport-mobile-hide),
+          показывается этот. Дублирование кода минимально — один компонент
+          в двух местах с CSS-переключателем по ширине экрана. */}
+      <div className="transport-mobile-only">
+        <TransportScheduleBlock />
+      </div>
 
       {/* 8.5 «Службы спасения» — переименование из «Полезные телефоны и
           службы» по ТЗ 2026-09-21; содержимое (PHONES) не менялось */}
