@@ -57,7 +57,7 @@ export default function RootLayout({
         {/* Google Search Console verification */}
         <meta name="google-site-verification" content="1JnkctkTBjfpNV2BEuKETwfvLFfXJ5nvP4dSDliouvY" />
       </head>
-      <body className="antialiased">
+      <body className="antialiased" suppressHydrationWarning>
         {/* Яндекс.Метрика — счётчик 113691446.
             Установлен 2026-10-20. Включён вебвизор, клики по ссылкам,
             точный показатель отказов, карта кликов.
