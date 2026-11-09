@@ -155,7 +155,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#AED6F1",
       url: "https://boomerangclub.ru",
-      logo: "/partners/ocean-friends-logo.png?v=2",
+      logo: "/partners/ocean-friends-logo.webp?v=2",
       siteLabel: "boomerangclub.ru",
       logoSize: 140
     },
@@ -166,7 +166,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#E5D9F2",
       url: "https://t.me/animals_sakhalin",
-      logo: "/partners/animals-sakhalin-logo-nobg.png?v=16",
+      logo: "/partners/animals-sakhalin-logo-nobg.webp?v=2",
       siteLabel: "t.me/animals_sakhalin",
       logoSize: 140
     },
@@ -177,7 +177,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#D6E4F5",
       url: "https://t.me/pesikotsakh",
-      logo: "/partners/pesikot-logo-centered.png?v=10",
+      logo: "/partners/pesikot-logo-centered.webp?v=2",
       siteLabel: "t.me/pesikotsakh",
       logoSize: 140
     },
@@ -188,7 +188,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#E8F5E9",
       url: "https://sakhrodnik.ru",
-      logo: "/partners/rodnik-logo.png?v=5",
+      logo: "/partners/rodnik-logo.webp?v=2",
       siteLabel: "sakhrodnik.ru",
       logoSize: 140,
       logoShiftUp: 8,
@@ -201,7 +201,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#AED6F1",
       url: "https://radostzhizni.ru",
-      logo: "/partners/radost-logo-white.png?v=5",
+      logo: "/partners/radost-logo-white.webp?v=2",
       siteLabel: "radostzhizni.ru",
       logoHorizontal: true
     },
@@ -212,7 +212,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#E3F27A",
       url: "https://ulybka-rebenka.ru",
-      logo: "/partners/ulybka-logo.png?v=3",
+      logo: "/partners/ulybka-logo.webp?v=2",
       siteLabel: "ulybka-rebenka.ru",
       logoSize: 140
     },
@@ -223,7 +223,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#FFD700",
       url: "https://t.me/sakhpsosova",
-      logo: "/partners/sova-logo-centered.png?v=7",
+      logo: "/partners/sova-logo-centered.webp?v=2",
       siteLabel: "t.me/sakhpsosova",
       logoSize: 140
     },
@@ -234,7 +234,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#FFE0B2",
       url: "https://zts-sakh.ru",
-      logo: "/partners/zts-logo-centered.png?v=4",
+      logo: "/partners/zts-logo-centered.webp?v=2",
       siteLabel: "zts-sakh.ru",
       logoSize: 140
     },
@@ -245,7 +245,7 @@ export default function VolunteersCarousel() {
       textColor: "#FFFFFF",
       subColor: "#FFCDD2",
       url: "http://hiv65.ru",
-      logo: "/partners/hiv-logo-shrunk.png?v=8",
+      logo: "/partners/hiv-logo-shrunk.webp?v=2",
       siteLabel: "hiv65.ru",
       logoSize: 140
     }

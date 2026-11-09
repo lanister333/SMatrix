@@ -345,8 +345,6 @@ export default function App({ initialSearchParams = {} }: { initialSearchParams?
 
   const syncFromUrl = useCallback(() => {
     const sp = new URLSearchParams(window.location.search);
-    // 2026-11-09: отладка back-button
-    console.log("[syncFromUrl] URL:", window.location.search);
     const sc = sp.get("scope");
     setScope(sc && ["new", "popular", "active", "mine", "participated", "favorites", "unanswered", "archive"].includes(sc) ? sc : "new");
     const rub = sp.get("rubric") || "";
@@ -665,9 +663,6 @@ export default function App({ initialSearchParams = {} }: { initialSearchParams?
     window.scrollTo(0, 0);
   }, []);
 
-  // 2026-11-09: отладка back-button
-  const _isHome = view === "home" && !profileNick && !topicId;
-  console.log("[render] view=" + view + " topicId=" + topicId + " tick=" + tick + " isHome=" + _isHome + " url=" + (typeof window !== "undefined" ? window.location.search : "SSR"));
   const mainView = profileNick && !topicId ? (
     <ProfileView nick={profileNick} onOpenTopic={openTopic} onOpenTopicAt={openTopicAt} onGoForumHome={goForumHome} />
   ) : view === "forum" ? (
