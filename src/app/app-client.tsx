@@ -666,7 +666,7 @@ export default function App({ initialSearchParams = {} }: { initialSearchParams?
   }, []);
 
   // 2026-11-09: отладка back-button
-  console.log("[render]", { view, topicId, tick, url: typeof window !== "undefined" ? window.location.search : "SSR" });
+  console.log("[render] view=" + view + " topicId=" + topicId + " tick=" + tick + " url=" + (typeof window !== "undefined" ? window.location.search : "SSR"));
   const mainView = profileNick && !topicId ? (
     <ProfileView nick={profileNick} onOpenTopic={openTopic} onOpenTopicAt={openTopicAt} onGoForumHome={goForumHome} />
   ) : view === "forum" ? (
