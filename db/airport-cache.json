@@ -1,0 +1,470 @@
+{
+  "source": "airportus.ru",
+  "fetchedAt": "2026-11-09T05:29:19.125Z",
+  "departures": [
+    {
+      "flight": "GA-2651",
+      "airline": "",
+      "city": "Советская Гавань",
+      "time": "10:30",
+      "status": "Совмещён"
+    },
+    {
+      "flight": "GA-2661",
+      "airline": "",
+      "city": "Советская Гавань",
+      "time": "",
+      "status": "10:05"
+    },
+    {
+      "flight": "HZ-3034",
+      "airline": "",
+      "city": "Южно-Курильск",
+      "time": "15:05",
+      "status": "Совмещён"
+    },
+    {
+      "flight": "HZ-3032",
+      "airline": "",
+      "city": "Южно-Курильск",
+      "time": "",
+      "status": "16:01"
+    },
+    {
+      "flight": "HZ-3004",
+      "airline": "",
+      "city": "Ноглики",
+      "time": "13:30",
+      "status": "Совмещён"
+    },
+    {
+      "flight": "HZ-3018",
+      "airline": "",
+      "city": "Курильск",
+      "time": "15:15",
+      "status": "Совмещён"
+    },
+    {
+      "flight": "S7-5258",
+      "airline": "",
+      "city": "Новосибирск",
+      "time": "",
+      "status": "10:00"
+    },
+    {
+      "flight": "HZ-3016",
+      "airline": "",
+      "city": "Курильск",
+      "time": "",
+      "status": "10:33"
+    },
+    {
+      "flight": "HZ-3006",
+      "airline": "",
+      "city": "Оха",
+      "time": "",
+      "status": "14:06"
+    },
+    {
+      "flight": "HZ-5627",
+      "airline": "",
+      "city": "Хабаровск",
+      "time": "",
+      "status": "11:43"
+    },
+    {
+      "flight": "HZ-5681",
+      "airline": "",
+      "city": "Владивосток",
+      "time": "",
+      "status": "14:40"
+    },
+    {
+      "flight": "SU-1743",
+      "airline": "",
+      "city": "Москва",
+      "time": "",
+      "status": "15:05"
+    },
+    {
+      "flight": "GA-2661",
+      "airline": "",
+      "city": "Советская Гавань",
+      "time": "",
+      "status": "14:56"
+    },
+    {
+      "flight": "HZ-3034",
+      "airline": "",
+      "city": "Южно-Курильск",
+      "time": "15:05",
+      "status": "Задержан"
+    },
+    {
+      "flight": "SU-5823",
+      "airline": "",
+      "city": "Москва",
+      "time": "17:00",
+      "status": ""
+    },
+    {
+      "flight": "HZ-5629",
+      "airline": "",
+      "city": "Хабаровск",
+      "time": "17:30",
+      "status": ""
+    },
+    {
+      "flight": "S7-6202",
+      "airline": "",
+      "city": "Владивосток",
+      "time": "19:00",
+      "status": ""
+    },
+    {
+      "flight": "IO-318",
+      "airline": "",
+      "city": "Чита - Иркутск",
+      "time": "21:10",
+      "status": ""
+    },
+    {
+      "flight": "HZ-4696",
+      "airline": "",
+      "city": "Пекин",
+      "time": "23:40",
+      "status": "Обслуживание в новом терминале"
+    },
+    {
+      "flight": "S7-6512",
+      "airline": "",
+      "city": "Хабаровск",
+      "time": "08:30",
+      "status": ""
+    },
+    {
+      "flight": "S7-5258",
+      "airline": "",
+      "city": "Новосибирск",
+      "time": "09:45",
+      "status": ""
+    },
+    {
+      "flight": "HZ-5625",
+      "airline": "",
+      "city": "Хабаровск",
+      "time": "09:45",
+      "status": ""
+    },
+    {
+      "flight": "GA-2651",
+      "airline": "",
+      "city": "Советская Гавань",
+      "time": "10:00",
+      "status": ""
+    },
+    {
+      "flight": "HZ-3032",
+      "airline": "",
+      "city": "Южно-Курильск",
+      "time": "10:30",
+      "status": ""
+    },
+    {
+      "flight": "HZ-3006",
+      "airline": "",
+      "city": "Оха",
+      "time": "11:15",
+      "status": ""
+    },
+    {
+      "flight": "FV-2476",
+      "airline": "",
+      "city": "Благовещенск",
+      "time": "14:15",
+      "status": ""
+    },
+    {
+      "flight": "HZ-5681",
+      "airline": "",
+      "city": "Владивосток",
+      "time": "14:30",
+      "status": ""
+    },
+    {
+      "flight": "SU-1743",
+      "airline": "",
+      "city": "Москва",
+      "time": "14:50",
+      "status": ""
+    },
+    {
+      "flight": "HZ-3018",
+      "airline": "",
+      "city": "Курильск",
+      "time": "15:15",
+      "status": ""
+    },
+    {
+      "flight": "FV-2458",
+      "airline": "",
+      "city": "Красноярск",
+      "time": "17:15",
+      "status": ""
+    },
+    {
+      "flight": "HZ-5629",
+      "airline": "",
+      "city": "Хабаровск",
+      "time": "17:30",
+      "status": ""
+    },
+    {
+      "flight": "S7-6202",
+      "airline": "",
+      "city": "Владивосток",
+      "time": "19:00",
+      "status": ""
+    },
+    {
+      "flight": "S7-6514",
+      "airline": "",
+      "city": "Хабаровск",
+      "time": "21:50",
+      "status": ""
+    }
+  ],
+  "arrivals": [
+    {
+      "flight": "GA-2662",
+      "airline": "",
+      "city": "Советская Гавань",
+      "time": "18:15",
+      "status": "Прибыл"
+    },
+    {
+      "flight": "HZ-3035",
+      "airline": "",
+      "city": "Южно-Курильск",
+      "time": "18:40",
+      "status": "Совмещён"
+    },
+    {
+      "flight": "HZ-3033",
+      "airline": "",
+      "city": "Южно-Курильск",
+      "time": "14:05",
+      "status": "Задержан"
+    },
+    {
+      "flight": "HZ-3005",
+      "airline": "",
+      "city": "Ноглики",
+      "time": "17:40",
+      "status": "Совмещён"
+    },
+    {
+      "flight": "HZ-3019",
+      "airline": "",
+      "city": "Курильск",
+      "time": "18:50",
+      "status": "Совмещён"
+    },
+    {
+      "flight": "S7-5257",
+      "airline": "",
+      "city": "Новосибирск",
+      "time": "08:30",
+      "status": "Прибыл"
+    },
+    {
+      "flight": "HZ-5626",
+      "airline": "",
+      "city": "Хабаровск",
+      "time": "10:30",
+      "status": "Прибыл"
+    },
+    {
+      "flight": "SU-1742",
+      "airline": "",
+      "city": "Москва",
+      "time": "11:25",
+      "status": "Прибыл"
+    },
+    {
+      "flight": "HZ-5680",
+      "airline": "",
+      "city": "Владивосток",
+      "time": "13:20",
+      "status": "Прибыл"
+    },
+    {
+      "flight": "HZ-3017",
+      "airline": "",
+      "city": "Курильск",
+      "time": "13:55",
+      "status": "Прибыл"
+    },
+    {
+      "flight": "SU-5822",
+      "airline": "",
+      "city": "Москва",
+      "time": "15:00",
+      "status": "Прибыл"
+    },
+    {
+      "flight": "HZ-5628",
+      "airline": "",
+      "city": "Хабаровск",
+      "time": "",
+      "status": "16:25"
+    },
+    {
+      "flight": "HZ-3007",
+      "airline": "",
+      "city": "Оха",
+      "time": "16:25",
+      "status": "Задержан"
+    },
+    {
+      "flight": "S7-6201",
+      "airline": "",
+      "city": "Владивосток",
+      "time": "18:00",
+      "status": ""
+    },
+    {
+      "flight": "GA-2662",
+      "airline": "",
+      "city": "Советская Гавань",
+      "time": "18:15",
+      "status": ""
+    },
+    {
+      "flight": "HZ-3035",
+      "airline": "",
+      "city": "Южно-Курильск",
+      "time": "18:40",
+      "status": "Задержан"
+    },
+    {
+      "flight": "IO-317",
+      "airline": "",
+      "city": "Иркутск - Чита",
+      "time": "20:10",
+      "status": ""
+    },
+    {
+      "flight": "HZ-5624",
+      "airline": "",
+      "city": "Хабаровск",
+      "time": "21:35",
+      "status": ""
+    },
+    {
+      "flight": "S7-6511",
+      "airline": "",
+      "city": "Хабаровск",
+      "time": "07:35",
+      "status": ""
+    },
+    {
+      "flight": "HZ-4697",
+      "airline": "",
+      "city": "Пекин",
+      "time": "08:15",
+      "status": ""
+    },
+    {
+      "flight": "S7-5257",
+      "airline": "",
+      "city": "Новосибирск",
+      "time": "08:30",
+      "status": ""
+    },
+    {
+      "flight": "SU-1742",
+      "airline": "",
+      "city": "Москва",
+      "time": "12:50",
+      "status": ""
+    },
+    {
+      "flight": "FV-2475",
+      "airline": "",
+      "city": "Благовещенск",
+      "time": "13:15",
+      "status": ""
+    },
+    {
+      "flight": "HZ-5680",
+      "airline": "",
+      "city": "Владивосток",
+      "time": "13:20",
+      "status": ""
+    },
+    {
+      "flight": "GA-2652",
+      "airline": "",
+      "city": "Советская Гавань",
+      "time": "13:25",
+      "status": ""
+    },
+    {
+      "flight": "HZ-3033",
+      "airline": "",
+      "city": "Южно-Курильск",
+      "time": "14:05",
+      "status": ""
+    },
+    {
+      "flight": "FV-2457",
+      "airline": "",
+      "city": "Красноярск",
+      "time": "16:15",
+      "status": ""
+    },
+    {
+      "flight": "HZ-5628",
+      "airline": "",
+      "city": "Хабаровск",
+      "time": "16:20",
+      "status": ""
+    },
+    {
+      "flight": "HZ-3007",
+      "airline": "",
+      "city": "Оха",
+      "time": "16:25",
+      "status": ""
+    },
+    {
+      "flight": "S7-6201",
+      "airline": "",
+      "city": "Владивосток",
+      "time": "18:00",
+      "status": ""
+    },
+    {
+      "flight": "HZ-3019",
+      "airline": "",
+      "city": "Курильск",
+      "time": "18:50",
+      "status": ""
+    },
+    {
+      "flight": "S7-6513",
+      "airline": "",
+      "city": "Хабаровск",
+      "time": "20:55",
+      "status": ""
+    },
+    {
+      "flight": "HZ-5624",
+      "airline": "",
+      "city": "Хабаровск",
+      "time": "22:20",
+      "status": ""
+    }
+  ]
+}
