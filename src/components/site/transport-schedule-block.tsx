@@ -66,8 +66,9 @@ export default function TransportScheduleBlock() {
   const [data, setData] = useState<TransportResponse | null>(null);
   const [activeTab, setActiveTab] = useState<TransportSection["id"]>("aviation");
   const [expanded, setExpanded] = useState(false);
-  const [expandedDepart, setExpandedDepart] = useState(false);
-  const [expandedArrive, setExpandedArrive] = useState(false);
+  // 2026-11-10: «картотека» — внутри вкладки Авиа две кнопки Вылет/Прилёт.
+  // Нажал «Прилёт» → видишь только прилёты. Нажал «Вылет» → только вылеты.
+  const [activeSubTab, setActiveSubTab] = useState<"depart" | "arrive">("depart");
 
   useEffect(() => {
     fetch("/api/transport")
@@ -79,20 +80,23 @@ export default function TransportScheduleBlock() {
   const section = data?.sections.find((s) => s.id === activeTab);
   const allFlights = section?.flights ?? [];
 
-  // 2026-11-10: для авиа — разделяем на вылеты/прилёты, показываем
-  // в двух отдельных окнах с цветными заголовками (бирюзовый/оранжевый).
-  // Для воды/ЖД — оставляем единый список (там только «отпр.»).
+  // 2026-11-10: «картотека» — для авиа показываем две кнопки Вылет/Прилёт.
+  // Активная кнопка фильтрует рейсы: видны только вылеты ИЛИ только прилёты.
   const isAviation = activeTab === "aviation";
   const departures = isAviation
     ? allFlights.filter((f) => /вылет|отпр/i.test(f.type))
-    : allFlights;
+    : [];
   const arrivals = isAviation
     ? allFlights.filter((f) => /прилёт|приб/i.test(f.type))
     : [];
-  const useSplitView = isAviation && (departures.length > 0 || arrivals.length > 0);
 
-  const flights = expanded ? allFlights : allFlights.slice(0, 5);
-  const hiddenCount = Math.max(0, allFlights.length - 5);
+  // Для авиа — берём рейсы активной суб-вкладки. Для воды/ЖД — все рейсы.
+  const visibleFlights = isAviation
+    ? (activeSubTab === "depart" ? departures : arrivals)
+    : allFlights;
+
+  const flights = expanded ? visibleFlights : visibleFlights.slice(0, 5);
+  const hiddenCount = Math.max(0, visibleFlights.length - 5);
 
   const cardStyle: React.CSSProperties = {
     backgroundColor: "#FFFFFF",
@@ -153,7 +157,7 @@ export default function TransportScheduleBlock() {
             return (
               <button
                 key={t.id}
-                onClick={() => { setActiveTab(t.id); setExpanded(false); setExpandedDepart(false); setExpandedArrive(false); }}
+                onClick={() => { setActiveTab(t.id); setExpanded(false); setActiveSubTab("depart"); }}
                 style={{
                   flex: 1,
                   display: "flex",
@@ -194,29 +198,88 @@ export default function TransportScheduleBlock() {
           })}
         </div>
 
-        {useSplitView ? (
-          /* 2026-11-10: раздельные окна для вылетов и прилётов */
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            {/* Окно ВЫЛЕТЫ — бирюзовый заголовок */}
-            <SubFlightsCard
-              title="✈ ВЫЛЕТЫ"
-              count={departures.length}
-              headerColor="#0a7d75"
-              flights={departures}
-              expanded={expandedDepart}
-              onToggle={() => setExpandedDepart((v) => !v)}
-            />
-            {/* Окно ПРИЛЁТЫ — оранжевый заголовок */}
-            <SubFlightsCard
-              title="🛬 ПРИЛЁТЫ"
-              count={arrivals.length}
-              headerColor="#b45309"
-              flights={arrivals}
-              expanded={expandedArrive}
-              onToggle={() => setExpandedArrive((v) => !v)}
-            />
+        {/* 2026-11-10: «картотека» — внутри вкладки Авиа две кнопки Вылет/Прилёт.
+            Нажал «Прилёт» → видишь только прилёты. Нажал «Вылет» → только вылеты. */}
+        {isAviation && (departures.length > 0 || arrivals.length > 0) && (
+          <div style={{
+            display: "flex",
+            gap: "4px",
+            marginBottom: "6px",
+            padding: "3px",
+            background: "#e8eef5",
+            borderRadius: "4px",
+          }}>
+            <button
+              onClick={() => { setActiveSubTab("depart"); setExpanded(false); }}
+              style={{
+                flex: 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "6px",
+                padding: "5px 8px",
+                background: activeSubTab === "depart" ? "#0a7d75" : "#FFFFFF",
+                color: activeSubTab === "depart" ? "#fff" : "#0a7d75",
+                border: "1px solid #0a7d75",
+                borderRadius: "3px",
+                cursor: "pointer",
+                fontSize: "13px",
+                fontWeight: 700,
+                fontFamily: "inherit",
+                lineHeight: 1.3,
+              }}
+            >
+              <span>✈</span>
+              <span>Вылет</span>
+              <span style={{
+                display: "inline-block",
+                minWidth: "14px",
+                padding: "0 3px",
+                background: activeSubTab === "depart" ? "rgba(255,255,255,0.25)" : "rgba(10,125,117,0.15)",
+                borderRadius: "8px",
+                fontSize: "11px",
+                fontWeight: 700,
+              }}>
+                {departures.length}
+              </span>
+            </button>
+            <button
+              onClick={() => { setActiveSubTab("arrive"); setExpanded(false); }}
+              style={{
+                flex: 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "6px",
+                padding: "5px 8px",
+                background: activeSubTab === "arrive" ? "#b45309" : "#FFFFFF",
+                color: activeSubTab === "arrive" ? "#fff" : "#b45309",
+                border: "1px solid #b45309",
+                borderRadius: "3px",
+                cursor: "pointer",
+                fontSize: "13px",
+                fontWeight: 700,
+                fontFamily: "inherit",
+                lineHeight: 1.3,
+              }}
+            >
+              <span>🛬</span>
+              <span>Прилёт</span>
+              <span style={{
+                display: "inline-block",
+                minWidth: "14px",
+                padding: "0 3px",
+                background: activeSubTab === "arrive" ? "rgba(255,255,255,0.25)" : "rgba(180,83,9,0.15)",
+                borderRadius: "8px",
+                fontSize: "11px",
+                fontWeight: 700,
+              }}>
+                {arrivals.length}
+              </span>
+            </button>
           </div>
-        ) : (
+        )}
+
         <div style={tableStyle}>
         <div
           className="ts-row ts-row-head"
@@ -284,10 +347,7 @@ export default function TransportScheduleBlock() {
           </div>
         )}
         </div>
-        )}
 
-        {!useSplitView && (
-          <>
         {hiddenCount > 0 && !expanded && (
           <button
             onClick={() => setExpanded(true)}
@@ -330,239 +390,8 @@ export default function TransportScheduleBlock() {
             ▲ Свернуть
           </button>
         )}
-          </>
-        )}
       </div>
     </section>
   );
 }
 
-/* 2026-11-10: Подкарточка для раздельного показа вылетов/прилётов.
-   Заголовок цветной (бирюзовый для вылетов, оранжевый для прилётов),
-   внутри — таблица с теми же ts-row/ts-col-* классами. */
-function SubFlightsCard({
-  title,
-  count,
-  headerColor,
-  flights,
-  expanded,
-  onToggle,
-}: {
-  title: string;
-  count: number;
-  headerColor: string;
-  flights: TransportFlight[];
-  expanded: boolean;
-  onToggle: () => void;
-}) {
-  const PREVIEW = 5;
-  const list = expanded ? flights : flights.slice(0, PREVIEW);
-  const hidden = Math.max(0, flights.length - PREVIEW);
-
-  return (
-    <div style={{
-      border: `1px solid ${headerColor}`,
-      borderRadius: "4px",
-      overflow: "hidden",
-      backgroundColor: "#fff",
-    }}>
-      {/* Цветной заголовок */}
-      <div style={{
-        backgroundColor: headerColor,
-        color: "#fff",
-        padding: "5px 10px",
-        fontSize: "13px",
-        fontWeight: 700,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        letterSpacing: "0.3px",
-      }}>
-        <span>{title}</span>
-        <span style={{
-          background: "rgba(255,255,255,0.25)",
-          padding: "1px 8px",
-          borderRadius: "10px",
-          fontSize: "11px",
-          fontWeight: 700,
-        }}>
-          {count}
-        </span>
-      </div>
-
-      {/* Шапка-подпись картотеки (не таблица, просто метки) */}
-      <div style={{
-        padding: "3px 10px",
-        fontSize: "10px",
-        fontWeight: 600,
-        color: "#64748b",
-        textTransform: "uppercase" as const,
-        letterSpacing: "0.5px",
-        backgroundColor: "#f8fafc",
-        borderBottom: `1px solid ${headerColor}22`,
-      }}>
-        Карточки рейсов
-      </div>
-
-      {/* Картотека — каждый рейс как отдельная карточка */}
-      {list.length === 0 ? (
-        <div style={{ padding: "16px", textAlign: "center", color: "#56657a", fontSize: "12px" }}>
-          Нет данных
-        </div>
-      ) : (
-        <div style={{
-          padding: "8px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "6px",
-          backgroundColor: "#f8fafc",
-        }}>
-          {list.map((f, i) => {
-            const si = statusInfo(f.status);
-            const isAlert = f.alert;
-            return (
-              <div
-                key={i}
-                style={{
-                  backgroundColor: "#fff",
-                  border: `1px solid ${headerColor}33`,
-                  borderLeft: `4px solid ${headerColor}`,
-                  borderRadius: "3px",
-                  padding: "8px 10px",
-                  boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "3px",
-                }}
-              >
-                {/* Верх卡片: время + номер рейса + статус */}
-                <div style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: "6px",
-                }}>
-                  <div style={{ display: "flex", alignItems: "baseline", gap: "8px", minWidth: 0, flex: 1 }}>
-                    <span style={{
-                      fontWeight: 700,
-                      color: isAlert ? "#c40000" : "#0a5caa",
-                      fontSize: "15px",
-                      fontVariantNumeric: "tabular-nums",
-                      flexShrink: 0,
-                    }}>
-                      {f.time}
-                    </span>
-                    <span style={{
-                      fontWeight: 700,
-                      fontSize: "13px",
-                      color: "#1E3A5F",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                      minWidth: 0,
-                    }} title={f.route}>
-                      {abbreviate(f.route)}
-                    </span>
-                  </div>
-                  {si && (
-                    <span style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "2px",
-                      fontSize: "10px",
-                      color: isAlert ? "#c40000" : "#64748b",
-                      fontWeight: 600,
-                      flexShrink: 0,
-                      whiteSpace: "nowrap",
-                    }}>
-                      <span>{si.icon}</span>
-                      <span>{si.label}</span>
-                    </span>
-                  )}
-                </div>
-                {/* Низ карточки: тип + полный маршрут */}
-                <div style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  flexWrap: "wrap",
-                }}>
-                  <span style={{
-                    display: "inline-block",
-                    backgroundColor: headerColor,
-                    color: "#fff",
-                    fontSize: "9px",
-                    fontWeight: 700,
-                    textTransform: "uppercase" as const,
-                    letterSpacing: "0.5px",
-                    padding: "1px 6px",
-                    borderRadius: "2px",
-                    flexShrink: 0,
-                  }}>
-                    {abbreviate(f.type)}
-                  </span>
-                  <span style={{
-                    fontSize: "12px",
-                    color: "#0a5caa",
-                    fontWeight: 500,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                    minWidth: 0,
-                    flex: 1,
-                  }} title={f.direction}>
-                    {abbreviate(f.direction)}
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Кнопка «показать ещё» */}
-      {hidden > 0 && !expanded && (
-        <button
-          onClick={onToggle}
-          style={{
-            display: "block",
-            width: "100%",
-            margin: "2px 0 0",
-            padding: "4px",
-            background: "transparent",
-            border: "none",
-            borderTop: "1px dashed #d0d9e6",
-            cursor: "pointer",
-            fontSize: "11px",
-            color: headerColor,
-            fontFamily: "inherit",
-            fontWeight: 700,
-          }}
-        >
-          ▼ Показать ещё {hidden}
-        </button>
-      )}
-      {expanded && (
-        <button
-          onClick={onToggle}
-          style={{
-            display: "block",
-            width: "100%",
-            margin: "2px 0 0",
-            padding: "4px",
-            background: "transparent",
-            border: "none",
-            borderTop: "1px dashed #d0d9e6",
-            cursor: "pointer",
-            fontSize: "11px",
-            color: "#56657a",
-            fontFamily: "inherit",
-            fontWeight: 700,
-          }}
-        >
-          ▲ Свернуть
-        </button>
-      )}
-    </div>
-  );
-}
