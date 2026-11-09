@@ -291,6 +291,8 @@ export default function App({ initialSearchParams = {} }: { initialSearchParams?
   }, []);
   const [newTopicOpen, setNewTopicOpen] = useState(false);
   const [toast, setToast] = useState("");
+  // 2026-11-09: re-render trigger для popstate (кнопка «Назад»)
+  const [tick, setTick] = useState(0);
   const [scope, setScope] = useState("new");
   const [rubricFilter, setRubricFilter] = useState<{ slug: string; name: string } | null>(null);
   const [rubrics, setRubrics] = useState<Rubric[]>([]);
@@ -444,19 +446,14 @@ export default function App({ initialSearchParams = {} }: { initialSearchParams?
 
   useEffect(() => {
     syncFromUrl();
-    // 2026-11-09: при нажатии «Назад» syncFromUrl вызывается, но React может
-    // не применить state изменения если значения совпадают (view="forum" не
-    // изменился). Принудительная перезагрузка если URL не содержит topic —
-    // гарантирует что пользователь вернётся на правильную страницу.
+    // 2026-11-09: при popstate принудительно обновляем state через
+    // дополнительный re-render trigger. React может не применить state
+    // изменения из syncFromUrl если значения совпадают (view="forum"→"forum").
+    // Дополнительный setState гарантирует re-render.
     const onPopState = () => {
       syncFromUrl();
-      const sp = new URLSearchParams(window.location.search);
-      const hasTopic = sp.get("topic");
-      if (!hasTopic) {
-        // Вернулись к списку тем (или другой странице без topic) —
-        // перезагружаем чтобы гарантированно показать правильную страницу
-        window.location.reload();
-      }
+      // Принудительный re-render
+      setTick((t) => t + 1);
     };
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
