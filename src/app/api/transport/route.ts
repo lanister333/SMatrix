@@ -351,17 +351,25 @@ export async function GET() {
         const cachePath = "/opt/smatrix/db/airport-cache.json";
         const raw = await readFile(cachePath, "utf-8");
         const cache = JSON.parse(raw);
-        if (cache.departures && Array.isArray(cache.departures)) {
-          finalAviation = cache.departures.map((d: { flight: string; city: string; time: string; status: string }) => ({
-            time: d.time || "--:--",
-            type: "вылет",
-            route: d.flight,
-            direction: d.city,
-            status: d.status || "",
-            alert: /задерж|отменён/i.test(d.status || ""),
-          }));
-          aviationSource = `airportus.ru (кэш: ${cache.fetchedAt?.slice(0, 16) || "?"})`;
-        }
+        const depFlights = (cache.departures || []).map((d: { flight: string; city: string; time: string; status: string }) => ({
+          time: d.time || "--:--",
+          type: "вылет",
+          route: d.flight,
+          direction: "→ " + d.city,
+          status: d.status || "",
+          alert: /задерж|отменён/i.test(d.status || ""),
+        }));
+        const arrFlights = (cache.arrivals || []).map((d: { flight: string; city: string; time: string; status: string }) => ({
+          time: d.time || "--:--",
+          type: "прилёт",
+          route: d.flight,
+          direction: "← " + d.city,
+          status: d.status || "",
+          alert: /задерж|отменён/i.test(d.status || ""),
+        }));
+        // Вылеты сначала, потом прилёты
+        finalAviation = [...depFlights, ...arrFlights];
+        aviationSource = `airportus.ru (кэш: ${cache.fetchedAt?.slice(0, 16) || "?"})`;
       } catch {}
     }
 
