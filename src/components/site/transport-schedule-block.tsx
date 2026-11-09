@@ -390,68 +390,130 @@ function SubFlightsCard({
         </span>
       </div>
 
-      {/* Шапка таблицы */}
-      <div
-        className="ts-row ts-row-head"
-        style={{
-          fontSize: "11px",
-          fontWeight: 700,
-          color: "#334155",
-          textTransform: "uppercase" as const,
-          letterSpacing: "0.5px",
-          borderBottom: `2px solid ${headerColor}33`,
-          backgroundColor: "#f1f5f9",
-        }}
-      >
-        <span className="ts-col-time">Время</span>
-        <span className="ts-col-type">Тип</span>
-        <span className="ts-col-route">Рейс</span>
-        <span className="ts-col-direction">Маршрут</span>
-        <span className="ts-col-status">Статус</span>
+      {/* Шапка-подпись картотеки (не таблица, просто метки) */}
+      <div style={{
+        padding: "3px 10px",
+        fontSize: "10px",
+        fontWeight: 600,
+        color: "#64748b",
+        textTransform: "uppercase" as const,
+        letterSpacing: "0.5px",
+        backgroundColor: "#f8fafc",
+        borderBottom: `1px solid ${headerColor}22`,
+      }}>
+        Карточки рейсов
       </div>
 
-      {/* Строки */}
+      {/* Картотека — каждый рейс как отдельная карточка */}
       {list.length === 0 ? (
-        <div style={{ padding: "10px", textAlign: "center", color: "#56657a", fontSize: "12px" }}>
+        <div style={{ padding: "16px", textAlign: "center", color: "#56657a", fontSize: "12px" }}>
           Нет данных
         </div>
       ) : (
-        <div>
+        <div style={{
+          padding: "8px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "6px",
+          backgroundColor: "#f8fafc",
+        }}>
           {list.map((f, i) => {
             const si = statusInfo(f.status);
+            const isAlert = f.alert;
             return (
               <div
                 key={i}
-                className="ts-row"
                 style={{
-                  alignItems: "center",
-                  fontSize: "12px",
-                  color: "#2A3B50",
-                  borderBottom: i < list.length - 1 ? "1px solid #eef2f6" : "none",
-                  minHeight: "26px",
-                  background: i % 2 === 0 ? "transparent" : "#f7f9fb",
+                  backgroundColor: "#fff",
+                  border: `1px solid ${headerColor}33`,
+                  borderLeft: `4px solid ${headerColor}`,
+                  borderRadius: "3px",
+                  padding: "8px 10px",
+                  boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "3px",
                 }}
               >
-                <span className="ts-col-time" style={{ fontWeight: 700, color: "#0a5caa", fontSize: "13px", fontVariantNumeric: "tabular-nums" }}>
-                  {f.time}
-                </span>
-                <span className="ts-col-type" style={{ color: headerColor, fontSize: "12px", fontWeight: 600, whiteSpace: "normal", wordBreak: "break-word" }}>
-                  {abbreviate(f.type)}
-                </span>
-                <span className="ts-col-route" style={{ fontWeight: 600, fontSize: "12px", color: "#1E3A5F", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={f.route}>
-                  {abbreviate(f.route)}
-                </span>
-                <span className="ts-col-direction" style={{ color: "#2A3B50", fontSize: "12.5px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={f.direction}>
-                  {abbreviate(f.direction)}
-                </span>
-                <span className="ts-col-status" style={{ fontSize: "11px", color: "#334155" }}>
+                {/* Верх卡片: время + номер рейса + статус */}
+                <div style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: "6px",
+                }}>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: "8px", minWidth: 0, flex: 1 }}>
+                    <span style={{
+                      fontWeight: 700,
+                      color: isAlert ? "#c40000" : "#0a5caa",
+                      fontSize: "15px",
+                      fontVariantNumeric: "tabular-nums",
+                      flexShrink: 0,
+                    }}>
+                      {f.time}
+                    </span>
+                    <span style={{
+                      fontWeight: 700,
+                      fontSize: "13px",
+                      color: "#1E3A5F",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      minWidth: 0,
+                    }} title={f.route}>
+                      {abbreviate(f.route)}
+                    </span>
+                  </div>
                   {si && (
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: "2px" }}>
+                    <span style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "2px",
+                      fontSize: "10px",
+                      color: isAlert ? "#c40000" : "#64748b",
+                      fontWeight: 600,
+                      flexShrink: 0,
+                      whiteSpace: "nowrap",
+                    }}>
                       <span>{si.icon}</span>
                       <span>{si.label}</span>
                     </span>
                   )}
-                </span>
+                </div>
+                {/* Низ карточки: тип + полный маршрут */}
+                <div style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  flexWrap: "wrap",
+                }}>
+                  <span style={{
+                    display: "inline-block",
+                    backgroundColor: headerColor,
+                    color: "#fff",
+                    fontSize: "9px",
+                    fontWeight: 700,
+                    textTransform: "uppercase" as const,
+                    letterSpacing: "0.5px",
+                    padding: "1px 6px",
+                    borderRadius: "2px",
+                    flexShrink: 0,
+                  }}>
+                    {abbreviate(f.type)}
+                  </span>
+                  <span style={{
+                    fontSize: "12px",
+                    color: "#0a5caa",
+                    fontWeight: 500,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    minWidth: 0,
+                    flex: 1,
+                  }} title={f.direction}>
+                    {abbreviate(f.direction)}
+                  </span>
+                </div>
               </div>
             );
           })}
