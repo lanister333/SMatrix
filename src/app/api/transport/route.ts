@@ -355,7 +355,7 @@ export async function GET() {
           time: d.time || "--:--",
           type: "вылет",
           route: d.flight,
-          direction: "→ " + d.city,
+          direction: `Южно-Сахалинск → ${d.city}`,
           status: d.status || "",
           alert: /задерж|отменён/i.test(d.status || ""),
         }));
@@ -363,7 +363,7 @@ export async function GET() {
           time: d.time || "--:--",
           type: "прилёт",
           route: d.flight,
-          direction: "← " + d.city,
+          direction: `${d.city} → Южно-Сахалинск`,
           status: d.status || "",
           alert: /задерж|отменён/i.test(d.status || ""),
         }));
