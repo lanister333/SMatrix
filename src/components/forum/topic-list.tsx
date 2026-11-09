@@ -49,16 +49,12 @@ export default function TopicList(props: {
   const [q, setQ] = useState("");
   const [topics, setTopics] = useState<TopicRow[]>([]);
   const [total, setTotal] = useState(0);
-  // 2026-11-09: номер страницы читается из URL (?page=N) при загрузке/обновлении.
-  // Раньше всегда page=1 → при F5 сбрасывалось на первую страницу.
-  const [page, setPageState] = useState(() => {
-    if (typeof window === "undefined") return 1;
-    const p = parseInt(new URLSearchParams(window.location.search).get("page") || "1", 10);
-    return p >= 1 ? p : 1;
-  });
+  // 2026-11-09: номер страницы читается из URL (?page=N) через useEffect
+  // ПОСЛЕ гидрации. useState initializer не работает при SSR гидрации —
+  // React использует SSR значение (page=1), игнорируя клиентский initializer.
+  const [page, setPageState] = useState(1);
   const [pages, setPages] = useState(1);
   // 2026-11-09: обёртка над setPage — обновляет URL через replaceState
-  // (replaceState, не pushState — чтобы не засорять историю каждой страницей)
   const setPage = useCallback((n: number) => {
     setPageState(n);
     if (typeof window !== "undefined") {
@@ -68,6 +64,11 @@ export default function TopicList(props: {
       const qs = sp.toString();
       window.history.replaceState(null, "", window.location.pathname + (qs ? `?${qs}` : ""));
     }
+  }, []);
+  // 2026-11-09: при mount — читать page из URL
+  useEffect(() => {
+    const p = parseInt(new URLSearchParams(window.location.search).get("page") || "1", 10);
+    if (p > 1 && p !== page) setPageState(p);
   }, []);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
