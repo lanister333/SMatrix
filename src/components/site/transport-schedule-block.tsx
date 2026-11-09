@@ -66,6 +66,8 @@ export default function TransportScheduleBlock() {
   const [data, setData] = useState<TransportResponse | null>(null);
   const [activeTab, setActiveTab] = useState<TransportSection["id"]>("aviation");
   const [expanded, setExpanded] = useState(false);
+  const [expandedDepart, setExpandedDepart] = useState(false);
+  const [expandedArrive, setExpandedArrive] = useState(false);
 
   useEffect(() => {
     fetch("/api/transport")
@@ -76,6 +78,19 @@ export default function TransportScheduleBlock() {
 
   const section = data?.sections.find((s) => s.id === activeTab);
   const allFlights = section?.flights ?? [];
+
+  // 2026-11-10: для авиа — разделяем на вылеты/прилёты, показываем
+  // в двух отдельных окнах с цветными заголовками (бирюзовый/оранжевый).
+  // Для воды/ЖД — оставляем единый список (там только «отпр.»).
+  const isAviation = activeTab === "aviation";
+  const departures = isAviation
+    ? allFlights.filter((f) => /вылет|отпр/i.test(f.type))
+    : allFlights;
+  const arrivals = isAviation
+    ? allFlights.filter((f) => /прилёт|приб/i.test(f.type))
+    : [];
+  const useSplitView = isAviation && (departures.length > 0 || arrivals.length > 0);
+
   const flights = expanded ? allFlights : allFlights.slice(0, 5);
   const hiddenCount = Math.max(0, allFlights.length - 5);
 
@@ -138,7 +153,7 @@ export default function TransportScheduleBlock() {
             return (
               <button
                 key={t.id}
-                onClick={() => { setActiveTab(t.id); setExpanded(false); }}
+                onClick={() => { setActiveTab(t.id); setExpanded(false); setExpandedDepart(false); setExpandedArrive(false); }}
                 style={{
                   flex: 1,
                   display: "flex",
@@ -179,6 +194,29 @@ export default function TransportScheduleBlock() {
           })}
         </div>
 
+        {useSplitView ? (
+          /* 2026-11-10: раздельные окна для вылетов и прилётов */
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            {/* Окно ВЫЛЕТЫ — бирюзовый заголовок */}
+            <SubFlightsCard
+              title="✈ ВЫЛЕТЫ"
+              count={departures.length}
+              headerColor="#0a7d75"
+              flights={departures}
+              expanded={expandedDepart}
+              onToggle={() => setExpandedDepart((v) => !v)}
+            />
+            {/* Окно ПРИЛЁТЫ — оранжевый заголовок */}
+            <SubFlightsCard
+              title="🛬 ПРИЛЁТЫ"
+              count={arrivals.length}
+              headerColor="#b45309"
+              flights={arrivals}
+              expanded={expandedArrive}
+              onToggle={() => setExpandedArrive((v) => !v)}
+            />
+          </div>
+        ) : (
         <div style={tableStyle}>
         <div
           className="ts-row ts-row-head"
@@ -246,7 +284,10 @@ export default function TransportScheduleBlock() {
           </div>
         )}
         </div>
+        )}
 
+        {!useSplitView && (
+          <>
         {hiddenCount > 0 && !expanded && (
           <button
             onClick={() => setExpanded(true)}
@@ -289,7 +330,177 @@ export default function TransportScheduleBlock() {
             ▲ Свернуть
           </button>
         )}
+          </>
+        )}
       </div>
     </section>
+  );
+}
+
+/* 2026-11-10: Подкарточка для раздельного показа вылетов/прилётов.
+   Заголовок цветной (бирюзовый для вылетов, оранжевый для прилётов),
+   внутри — таблица с теми же ts-row/ts-col-* классами. */
+function SubFlightsCard({
+  title,
+  count,
+  headerColor,
+  flights,
+  expanded,
+  onToggle,
+}: {
+  title: string;
+  count: number;
+  headerColor: string;
+  flights: TransportFlight[];
+  expanded: boolean;
+  onToggle: () => void;
+}) {
+  const PREVIEW = 5;
+  const list = expanded ? flights : flights.slice(0, PREVIEW);
+  const hidden = Math.max(0, flights.length - PREVIEW);
+
+  return (
+    <div style={{
+      border: `1px solid ${headerColor}`,
+      borderRadius: "4px",
+      overflow: "hidden",
+      backgroundColor: "#fff",
+    }}>
+      {/* Цветной заголовок */}
+      <div style={{
+        backgroundColor: headerColor,
+        color: "#fff",
+        padding: "5px 10px",
+        fontSize: "13px",
+        fontWeight: 700,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        letterSpacing: "0.3px",
+      }}>
+        <span>{title}</span>
+        <span style={{
+          background: "rgba(255,255,255,0.25)",
+          padding: "1px 8px",
+          borderRadius: "10px",
+          fontSize: "11px",
+          fontWeight: 700,
+        }}>
+          {count}
+        </span>
+      </div>
+
+      {/* Шапка таблицы */}
+      <div
+        className="ts-row ts-row-head"
+        style={{
+          fontSize: "11px",
+          fontWeight: 700,
+          color: "#334155",
+          textTransform: "uppercase" as const,
+          letterSpacing: "0.5px",
+          borderBottom: `2px solid ${headerColor}33`,
+          backgroundColor: "#f1f5f9",
+        }}
+      >
+        <span className="ts-col-time">Время</span>
+        <span className="ts-col-type">Тип</span>
+        <span className="ts-col-route">Рейс</span>
+        <span className="ts-col-direction">Маршрут</span>
+        <span className="ts-col-status">Статус</span>
+      </div>
+
+      {/* Строки */}
+      {list.length === 0 ? (
+        <div style={{ padding: "10px", textAlign: "center", color: "#56657a", fontSize: "12px" }}>
+          Нет данных
+        </div>
+      ) : (
+        <div>
+          {list.map((f, i) => {
+            const si = statusInfo(f.status);
+            return (
+              <div
+                key={i}
+                className="ts-row"
+                style={{
+                  alignItems: "center",
+                  fontSize: "12px",
+                  color: "#2A3B50",
+                  borderBottom: i < list.length - 1 ? "1px solid #eef2f6" : "none",
+                  minHeight: "26px",
+                  background: i % 2 === 0 ? "transparent" : "#f7f9fb",
+                }}
+              >
+                <span className="ts-col-time" style={{ fontWeight: 700, color: "#0a5caa", fontSize: "13px", fontVariantNumeric: "tabular-nums" }}>
+                  {f.time}
+                </span>
+                <span className="ts-col-type" style={{ color: headerColor, fontSize: "12px", fontWeight: 600, whiteSpace: "normal", wordBreak: "break-word" }}>
+                  {abbreviate(f.type)}
+                </span>
+                <span className="ts-col-route" style={{ fontWeight: 600, fontSize: "12px", color: "#1E3A5F", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={f.route}>
+                  {abbreviate(f.route)}
+                </span>
+                <span className="ts-col-direction" style={{ color: "#2A3B50", fontSize: "12.5px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={f.direction}>
+                  {abbreviate(f.direction)}
+                </span>
+                <span className="ts-col-status" style={{ fontSize: "11px", color: "#334155" }}>
+                  {si && (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "2px" }}>
+                      <span>{si.icon}</span>
+                      <span>{si.label}</span>
+                    </span>
+                  )}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Кнопка «показать ещё» */}
+      {hidden > 0 && !expanded && (
+        <button
+          onClick={onToggle}
+          style={{
+            display: "block",
+            width: "100%",
+            margin: "2px 0 0",
+            padding: "4px",
+            background: "transparent",
+            border: "none",
+            borderTop: "1px dashed #d0d9e6",
+            cursor: "pointer",
+            fontSize: "11px",
+            color: headerColor,
+            fontFamily: "inherit",
+            fontWeight: 700,
+          }}
+        >
+          ▼ Показать ещё {hidden}
+        </button>
+      )}
+      {expanded && (
+        <button
+          onClick={onToggle}
+          style={{
+            display: "block",
+            width: "100%",
+            margin: "2px 0 0",
+            padding: "4px",
+            background: "transparent",
+            border: "none",
+            borderTop: "1px dashed #d0d9e6",
+            cursor: "pointer",
+            fontSize: "11px",
+            color: "#56657a",
+            fontFamily: "inherit",
+            fontWeight: 700,
+          }}
+        >
+          ▲ Свернуть
+        </button>
+      )}
+    </div>
   );
 }

@@ -11117,7 +11117,7 @@ article button[style*="color: #dc2626"] {
   .ts-col-route { grid-column: 2 !important; grid-row: 1 !important; font-weight: 600 !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; min-width: 0 !important; }
   .ts-col-status { grid-column: 3 !important; grid-row: 1 !important; font-size: 10px !important; max-width: 80px !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
   /* Row 2: type label | direction (полный маршрут) */
-  .ts-col-type { grid-column: 1 !important; grid-row: 2 !important; display: block !important; font-size: 9px !important; color: #06cdbd !important; font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.3px !important; }
+  .ts-col-type { grid-column: 1 !important; grid-row: 2 !important; display: block !important; font-size: 9px !important; font-weight: 700 !important; text-transform: uppercase !important; letter-spacing: 0.3px !important; }
   .ts-col-direction { grid-column: 2 / -1 !important; grid-row: 2 !important; display: block !important; font-size: 11px !important; color: #0a5caa !important; font-weight: 500 !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; min-width: 0 !important; }
   .ts-col-direction::before { content: "" !important; }
   /* Hide type/direction in header row */
