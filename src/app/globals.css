@@ -11124,3 +11124,75 @@ article button[style*="color: #dc2626"] {
   .ts-row-head .ts-col-type { display: none !important; }
   .ts-row-head .ts-col-direction { display: none !important; }
 }
+
+/* ============================================================
+   2026-11-10: «СРОЧНО» — бегущая строка в самом верху сайта.
+   Невидима по умолчанию. Включается через админку (urgentBannerEnabled=1).
+   ============================================================ */
+
+.sm-urgent-banner{
+  display:flex;
+  align-items:center;
+  width:100%;
+  height:26px;
+  background:#B22335;
+  color:#fff;
+  overflow:hidden;
+  font-family:system-ui,-apple-system,sans-serif;
+  font-size:13px;
+  font-weight:600;
+  line-height:1;
+  border-bottom:1px solid #7a1422;
+  position:relative;
+  z-index:50;
+}
+.sm-urgent-banner-label{
+  flex-shrink:0;
+  padding:0 10px;
+  height:100%;
+  display:flex;
+  align-items:center;
+  background:#7a1422;
+  color:#fff;
+  font-weight:800;
+  font-size:11px;
+  letter-spacing:1px;
+  border-right:1px solid rgba(255,255,255,0.2);
+}
+.sm-urgent-banner-track{
+  flex:1;
+  min-width:0;
+  overflow:hidden;
+  white-space:nowrap;
+  position:relative;
+  height:100%;
+  display:flex;
+  align-items:center;
+}
+.sm-urgent-banner-text{
+  display:inline-block;
+  padding-left:100%;
+  white-space:nowrap;
+  animation:sm-urgent-marquee 18s linear infinite;
+}
+.sm-urgent-banner-text + .sm-urgent-banner-text{
+  padding-left:0;
+  margin-left:50px;
+}
+@keyframes sm-urgent-marquee{
+  0%   { transform:translateX(0); }
+  100% { transform:translateX(-100%); }
+}
+/* На узких экранах — быстрее, чтобы длинный текст успевал пройти */
+@media (max-width:480px){
+  .sm-urgent-banner{ height:24px; font-size:12px; }
+  .sm-urgent-banner-label{ font-size:10px; padding:0 8px; }
+  .sm-urgent-banner-text{ animation-duration:13s; }
+}
+/* Респект к prefers-reduced-motion: без анимации, просто статичный текст */
+@media (prefers-reduced-motion:reduce){
+  .sm-urgent-banner-text{
+    animation:none;
+    padding-left:10px;
+  }
+}

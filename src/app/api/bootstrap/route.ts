@@ -36,6 +36,8 @@ export async function GET() {
         siteSubtitle: settings.siteSubtitle || "Сахалинская матрица взаимопомощи",
         siteDescription: settings.siteDescription || "",
         footerNote: settings.footerNote || "",
+        urgentBannerEnabled: settings.urgentBannerEnabled || "0",
+        urgentBannerText: settings.urgentBannerText || "",
       },
     });
   } catch (e) {

@@ -3057,6 +3057,38 @@ function SettingsSection(props: { token: string | null; notify: (m: string) => v
         </label>
       </div>
 
+      {/* 2026-11-10: «Срочно» — бегущая строка в самом верху сайта.
+          По умолчанию выключена. Включает владелец при экстренных оповещениях
+          (аварии, отключения, погодные предупреждения и т.п.). */}
+      <div className="mt-3 border border-[#B22335] bg-[#FFF5F5] p-2.5">
+        <div className="mb-1.5 text-[12.5px] font-bold text-[#B22335]">
+          ⚠ Срочное оповещение (бегущая строка вверху сайта)
+        </div>
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={(settings.urgentBannerEnabled ?? "0") === "1"}
+            onChange={(e) => set("urgentBannerEnabled", e.target.checked ? "1" : "0")}
+          />
+          <span>
+            <b>Показывать срочную строку</b>
+            <span className="text-[12px] text-[#56657a]"> — красная плашка с бегущим текстом в самом верху каждой страницы</span>
+          </span>
+        </label>
+        <label className="mt-2 block text-[12.5px] font-bold text-[#1E3A5F]">Текст срочного сообщения</label>
+        <textarea
+          value={settings.urgentBannerText ?? ""}
+          onChange={(e) => set("urgentBannerText", e.target.value)}
+          rows={2}
+          placeholder="Например: Внимание! Отключение воды в Ленинском районе 10 ноября с 9:00 до 14:00"
+          className="mt-0.5 w-full border border-[#1E3A5F] px-2 py-1.5 outline-none"
+        />
+        <p className="mt-1 text-[11.5px] text-[#56657a]">
+          Когда выключено — плашка не видна. Когда включено с пустым текстом — тоже не видна.
+          Текст бежит справа налево, повторяется по кругу.
+        </p>
+      </div>
+
       <button className="sm-btn sm-btn-primary mt-3 px-4 py-1.5" disabled={busy} onClick={save}>
         Сохранить настройки
       </button>

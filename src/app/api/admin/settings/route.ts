@@ -19,6 +19,10 @@ const EDITABLE_KEYS = [
   "aiShadowMode",
   /// ПРОМТ №2: включить/выключить AI-кэш по text-hash (cost protection).
   "aiCacheEnabled",
+  /// 2026-11-10: «срочная бегущая строка» наверху сайта — включается
+  /// вручную из админки при необходимости (аварии, экстренные оповещения).
+  "urgentBannerEnabled",
+  "urgentBannerText",
 ] as const;
 
 const DEFAULTS: Record<string, string> = {
@@ -32,6 +36,8 @@ const DEFAULTS: Record<string, string> = {
   /// потом отключает (значение "0" = обычный режим с автоматическими действиями).
   aiShadowMode: "1",
   aiCacheEnabled: "1",
+  urgentBannerEnabled: "0",
+  urgentBannerText: "",
 };
 
 const LABELS: Record<string, string> = {
@@ -43,6 +49,8 @@ const LABELS: Record<string, string> = {
   newTopicsEnabled: "создание тем",
   aiShadowMode: "AI-теневой режим",
   aiCacheEnabled: "AI-кэш вердиктов",
+  urgentBannerEnabled: "срочная строка (вкл/выкл)",
+  urgentBannerText: "текст срочной строки",
 };
 
 /**
@@ -89,9 +97,13 @@ export async function POST(req: NextRequest) {
         key === "registrationEnabled" ||
         key === "newTopicsEnabled" ||
         key === "aiShadowMode" ||
-        key === "aiCacheEnabled"
+        key === "aiCacheEnabled" ||
+        key === "urgentBannerEnabled"
       ) {
         value = value === "0" || value === "false" ? "0" : "1";
+      }
+      if (key === "urgentBannerText") {
+        value = value.slice(0, 500);
       }
       const current = await db.siteSetting.findUnique({ where: { key } });
       if (!current || current.value !== value) {

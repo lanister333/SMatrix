@@ -38,6 +38,10 @@ export interface SiteSettings {
   siteSubtitle: string;
   siteDescription: string;
   footerNote: string;
+  /// 2026-11-10: срочная бегущая строка наверху сайта (невидима, пока
+  /// владелец не включит через админку).
+  urgentBannerEnabled?: string;
+  urgentBannerText?: string;
 }
 
 export const DEFAULT_SETTINGS: SiteSettings = {
@@ -46,6 +50,8 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   siteDescription:
     "Независимый форум-портал для жителей острова: советы, рекомендации мастеров, дороги, рыбалка и жизнь Сахалина. Спроси — и город ответит.",
   footerNote: "Спроси у города — город ответит.",
+  urgentBannerEnabled: "0",
+  urgentBannerText: "",
 };
 
 /** ШАГ 12: сотрудник проекта (владелец или модератор). */
@@ -115,6 +121,11 @@ export function Masthead(props: { settings: SiteSettings }) {
   // активной кнопки; для мобайла (≤480px, полоса скрыта) полоска вернута
   // правилом .sm-masthead в существующем @media-блоке globals.css
   return (
+    <>
+    {/* 2026-11-10: «Срочно» — бегущая строка в самом верху сайта.
+        Невидима по умолчанию (urgentBannerEnabled !== "1").
+        Включается через админку: Настройки сайта → «Срочная строка». */}
+    <UrgentBanner settings={props.settings} />
     <header
       className="w-full sm-masthead"
       /* ТЗ 2026-09-21 «шапку сайта окрась в цвет как у блока поддержка
@@ -244,6 +255,34 @@ export function Masthead(props: { settings: SiteSettings }) {
         </div>
       </div>
     </header>
+    </>
+  );
+}
+
+/**
+ * 2026-11-10: UrgentBanner — «СРОЧНО» бегущая строка в самом верху сайта.
+ *
+ * Невидима по умолчанию. Появляется только когда владелец включил её
+ * через админку (Настройки сайта → «Срочная строка включена»).
+ *
+ * Реализация:
+ *   - красный фон #B22335, белый текст
+ *   - CSS-анимация marquee (бегущая строка) — текст уезжает справа налево
+ *   - одна строка высотой ~26px, на всю ширину
+ *   - если текст пустой — плашка не показывается даже при enabled=1
+ */
+export function UrgentBanner(props: { settings: SiteSettings }) {
+  const enabled = (props.settings.urgentBannerEnabled ?? "0") === "1";
+  const text = (props.settings.urgentBannerText ?? "").trim();
+  if (!enabled || !text) return null;
+  return (
+    <div className="sm-urgent-banner" role="alert" aria-live="polite">
+      <span className="sm-urgent-banner-label">СРОЧНО</span>
+      <div className="sm-urgent-banner-track">
+        <span className="sm-urgent-banner-text">{text}</span>
+        <span className="sm-urgent-banner-text" aria-hidden="true">{text}</span>
+      </div>
+    </div>
   );
 }
 
