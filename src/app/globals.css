@@ -7362,10 +7362,10 @@ div[style*="background-color: rgb(0, 74, 143)"] {
   }
 }
 
-/* Узкий мобильный (≤480px): 3 колонки — Время / Рейс+Маршрут / Статус */
+/* Узкий мобильный (≤480px): 3 колонки — Время / Рейс+Направление / Статус */
 @media (max-width: 480px) {
   .ts-row {
-    grid-template-columns: 42px minmax(0, 1fr) 62px;
+    grid-template-columns: 44px minmax(0, 1fr) 68px;
     gap: 4px;
     padding: 3px 4px;
     font-size: 11px !important;
@@ -7373,17 +7373,29 @@ div[style*="background-color: rgb(0, 74, 143)"] {
   .ts-row-head {
     font-size: 10px !important;
   }
+  /* 2026-11-09: направление (куда/откуда) НЕ скрываем — показываем
+     под номером рейса мелким шрифтом. Раньше было display:none. */
   .ts-col-direction {
-    display: none;
+    display: block !important;
+    font-size: 10px !important;
+    color: #56657a !important;
+    line-height: 1.2 !important;
+    margin-top: 1px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
   .ts-row-head .ts-col-direction {
-    display: none;
+    display: none !important;
   }
   .ts-col-time {
     font-size: 12px !important;
   }
   .ts-col-status {
     font-size: 10px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
 }
 
