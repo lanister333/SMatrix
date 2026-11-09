@@ -11099,10 +11099,22 @@ article button[style*="color: #dc2626"] {
 .sk-rubric-toggle{cursor:pointer;text-align:left;background:0 0;border:0;padding:1px 0;font-family:inherit;font-size:13.5px;color:#0a5caa;text-decoration:underline;flex:0 1 auto;min-width:0}
 .sk-rubric-toggle:hover{color:#c40000}
 
-/* 2026-11-09: фикс позиционирования в транспортной таблице на мобильной.
-   time → col1/row1, route → col2/row1, status → col3/row1, direction → col2/row2 */
+/* 2026-11-09: фикс наложения слов в транспортной таблице на мобильной.
+   Предыдущая правка переместила route в col2/row1, но забыла скрыть
+   .ts-col-type, который уже стоял в col2/row1 → зелёный текст «вылет»
+   наезжал на номер рейса. Также ::before добавлял вторую «→ » перед
+   направлением, хотя в самом direction уже есть «→» (двойная стрелка).
+   Решение: 3 колонки (Время / Рейс / Статус) + направление на 2-й строке
+   во всю ширину, без отдельной колонки «Тип» и без дублирующей стрелки. */
 @media (max-width: 480px) {
+  .ts-row {
+    grid-template-columns: auto 1fr auto !important;
+    grid-template-rows: auto auto !important;
+  }
   .ts-col-time { grid-column: 1 !important; grid-row: 1 !important; }
-  .ts-col-route { grid-column: 2 !important; grid-row: 1 !important; }
+  .ts-col-type { display: none !important; }
+  .ts-col-route { grid-column: 2 !important; grid-row: 1 !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; min-width: 0 !important; }
   .ts-col-status { grid-column: 3 !important; grid-row: 1 !important; }
+  .ts-col-direction { grid-column: 1 / -1 !important; grid-row: 2 !important; }
+  .ts-col-direction::before { content: "" !important; }
 }
