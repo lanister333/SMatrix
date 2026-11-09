@@ -49,8 +49,26 @@ export default function TopicList(props: {
   const [q, setQ] = useState("");
   const [topics, setTopics] = useState<TopicRow[]>([]);
   const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
+  // 2026-11-09: номер страницы читается из URL (?page=N) при загрузке/обновлении.
+  // Раньше всегда page=1 → при F5 сбрасывалось на первую страницу.
+  const [page, setPageState] = useState(() => {
+    if (typeof window === "undefined") return 1;
+    const p = parseInt(new URLSearchParams(window.location.search).get("page") || "1", 10);
+    return p >= 1 ? p : 1;
+  });
   const [pages, setPages] = useState(1);
+  // 2026-11-09: обёртка над setPage — обновляет URL через replaceState
+  // (replaceState, не pushState — чтобы не засорять историю каждой страницей)
+  const setPage = useCallback((n: number) => {
+    setPageState(n);
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search);
+      if (n > 1) sp.set("page", String(n));
+      else sp.delete("page");
+      const qs = sp.toString();
+      window.history.replaceState(null, "", window.location.pathname + (qs ? `?${qs}` : ""));
+    }
+  }, []);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchRes, setSearchRes] = useState<SearchRow[] | null>(null);
