@@ -361,48 +361,48 @@ function SubFlightsCard({
 
   return (
     <div style={{
-      backgroundColor: "#FFFFFF",
-      border: "1px solid #4A688C",
-      borderRadius: 0,
-      boxShadow: "0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03)",
+      border: `1px solid ${headerColor}`,
+      borderRadius: "4px",
       overflow: "hidden",
-      boxSizing: "border-box",
-      width: "100%",
-      fontFamily: "inherit",
+      backgroundColor: "#fff",
     }}>
-      {/* Шапка — точно как у внешнего блока «🚍 Расписание транспорта»:
-          тёмно-синяя, белый текст, по центру. */}
+      {/* Цветной заголовок */}
       <div style={{
-        backgroundColor: "#1E3A5F",
-        color: "#FFFFFF",
-        padding: "3px 9px",
-        fontWeight: 700,
+        backgroundColor: headerColor,
+        color: "#fff",
+        padding: "5px 10px",
         fontSize: "13px",
-        textAlign: "center",
-        borderBottom: "1px solid #16293F",
+        fontWeight: 700,
         display: "flex",
         alignItems: "center",
-        justifyContent: "center",
-        gap: "6px",
+        justifyContent: "space-between",
+        letterSpacing: "0.3px",
       }}>
         <span>{title}</span>
         <span style={{
-          display: "inline-block",
-          minWidth: "14px",
-          padding: "0 3px",
           background: "rgba(255,255,255,0.25)",
-          borderRadius: "8px",
+          padding: "1px 8px",
+          borderRadius: "10px",
           fontSize: "11px",
           fontWeight: 700,
-          lineHeight: 1.3,
         }}>
           {count}
         </span>
       </div>
 
-      {/* Тонкая цветная полоска-индикатор (бирюзовая/оранжевая) —
-          единственный визуальный отличитель вылетов от прилётов. */}
-      <div style={{ height: "3px", backgroundColor: headerColor }} />
+      {/* Шапка-подпись картотеки (не таблица, просто метки) */}
+      <div style={{
+        padding: "3px 10px",
+        fontSize: "10px",
+        fontWeight: 600,
+        color: "#64748b",
+        textTransform: "uppercase" as const,
+        letterSpacing: "0.5px",
+        backgroundColor: "#f8fafc",
+        borderBottom: `1px solid ${headerColor}22`,
+      }}>
+        Карточки рейсов
+      </div>
 
       {/* Картотека — каждый рейс как отдельная карточка */}
       {list.length === 0 ? (
@@ -411,11 +411,11 @@ function SubFlightsCard({
         </div>
       ) : (
         <div style={{
-          padding: "6px 9px",
+          padding: "8px",
           display: "flex",
           flexDirection: "column",
           gap: "6px",
-          backgroundColor: "#FFFFFF",
+          backgroundColor: "#f8fafc",
         }}>
           {list.map((f, i) => {
             const si = statusInfo(f.status);
