@@ -444,8 +444,22 @@ export default function App({ initialSearchParams = {} }: { initialSearchParams?
 
   useEffect(() => {
     syncFromUrl();
-    window.addEventListener("popstate", syncFromUrl);
-    return () => window.removeEventListener("popstate", syncFromUrl);
+    // 2026-11-09: при нажатии «Назад» syncFromUrl вызывается, но React может
+    // не применить state изменения если значения совпадают (view="forum" не
+    // изменился). Принудительная перезагрузка если URL не содержит topic —
+    // гарантирует что пользователь вернётся на правильную страницу.
+    const onPopState = () => {
+      syncFromUrl();
+      const sp = new URLSearchParams(window.location.search);
+      const hasTopic = sp.get("topic");
+      if (!hasTopic) {
+        // Вернулись к списку тем (или другой странице без topic) —
+        // перезагружаем чтобы гарантированно показать правильную страницу
+        window.location.reload();
+      }
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
   }, [syncFromUrl]);
 
   useEffect(() => {
