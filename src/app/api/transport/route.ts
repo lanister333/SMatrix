@@ -340,31 +340,56 @@ export async function GET() {
     const waterFlights = water.status === "fulfilled" ? water.value : [];
     const railwayFlights = railway.status === "fulfilled" ? railway.value : [];
 
+    // 2026-11-09: fallback для авиа — airportus.ru использует SSR Vue + anti-bot,
+    // серверный парсер получает пустую страницу. Если авиа пусто — читаем кэш-файл
+    // /opt/smatrix/db/airport-cache.json (обновляется локальным Puppeteer скриптом).
+    let finalAviation = aviationFlights;
+    let aviationSource = "airportus.ru";
+    if (finalAviation.length === 0) {
+      try {
+        const { readFile } = await import("fs/promises");
+        const cachePath = "/opt/smatrix/db/airport-cache.json";
+        const raw = await readFile(cachePath, "utf-8");
+        const cache = JSON.parse(raw);
+        if (cache.departures && Array.isArray(cache.departures)) {
+          finalAviation = cache.departures.map((d: { flight: string; city: string; time: string; status: string }) => ({
+            time: d.time || "--:--",
+            type: "вылет",
+            route: d.flight,
+            direction: d.city,
+            status: d.status || "",
+            alert: /задерж|отменён/i.test(d.status || ""),
+          }));
+          aviationSource = `airportus.ru (кэш: ${cache.fetchedAt?.slice(0, 16) || "?"})`;
+        }
+      } catch {}
+    }
+
     // Все 3 пустые → fallback на stub с предупреждением
-    const totalFlights = aviationFlights.length + waterFlights.length + railwayFlights.length;
+    const totalFlights = finalAviation.length + waterFlights.length + railwayFlights.length;
     if (totalFlights === 0) {
       return NextResponse.json(stubData());
     }
 
     // Определить источник: все 3 ok → "live", иначе "partial"
-    const allOk = aviation.status === "fulfilled" && water.status === "fulfilled" && railway.status === "fulfilled";
+    const allOk = finalAviation.length > 0 && water.status === "fulfilled" && railway.status === "fulfilled";
     const source: "live" | "partial" = allOk ? "live" : "partial";
 
     // Сформировать note
     const notes: string[] = [];
-    if (aviation.status !== "fulfilled") notes.push("авиа: нет данных");
+    if (finalAviation.length === 0) notes.push("авиа: нет данных");
     if (water.status !== "fulfilled") notes.push("паромы: нет данных");
     if (railway.status !== "fulfilled") notes.push("ЖД: нет данных");
     const note = notes.length
       ? `Частично: ${notes.join(", ")}. Обновлено ${nowStamp()}.`
-      : `Данные на ${nowStamp()}. Источники: airportus.ru, sasco.ru, travel65.ru.`;
+      : `Данные на ${nowStamp()}. Источники: ${aviationSource}, sasco.ru, travel65.ru.`;
 
     return NextResponse.json({
       source,
       note,
       updated: nowStamp(),
       sections: [
-        { id: "aviation", emoji: "✈️", title: "Авиа (Хомутово / UUS)", flights: aviationFlights },
+        { id: "aviation", emoji: "✈️", title: "Авиа (Хомутово / UUS)", flights: finalAviation },
         { id: "water", emoji: "🚢", title: "Водный транспорт (паромы Холмск — Ванино)", flights: waterFlights },
         { id: "railway", emoji: "🚂", title: "ЖД (Сахалинская железная дорога)", flights: railwayFlights },
       ],
