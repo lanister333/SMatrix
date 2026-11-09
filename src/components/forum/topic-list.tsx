@@ -88,11 +88,18 @@ export default function TopicList(props: {
     setNewBadges(badges);
   }, [topics]);
 
-  const [syncKey, setSyncKey] = useState("");
+  const [syncKey, setSyncKey] = useState(`${scope}|${rubricFilter?.slug ?? ""}`);
   const lastSync = `${scope}|${rubricFilter?.slug ?? ""}`;
   if (syncKey !== lastSync) {
     setSyncKey(lastSync);
     setPage(1);
+    // 2026-11-09: при смене scope/rubric — убрать page из URL
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search);
+      sp.delete("page");
+      const qs = sp.toString();
+      window.history.replaceState(null, "", window.location.pathname + (qs ? `?${qs}` : ""));
+    }
     setSearchRes(null);
     setQ("");
   }
