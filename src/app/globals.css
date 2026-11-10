@@ -11234,3 +11234,16 @@ section[aria-label="Погода на Сахалине"] .mp-w-frame {
 @media (max-width: 900px) {
   .mp-grid { margin-top: 10px !important; }
 }
+
+/* 2026-11-10: Единый отступ 10px между ВСЕМИ блоками правой колонки на мобильных.
+   Некоторые блоки (Курсы валют, Отключения, Пробки) имели margin-top:5px и
+   margin-bottom:0 → неравномерные отступы (5px вместо 10px). */
+@media (max-width: 900px) {
+  .mp-right > * {
+    margin-top: 0 !important;
+    margin-bottom: 10px !important;
+  }
+  .mp-right > *:last-child {
+    margin-bottom: 0 !important;
+  }
+}
