@@ -235,14 +235,11 @@ export default function HomeRight() {
         <SakhDatetimeBlock />
       </div>
 
-      {/* 8.1 «Погода на Сахалине» — Шаг 5: старая статичная таблица
-          прогноза по дням полностью удалена. Единственный информер блока
-          — готовый бесплатный адаптивный HTML-виджет погоды (pogodnik.com
-          закрыт ботам — 403, поэтому аналогичный бесплатный meteoblue),
-          геопривязка — Южно-Сахалинск. Контейнер .mp-weather резиновый
-          width:100% внутри карточки .sakh-card: на смартфонах 360–414px
-          виджет подстраивается под ширину и не выходит за белую рамку.
-          Синий заголовок плашки — кликабельная ссылка на /weather.php. */}
+      {/* 8.1 «Погода на Сахалине» — 2026-11-10: заменён внешний iframe
+          meteoblue (не грузится на мобильных с VPN) на собственный виджет,
+          который берёт живые данные из /api/weather/full (open-meteo.com).
+          Показывает: иконку, температуру, ощущается, ветер, влажность,
+          давление. Синий заголовок — ссылка на /weather.php. */}
       <section className="mp-panel sakh-card" aria-label="Погода на Сахалине">
         <div className="mp-paneltitle">
           <span className="tri">▼</span>
@@ -250,29 +247,11 @@ export default function HomeRight() {
             Погода на Сахалине
           </a>
         </div>
-        {/* ТЗ 2026-09-21 «оцентруй надпись Южно-Сахалинск … покрась в
-            тёмно-синий»: надпись живёт внутри кросс-доменного iframe
-            meteoblue (нашим CSS недостижима) — вместо неё СВОЯ шапка
-            .mp-w-cap (по центру, var(--sm-navy)); текст = статичные
-            данные виджета (город/координаты/высота — константы, не
-            прогноз). Внутренняя шапка iframe подрезана стилями
-            (globals: .mp-w-frame -50px / .mp-weather overflow). */}
         <div className="mp-w-cap">
           <b>Южно-Сахалинск</b>
           <small>46.95°С 142.74°В 48м над уровнем моря</small>
         </div>
-        <div className="mp-weather">
-          {/* src откладывается до window.load: медленный/подвисший ответ
-              meteoblue в сети пользователя не должен удерживать событие
-              загрузки страницы (вечный спиннер панели предпросмотра). */}
-          <DeferredIframe
-            className="mp-w-frame"
-            src="https://www.meteoblue.com/ru/weather/widget/daily/yuzhno-sakhalinsk_russia_2119441"
-            title="Погода в Южно-Сахалинске — виджет meteoblue"
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          />
-        </div>
+        <NativeWeatherWidget />
       </section>
 
       {/* 8.2 «Курсы валют» — ТЗ 2026-09-23: наличные курсы касс 15 банков
@@ -487,4 +466,133 @@ export default function HomeRight() {
       </section>
     </div>
   );
+}
+
+/**
+ * 2026-11-10: NativeWeatherWidget — собственный виджет погоды.
+ * Заменяет внешний iframe meteoblue (который не грузится на мобильных
+ * с VPN). Берёт живые данные из /api/weather/full (open-meteo.com).
+ *
+ * Показывает:
+ *   - крупную иконку погоды (emoji по WMO code)
+ *   - температуру и «ощущается как»
+ *   - текстовую метку («Ясно», «Дождь»…)
+ *   - ветер (скорость + направление)
+ *   - влажность и давление
+ */
+function NativeWeatherWidget() {
+  const [data, setData] = useState<{
+    now?: { temp: number; feels: number; code: number; label: string; hum: number; press: number; wind: number; rumb: string };
+    source?: string;
+  } | null>(null);
+  const [err, setErr] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/weather/full")
+      .then((r) => r.json())
+      .then((d) => { if (d?.now) setData(d); else setErr(true); })
+      .catch(() => setErr(true));
+  }, []);
+
+  if (err) {
+    return (
+      <div style={{ padding: "12px 8px", textAlign: "center", fontSize: "12px", color: "#56657a" }}>
+        Не удалось загрузить погоду.{" "}
+        <a href="/weather.php" style={{ color: "#0a5caa", textDecoration: "underline" }}>
+          Подробнее →
+        </a>
+      </div>
+    );
+  }
+  if (!data?.now) {
+    return (
+      <div style={{ padding: "16px 8px", textAlign: "center", fontSize: "12px", color: "#56657a" }}>
+        Загрузка…
+      </div>
+    );
+  }
+
+  const w = data.now;
+  const icon = weatherEmoji(w.code);
+  const windDir = windDirectionLabel(w.rumb);
+
+  return (
+    <div className="mp-weather" style={{
+      padding: "8px 10px",
+      display: "flex",
+      flexDirection: "column",
+      gap: "6px",
+      fontFamily: "system-ui, -apple-system, sans-serif",
+    }}>
+      {/* Главная строка: иконка + температура + метка */}
+      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <span style={{ fontSize: "34px", lineHeight: 1 }} aria-hidden="true">{icon}</span>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: "26px", fontWeight: 700, color: "#1E3A5F", lineHeight: 1.1 }}>
+            {w.temp > 0 ? "+" : ""}{w.temp}°
+          </div>
+          <div style={{ fontSize: "11.5px", color: "#56657a" }}>
+            ощущается {w.feels > 0 ? "+" : ""}{w.feels}°
+          </div>
+        </div>
+        <div style={{ fontSize: "13px", fontWeight: 600, color: "#0a5caa", textAlign: "right" }}>
+          {w.label}
+        </div>
+      </div>
+      {/* Метрики: ветер / влажность / давление */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr 1fr",
+        gap: "4px",
+        fontSize: "11px",
+        color: "#475569",
+        borderTop: "1px solid #eef2f6",
+        paddingTop: "6px",
+      }}>
+        <div title="Ветер">
+          <div style={{ fontSize: "9px", textTransform: "uppercase", color: "#94a3b8", letterSpacing: "0.3px" }}>Ветер</div>
+          <div style={{ fontWeight: 600 }}>{w.wind} м/с {windDir}</div>
+        </div>
+        <div title="Влажность">
+          <div style={{ fontSize: "9px", textTransform: "uppercase", color: "#94a3b8", letterSpacing: "0.3px" }}>Влажн.</div>
+          <div style={{ fontWeight: 600 }}>{w.hum}%</div>
+        </div>
+        <div title="Давление">
+          <div style={{ fontSize: "9px", textTransform: "uppercase", color: "#94a3b8", letterSpacing: "0.3px" }}>Давл.</div>
+          <div style={{ fontWeight: 600 }}>{w.press} мм</div>
+        </div>
+      </div>
+      {data.source === "live" && (
+        <div style={{ fontSize: "10px", color: "#94a3b8", textAlign: "right" }}>
+          open-meteo.com · обновлено сейчас
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** WMO weather code → emoji. */
+function weatherEmoji(code: number): string {
+  if (code === 0) return "☀️";
+  if (code <= 2) return "🌤️";
+  if (code === 3) return "☁️";
+  if (code >= 45 && code <= 48) return "🌫️";
+  if (code >= 51 && code <= 57) return "🌦️";
+  if (code >= 61 && code <= 67) return "🌧️";
+  if (code >= 71 && code <= 77) return "❄️";
+  if (code >= 80 && code <= 82) return "🌧️";
+  if (code >= 85 && code <= 86) return "🌨️";
+  if (code >= 95) return "⛈️";
+  return "🌡️";
+}
+
+/** Сокращение стороны света (С, Ю, В, З, СВ, ...) → читаемый вариант. */
+function windDirectionLabel(rumb: string): string {
+  const map: Record<string, string> = {
+    "С": "С", "ССВ": "ССВ", "СВ": "СВ", "ВСВ": "ВСВ",
+    "В": "В", "ВЮВ": "ВЮВ", "ЮВ": "ЮВ", "ЮЮВ": "ЮЮВ",
+    "Ю": "Ю", "ЮЮЗ": "ЮЮЗ", "ЮЗ": "ЮЗ", "ЗЮЗ": "ЗЮЗ",
+    "З": "З", "ЗСЗ": "ЗСЗ", "СЗ": "СЗ", "ССЗ": "ССЗ",
+  };
+  return map[rumb] ?? rumb;
 }
