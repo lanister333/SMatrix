@@ -314,7 +314,7 @@ const NAV_MAIN = [
  *  Один источник NAV_MORE для ПК и мобилки — интерфейс монолитен,
  *  дублирование списков исключено. */
 const NAV_MORE = [
-  { label: "Дома и СНТ", href: "/doma" },
+  { label: "Домовой ЧАТ", href: "/doma" },
   { label: "О проекте", href: "/about.php" },
   { label: "Правила форума", href: "/rules.php" },
   { label: "Обращение к администратору", href: "/feedback.php" },

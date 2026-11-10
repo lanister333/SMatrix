@@ -90,6 +90,9 @@ interface GridCell {
   /** У ячейки бизнеса пунктов нет — в белом поле ротатор баннеров
    *  (оба ведут на /startup.php — страница «Новый бизнес Сахалина»). */
   items?: string[];
+  /** 2026-11-10: fullSpan — ячейка растягивается на всю ширину колонки
+   *  (grid-column: 1 / -1), а не занимает 1 ячейку сетки. */
+  fullSpan?: boolean;
 }
 
 const BIZ_CELL_TITLE = "Поддержка молодого бизнеса";
@@ -173,9 +176,10 @@ const GRID_CELLS: GridCell[] = [
     // (ЗНАКОМСТВА / ДРУЖБА / ОБЩЕНИЕ), меняется каждые 6 сек.
   },
   {
-    title: "Дома и СНТ",
+    title: "Домовой ЧАТ",
     href: "/doma",
     icon: Home,
+    fullSpan: true,
     // 2026-11-10: домовые чаты по требованию.
     // Пользователь вводит адрес → создаётся чат дома с 3 ветками.
   },
@@ -563,7 +567,7 @@ const DATING_ROT_SLIDES = [
   },
 ];
 
-/* 2026-11-10: «Дома и СНТ» — домовые чаты по требованию.
+/* 2026-11-10: «Домовой ЧАТ» — домовые чаты по требованию.
    Подзаголовок: НАЙДИ СВОИХ СОСЕДЕЙ. */
 const HOUSE_ROT_SLIDES = [
   {
@@ -580,10 +584,17 @@ const HOUSE_ROT_SLIDES = [
           </radialGradient>
         </defs>
         <circle cx="40" cy="40" r="34" fill="url(#hs1-halo)" />
-        {/* дом */}
-        <path d="M40 18L18 36v26h16V48h12v14h16V36L40 18Z" fill="#ffffff" opacity="0.9" stroke="#ffffff" strokeWidth="1.4" strokeLinejoin="round" />
-        {/* дверь */}
-        <rect x="34" y="52" width="12" height="10" fill="#0a7d75" opacity="0.6" />
+        {/* несколько домов (город) */}
+        {/* дом 1 (левый, ниже) */}
+        <path d="M18 38L12 44v18h14V44L18 38Z" fill="#ffffff" opacity="0.85" stroke="#ffffff" strokeWidth="1.2" strokeLinejoin="round" />
+        <rect x="16" y="50" width="6" height="6" fill="#0a7d75" opacity="0.5" />
+        {/* дом 2 (центральный, выше — главный) */}
+        <path d="M40 20L28 32v30h24V32L40 20Z" fill="#ffffff" opacity="0.95" stroke="#ffffff" strokeWidth="1.4" strokeLinejoin="round" />
+        <rect x="36" y="48" width="8" height="14" fill="#0a7d75" opacity="0.6" />
+        <rect x="46" y="38" width="4" height="4" fill="#0a7d75" opacity="0.45" />
+        {/* дом 3 (правый, ниже) */}
+        <path d="M62 38L56 44v18h14V44L62 38Z" fill="#ffffff" opacity="0.85" stroke="#ffffff" strokeWidth="1.2" strokeLinejoin="round" />
+        <rect x="60" y="50" width="6" height="6" fill="#0a7d75" opacity="0.5" />
       </svg>
     ),
   },
@@ -2354,7 +2365,12 @@ export default function HomeCenter(props: {
           на страницу «Новый бизнес Сахалина» (/startup.php). */}
       <div className="mp-grid">
         {GRID_CELLS.map((c) => (
-          <section key={c.title} className="mp-panel mp-cell" aria-label={c.title}>
+          <section
+            key={c.title}
+            className={`mp-panel mp-cell${c.fullSpan ? " mp-cell-fullspan" : ""}`}
+            aria-label={c.title}
+            style={c.fullSpan ? { gridColumn: "1 / -1" } : undefined}
+          >
             <a className="mp-paneltitle mp-celltitle" href={c.href}>
               <c.icon size={14} strokeWidth={2.4} aria-hidden="true" />
               <span>{c.title}</span>
