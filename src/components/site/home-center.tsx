@@ -2387,7 +2387,7 @@ export default function HomeCenter(props: {
               <BizRotator onOpenStartup={openStartup} onOpenRegister={props.onOpenRegister} />
             ) : c.title === "Знакомства" ? (
               <DatingRotator onOpen={() => { window.location.href = c.href; }} />
-            ) : c.title === "Дома и СНТ" ? (
+            ) : c.title === "Домовой ЧАТ" ? (
               <HouseRotator onOpen={() => { window.location.href = c.href; }} />
             ) : c.title === "Объявления" ? (
               <AdsRotator onOpen={() => { window.location.href = c.href; }} />
