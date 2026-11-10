@@ -71,7 +71,7 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "desc" },
       take: 50,
       include: {
-        houseBranches: { select: { id: true } },
+        branches: { select: { id: true } },
       },
     });
 
@@ -82,7 +82,7 @@ export async function GET(req: NextRequest) {
         street: h.street,
         houseNumber: h.houseNumber,
         createdAt: h.createdAt,
-        branchesCount: h.houseBranches.length,
+        branchesCount: h.branches.length,
       })),
     });
   } catch (e) {
@@ -127,8 +127,8 @@ export async function POST(req: NextRequest) {
     const existing = await db.houseBlock.findFirst({
       where: { city, street, houseNumber },
       include: {
-        houseModerators: true,
-        houseBranches: true,
+        moderators: true,
+        branches: true,
       },
     });
 
@@ -136,12 +136,12 @@ export async function POST(req: NextRequest) {
       // Анти-вахтер: проверяем активность модераторов
       const THIRTY_DAYS_SEC = 30 * 24 * 60 * 60;
       const nowSec = Math.floor(Date.now() / 1000);
-      const activeMods = existing.houseModerators.filter(
+      const activeMods = existing.moderators.filter(
         (m) => nowSec - m.lastActionAt < THIRTY_DAYS_SEC,
       );
 
       if (activeMods.length === 0) {
-        const alreadyMod = existing.houseModerators.find(
+        const alreadyMod = existing.moderators.find(
           (m) => m.userId === user.id,
         );
         if (!alreadyMod) {
@@ -165,7 +165,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Обновляем lastActionAt текущего модератора
-      const myMod = existing.houseModerators.find((m) => m.userId === user.id);
+      const myMod = existing.moderators.find((m) => m.userId === user.id);
       if (myMod) {
         await db.houseModerator.update({
           where: { userId_houseId: { userId: user.id, houseId: existing.id } },
@@ -179,7 +179,7 @@ export async function POST(req: NextRequest) {
         city: existing.city,
         street: existing.street,
         houseNumber: existing.houseNumber,
-        branches: existing.houseBranches.map((b) => ({ id: b.id, title: b.title })),
+        branches: existing.branches.map((b) => ({ id: b.id, title: b.title })),
       });
     }
 

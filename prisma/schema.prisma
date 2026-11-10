@@ -1269,31 +1269,36 @@ model HouseBlock {
   creatorId   String   // ID пользователя-создателя
   createdAt   DateTime @default(now())
 
+  branches     HouseBranch[]     @relation("HouseBranches")
+  moderators   HouseModerator[]  @relation("HouseModerators")
+
   @@unique([city, street, houseNumber])
   @@index([city])
 }
 
 /// Стандартные ветки внутри дома (ЖКХ, Двор, Свободный чат).
-/// При создании дома автоматически создаются 3 ветки.
 model HouseBranch {
   id          String   @id @default(cuid())
   houseId     String
-  title       String   // «ЖКХ и Управляющая компания» и т.д.
+  title       String
   createdAt   DateTime @default(now())
+
+  house       HouseBlock @relation("HouseBranches", fields: [houseId], references: [id])
 
   @@index([houseId])
 }
 
 /// Локальные модераторы дома.
-/// Составной PK (userId + houseId) — один пользователь = одна запись на дом.
 model HouseModerator {
   userId         String
   houseId        String
-  isCreator      Int      @default(0)   // 1 = создатель дома
-  canPin         Int      @default(1)   // право закреплять темы
-  canDelete      Int      @default(1)   // право удалять сообщения
-  canClose       Int      @default(1)   // право закрывать темы
-  lastActionAt   Int      @default(0)   // Unix timestamp последнего действия
+  isCreator      Int      @default(0)
+  canPin         Int      @default(1)
+  canDelete      Int      @default(1)
+  canClose       Int      @default(1)
+  lastActionAt   Int      @default(0)
+
+  house       HouseBlock @relation("HouseModerators", fields: [houseId], references: [id])
 
   @@id([userId, houseId])
   @@index([houseId])

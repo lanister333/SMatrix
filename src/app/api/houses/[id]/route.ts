@@ -22,8 +22,8 @@ export async function GET(
     const house = await db.houseBlock.findUnique({
       where: { id },
       include: {
-        houseBranches: true,
-        houseModerators: true,
+        branches: true,
+        moderators: true,
       },
     });
 
@@ -33,7 +33,7 @@ export async function GET(
 
     // Обновляем lastActionAt текущего модератора
     if (user) {
-      const myMod = house.houseModerators.find((m) => m.userId === user.id);
+      const myMod = house.moderators.find((m) => m.userId === user.id);
       if (myMod) {
         await db.houseModerator.update({
           where: { userId_houseId: { userId: user.id, houseId: id } },
@@ -50,12 +50,12 @@ export async function GET(
         houseNumber: house.houseNumber,
         createdAt: house.createdAt,
       },
-      branches: house.houseBranches.map((b) => ({ id: b.id, title: b.title })),
+      branches: house.branches.map((b) => ({ id: b.id, title: b.title })),
       isModerator: user
-        ? house.houseModerators.some((m) => m.userId === user.id)
+        ? house.moderators.some((m) => m.userId === user.id)
         : false,
       isCreator: user
-        ? house.houseModerators.some(
+        ? house.moderators.some(
             (m) => m.userId === user.id && m.isCreator === 1,
           )
         : false,
