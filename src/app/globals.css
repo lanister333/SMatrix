@@ -11203,3 +11203,13 @@ article button[style*="color: #dc2626"] {
 @media (max-width: 480px) {
   .ts-head { padding: 4px 5px !important; }
 }
+
+/* 2026-11-10: NativeWeatherWidget — убираем фиксированную высоту 230px
+   (осталась от старого iframe meteoblue). Виджет теперь размером по контенту. */
+section[aria-label="Погода на Сахалине"] .mp-weather {
+  height: auto !important;
+  overflow: visible !important;
+}
+section[aria-label="Погода на Сахалине"] .mp-w-frame {
+  display: none !important;
+}
