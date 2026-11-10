@@ -87,8 +87,10 @@ export default function HousePage() {
       <div className="sm-page flex min-h-screen flex-col">
         <Masthead settings={settings} />
         <MainNav current="useful" isAdmin={isStaffRole(user?.role)} onNavigate={goNav} />
-        <div className="sk" style={{ minHeight: 0, flex: "1 0 auto", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <p style={{ fontSize: "16px", color: "#56657a" }}>Загрузка…</p>
+        <div className="sk" style={{ minHeight: 0, flex: "1 0 auto" }}>
+          <div style={{ width: "100%", maxWidth: 900, margin: "0 auto", padding: "16px", boxSizing: "border-box" }}>
+            <p style={{ fontSize: "16px", color: "#56657a", textAlign: "center" }}>Загрузка…</p>
+          </div>
         </div>
         <SiteFooter settings={settings} />
       </div>
@@ -101,20 +103,15 @@ export default function HousePage() {
         <Masthead settings={settings} />
         <MainNav current="useful" isAdmin={isStaffRole(user?.role)} onNavigate={goNav} />
         <div className="sk" style={{ minHeight: 0, flex: "1 0 auto" }}>
-          <div className="sk-shell">
-            <div className="sk-layout sk-layout-page main-grid-container">
-              <div className="sk-col-main center-column" style={{ maxWidth: 800, margin: "0 auto", width: "100%" }}>
-                <div className="sm-stub-home crt-back">Ошибка</div>
-                <div className="crt-body" style={{ padding: "24px", textAlign: "center" }}>
-                  <p style={{ color: "#c40000", fontSize: "16px" }}>{error}</p>
-                  <button
-                    onClick={() => router.push("/doma")}
-                    style={{ marginTop: "16px", color: "#0a5caa", textDecoration: "underline", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: "15px" }}
-                  >
-                    ← К списку домов
-                  </button>
-                </div>
-              </div>
+          <div style={{ width: "100%", maxWidth: 900, margin: "0 auto", padding: "16px", boxSizing: "border-box" }}>
+            <div style={{ padding: "24px", textAlign: "center" }}>
+              <p style={{ color: "#c40000", fontSize: "16px" }}>{error}</p>
+              <button
+                onClick={() => router.push("/doma")}
+                style={{ marginTop: "16px", color: "#0a5caa", textDecoration: "underline", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: "15px" }}
+              >
+                ← К списку домов
+              </button>
             </div>
           </div>
         </div>
@@ -133,15 +130,23 @@ export default function HousePage() {
       <MainNav current="useful" isAdmin={isStaffRole(user?.role)} onNavigate={goNav} />
       <div className="sk" style={{ minHeight: 0, flex: "1 0 auto" }}>
         <div className="sk-topbar">
-          <span className="tb-title">Домовой ЧАТ</span>
+          <span className="tb-title">Дома и СНТ — домовые чаты по требованию</span>
         </div>
-        <div className="sk-shell">
-          <div className="sk-layout sk-layout-page main-grid-container">
-            <div className="sk-col-main center-column" style={{ maxWidth: 800, margin: "0 auto", width: "100%" }}>
-              <div className="sm-stub-home crt-back" style={{ borderBottom: "3px solid #0a7d75" }}>
-                🏠 {fullAddress}
-              </div>
-              <div className="crt-body" style={{ padding: "16px" }}>
+        <div style={{ width: "100%", maxWidth: 900, margin: "0 auto", padding: "16px", boxSizing: "border-box" }}>
+          <div style={{
+            background: "#fff",
+            border: "1px solid #4A688C",
+            borderBottom: "3px solid #0a7d75",
+            borderRadius: "4px",
+            padding: "14px 20px",
+            fontSize: "16px",
+            fontWeight: 700,
+            color: "#1E3A5F",
+            marginBottom: "16px",
+          }}>
+            🏠 {fullAddress}
+          </div>
+          <div style={{ padding: "0 4px" }}>
                 {isModerator && (
                   <div style={{
                     display: "inline-block",
@@ -204,8 +209,6 @@ export default function HousePage() {
                     ← К списку домов
                   </button>
                 </div>
-              </div>
-            </div>
           </div>
         </div>
         <SiteFooter settings={settings} />

@@ -908,7 +908,7 @@ export function SiteFooter(props: { settings?: SiteSettings | null; onNavigate?:
           <div className="mp-footer-disc">Публикации пользователей отражают их личный опыт и не являются официальной позицией SakhMatrix.</div>
         </div>
         <div className="mp-footer-right">
-          <div>© 2025 SakhMatrix. Все права защищены.</div>
+          <div>© 2026 SakhMatrix. Все права защищены.</div>
           <div>
             Версия 1.0 | <a {...linkProps("about", "/?view=about")}>Техническая информация</a>
           </div>

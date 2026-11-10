@@ -162,155 +162,148 @@ export default function DomaPage() {
       <MainNav current="useful" isAdmin={isStaffRole(user?.role)} onNavigate={goNav} />
       <div className="sk" style={{ minHeight: 0, flex: "1 0 auto" }}>
         <div className="sk-topbar">
-          <span className="tb-title">Домовой ЧАТ</span>
+          <span className="tb-title">Дома и СНТ — домовые чаты по требованию</span>
         </div>
         <div className="sk-shell">
-          <div className="sk-layout sk-layout-page main-grid-container">
-            <div className="sk-col-main center-column" style={{ maxWidth: 800, margin: "0 auto", width: "100%" }}>
-              <div className="sm-stub-home crt-back" style={{ borderBottom: "3px solid #0a7d75" }}>
-                Домовой ЧАТ — домовые чаты по требованию
+          {/* Полноширинный контейнер — без левой/правой колонки */}
+          <div style={{ width: "100%", maxWidth: 900, margin: "0 auto", padding: "16px", boxSizing: "border-box" }}>
+
+            {/* Две колонки на широких экранах, одна под другой на узких */}
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)",
+              gap: "16px",
+              marginBottom: "20px",
+            }}>
+              {/* Левая колонка — инструкция */}
+              <div style={{
+                background: "#f0f9ff",
+                border: "1px solid #bae6fd",
+                borderRadius: "6px",
+                padding: "16px 20px",
+                fontSize: "14px",
+                lineHeight: 1.7,
+                color: "#0c4a6e",
+                boxSizing: "border-box",
+              }}>
+                <b style={{ fontSize: "16px", display: "block", marginBottom: "10px" }}>Как это работает:</b>
+                <ul style={{ margin: "0", padding: "0 0 0 18px", listStyle: "disc" }}>
+                  <li style={{ marginBottom: "8px" }}>Введите свой адрес — город, улицу и номер дома.</li>
+                  <li style={{ marginBottom: "8px" }}>Если чат дома уже создан соседом — вас перенаправит внутрь.</li>
+                  <li style={{ marginBottom: "8px" }}>Если дома ещё нет — он создаётся автоматически, вы становитесь модератором.</li>
+                  <li style={{ marginBottom: "0" }}>Внутри дома 3 ветки: «ЖКХ и УК», «Благоустройство двора», «Свободный чат».</li>
+                </ul>
               </div>
-              <div className="crt-body" style={{ padding: "16px" }}>
-                {/* Инструкция */}
-                <div style={{
-                  background: "#f0f9ff",
-                  border: "1px solid #bae6fd",
-                  borderRadius: "6px",
-                  padding: "14px 18px",
-                  marginBottom: "20px",
-                  fontSize: "14px",
-                  lineHeight: 1.7,
-                  color: "#0c4a6e",
+
+              {/* Правая колонка — форма */}
+              <form onSubmit={handleSubmit} style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "12px",
+                background: "#fff",
+                border: "1px solid #4A688C",
+                borderRadius: "6px",
+                padding: "16px 20px",
+                boxSizing: "border-box",
+              }}>
+                <div>
+                  <label style={labelStyle}>Город / населённый пункт</label>
+                  <select value={city} onChange={(e) => setCity(e.target.value)} style={inputStyle}>
+                    <option value="">— Выберите город —</option>
+                    {CITIES.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label style={labelStyle}>Улица</label>
+                  <input type="text" value={street} onChange={(e) => setStreet(e.target.value)} placeholder="Например: Ленина" style={inputStyle} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Номер дома</label>
+                  <input type="text" value={houseNumber} onChange={(e) => setHouseNumber(e.target.value)} placeholder="Например: 15 или 15А" style={inputStyle} />
+                </div>
+                {error && (
+                  <div style={{ color: "#c40000", fontSize: "14px", fontWeight: 600 }}>{error}</div>
+                )}
+                <button type="submit" disabled={loading} style={{
+                  padding: "12px 24px",
+                  background: "#0a7d75",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "4px",
+                  fontSize: "16px",
+                  fontWeight: 700,
+                  fontFamily: "inherit",
+                  cursor: loading ? "wait" : "pointer",
+                  width: "100%",
+                  boxSizing: "border-box",
+                  marginTop: "4px",
                 }}>
-                  <b style={{ fontSize: "15px", display: "block", marginBottom: "8px" }}>Как это работает:</b>
-                  <ul style={{ margin: "0", padding: "0 0 0 20px", listStyle: "disc" }}>
-                    <li style={{ marginBottom: "6px" }}>Введите свой адрес — город, улицу и номер дома.</li>
-                    <li style={{ marginBottom: "6px" }}>Если чат дома уже создан соседом — вас перенаправит внутрь.</li>
-                    <li style={{ marginBottom: "6px" }}>Если дома ещё нет — он создаётся автоматически, вы становитесь модератором.</li>
-                    <li style={{ marginBottom: "0" }}>Внутри дома 3 ветки: «ЖКХ и УК», «Благоустройство двора», «Свободный чат».</li>
-                  </ul>
-                </div>
+                  {loading ? "Обработка…" : "Перейти в чат дома →"}
+                </button>
+              </form>
+            </div>
 
-                {/* Форма */}
-                <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-                  <div>
-                    <label style={labelStyle}>Город / населённый пункт</label>
-                    <select
-                      value={city}
-                      onChange={(e) => setCity(e.target.value)}
-                      style={inputStyle}
+            {/* Список существующих домов — на всю ширину */}
+            <div>
+              <h2 style={{ fontSize: "17px", fontWeight: 700, color: "#1E3A5F", marginBottom: "10px" }}>
+                Уже созданные дома ({houses.length})
+              </h2>
+              <input
+                type="text"
+                value={searchQ}
+                onChange={(e) => setSearchQ(e.target.value)}
+                placeholder="Поиск по адресу…"
+                style={{
+                  width: "100%",
+                  padding: "10px 12px",
+                  border: "1px solid #c0cad8",
+                  borderRadius: "4px",
+                  fontSize: "15px",
+                  marginBottom: "10px",
+                  fontFamily: "inherit",
+                  boxSizing: "border-box",
+                }}
+              />
+              {filtered.length === 0 ? (
+                <div style={{ padding: "24px", textAlign: "center", color: "#56657a", fontSize: "14px" }}>
+                  {houses.length === 0 ? "Пока ни один дом не создан. Будьте первым!" : "Ничего не найдено."}
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  {filtered.map((h) => (
+                    <button
+                      key={h.id}
+                      onClick={() => router.push(`/doma/${h.id}`)}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        padding: "12px 16px",
+                        background: "#fff",
+                        border: "1px solid #d0d9e6",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                        fontSize: "15px",
+                        fontFamily: "inherit",
+                        textAlign: "left",
+                        width: "100%",
+                        boxSizing: "border-box",
+                      }}
                     >
-                      <option value="">— Выберите город —</option>
-                      {CITIES.map((c) => (
-                        <option key={c} value={c}>{c}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Улица</label>
-                    <input
-                      type="text"
-                      value={street}
-                      onChange={(e) => setStreet(e.target.value)}
-                      placeholder="Например: Ленина"
-                      style={inputStyle}
-                    />
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Номер дома</label>
-                    <input
-                      type="text"
-                      value={houseNumber}
-                      onChange={(e) => setHouseNumber(e.target.value)}
-                      placeholder="Например: 15 или 15А"
-                      style={inputStyle}
-                    />
-                  </div>
-                  {error && (
-                    <div style={{ color: "#c40000", fontSize: "14px", fontWeight: 600 }}>{error}</div>
-                  )}
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    style={{
-                      padding: "12px 24px",
-                      background: "#0a7d75",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: "4px",
-                      fontSize: "16px",
-                      fontWeight: 700,
-                      fontFamily: "inherit",
-                      cursor: loading ? "wait" : "pointer",
-                      width: "100%",
-                      boxSizing: "border-box",
-                    }}
-                  >
-                    {loading ? "Обработка…" : "Перейти в чат дома →"}
-                  </button>
-                </form>
-
-                {/* Список существующих домов */}
-                <div style={{ marginTop: "28px" }}>
-                  <h2 style={{ fontSize: "17px", fontWeight: 700, color: "#1E3A5F", marginBottom: "10px" }}>
-                    Уже созданные дома ({houses.length})
-                  </h2>
-                  <input
-                    type="text"
-                    value={searchQ}
-                    onChange={(e) => setSearchQ(e.target.value)}
-                    placeholder="Поиск по адресу…"
-                    style={{
-                      width: "100%",
-                      padding: "10px 12px",
-                      border: "1px solid #c0cad8",
-                      borderRadius: "4px",
-                      fontSize: "15px",
-                      marginBottom: "10px",
-                      fontFamily: "inherit",
-                      boxSizing: "border-box",
-                    }}
-                  />
-                  {filtered.length === 0 ? (
-                    <div style={{ padding: "24px", textAlign: "center", color: "#56657a", fontSize: "14px" }}>
-                      {houses.length === 0 ? "Пока ни один дом не создан. Будьте первым!" : "Ничего не найдено."}
-                    </div>
-                  ) : (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                      {filtered.map((h) => (
-                        <button
-                          key={h.id}
-                          onClick={() => router.push(`/doma/${h.id}`)}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            padding: "12px 16px",
-                            background: "#fff",
-                            border: "1px solid #d0d9e6",
-                            borderRadius: "4px",
-                            cursor: "pointer",
-                            fontSize: "15px",
-                            fontFamily: "inherit",
-                            textAlign: "left",
-                            width: "100%",
-                            boxSizing: "border-box",
-                          }}
-                        >
-                          <span>
-                            <b style={{ color: "#1E3A5F" }}>{h.city}</b>
-                            {" — "}
-                            {h.street}, {h.houseNumber}
-                          </span>
-                          <span style={{ fontSize: "13px", color: "#56657a", flexShrink: 0, marginLeft: "8px" }}>
-                            {h.branchesCount} ветки
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                      <span>
+                        <b style={{ color: "#1E3A5F" }}>{h.city}</b>
+                        {" — "}
+                        {h.street}, {h.houseNumber}
+                      </span>
+                      <span style={{ fontSize: "13px", color: "#56657a", flexShrink: 0, marginLeft: "8px" }}>
+                        {h.branchesCount} ветки
+                      </span>
+                    </button>
+                  ))}
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
