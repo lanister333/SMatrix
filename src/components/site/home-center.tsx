@@ -577,24 +577,17 @@ const HOUSE_ROT_SLIDES = [
     bg: "linear-gradient(135deg,#0a7d75 0%,#0c4a6e 100%)",
     icon: (
       <svg viewBox="0 0 80 80" width={80} height={80} aria-hidden="true">
-        <defs>
-          <radialGradient id="hs1-halo" cx="0.5" cy="0.5" r="0.5">
-            <stop offset="0" stopColor="#ffffff" stopOpacity="0.28" />
-            <stop offset="1" stopColor="#ffffff" stopOpacity="0" />
-          </radialGradient>
-        </defs>
-        <circle cx="40" cy="40" r="34" fill="url(#hs1-halo)" />
-        {/* несколько домов (город) */}
+        {/* несколько домов (город) — тёмные цвета на светлом фоне */}
         {/* дом 1 (левый, ниже) */}
-        <path d="M18 38L12 44v18h14V44L18 38Z" fill="#ffffff" opacity="0.85" stroke="#ffffff" strokeWidth="1.2" strokeLinejoin="round" />
-        <rect x="16" y="50" width="6" height="6" fill="#0a7d75" opacity="0.5" />
+        <path d="M18 38L12 44v18h14V44L18 38Z" fill="#0a7d75" opacity="0.7" stroke="#0a7d75" strokeWidth="1.2" strokeLinejoin="round" />
+        <rect x="16" y="50" width="6" height="6" fill="#ffffff" opacity="0.9" />
         {/* дом 2 (центральный, выше — главный) */}
-        <path d="M40 20L28 32v30h24V32L40 20Z" fill="#ffffff" opacity="0.95" stroke="#ffffff" strokeWidth="1.4" strokeLinejoin="round" />
-        <rect x="36" y="48" width="8" height="14" fill="#0a7d75" opacity="0.6" />
-        <rect x="46" y="38" width="4" height="4" fill="#0a7d75" opacity="0.45" />
+        <path d="M40 20L28 32v30h24V32L40 20Z" fill="#0c4a6e" opacity="0.85" stroke="#0c4a6e" strokeWidth="1.4" strokeLinejoin="round" />
+        <rect x="36" y="48" width="8" height="14" fill="#ffffff" opacity="0.9" />
+        <rect x="46" y="38" width="4" height="4" fill="#ffffff" opacity="0.8" />
         {/* дом 3 (правый, ниже) */}
-        <path d="M62 38L56 44v18h14V44L62 38Z" fill="#ffffff" opacity="0.85" stroke="#ffffff" strokeWidth="1.2" strokeLinejoin="round" />
-        <rect x="60" y="50" width="6" height="6" fill="#0a7d75" opacity="0.5" />
+        <path d="M62 38L56 44v18h14V44L62 38Z" fill="#0a7d75" opacity="0.7" stroke="#0a7d75" strokeWidth="1.2" strokeLinejoin="round" />
+        <rect x="60" y="50" width="6" height="6" fill="#ffffff" opacity="0.9" />
       </svg>
     ),
   },
