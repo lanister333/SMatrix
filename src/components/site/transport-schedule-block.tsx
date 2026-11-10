@@ -114,7 +114,10 @@ export default function TransportScheduleBlock() {
   const headStyle: React.CSSProperties = {
     backgroundColor: "#1E3A5F",
     color: "#FFFFFF",
-    padding: "3px 9px",
+    // 2026-11-10: padding приведён к эталону .mp-paneltitle (5px 9px на
+    // десктопе, 4px 5px на мобиле ≤480px) — раньше было 3px 9px, шапка
+    // была ниже соседних блоков.
+    padding: "5px 9px",
     fontWeight: 700,
     fontSize: "13px",
     textAlign: "center",
@@ -146,7 +149,7 @@ export default function TransportScheduleBlock() {
 
   return (
     <section style={cardStyle} aria-label="Расписание транспорта">
-      <div style={headStyle}>🚍 Расписание транспорта</div>
+      <div style={headStyle} className="ts-head">🚍 Расписание транспорта</div>
 
       <div style={bodyStyle}>
         <div style={tabsWrapStyle}>

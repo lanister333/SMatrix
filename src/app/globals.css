@@ -11196,3 +11196,10 @@ article button[style*="color: #dc2626"] {
     padding-left:10px;
   }
 }
+
+/* 2026-11-10: шапка «Расписание транспорта» — тот же padding, что у
+   эталонной .mp-paneltitle на мобиле (4px 5px). На десктопе padding
+   задаётся инлайн в headStyle компонента (5px 9px). */
+@media (max-width: 480px) {
+  .ts-head { padding: 4px 5px !important; }
+}
