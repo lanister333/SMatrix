@@ -168,6 +168,19 @@ export default function DomaPage() {
           {/* Полноширинный контейнер — без левой/правой колонки */}
           <div style={{ width: "100%", maxWidth: 900, margin: "0 auto", padding: "16px", boxSizing: "border-box" }}>
 
+            {/* Заголовок страницы */}
+            <h1 style={{
+              fontSize: "22px",
+              fontWeight: 700,
+              color: "#1E3A5F",
+              margin: "0 0 16px",
+              padding: "0 0 10px",
+              borderBottom: "2px solid #0a7d75",
+              lineHeight: 1.3,
+            }}>
+              Дома и СНТ — домовые чаты по требованию
+            </h1>
+
             {/* Две колонки на широких экранах, одна под другой на узких */}
             <div style={{
               display: "grid",
