@@ -1257,3 +1257,44 @@ model BotReplyQueue {
   @@index([section, postId])
 }
 
+
+/// 2026-11-10: «Дома и СНТ» — домовые чаты по требованию.
+/// Пользователь вводит адрес → если дом есть, редирект в него;
+/// если нет — создаётся дом с 3 ветками и пользователь становится модератором.
+model HouseBlock {
+  id          String   @id @default(cuid())
+  city        String   // нормализованный (lower, trim)
+  street      String   // нормализованный
+  houseNumber String   // нормализованный
+  creatorId   String   // ID пользователя-создателя
+  createdAt   DateTime @default(now())
+
+  @@unique([city, street, houseNumber])
+  @@index([city])
+}
+
+/// Стандартные ветки внутри дома (ЖКХ, Двор, Свободный чат).
+/// При создании дома автоматически создаются 3 ветки.
+model HouseBranch {
+  id          String   @id @default(cuid())
+  houseId     String
+  title       String   // «ЖКХ и Управляющая компания» и т.д.
+  createdAt   DateTime @default(now())
+
+  @@index([houseId])
+}
+
+/// Локальные модераторы дома.
+/// Составной PK (userId + houseId) — один пользователь = одна запись на дом.
+model HouseModerator {
+  userId         String
+  houseId        String
+  isCreator      Int      @default(0)   // 1 = создатель дома
+  canPin         Int      @default(1)   // право закреплять темы
+  canDelete      Int      @default(1)   // право удалять сообщения
+  canClose       Int      @default(1)   // право закрывать темы
+  lastActionAt   Int      @default(0)   // Unix timestamp последнего действия
+
+  @@id([userId, houseId])
+  @@index([houseId])
+}

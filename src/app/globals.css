@@ -11261,3 +11261,10 @@ section[aria-label="Погода на Сахалине"] .mp-w-frame {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
 }
+
+/* 2026-11-10: Визуальный акцент для карточки «Дома и СНТ» —
+   бирюзовая рамка, чтобы не терялась внизу сетки. */
+.mp-cell[aria-label="Дома и СНТ"] {
+  border: 2px solid #0a7d75 !important;
+  box-shadow: 0 2px 8px rgba(10,125,117,0.15) !important;
+}

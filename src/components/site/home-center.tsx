@@ -23,6 +23,7 @@ import {
   Hammer,
   Heart,
   HeartHandshake,
+  Home,
   Megaphone,
   ShoppingCart,
   Store,
@@ -170,6 +171,13 @@ const GRID_CELLS: GridCell[] = [
     icon: Heart,
     // 2026-10-05: вместо списка пунктов — ротатор из 3 банеров
     // (ЗНАКОМСТВА / ДРУЖБА / ОБЩЕНИЕ), меняется каждые 6 сек.
+  },
+  {
+    title: "Дома и СНТ",
+    href: "/doma",
+    icon: Home,
+    // 2026-11-10: домовые чаты по требованию.
+    // Пользователь вводит адрес → создаётся чат дома с 3 ветками.
   },
 ];
 
@@ -554,6 +562,47 @@ const DATING_ROT_SLIDES = [
     ),
   },
 ];
+
+/* 2026-11-10: «Дома и СНТ» — домовые чаты по требованию.
+   Подзаголовок: НАЙДИ СВОИХ СОСЕДЕЙ. */
+const HOUSE_ROT_SLIDES = [
+  {
+    key: "neighbors",
+    title: "НАЙДИ СВОИХ СОСЕДЕЙ",
+    sub: "Введи свой адрес — создай ветку дома и решай вопросы двора вместе",
+    bg: "linear-gradient(135deg,#0a7d75 0%,#0c4a6e 100%)",
+    icon: (
+      <svg viewBox="0 0 80 80" width={80} height={80} aria-hidden="true">
+        <defs>
+          <radialGradient id="hs1-halo" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0" stopColor="#ffffff" stopOpacity="0.28" />
+            <stop offset="1" stopColor="#ffffff" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        <circle cx="40" cy="40" r="34" fill="url(#hs1-halo)" />
+        {/* дом */}
+        <path d="M40 18L18 36v26h16V48h12v14h16V36L40 18Z" fill="#ffffff" opacity="0.9" stroke="#ffffff" strokeWidth="1.4" strokeLinejoin="round" />
+        {/* дверь */}
+        <rect x="34" y="52" width="12" height="10" fill="#0a7d75" opacity="0.6" />
+      </svg>
+    ),
+  },
+];
+
+function HouseRotator({ onOpen }: { onOpen: () => void }) {
+  const s = HOUSE_ROT_SLIDES[0];
+  return (
+    <div className="biz-rot" style={{ background: s.bg }}>
+      <button type="button" className="biz-rot-slide biz-rot-fade" onClick={onOpen}>
+        <span className="biz-rot-ico">{s.icon}</span>
+        <span className="biz-rot-txt">
+          <span className="biz-rot-h">{s.title}</span>
+          <span className="biz-rot-sub">{s.sub}</span>
+        </span>
+      </button>
+    </div>
+  );
+}
 
 function DatingRotator({ onOpen }: { onOpen: () => void }) {
   const [slide, setSlide] = useState(() => Math.floor(Math.random() * DATING_ROT_SLIDES.length));
@@ -2322,6 +2371,8 @@ export default function HomeCenter(props: {
               <BizRotator onOpenStartup={openStartup} onOpenRegister={props.onOpenRegister} />
             ) : c.title === "Знакомства" ? (
               <DatingRotator onOpen={() => { window.location.href = c.href; }} />
+            ) : c.title === "Дома и СНТ" ? (
+              <HouseRotator onOpen={() => { window.location.href = c.href; }} />
             ) : c.title === "Объявления" ? (
               <AdsRotator onOpen={() => { window.location.href = c.href; }} />
             ) : c.title === "ЖКХ и городские проблемы" ? (
