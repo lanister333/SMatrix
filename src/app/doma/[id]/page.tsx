@@ -11,6 +11,7 @@ import {
   useAuth,
   type SiteSettings,
 } from "@/components/site/chrome";
+import { AUTH_KEY } from "@/lib/ui";
 
 const NAV_ROUTES: Record<string, string> = {
   home: "/",
@@ -65,7 +66,14 @@ export default function HousePage() {
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem("forum_token") || "";
+    let token = "";
+    try {
+      const raw = localStorage.getItem(AUTH_KEY);
+      if (raw) {
+        const saved = JSON.parse(raw);
+        token = saved.token || "";
+      }
+    } catch {}
     fetch(`/api/houses/${params.id}?token=${encodeURIComponent(token)}`)
       .then(async (r) => {
         const d = await r.json();
@@ -129,9 +137,6 @@ export default function HousePage() {
       <Masthead settings={settings} />
       <MainNav current="useful" isAdmin={isStaffRole(user?.role)} onNavigate={goNav} />
       <div className="sk" style={{ minHeight: 0, flex: "1 0 auto" }}>
-        <div className="sk-topbar">
-          <span className="tb-title">Дома и СНТ — домовые чаты по требованию</span>
-        </div>
         <div style={{ width: "100%", maxWidth: 900, margin: "0 auto", padding: "16px", boxSizing: "border-box" }}>
           <div style={{
             background: "#fff",

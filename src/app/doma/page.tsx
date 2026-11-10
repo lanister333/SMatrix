@@ -11,6 +11,7 @@ import {
   useAuth,
   type SiteSettings,
 } from "@/components/site/chrome";
+import { AUTH_KEY } from "@/lib/ui";
 
 interface HouseListItem {
   id: string;
@@ -85,8 +86,13 @@ export default function DomaPage() {
   }, []);
 
   useEffect(() => {
-    const t = localStorage.getItem("forum_token") || "";
-    setToken(t);
+    try {
+      const raw = localStorage.getItem(AUTH_KEY);
+      if (raw) {
+        const saved = JSON.parse(raw);
+        if (saved.token) setToken(saved.token);
+      }
+    } catch {}
   }, []);
 
   useEffect(() => {
@@ -114,7 +120,7 @@ export default function DomaPage() {
     e.preventDefault();
     setError("");
     if (!token) {
-      setError("Нужно войти на форум, чтобы создать или открыть чат дома.");
+      setError("Чтобы создать новый чат дома, нужно войти на форум. Уже созданные дома доступны для просмотра всем.");
       return;
     }
     if (!city || !street || !houseNumber) {
@@ -161,14 +167,11 @@ export default function DomaPage() {
       <Masthead settings={settings} />
       <MainNav current="useful" isAdmin={isStaffRole(user?.role)} onNavigate={goNav} />
       <div className="sk" style={{ minHeight: 0, flex: "1 0 auto" }}>
-        <div className="sk-topbar">
-          <span className="tb-title">Дома и СНТ — домовые чаты по требованию</span>
-        </div>
         <div className="sk-shell">
           {/* Полноширинный контейнер — без левой/правой колонки */}
           <div style={{ width: "100%", maxWidth: 900, margin: "0 auto", padding: "16px", boxSizing: "border-box" }}>
 
-            {/* Заголовок страницы */}
+            {/* Заголовок страницы (единственный — синюю плашку убрали, чтобы не дублировалось) */}
             <h1 style={{
               fontSize: "22px",
               fontWeight: 700,
