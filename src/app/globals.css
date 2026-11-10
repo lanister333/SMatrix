@@ -11251,3 +11251,13 @@ section[aria-label="Погода на Сахалине"] .mp-w-frame {
     margin-bottom: 0 !important;
   }
 }
+
+/* 2026-11-10: Фикс неравномерного gap в mp-grid.
+   Cell 0 (Поддержка молодого бизнеса) наследовал margin-bottom:10px
+   от .mp-panel, а остальные cells имели margin-bottom:0 от .mp-cell.
+   Result: gap 0→1 = 21px, gap 1→2 = 11px. Принудительно margin:0
+   для всех mp-cell — теперь grid gap единый. */
+.mp-grid > .mp-cell {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
