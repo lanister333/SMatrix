@@ -121,11 +121,6 @@ export function Masthead(props: { settings: SiteSettings }) {
   // активной кнопки; для мобайла (≤480px, полоса скрыта) полоска вернута
   // правилом .sm-masthead в существующем @media-блоке globals.css
   return (
-    <>
-    {/* 2026-11-10: «Срочно» — бегущая строка в самом верху сайта.
-        Невидима по умолчанию (urgentBannerEnabled !== "1").
-        Включается через админку: Настройки сайта → «Срочная строка». */}
-    <UrgentBanner settings={props.settings} />
     <header
       className="w-full sm-masthead"
       /* ТЗ 2026-09-21 «шапку сайта окрась в цвет как у блока поддержка
@@ -255,25 +250,30 @@ export function Masthead(props: { settings: SiteSettings }) {
         </div>
       </div>
     </header>
-    </>
   );
 }
 
 /**
- * 2026-11-10: UrgentBanner — «СРОЧНО» бегущая строка в самом верху сайта.
+ * 2026-11-10: UrgentBanner — «СРОЧНО» бегущая строка.
+ * Самостоятельный компонент: сам подтягивает настройки из /api/bootstrap
+ * (чтобы не прокидывать settings во все 20+ страниц через MainNav).
  *
  * Невидима по умолчанию. Появляется только когда владелец включил её
  * через админку (Настройки сайта → «Срочная строка включена»).
  *
- * Реализация:
- *   - красный фон #B22335, белый текст
- *   - CSS-анимация marquee (бегущая строка) — текст уезжает справа налево
- *   - одна строка высотой ~26px, на всю ширину
- *   - если текст пустой — плашка не показывается даже при enabled=1
+ * Размещается ПОД синей шапкой (MainNav) — рендерится в конце MainNav.
  */
-export function UrgentBanner(props: { settings: SiteSettings }) {
-  const enabled = (props.settings.urgentBannerEnabled ?? "0") === "1";
-  const text = (props.settings.urgentBannerText ?? "").trim();
+export function UrgentBanner() {
+  const [settings, setSettings] = useState<SiteSettings | null>(null);
+  useEffect(() => {
+    fetch("/api/bootstrap")
+      .then((r) => r.json())
+      .then((d) => { if (d?.settings) setSettings({ ...DEFAULT_SETTINGS, ...d.settings }); })
+      .catch(() => {});
+  }, []);
+  if (!settings) return null;
+  const enabled = (settings.urgentBannerEnabled ?? "0") === "1";
+  const text = (settings.urgentBannerText ?? "").trim();
   if (!enabled || !text) return null;
   return (
     <div className="sm-urgent-banner" role="alert" aria-live="polite">
@@ -732,6 +732,11 @@ export function MainNav(props: {
         </div>
       </div>
       </nav>
+      {/* 2026-11-10: «СРОЧНО» — бегущая строка ПОД синей шапкой (MainNav).
+          Самостоятельный компонент: сам подтягивает настройки из /api/bootstrap.
+          Невидима по умолчанию — появляется только когда владелец включил её
+          через админку (Настройки сайта → «Срочная строка»). */}
+      <UrgentBanner />
       {/* СТАДИЯ 1/Шаги 3-4 (только ≤480px, см. CSS): левая шторка — все навигационные
           ссылки и кнопки «Войти»/«Зарегистрироваться»; подпункты «Ещё» — аккордеоном,
           без десктопного position:absolute. Монтируется только в открытом состоянии.
