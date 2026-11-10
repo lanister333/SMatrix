@@ -71,7 +71,7 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "desc" },
       take: 50,
       include: {
-        _count: { select: { houseBranches: true } },
+        houseBranches: { select: { id: true } },
       },
     });
 
@@ -82,7 +82,7 @@ export async function GET(req: NextRequest) {
         street: h.street,
         houseNumber: h.houseNumber,
         createdAt: h.createdAt,
-        branchesCount: h._count.houseBranches,
+        branchesCount: h.houseBranches.length,
       })),
     });
   } catch (e) {
