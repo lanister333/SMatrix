@@ -2,6 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  DEFAULT_SETTINGS,
+  isStaffRole,
+  MainNav,
+  Masthead,
+  SiteFooter,
+  useAuth,
+  type SiteSettings,
+} from "@/components/site/chrome";
 
 interface HouseListItem {
   id: string;
@@ -10,6 +19,25 @@ interface HouseListItem {
   houseNumber: string;
   branchesCount: number;
 }
+
+const NAV_ROUTES: Record<string, string> = {
+  home: "/",
+  forum: "/?view=forum",
+  ads: "/obyavleniya",
+  podslyshano: "/podslyshano",
+  wheretobuy: "/gde-kupit",
+  gdedeshevle: "/gde-deshevle",
+  recommend: "/rekomenduyu",
+  employers: "/o-rabotodatelyah",
+  gkh: "/gkh",
+  help: "/help",
+  dating: "/znakomstva",
+  weather: "/weather.php",
+  currency: "/currency.php",
+  disconnections: "/disconnections.php",
+  traffic: "/traffic.php",
+  transport: "/transport.php",
+};
 
 const CITIES = [
   "Южно-Сахалинск",
@@ -36,6 +64,8 @@ const CITIES = [
 
 export default function DomaPage() {
   const router = useRouter();
+  const { user } = useAuth();
+  const [settings, setSettings] = useState<SiteSettings>(DEFAULT_SETTINGS);
   const [token, setToken] = useState<string | null>(null);
   const [city, setCity] = useState("");
   const [street, setStreet] = useState("");
@@ -46,11 +76,19 @@ export default function DomaPage() {
   const [searchQ, setSearchQ] = useState("");
 
   useEffect(() => {
+    fetch("/api/bootstrap")
+      .then((r) => r.json())
+      .then((r) => {
+        if (r.settings) setSettings({ ...DEFAULT_SETTINGS, ...r.settings });
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
     const t = localStorage.getItem("forum_token") || "";
     setToken(t);
   }, []);
 
-  // Load existing houses
   useEffect(() => {
     fetch("/api/houses")
       .then((r) => r.json())
@@ -58,7 +96,10 @@ export default function DomaPage() {
       .catch(() => {});
   }, []);
 
-  // Filter houses by search
+  const goNav = (k: string) => {
+    window.location.href = NAV_ROUTES[k] ?? "/";
+  };
+
   const filtered = houses.filter((h) => {
     if (!searchQ.trim()) return true;
     const q = searchQ.trim().toLowerCase();
@@ -97,17 +138,37 @@ export default function DomaPage() {
     }
   };
 
+  const inputStyle: React.CSSProperties = {
+    width: "100%",
+    padding: "10px 12px",
+    border: "1px solid #4A688C",
+    borderRadius: "4px",
+    fontSize: "15px",
+    fontFamily: "inherit",
+    boxSizing: "border-box",
+  };
+
+  const labelStyle: React.CSSProperties = {
+    display: "block",
+    fontSize: "14px",
+    fontWeight: 700,
+    color: "#1E3A5F",
+    marginBottom: "5px",
+  };
+
   return (
     <div className="sm-page flex min-h-screen flex-col">
-      <div className="sk">
+      <Masthead settings={settings} />
+      <MainNav current="useful" isAdmin={isStaffRole(user?.role)} onNavigate={goNav} />
+      <div className="sk" style={{ minHeight: 0, flex: "1 0 auto" }}>
         <div className="sk-topbar">
-          <span className="tb-title">Дома и СНТ</span>
+          <span className="tb-title">Домовой ЧАТ</span>
         </div>
         <div className="sk-shell">
           <div className="sk-layout sk-layout-page main-grid-container">
-            <div className="sk-col-main center-column" style={{ maxWidth: 700, margin: "0 auto" }}>
+            <div className="sk-col-main center-column" style={{ maxWidth: 800, margin: "0 auto", width: "100%" }}>
               <div className="sm-stub-home crt-back" style={{ borderBottom: "3px solid #0a7d75" }}>
-                Дома и СНТ — домовые чаты по требованию
+                Домовой ЧАТ — домовые чаты по требованию
               </div>
               <div className="crt-body" style={{ padding: "16px" }}>
                 {/* Инструкция */}
@@ -115,38 +176,29 @@ export default function DomaPage() {
                   background: "#f0f9ff",
                   border: "1px solid #bae6fd",
                   borderRadius: "6px",
-                  padding: "12px 16px",
+                  padding: "14px 18px",
                   marginBottom: "20px",
                   fontSize: "14px",
-                  lineHeight: 1.6,
+                  lineHeight: 1.7,
                   color: "#0c4a6e",
                 }}>
-                  <b>Как это работает:</b>
-                  <ol style={{ margin: "8px 0 0 20px", padding: 0 }}>
-                    <li>Введите свой адрес (город, улицу, номер дома).</li>
-                    <li>Если чат дома уже создан соседом — вас перенаправит внутрь.</li>
-                    <li>Если дома ещё нет — он создаётся автоматически, вы становитесь модератором.</li>
-                    <li>Внутри дома 3 ветки: ЖКХ и УК, Благоустройство двора, Свободный чат.</li>
-                  </ol>
+                  <b style={{ fontSize: "15px", display: "block", marginBottom: "8px" }}>Как это работает:</b>
+                  <ul style={{ margin: "0", padding: "0 0 0 20px", listStyle: "disc" }}>
+                    <li style={{ marginBottom: "6px" }}>Введите свой адрес — город, улицу и номер дома.</li>
+                    <li style={{ marginBottom: "6px" }}>Если чат дома уже создан соседом — вас перенаправит внутрь.</li>
+                    <li style={{ marginBottom: "6px" }}>Если дома ещё нет — он создаётся автоматически, вы становитесь модератором.</li>
+                    <li style={{ marginBottom: "0" }}>Внутри дома 3 ветки: «ЖКХ и УК», «Благоустройство двора», «Свободный чат».</li>
+                  </ul>
                 </div>
 
                 {/* Форма */}
-                <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                   <div>
-                    <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#1E3A5F", marginBottom: "4px" }}>
-                      Город / населённый пункт
-                    </label>
+                    <label style={labelStyle}>Город / населённый пункт</label>
                     <select
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
-                      style={{
-                        width: "100%",
-                        padding: "8px 10px",
-                        border: "1px solid #4A688C",
-                        borderRadius: "4px",
-                        fontSize: "14px",
-                        fontFamily: "inherit",
-                      }}
+                      style={inputStyle}
                     >
                       <option value="">— Выберите город —</option>
                       {CITIES.map((c) => (
@@ -155,59 +207,43 @@ export default function DomaPage() {
                     </select>
                   </div>
                   <div>
-                    <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#1E3A5F", marginBottom: "4px" }}>
-                      Улица
-                    </label>
+                    <label style={labelStyle}>Улица</label>
                     <input
                       type="text"
                       value={street}
                       onChange={(e) => setStreet(e.target.value)}
                       placeholder="Например: Ленина"
-                      style={{
-                        width: "100%",
-                        padding: "8px 10px",
-                        border: "1px solid #4A688C",
-                        borderRadius: "4px",
-                        fontSize: "14px",
-                        fontFamily: "inherit",
-                      }}
+                      style={inputStyle}
                     />
                   </div>
                   <div>
-                    <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#1E3A5F", marginBottom: "4px" }}>
-                      Номер дома
-                    </label>
+                    <label style={labelStyle}>Номер дома</label>
                     <input
                       type="text"
                       value={houseNumber}
                       onChange={(e) => setHouseNumber(e.target.value)}
                       placeholder="Например: 15 или 15А"
-                      style={{
-                        width: "100%",
-                        padding: "8px 10px",
-                        border: "1px solid #4A688C",
-                        borderRadius: "4px",
-                        fontSize: "14px",
-                        fontFamily: "inherit",
-                      }}
+                      style={inputStyle}
                     />
                   </div>
                   {error && (
-                    <div style={{ color: "#c40000", fontSize: "13px", fontWeight: 600 }}>{error}</div>
+                    <div style={{ color: "#c40000", fontSize: "14px", fontWeight: 600 }}>{error}</div>
                   )}
                   <button
                     type="submit"
                     disabled={loading}
                     style={{
-                      padding: "10px 20px",
+                      padding: "12px 24px",
                       background: "#0a7d75",
                       color: "#fff",
                       border: "none",
                       borderRadius: "4px",
-                      fontSize: "15px",
+                      fontSize: "16px",
                       fontWeight: 700,
                       fontFamily: "inherit",
                       cursor: loading ? "wait" : "pointer",
+                      width: "100%",
+                      boxSizing: "border-box",
                     }}
                   >
                     {loading ? "Обработка…" : "Перейти в чат дома →"}
@@ -216,7 +252,7 @@ export default function DomaPage() {
 
                 {/* Список существующих домов */}
                 <div style={{ marginTop: "28px" }}>
-                  <h2 style={{ fontSize: "16px", fontWeight: 700, color: "#1E3A5F", marginBottom: "10px" }}>
+                  <h2 style={{ fontSize: "17px", fontWeight: 700, color: "#1E3A5F", marginBottom: "10px" }}>
                     Уже созданные дома ({houses.length})
                   </h2>
                   <input
@@ -226,20 +262,21 @@ export default function DomaPage() {
                     placeholder="Поиск по адресу…"
                     style={{
                       width: "100%",
-                      padding: "8px 10px",
+                      padding: "10px 12px",
                       border: "1px solid #c0cad8",
                       borderRadius: "4px",
-                      fontSize: "14px",
+                      fontSize: "15px",
                       marginBottom: "10px",
                       fontFamily: "inherit",
+                      boxSizing: "border-box",
                     }}
                   />
                   {filtered.length === 0 ? (
-                    <div style={{ padding: "20px", textAlign: "center", color: "#56657a", fontSize: "13px" }}>
+                    <div style={{ padding: "24px", textAlign: "center", color: "#56657a", fontSize: "14px" }}>
                       {houses.length === 0 ? "Пока ни один дом не создан. Будьте первым!" : "Ничего не найдено."}
                     </div>
                   ) : (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                       {filtered.map((h) => (
                         <button
                           key={h.id}
@@ -248,14 +285,16 @@ export default function DomaPage() {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "space-between",
-                            padding: "10px 14px",
+                            padding: "12px 16px",
                             background: "#fff",
                             border: "1px solid #d0d9e6",
                             borderRadius: "4px",
                             cursor: "pointer",
-                            fontSize: "14px",
+                            fontSize: "15px",
                             fontFamily: "inherit",
                             textAlign: "left",
+                            width: "100%",
+                            boxSizing: "border-box",
                           }}
                         >
                           <span>
@@ -263,7 +302,7 @@ export default function DomaPage() {
                             {" — "}
                             {h.street}, {h.houseNumber}
                           </span>
-                          <span style={{ fontSize: "12px", color: "#56657a" }}>
+                          <span style={{ fontSize: "13px", color: "#56657a", flexShrink: 0, marginLeft: "8px" }}>
                             {h.branchesCount} ветки
                           </span>
                         </button>
@@ -275,6 +314,7 @@ export default function DomaPage() {
             </div>
           </div>
         </div>
+        <SiteFooter settings={settings} />
       </div>
     </div>
   );
