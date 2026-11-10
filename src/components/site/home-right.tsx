@@ -518,55 +518,41 @@ function NativeWeatherWidget() {
 
   return (
     <div className="mp-weather" style={{
-      padding: "8px 10px",
+      padding: "5px 9px 6px",
       display: "flex",
       flexDirection: "column",
-      gap: "6px",
+      gap: "3px",
       fontFamily: "system-ui, -apple-system, sans-serif",
     }}>
-      {/* Главная строка: иконка + температура + метка */}
-      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        <span style={{ fontSize: "34px", lineHeight: 1 }} aria-hidden="true">{icon}</span>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: "26px", fontWeight: 700, color: "#1E3A5F", lineHeight: 1.1 }}>
+      {/* Главная строка: иконка + температура + метка — компактно */}
+      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <span style={{ fontSize: "26px", lineHeight: 1 }} aria-hidden="true">{icon}</span>
+        <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "baseline", gap: "6px" }}>
+          <span style={{ fontSize: "22px", fontWeight: 700, color: "#1E3A5F", lineHeight: 1 }}>
             {w.temp > 0 ? "+" : ""}{w.temp}°
-          </div>
-          <div style={{ fontSize: "11.5px", color: "#56657a" }}>
-            ощущается {w.feels > 0 ? "+" : ""}{w.feels}°
-          </div>
+          </span>
+          <span style={{ fontSize: "10.5px", color: "#56657a" }}>
+            ощущ. {w.feels > 0 ? "+" : ""}{w.feels}°
+          </span>
         </div>
-        <div style={{ fontSize: "13px", fontWeight: 600, color: "#0a5caa", textAlign: "right" }}>
+        <span style={{ fontSize: "12px", fontWeight: 600, color: "#0a5caa", textAlign: "right", flexShrink: 0 }}>
           {w.label}
-        </div>
+        </span>
       </div>
-      {/* Метрики: ветер / влажность / давление */}
+      {/* Метрики в одну строку через запятую — компактно */}
       <div style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr 1fr",
-        gap: "4px",
-        fontSize: "11px",
+        fontSize: "10.5px",
         color: "#475569",
         borderTop: "1px solid #eef2f6",
-        paddingTop: "6px",
+        paddingTop: "3px",
+        display: "flex",
+        gap: "8px",
+        flexWrap: "wrap",
       }}>
-        <div title="Ветер">
-          <div style={{ fontSize: "9px", textTransform: "uppercase", color: "#94a3b8", letterSpacing: "0.3px" }}>Ветер</div>
-          <div style={{ fontWeight: 600 }}>{w.wind} м/с {windDir}</div>
-        </div>
-        <div title="Влажность">
-          <div style={{ fontSize: "9px", textTransform: "uppercase", color: "#94a3b8", letterSpacing: "0.3px" }}>Влажн.</div>
-          <div style={{ fontWeight: 600 }}>{w.hum}%</div>
-        </div>
-        <div title="Давление">
-          <div style={{ fontSize: "9px", textTransform: "uppercase", color: "#94a3b8", letterSpacing: "0.3px" }}>Давл.</div>
-          <div style={{ fontWeight: 600 }}>{w.press} мм</div>
-        </div>
+        <span title="Ветер">💨 {w.wind} м/с {windDir}</span>
+        <span title="Влажность">💧 {w.hum}%</span>
+        <span title="Давление">📊 {w.press} мм</span>
       </div>
-      {data.source === "live" && (
-        <div style={{ fontSize: "10px", color: "#94a3b8", textAlign: "right" }}>
-          open-meteo.com · обновлено сейчас
-        </div>
-      )}
     </div>
   );
 }
