@@ -11213,3 +11213,17 @@ section[aria-label="Погода на Сахалине"] .mp-weather {
 section[aria-label="Погода на Сахалине"] .mp-w-frame {
   display: none !important;
 }
+
+/* 2026-11-10: На мобильных (≤900px, grid в 1 колонку) — убираем фиксированную
+   высоту 96px у biz-rot карточек. Карточки sizing по контенту (~70px),
+   расстояние между ними становится равномерным = grid gap 10px.
+   Раньше: 96px высота при ~67px контента → ~29px пустого места снизу
+   каждой карточки → визуально разные отступы между блоками. */
+@media (max-width: 900px) {
+  .mp-grid .mp-cell .biz-rot-slide,
+  .mp-grid .mp-cell .biz-rot {
+    min-height: auto !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+}
