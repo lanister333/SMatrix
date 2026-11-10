@@ -9,7 +9,8 @@ export const runtime = "nodejs";
 /** Заглавная буква для красивого вывода. */
 function capitalize(s: string): string {
   if (!s) return s;
-  return s.charAt(0).toUpperCase() + s.slice(1);
+  // Разделяем по дефису и каждое слово с заглавной: «южно-сахалинск» → «Южно-Сахалинск»
+  return s.split('-').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join('-');
 }
 
 /**
