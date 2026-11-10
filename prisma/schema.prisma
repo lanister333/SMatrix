@@ -1271,6 +1271,7 @@ model HouseBlock {
 
   branches     HouseBranch[]     @relation("HouseBranches")
   moderators   HouseModerator[]  @relation("HouseModerators")
+  topics       HouseTopic[]      @relation("HouseTopics")
 
   @@unique([city, street, houseNumber])
   @@index([city])
@@ -1301,5 +1302,38 @@ model HouseModerator {
   house       HouseBlock @relation("HouseModerators", fields: [houseId], references: [id])
 
   @@id([userId, houseId])
+  @@index([houseId])
+}
+
+/// Темы внутри веток дома.
+model HouseTopic {
+  id          String   @id @default(cuid())
+  houseId     String
+  branchId    String   // ID ветки (HouseBranch)
+  title       String
+  body        String   @default("")  // текст первого сообщения
+  authorId    String
+  authorNick  String
+  pinned      Int      @default(0)   // 1 = закреплена
+  closed      Int      @default(0)   // 1 = закрыта
+  createdAt   DateTime @default(now())
+
+  house       HouseBlock   @relation("HouseTopics", fields: [houseId], references: [id])
+
+  @@index([houseId, branchId])
+  @@index([houseId, createdAt])
+}
+
+/// Сообщения (ответы) внутри темы дома.
+model HouseMessage {
+  id          String   @id @default(cuid())
+  topicId     String
+  houseId     String
+  authorId    String
+  authorNick  String
+  body        String
+  createdAt   DateTime @default(now())
+
+  @@index([topicId, createdAt])
   @@index([houseId])
 }
