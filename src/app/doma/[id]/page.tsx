@@ -41,6 +41,8 @@ interface TopicDetail {
   messages: Msg[];
   isModerator: boolean;
 }
+interface ChatMsg { id: string; body: string; authorNick: string; authorId: string; createdAt: string; }
+interface ChatData { messages: ChatMsg[]; isModerator: boolean; }
 
 function getToken(): string {
   try { const raw = localStorage.getItem(AUTH_KEY); if (raw) { const s = JSON.parse(raw); return s.token || ""; } } catch {}
@@ -67,29 +69,52 @@ function HousePageInner() {
   const [reply, setReply] = useState("");
   const [replyBusy, setReplyBusy] = useState(false);
   const [replyError, setReplyError] = useState("");
+  const [chatData, setChatData] = useState<ChatData | null>(null);
+  const [chatMsg, setChatMsg] = useState("");
+  const [chatBusy, setChatBusy] = useState(false);
+  const [chatError, setChatError] = useState("");
 
   useEffect(() => {
     fetch("/api/bootstrap").then((r) => r.json()).then((r) => { if (r.settings) setSettings({ ...DEFAULT_SETTINGS, ...r.settings }); }).catch(() => {});
   }, []);
 
-  // Load house data or topic data depending on params
+  // Load house data, topic data, or chat data depending on params
   useEffect(() => {
     setLoading(true);
     setError("");
     const t = getToken();
     if (topicId) {
-      // Load topic detail
+      setChatData(null);
       fetch(`/api/houses/topics/${topicId}?token=${encodeURIComponent(t)}`)
         .then(async (r) => { const d = await r.json(); if (!r.ok) throw Error(d.error); return d; })
         .then(setTopicData)
         .catch((e) => setError(e instanceof Error ? e.message : "Ошибка"))
         .finally(() => setLoading(false));
-    } else {
-      // Load house overview (with optional branch filter)
-      setTopicData(null);
-      fetch(`/api/houses/${params.id}/topics?token=${encodeURIComponent(t)}${branchId ? `&branchId=${branchId}` : ""}`)
+    } else if (branchId) {
+      // Check if this is the free chat branch
+      fetch(`/api/houses/${params.id}/topics?token=${encodeURIComponent(t)}&branchId=${branchId}`)
         .then(async (r) => { const d = await r.json(); if (!r.ok) throw Error(d.error); return d; })
-        .then((d) => { setData(d); if (d.branches.length > 0) setQfBranch(branchId || d.branches[0].id); })
+        .then(async (d) => {
+          setData(d);
+          const br = d.branches.find((b: Branch) => b.id === branchId);
+          if (br && br.title === "Свободный чат жителей") {
+            // Load chat messages
+            const cr = await fetch(`/api/houses/${params.id}/chat?token=${encodeURIComponent(t)}`);
+            const cd = await cr.json();
+            setChatData(cd);
+          } else {
+            setChatData(null);
+          }
+          if (d.branches.length > 0) setQfBranch(branchId || d.branches[0].id);
+        })
+        .catch((e) => setError(e instanceof Error ? e.message : "Ошибка"))
+        .finally(() => setLoading(false));
+    } else {
+      setTopicData(null);
+      setChatData(null);
+      fetch(`/api/houses/${params.id}/topics?token=${encodeURIComponent(t)}`)
+        .then(async (r) => { const d = await r.json(); if (!r.ok) throw Error(d.error); return d; })
+        .then((d) => { setData(d); if (d.branches.length > 0) setQfBranch(d.branches[0].id); })
         .catch((e) => setError(e instanceof Error ? e.message : "Ошибка"))
         .finally(() => setLoading(false));
     }
@@ -164,6 +189,39 @@ function HousePageInner() {
       body: JSON.stringify({ token: t, action }),
     });
     window.location.href = `/doma/${params.id}?topic=${topicId}`;
+  };
+
+  // === CHAT HANDLERS ===
+  const handleChatSend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setChatError("");
+    const t = getToken();
+    if (!t) { setChatError("Войдите на форум, чтобы писать."); return; }
+    if (!chatMsg.trim()) return;
+    setChatBusy(true);
+    try {
+      const r = await fetch(`/api/houses/${params.id}/chat`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: t, body: chatMsg }),
+      });
+      const d = await r.json();
+      if (!r.ok) throw Error(d.error || "Ошибка");
+      setChatMsg("");
+      // Reload chat
+      const cr = await fetch(`/api/houses/${params.id}/chat?token=${encodeURIComponent(t)}`);
+      const cd = await cr.json();
+      setChatData(cd);
+    } catch (e) { setChatError(e instanceof Error ? e.message : "Ошибка"); }
+    finally { setChatBusy(false); }
+  };
+
+  const handleChatDelete = async (msgId: string) => {
+    if (!confirm("Удалить сообщение?")) return;
+    const t = getToken();
+    await fetch(`/api/houses/${params.id}/chat?msgId=${msgId}&token=${encodeURIComponent(t)}`, { method: "DELETE" });
+    const cr = await fetch(`/api/houses/${params.id}/chat?token=${encodeURIComponent(t)}`);
+    const cd = await cr.json();
+    setChatData(cd);
   };
 
   // === LOADING ===
@@ -246,6 +304,56 @@ function HousePageInner() {
             ) : (
               <div style={{ marginTop: "16px", padding: "12px", textAlign: "center", color: "#56657a", fontSize: "14px", background: "#f8fafc", borderRadius: "4px" }}>🔒 Тема закрыта для новых ответов</div>
             )}
+          </div>
+          <SiteFooter settings={settings} />
+        </div>
+      </div>
+    );
+  }
+
+  // === FREE CHAT VIEW (?branch=freeChatBranchId) ===
+  if (chatData && branchId) {
+    return (
+      <div className="sm-page flex min-h-screen flex-col">
+        <Masthead settings={settings} />
+        <MainNav current="useful" isAdmin={isStaffRole(user?.role)} onNavigate={goNav} />
+        <div className="sk" style={{ minHeight: 0, flex: "1 0 auto" }}>
+          <div style={{ width: "100%", maxWidth: 900, margin: "0 auto", padding: "16px", boxSizing: "border-box" }}>
+            <button onClick={() => window.location.href = `/doma/${params.id}`} style={{ color: "#0a5caa", textDecoration: "underline", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: "15px", marginBottom: "12px" }}>← Все ветки дома</button>
+            <h1 style={{ fontSize: "20px", fontWeight: 700, color: "#1E3A5F", margin: "0 0 16px" }}>💬 Свободный чат жителей</h1>
+
+            {/* Лента сообщений */}
+            <div style={{ marginBottom: "20px" }}>
+              {chatData.messages.length === 0 ? (
+                <div style={{ padding: "24px", textAlign: "center", color: "#56657a", fontSize: "14px", background: "#f8fafc", borderRadius: "4px" }}>Пока нет сообщений. Напишите первое!</div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  {chatData.messages.map((m) => (
+                    <div key={m.id} style={{ background: "#fff", border: "1px solid #d0d9e6", borderRadius: "4px", padding: "12px 16px" }}>
+                      <div style={{ fontSize: "13px", color: "#56657a", marginBottom: "4px", display: "flex", alignItems: "center", gap: "8px" }}>
+                        <b style={{ color: "#1E3A5F" }}>{m.authorNick}</b>
+                        <span>{new Date(m.createdAt).toLocaleString("ru-RU")}</span>
+                        {chatData.isModerator && (
+                          <button onClick={() => handleChatDelete(m.id)} style={{ marginLeft: "auto", fontSize: "11px", color: "#c40000", background: "none", border: "1px solid #c4000044", borderRadius: "3px", cursor: "pointer", padding: "1px 6px", fontFamily: "inherit" }}>Удалить</button>
+                        )}
+                      </div>
+                      <div style={{ fontSize: "15px", color: "#2A3B50", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{m.body}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Форма отправки */}
+            <form onSubmit={handleChatSend} style={{ position: "sticky", bottom: "0", background: "#fff", padding: "12px 0", borderTop: "2px solid #eef2f6" }}>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <input type="text" value={chatMsg} onChange={(e) => setChatMsg(e.target.value)} placeholder="Написать сообщение…" style={{ flex: 1, padding: "10px 14px", border: "1px solid #4A688C", borderRadius: "4px", fontSize: "15px", fontFamily: "inherit" }} />
+                <button type="submit" disabled={chatBusy} style={{ padding: "10px 20px", background: "#0a7d75", color: "#fff", border: "none", borderRadius: "4px", fontSize: "15px", fontWeight: 700, fontFamily: "inherit", cursor: chatBusy ? "wait" : "pointer", flexShrink: 0 }}>
+                  {chatBusy ? "…" : "Отправить"}
+                </button>
+              </div>
+              {chatError && <div style={{ color: "#c40000", fontSize: "13px", marginTop: "6px" }}>{chatError}</div>}
+            </form>
           </div>
           <SiteFooter settings={settings} />
         </div>
