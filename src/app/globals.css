@@ -11268,3 +11268,11 @@ section[aria-label="Погода на Сахалине"] .mp-w-frame {
   border: 2px solid #0a7d75 !important;
   box-shadow: 0 2px 8px rgba(10,125,117,0.15) !important;
 }
+
+/* 2026-11-10: «Домовой ЧАТ» — иконка крупнее, как у других блоков.
+   Другие блоки используют ::before 50x50 в контейнере 64x64.
+   Наш SVG был 56x56 — увеличим до 64x64 (заполняет контейнер). */
+.mp-cell[aria-label="Домовой ЧАТ"] .biz-rot-ico svg {
+  width: 64px !important;
+  height: 64px !important;
+}
