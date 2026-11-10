@@ -11227,3 +11227,10 @@ section[aria-label="Погода на Сахалине"] .mp-w-frame {
     max-height: none !important;
   }
 }
+
+/* 2026-11-10: Фикс отступа между «Последние темы форума» и сеткой biz-rot.
+   mp-grid имел margin-top:2px — блоки почти слипались. Приводим к 10px
+   на мобильных, чтобы совпадало с отступами между другими блоками. */
+@media (max-width: 900px) {
+  .mp-grid { margin-top: 10px !important; }
+}
