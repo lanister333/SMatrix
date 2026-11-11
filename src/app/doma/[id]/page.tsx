@@ -354,7 +354,7 @@ function HousePageInner() {
             <div className="sk-topicbox">
               <div className="t-title">
                 <span className="t-title-text">
-                  <strong style={{ fontWeight: 700, display: "block", fontSize: "1em", lineHeight: 1.4 }}>{tp.title}</strong>
+                  <strong style={{ fontWeight: 700, display: "block", fontSize: "20px", lineHeight: 1.3, color: "#1E3A5F" }}>{tp.title}</strong>
                   {tp.pinned && <span className="sk-tstatus pinned">Закреплена</span>}
                   {tp.closed && <span className="sk-tstatus closed">Тема закрыта</span>}
                 </span>
