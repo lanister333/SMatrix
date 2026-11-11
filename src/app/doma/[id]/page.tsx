@@ -354,21 +354,6 @@ function HousePageInner() {
               </div>
             )}
 
-            {/* Первое сообщение (тело темы) — как sk-msg #1 на форуме */}
-            {tp.body && (
-              <div className="sk-msg" data-msgnum={1}>
-                <div className="sk-msg-head">
-                  <span className="sk-msg-author" style={{ fontWeight: 700, color: "#1E3A5F", fontSize: "13px" }}>{tp.authorNick}</span>
-                  <span className="sk-msg-time" style={{ fontSize: "12px", color: "#56657a" }}>{new Date(tp.createdAt).toLocaleString("ru-RU")}</span>
-                  <span className="sk-msg-spacer" />
-                  <div className="sk-msg-actions">
-                    <button className="sk-btn-answer sk-btn-answer-in-msg" onClick={() => setReplyTo("")} title="Ответить на это сообщение">Ответить</button>
-                  </div>
-                </div>
-                <div className="sk-msg-body">{tp.body}</div>
-              </div>
-            )}
-
             {/* Дерево ответов — лесница с бирюзовыми линиями, как CollapsibleComments на форуме */}
             <div className="sakh-comments-container cc-container" style={{ position: "relative" }}>
               {(() => {
