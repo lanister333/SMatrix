@@ -57,9 +57,16 @@ export default function RootLayout({
         {/* Google Search Console verification */}
         <meta name="google-site-verification" content="1JnkctkTBjfpNV2BEuKETwfvLFfXJ5nvP4dSDliouvY" />
         {/* 2026-11-08: favicon — избавляет от 404 на /favicon.ico в логах.
-            Логотип SakhMatrix (Z-символ на тёмно-графитовом фоне). */}
+            Логотип SakhMatrix (Z-символ на тёмно-графитовом фоне).
+            2026-11-11: favicon.ico собран напрямую из logo.svg (16/32/64),
+            добавлены apple-touch-icon (180×180) и PNG 32/256 для разных
+            платформ — везде теперь наш логотип. */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/logo.svg" type="image/svg+xml" />
+        <link rel="icon" href="/icon-32.png" type="image/png" sizes="32x32" />
+        <link rel="icon" href="/icon-256.png" type="image/png" sizes="256x256" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="mask-icon" href="/logo.svg" color="#2D2D2D" />
       </head>
       <body className="antialiased" suppressHydrationWarning>
         {/* Яндекс.Метрика — счётчик 113691446.
