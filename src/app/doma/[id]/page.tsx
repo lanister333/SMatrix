@@ -514,6 +514,21 @@ function HousePageInner() {
             )}
           </div>
 
+          {/* Форма создания темы — только внутри ветки (не на главной) и не в свободном чате */}
+          {activeBranch && activeBranch.title !== "Свободный чат жителей" && (
+            <div style={{ background: "#f8fafc", border: "1px solid #d0d9e6", borderRadius: "6px", padding: "16px 20px", marginBottom: "20px" }}>
+              <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#1E3A5F", margin: "0 0 12px" }}>Создать тему</h3>
+              <form onSubmit={handleQuickSubmit} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                <input type="text" value={qfTitle} onChange={(e) => setQfTitle(e.target.value)} placeholder="Заголовок темы" style={{ width: "100%", padding: "8px 12px", border: "1px solid #4A688C", borderRadius: "4px", fontSize: "14px", fontFamily: "inherit", boxSizing: "border-box" }} />
+                <textarea value={qfBody} onChange={(e) => setQfBody(e.target.value)} placeholder="Текст сообщения (необязательно)" rows={3} style={{ width: "100%", padding: "8px 12px", border: "1px solid #4A688C", borderRadius: "4px", fontSize: "14px", fontFamily: "inherit", boxSizing: "border-box", resize: "vertical" }} />
+                {qfError && <div style={{ color: "#c40000", fontSize: "13px", fontWeight: 600 }}>{qfError}</div>}
+                <button type="submit" disabled={qfBusy} style={{ padding: "10px 20px", background: "#0a7d75", color: "#fff", border: "none", borderRadius: "4px", fontSize: "15px", fontWeight: 700, fontFamily: "inherit", cursor: qfBusy ? "wait" : "pointer", width: "100%", boxSizing: "border-box" }}>
+                  {qfBusy ? "Отправка…" : "Создать тему"}
+                </button>
+              </form>
+            </div>
+          )}
+
           {/* Кнопка возврата */}
           <div style={{ marginTop: "20px" }}>
             <button onClick={() => router.push("/doma")} style={{ color: "#0a5caa", textDecoration: "underline", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: "15px" }}>← К списку домов</button>
