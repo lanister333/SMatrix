@@ -279,13 +279,22 @@ function HousePageInner() {
       if (!childrenMap.has(key)) childrenMap.set(key, []);
       childrenMap.get(key)!.push(m);
     }
+    // Карта ID → автор (для пометки «ответ на сообщение от Автор»)
+    const authorById = new Map(topicData.messages.map(m => [m.id, m.authorNick]));
+    // Нумерация #1, #2, #3...
+    const sortedMsgs = [...topicData.messages].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    const numById = new Map(sortedMsgs.map((m, i) => [m.id, i + 1]));
 
     function renderMsg(msg: Msg, level: number): React.ReactNode {
       const children = childrenMap.get(msg.id) || [];
+      const num = numById.get(msg.id) || "?";
+      const parentAuthor = msg.parentId ? authorById.get(msg.parentId) : null;
+      const parentNum = msg.parentId ? numById.get(msg.parentId) : null;
       return (
         <div key={msg.id} style={{ position: "relative", marginBottom: "8px" }}>
-          <div className="sk-msg" data-msgnum={msg.id} style={{ position: "relative", zIndex: 1 }}>
+          <div className="sk-msg" data-msgnum={num} style={{ position: "relative", zIndex: 1 }}>
             <div className="sk-msg-head">
+              <a className="sk-msg-num" title="Ссылка на это сообщение">#{num}</a>
               <span className="sk-msg-author" style={{ fontWeight: 700, color: "#1E3A5F", fontSize: "13px" }}>{msg.authorNick}</span>
               <span className="sk-msg-time" style={{ fontSize: "12px", color: "#56657a" }}>{new Date(msg.createdAt).toLocaleString("ru-RU")}</span>
               <span className="sk-msg-spacer" />
@@ -301,7 +310,14 @@ function HousePageInner() {
                 )}
               </div>
             </div>
-            <div className="sk-msg-body">{msg.body}</div>
+            <div className="sk-msg-body">
+              {parentAuthor && (
+                <a className="sk-msg-parent sk-msg-parent-in-body" title={`Ответ на сообщение №${parentNum} от ${parentAuthor}`}>
+                  └ ответ на #{parentNum} от {parentAuthor}
+                </a>
+              )}
+              {msg.body}
+            </div>
           </div>
           {children.length > 0 && (
             <div style={{ position: "relative", marginTop: "4px" }}>
