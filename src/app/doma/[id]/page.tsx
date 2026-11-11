@@ -346,7 +346,7 @@ function HousePageInner() {
         <Masthead settings={settings} />
         <MainNav current="useful" isAdmin={isStaffRole(user?.role)} onNavigate={goNav} />
         <div className="sk" style={{ minHeight: 0, flex: "1 0 auto" }}>
-          <div style={{ width: "100%", maxWidth: 900, margin: "0 auto", padding: "16px", boxSizing: "border-box" }}>
+          <div className="doma-topic" style={{ width: "100%", maxWidth: 900, margin: "0 auto", padding: "16px", boxSizing: "border-box" }}>
             {/* Хлебные крошки */}
             <a className="sk-backlink" onClick={() => window.location.href = `/doma/${params.id}`} style={{ display: "inline-block", marginBottom: "12px", cursor: "pointer" }}>← Назад в дом</a>
 
