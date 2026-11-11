@@ -311,10 +311,14 @@ function HousePageInner() {
               </div>
             </div>
             <div className="sk-msg-body">
-              {parentAuthor && (
+              {parentAuthor ? (
                 <a className="sk-msg-parent sk-msg-parent-in-body" title={`Ответ на сообщение №${parentNum} от ${parentAuthor}`}>
                   └ ответ на #{parentNum} от {parentAuthor}
                 </a>
+              ) : (
+                <span className="sk-msg-parent sk-msg-parent-in-body" style={{ color: "#0a5caa", fontSize: "12px", fontWeight: 600 }}>
+                  └ ответ на тему
+                </span>
               )}
               {msg.body}
             </div>
@@ -377,11 +381,6 @@ function HousePageInner() {
                 if (roots.length === 0) return <div style={{ padding: "20px", textAlign: "center", color: "#56657a", fontSize: "14px" }}>Нет ответов. Напишите первым!</div>;
                 return roots.map(root => renderMsg(root, 0));
               })()}
-            </div>
-
-            {/* Подсказка для корневых ответов */}
-            <div style={{ fontSize: "12px", color: "#94a3b8", textAlign: "center", margin: "8px 0 16px" }}>
-              Сообщения без пометки «ответ на» — это прямые ответы в тему
             </div>
 
             {/* Форма быстрого ответа — как .sk-qr на форуме */}
