@@ -58,11 +58,11 @@ export default function RootLayout({
             2026-11-11: favicon.ico собран напрямую из logo.svg (16/32/64),
             добавлены apple-touch-icon (180×180) и PNG 32/256 для разных
             платформ — везде теперь наш логотип. */}
-        <link rel="icon" href="/favicon.ico?v=20261111g" sizes="any" />
+        <link rel="icon" href="/favicon.ico?v=20261111h" sizes="any" />
         <link rel="icon" href="/logo.svg" type="image/svg+xml" />
-        <link rel="icon" href="/icon-32.png?v=20261111g" type="image/png" sizes="32x32" />
-        <link rel="icon" href="/icon-256.png?v=20261111g" type="image/png" sizes="256x256" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20261111g" />
+        <link rel="icon" href="/icon-32.png?v=20261111h" type="image/png" sizes="32x32" />
+        <link rel="icon" href="/icon-256.png?v=20261111h" type="image/png" sizes="256x256" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20261111h" />
         <link rel="mask-icon" href="/logo.svg" color="#0a7d75" />
       </head>
       <body className="antialiased" suppressHydrationWarning>
