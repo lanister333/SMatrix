@@ -1367,7 +1367,10 @@ export default function WeatherScreen() {
           {/* ТЗ п.4: «Оперативная обстановка на перевалах» — лог из 3
               последних сообщений форума с тегом «Дороги» (данные БД,
               /api/weather/roads); текст переносится по строкам и не
-              ломает правую границу .sakh-card на телефонах. */}
+              ломает правую границу .sakh-card на телефонах.
+              2026-11-11: блок отключается из админки
+              (settings.passesSituationEnabled === "1" по умолчанию). */}
+          {(settings.passesSituationEnabled ?? "1") === "1" && (
           <section className="mp-panel sakh-card" aria-label="Оперативная обстановка на перевалах">
             <div className="mp-paneltitle">
               Оперативная обстановка на перевалах
@@ -1389,6 +1392,7 @@ export default function WeatherScreen() {
               <div className="wth-empty">Отчётов о перевалах и дорогах пока нет — добавьте свой на форуме.</div>
             )}
           </section>
+          )}
           </div>
           <HomeRight />
           </div>

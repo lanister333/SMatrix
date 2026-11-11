@@ -148,7 +148,10 @@ export default function TrafficScreen() {
           {/* ТЗ п.3: «Народный лог» — «Оперативные дорожные события»:
               лента из 10 последних сообщений БД с тегом «Дороги»; текст
               12px с автопереносом строк, правую границу .sakh-card на
-              360–414px не ломает. */}
+              360–414px не ломает.
+              2026-11-11: блок отключается из админки
+              (settings.trafficEventsEnabled === "1" по умолчанию). */}
+          {(settings.trafficEventsEnabled ?? "1") === "1" && (
           <section className="mp-panel sakh-card" aria-label="Оперативные дорожные события">
             <div className="mp-paneltitle">
               Оперативные дорожные события
@@ -170,6 +173,7 @@ export default function TrafficScreen() {
               <div className="trf-empty">Дорожных сводок пока нет — добавьте свою на форуме.</div>
             )}
           </section>
+          )}
 
           {/* ТЗ п.4: «Состояние загородных трасс» — компактная таблица
               трёх островных направлений со статусами из БД (Открыта /

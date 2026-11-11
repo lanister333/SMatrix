@@ -42,6 +42,9 @@ export interface SiteSettings {
   /// владелец не включит через админку).
   urgentBannerEnabled?: string;
   urgentBannerText?: string;
+  /// 2026-11-11: отключаемые блоки-виджеты.
+  trafficEventsEnabled?: string;
+  passesSituationEnabled?: string;
 }
 
 export const DEFAULT_SETTINGS: SiteSettings = {
@@ -52,6 +55,8 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   footerNote: "Спроси у города — город ответит.",
   urgentBannerEnabled: "0",
   urgentBannerText: "",
+  trafficEventsEnabled: "1",
+  passesSituationEnabled: "1",
 };
 
 /** ШАГ 12: сотрудник проекта (владелец или модератор). */

@@ -38,6 +38,9 @@ export async function GET() {
         footerNote: settings.footerNote || "",
         urgentBannerEnabled: settings.urgentBannerEnabled || "0",
         urgentBannerText: settings.urgentBannerText || "",
+        /// 2026-11-11: отключаемые блоки-виджеты (по умолчанию включены).
+        trafficEventsEnabled: settings.trafficEventsEnabled || "1",
+        passesSituationEnabled: settings.passesSituationEnabled || "1",
       },
     });
   } catch (e) {

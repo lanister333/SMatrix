@@ -3057,6 +3057,27 @@ function SettingsSection(props: { token: string | null; notify: (m: string) => v
         </label>
       </div>
 
+      {/* 2026-11-11: отключаемые блоки-виджеты на /traffic.php и /weather.php */}
+      <div className="mt-3 space-y-1.5 border border-[#C9D4E2] bg-[#F7FAFD] p-2.5">
+        <div className="mb-1 text-[12.5px] font-bold text-[#1E3A5F]">
+          Блоки-виджеты на страницах
+        </div>
+        <label className="flex items-center gap-2">
+          <input type="checkbox" checked={(settings.trafficEventsEnabled ?? "1") === "1"} onChange={(e) => set("trafficEventsEnabled", e.target.checked ? "1" : "0")} />
+          <span>
+            <b>«Оперативные дорожные события»</b>
+            <span className="text-[12px] text-[#56657a]"> — лента 10 последних сообщений тега «Дороги» на странице /traffic.php</span>
+          </span>
+        </label>
+        <label className="flex items-center gap-2">
+          <input type="checkbox" checked={(settings.passesSituationEnabled ?? "1") === "1"} onChange={(e) => set("passesSituationEnabled", e.target.checked ? "1" : "0")} />
+          <span>
+            <b>«Оперативная обстановка на перевалах»</b>
+            <span className="text-[12px] text-[#56657a]"> — лог 3 последних сообщений тега «Дороги» на странице /weather.php</span>
+          </span>
+        </label>
+      </div>
+
       {/* 2026-11-10: «Срочно» — бегущая строка в самом верху сайта.
           По умолчанию выключена. Включает владелец при экстренных оповещениях
           (аварии, отключения, погодные предупреждения и т.п.). */}

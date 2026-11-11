@@ -23,6 +23,11 @@ const EDITABLE_KEYS = [
   /// вручную из админки при необходимости (аварии, экстренные оповещения).
   "urgentBannerEnabled",
   "urgentBannerText",
+  /// 2026-11-11: отключаемые блоки-виджеты (по требованию админа).
+  /// «Оперативные дорожные события» на /traffic.php и
+  /// «Оперативная обстановка на перевалах» на /weather.php.
+  "trafficEventsEnabled",
+  "passesSituationEnabled",
 ] as const;
 
 const DEFAULTS: Record<string, string> = {
@@ -38,6 +43,8 @@ const DEFAULTS: Record<string, string> = {
   aiCacheEnabled: "1",
   urgentBannerEnabled: "0",
   urgentBannerText: "",
+  trafficEventsEnabled: "1",
+  passesSituationEnabled: "1",
 };
 
 const LABELS: Record<string, string> = {
@@ -51,6 +58,8 @@ const LABELS: Record<string, string> = {
   aiCacheEnabled: "AI-кэш вердиктов",
   urgentBannerEnabled: "срочная строка (вкл/выкл)",
   urgentBannerText: "текст срочной строки",
+  trafficEventsEnabled: "блок «Оперативные дорожные события» (/traffic)",
+  passesSituationEnabled: "блок «Обстановка на перевалах» (/weather)",
 };
 
 /**
@@ -98,7 +107,9 @@ export async function POST(req: NextRequest) {
         key === "newTopicsEnabled" ||
         key === "aiShadowMode" ||
         key === "aiCacheEnabled" ||
-        key === "urgentBannerEnabled"
+        key === "urgentBannerEnabled" ||
+        key === "trafficEventsEnabled" ||
+        key === "passesSituationEnabled"
       ) {
         value = value === "0" || value === "false" ? "0" : "1";
       }
