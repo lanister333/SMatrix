@@ -379,6 +379,11 @@ function HousePageInner() {
               })()}
             </div>
 
+            {/* Подсказка для корневых ответов */}
+            <div style={{ fontSize: "12px", color: "#94a3b8", textAlign: "center", margin: "8px 0 16px" }}>
+              Сообщения без пометки «ответ на» — это прямые ответы в тему
+            </div>
+
             {/* Форма быстрого ответа — как .sk-qr на форуме */}
             <div className="sk-qr" id="reply-form">
               <div className="sk-qr-label">Быстрый ответ в теме:</div>
