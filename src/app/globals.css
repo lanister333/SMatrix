@@ -11277,9 +11277,12 @@ section[aria-label="Погода на Сахалине"] .mp-w-frame {
   height: 64px !important;
 }
 
-/* 2026-11-11: Домовой чат — сохранить голубую шапку .sk-msg-head
-   на мобильных (форум убирает её, но дому нужна для визуального
-   отличия от форума и читаемости). */
+/* 2026-11-11: Домовой чат — тема в рамке (.sk-topicbox), у ответов
+   (.sk-msg) убираем только контур (border), само окно (фон, голубая
+   шапка) сохраняем. */
+.doma-topic .sk-msg {
+  border: 0 !important;
+}
 @media (max-width: 480px) {
   .doma-topic .sk-msg-head {
     background: #d3e2f2 !important;
