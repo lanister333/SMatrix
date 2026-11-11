@@ -347,28 +347,31 @@ function HousePageInner() {
         <MainNav current="useful" isAdmin={isStaffRole(user?.role)} onNavigate={goNav} />
         <div className="sk" style={{ minHeight: 0, flex: "1 0 auto" }}>
           <div className="doma-topic" style={{ width: "100%", maxWidth: 900, margin: "0 auto", padding: "16px", boxSizing: "border-box" }}>
-            {/* Хлебные крошки */}
-            <a className="sk-backlink" onClick={() => window.location.href = `/doma/${params.id}`} style={{ display: "inline-block", marginBottom: "12px", cursor: "pointer" }}>← Назад в дом</a>
+            {/* Хлебные крошки — как на форуме */}
+            <div className="sk-crumbs forum-cat-crumbs">
+              <a onClick={() => window.location.href = "/doma"} style={{ cursor: "pointer" }}>Дома и СНТ</a>
+              <span className="sep"> → </span>
+              <a onClick={() => window.location.href = `/doma/${params.id}`} style={{ cursor: "pointer" }}>{data?.house ? `${data.house.city}, ${data.house.street}, ${data.house.houseNumber}` : "Дом"}</a>
+              <span className="sep"> → </span>
+              <span>{tp.title}</span>
+            </div>
 
-            {/* Шапка темы — как .sk-topicbox на форуме */}
+            {/* Шапка темы — один в один как .sk-topicbox на форуме */}
             <div className="sk-topicbox">
               <div className="t-title">
                 <span className="t-title-text">
-                  <strong style={{ fontWeight: 700, display: "block", fontSize: "20px", lineHeight: 1.3, color: "#1E3A5F" }}>{tp.title}</strong>
+                  {tp.title}
                   {tp.pinned && <span className="sk-tstatus pinned">Закреплена</span>}
                   {tp.closed && <span className="sk-tstatus closed">Тема закрыта</span>}
                 </span>
                 <button className="sk-btn-answer sk-btn-answer-in-title" onClick={() => { if (tp.closed) return; document.getElementById("reply-form")?.scrollIntoView({ behavior: "smooth" }); }}>Ответить</button>
               </div>
               <div className="t-meta">
-                Автор: <b style={{ color: "#1E3A5F" }}>{tp.authorNick}</b> · создана {new Date(tp.createdAt).toLocaleString("ru-RU")}
+                Автор: <b style={{ color: "#1E3A5F" }}>{tp.authorNick}</b> · создана {new Date(tp.createdAt).toLocaleDateString("ru-RU")} · ответов: {topicData.messages.length}
               </div>
-              {tp.body && (
-                <div style={{ fontSize: "15px", color: "#2A3B50", lineHeight: 1.6, padding: "8px 0", whiteSpace: "pre-wrap" }}>{tp.body}</div>
-              )}
             </div>
 
-            {/* Админ-кнопки темы */}
+            {/* Админ-кнопки темы — как .sk-topicactions на форуме */}
             {topicData.isModerator && (
               <div className="sk-topicactions">
                 <button onClick={() => handleTopicActionDetail(tp.pinned ? "unpin" : "pin")}>{tp.pinned ? "Открепить тему" : "Закрепить тему"}</button>
@@ -377,7 +380,7 @@ function HousePageInner() {
               </div>
             )}
 
-            {/* Дерево ответов — лесница с бирюзовыми линиями, как CollapsibleComments на форуме */}
+            {/* Дерево ответов — лесница с бирюзовыми линиями */}
             <div className="sakh-comments-container cc-container" style={{ position: "relative" }}>
               {(() => {
                 const roots = childrenMap.get("") || [];
