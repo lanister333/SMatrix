@@ -267,110 +267,138 @@ function HousePageInner() {
   const icons = ["🔧", "🌳", "💬"];
   const colors = ["#0a5caa", "#0a7d75", "#b45309"];
 
-  // === TOPIC VIEW (?topic=ID) ===
+  // === TOPIC VIEW (?topic=ID) — один в один как на форуме ===
   if (topicId && topicData) {
     const tp = topicData.topic;
+    const TEAL = "#249790";
+    const PAD = 30;
+    // Дерево: topic body = корневой узел, messages = ответы
+    const childrenMap = new Map<string, Msg[]>();
+    for (const m of topicData.messages) {
+      const key = m.parentId || "";
+      if (!childrenMap.has(key)) childrenMap.set(key, []);
+      childrenMap.get(key)!.push(m);
+    }
+
+    function renderMsg(msg: Msg, level: number): React.ReactNode {
+      const children = childrenMap.get(msg.id) || [];
+      return (
+        <div key={msg.id} style={{ position: "relative", marginBottom: "8px" }}>
+          <div className="sk-msg" data-msgnum={msg.id} style={{ position: "relative", zIndex: 1 }}>
+            <div className="sk-msg-head">
+              <span className="sk-msg-author" style={{ fontWeight: 700, color: "#1E3A5F", fontSize: "13px" }}>{msg.authorNick}</span>
+              <span className="sk-msg-time" style={{ fontSize: "12px", color: "#56657a" }}>{new Date(msg.createdAt).toLocaleString("ru-RU")}</span>
+              <span className="sk-msg-spacer" />
+              <div className="sk-msg-actions">
+                <button className="sk-btn-answer sk-btn-answer-in-msg" onClick={() => setReplyTo(msg.id)} title="Ответить на это сообщение">Ответить</button>
+                {topicData.isModerator && (
+                  <button className="sk-flood-btn sk-msg-del" onClick={async () => {
+                    if (!confirm("Удалить сообщение?")) return;
+                    const t = getToken();
+                    await fetch(`/api/houses/topics/${topicId}`, { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: t, msgId: msg.id }) });
+                    window.location.href = `/doma/${params.id}?topic=${topicId}`;
+                  }}>Удалить</button>
+                )}
+              </div>
+            </div>
+            <div className="sk-msg-body">{msg.body}</div>
+          </div>
+          {children.length > 0 && (
+            <div style={{ position: "relative", marginTop: "4px" }}>
+              {children.map((child, idx) => {
+                const isLast = idx === children.length - 1;
+                return (
+                  <div key={child.id} style={{ position: "relative", paddingLeft: PAD + "px", marginBottom: "4px" }}>
+                    <div style={{ position: "absolute", left: "12px", top: "-16px", height: isLast ? "28px" : "calc(100% + 20px)", width: "2px", background: TEAL, zIndex: 0 }} />
+                    <div style={{ position: "absolute", left: "12px", top: "10px", width: "20px", height: "2px", background: TEAL, zIndex: 0 }} />
+                    {renderMsg(child, Math.min(level + 1, 4))}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      );
+    }
+
     return (
       <div className="sm-page flex min-h-screen flex-col">
         <Masthead settings={settings} />
         <MainNav current="useful" isAdmin={isStaffRole(user?.role)} onNavigate={goNav} />
         <div className="sk" style={{ minHeight: 0, flex: "1 0 auto" }}>
           <div style={{ width: "100%", maxWidth: 900, margin: "0 auto", padding: "16px", boxSizing: "border-box" }}>
-            <button onClick={() => window.location.href = `/doma/${params.id}`} style={{ color: "#0a5caa", textDecoration: "underline", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: "15px", marginBottom: "12px" }}>← Назад в дом</button>
-            <h1 style={{ fontSize: "20px", fontWeight: 700, color: "#1E3A5F", margin: "0 0 8px", lineHeight: 1.3 }}>
-              {tp.pinned && <span style={{ marginRight: "4px" }}>📌</span>}
-              {tp.closed && <span style={{ marginRight: "4px" }}>🔒</span>}
-              {tp.title}
-            </h1>
-            <div style={{ fontSize: "13px", color: "#56657a", marginBottom: "16px" }}>
-              Автор: {tp.authorNick} · {new Date(tp.createdAt).toLocaleString("ru-RU")}
-              {topicData.isModerator && (
-                <span style={{ marginLeft: "12px", display: "inline-flex", gap: "6px" }}>
-                  <button onClick={() => handleTopicActionDetail(tp.pinned ? "unpin" : "pin")} style={{ fontSize: "11px", color: "#0a7d75", background: "none", border: "1px solid #0a7d7544", borderRadius: "3px", cursor: "pointer", padding: "1px 6px", fontFamily: "inherit" }}>{tp.pinned ? "Открепить" : "Закрепить"}</button>
-                  <button onClick={() => handleTopicActionDetail(tp.closed ? "open" : "close")} style={{ fontSize: "11px", color: "#b45309", background: "none", border: "1px solid #b4530944", borderRadius: "3px", cursor: "pointer", padding: "1px 6px", fontFamily: "inherit" }}>{tp.closed ? "Открыть" : "Закрыть"}</button>
+            {/* Хлебные крошки */}
+            <a className="sk-backlink" onClick={() => window.location.href = `/doma/${params.id}`} style={{ display: "inline-block", marginBottom: "12px", cursor: "pointer" }}>← Назад в дом</a>
+
+            {/* Шапка темы — как .sk-topicbox на форуме */}
+            <div className="sk-topicbox">
+              <div className="t-title">
+                <span className="t-title-text">
+                  <strong style={{ fontWeight: 700, display: "block", fontSize: "1em", lineHeight: 1.4 }}>{tp.title}</strong>
+                  {tp.pinned && <span className="sk-tstatus pinned">Закреплена</span>}
+                  {tp.closed && <span className="sk-tstatus closed">Тема закрыта</span>}
                 </span>
-              )}
+                <button className="sk-btn-answer sk-btn-answer-in-title" onClick={() => { if (tp.closed) return; document.getElementById("reply-form")?.scrollIntoView({ behavior: "smooth" }); }}>Ответить</button>
+              </div>
+              <div className="t-meta">
+                Автор: <b style={{ color: "#1E3A5F" }}>{tp.authorNick}</b> · создана {new Date(tp.createdAt).toLocaleString("ru-RU")}
+              </div>
             </div>
-            {tp.body && (
-              <div className="sk-msg" style={{ background: "#fbfdff", border: "1px solid #1E3A5F", marginBottom: "8px" }}>
-                <div className="sk-msg-head" style={{ background: "#d3e2f2", borderBottom: "1px solid #b9cde2", padding: "3px 8px", display: "flex", alignItems: "center", gap: "8px" }}>
-                  <b style={{ color: "#1E3A5F", fontSize: "13px" }}>{tp.authorNick}</b>
-                  <span style={{ fontSize: "12px", color: "#56657a" }}>{new Date(tp.createdAt).toLocaleString("ru-RU")}</span>
-                </div>
-                <div style={{ whiteSpace: "pre-wrap", wordBreak: "break-word", padding: "6px 8px", fontSize: "14px", lineHeight: 1.5, color: "#2A3B50" }}>{tp.body}</div>
+
+            {/* Админ-кнопки темы */}
+            {topicData.isModerator && (
+              <div className="sk-topicactions">
+                <button onClick={() => handleTopicActionDetail(tp.pinned ? "unpin" : "pin")}>{tp.pinned ? "Открепить тему" : "Закрепить тему"}</button>
+                <button onClick={() => handleTopicActionDetail(tp.closed ? "open" : "close")}>{tp.closed ? "Открыть тему" : "Закрыть тему"}</button>
+                <button className="sk-topicdel" onClick={() => { if (confirm("Удалить тему?")) handleTopicDelete(topicId || ""); }}>Удалить тему</button>
               </div>
             )}
-            {/* Дерево сообщений — лесница как на форуме */}
-            <div className="sakh-comments-container" style={{ position: "relative" }}>
+
+            {/* Первое сообщение (тело темы) — как sk-msg #1 на форуме */}
+            {tp.body && (
+              <div className="sk-msg" data-msgnum={1}>
+                <div className="sk-msg-head">
+                  <span className="sk-msg-author" style={{ fontWeight: 700, color: "#1E3A5F", fontSize: "13px" }}>{tp.authorNick}</span>
+                  <span className="sk-msg-time" style={{ fontSize: "12px", color: "#56657a" }}>{new Date(tp.createdAt).toLocaleString("ru-RU")}</span>
+                  <span className="sk-msg-spacer" />
+                  <div className="sk-msg-actions">
+                    <button className="sk-btn-answer sk-btn-answer-in-msg" onClick={() => setReplyTo("")} title="Ответить на это сообщение">Ответить</button>
+                  </div>
+                </div>
+                <div className="sk-msg-body">{tp.body}</div>
+              </div>
+            )}
+
+            {/* Дерево ответов — лесница с бирюзовыми линиями, как CollapsibleComments на форуме */}
+            <div className="sakh-comments-container cc-container" style={{ position: "relative" }}>
               {(() => {
-                const TEAL = "#249790";
-                const PAD = 30;
-                const childrenMap = new Map<string, Msg[]>();
-                for (const m of topicData.messages) {
-                  const key = m.parentId || "";
-                  if (!childrenMap.has(key)) childrenMap.set(key, []);
-                  childrenMap.get(key)!.push(m);
-                }
                 const roots = childrenMap.get("") || [];
-                function renderNode(msg: Msg, level: number): React.ReactNode {
-                  const children = childrenMap.get(msg.id) || [];
-                  return (
-                    <div key={msg.id} style={{ position: "relative", marginBottom: "8px" }}>
-                      <div className="sk-msg" style={{ position: "relative", zIndex: 1, background: "#fbfdff", border: "1px solid #1E3A5F" }}>
-                        <div className="sk-msg-head" style={{ background: "#d3e2f2", borderBottom: "1px solid #b9cde2", padding: "3px 8px", display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                          <b style={{ color: "#1E3A5F", fontSize: "13px" }}>{msg.authorNick}</b>
-                          <span style={{ fontSize: "12px", color: "#56657a" }}>{new Date(msg.createdAt).toLocaleString("ru-RU")}</span>
-                          <span style={{ flex: 1 }} />
-                          <button onClick={() => setReplyTo(msg.id)} style={{ fontSize: "11px", color: "#0a5caa", background: "none", border: "1px solid #c9daec", borderRadius: "2px", cursor: "pointer", padding: "1px 6px", fontFamily: "inherit" }}>Ответить</button>
-                          {topicData.isModerator && (
-                            <button onClick={async () => {
-                              if (!confirm("Удалить сообщение?")) return;
-                              const t = getToken();
-                              await fetch(`/api/houses/topics/${topicId}`, { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: t, msgId: msg.id }) });
-                              window.location.href = `/doma/${params.id}?topic=${topicId}`;
-                            }} style={{ fontSize: "11px", color: "#c40000", background: "none", border: "1px solid #c4000044", borderRadius: "3px", cursor: "pointer", padding: "1px 6px", fontFamily: "inherit" }}>Удалить</button>
-                          )}
-                        </div>
-                        <div style={{ whiteSpace: "pre-wrap", wordBreak: "break-word", padding: "6px 8px", fontSize: "14px", lineHeight: 1.5, color: "#2A3B50" }}>{msg.body}</div>
-                      </div>
-                      {children.length > 0 && (
-                        <div style={{ position: "relative", marginTop: "4px" }}>
-                          {children.map((child, idx) => {
-                            const isLast = idx === children.length - 1;
-                            return (
-                              <div key={child.id} style={{ position: "relative", paddingLeft: PAD + "px", marginBottom: "4px" }}>
-                                <div style={{ position: "absolute", left: "12px", top: "-16px", height: isLast ? "28px" : "calc(100% + 20px)", width: "2px", background: TEAL, zIndex: 0 }} />
-                                <div style={{ position: "absolute", left: "12px", top: "10px", width: "20px", height: "2px", background: TEAL, zIndex: 0 }} />
-                                {renderNode(child, Math.min(level + 1, 4))}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                }
                 if (roots.length === 0) return <div style={{ padding: "20px", textAlign: "center", color: "#56657a", fontSize: "14px" }}>Нет ответов. Напишите первым!</div>;
-                return roots.map(root => renderNode(root, 0));
+                return roots.map(root => renderMsg(root, 0));
               })()}
             </div>
-            {!tp.closed ? (
-              <form onSubmit={handleReply} style={{ marginTop: "16px" }}>
-                {replyTo && (
-                  <div style={{ marginBottom: "6px", fontSize: "13px", color: "#0a5caa", display: "flex", alignItems: "center", gap: "6px" }}>
-                    Ответ на сообщение
-                    <button type="button" onClick={() => setReplyTo("")} style={{ color: "#c40000", background: "none", border: "none", cursor: "pointer", fontSize: "13px", fontFamily: "inherit" }}>✕ Отмена</button>
+
+            {/* Форма быстрого ответа — как .sk-qr на форуме */}
+            <div className="sk-qr" id="reply-form">
+              <div className="sk-qr-label">Быстрый ответ в теме:</div>
+              {!tp.closed ? (
+                <>
+                  {replyTo && (
+                    <div className="sk-qr-target">
+                      Ответ на сообщение
+                      <button onClick={() => setReplyTo("")}>отменить ×</button>
+                    </div>
+                  )}
+                  <textarea value={reply} onChange={(e) => setReply(e.target.value)} placeholder="Напишите ваше мнение…" maxLength={10000} />
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+                    <button className="sk-btn-classic" disabled={replyBusy || !reply.trim()} onClick={handleReply as any}>{replyBusy ? "Проверка…" : "Отправить мнение"}</button>
                   </div>
-                )}
-                <textarea value={reply} onChange={(e) => setReply(e.target.value)} placeholder={replyTo ? "Ваш ответ соседу…" : "Написать сообщение…"} rows={3} style={{ width: "100%", padding: "10px 12px", border: "1px solid #4A688C", borderRadius: "4px", fontSize: "15px", fontFamily: "inherit", boxSizing: "border-box", resize: "vertical" }} />
-                {replyError && <div style={{ color: "#c40000", fontSize: "13px", marginTop: "6px" }}>{replyError}</div>}
-                <button type="submit" disabled={replyBusy} style={{ marginTop: "8px", padding: "10px 20px", background: "#0a7d75", color: "#fff", border: "none", borderRadius: "4px", fontSize: "15px", fontWeight: 700, fontFamily: "inherit", cursor: replyBusy ? "wait" : "pointer" }}>
-                  {replyBusy ? "Отправка…" : "Отправить"}
-                </button>
-              </form>
-            ) : (
-              <div style={{ marginTop: "16px", padding: "12px", textAlign: "center", color: "#56657a", fontSize: "14px", background: "#f8fafc", borderRadius: "4px" }}>🔒 Тема закрыта для новых ответов</div>
-            )}
+                  {replyError && <div style={{ color: "#c40000", fontSize: "13px", marginTop: "6px" }}>{replyError}</div>}
+                </>
+              ) : (
+                <div className="sk-note">Тема закрыта для новых сообщений.</div>
+              )}
+            </div>
           </div>
           <SiteFooter settings={settings} />
         </div>
