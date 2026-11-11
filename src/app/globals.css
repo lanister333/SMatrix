@@ -11277,14 +11277,36 @@ section[aria-label="Погода на Сахалине"] .mp-w-frame {
   height: 64px !important;
 }
 
-/* 2026-11-11: Домовой чат — сохранить голубую шапку .sk-msg-head
-   на мобильных (форум убирает её, но дому нужна для визуального
-   отличия от форума и читаемости). */
+/* 2026-11-11: Домовой чат — тема в рамке (.sk-topicbox), ответы без
+   выделения (убираем border/background у .sk-msg и .sk-msg-head),
+   чтобы визуально отделить тему (заголовок) от потока ответов. */
+.doma-topic .sk-msg {
+  background: transparent !important;
+  border: 0 !important;
+  margin-bottom: 6px !important;
+  padding: 0 !important;
+}
+.doma-topic .sk-msg-head {
+  background: transparent !important;
+  border-bottom: 0 !important;
+  padding: 2px 0 !important;
+  min-height: 0 !important;
+}
+.doma-topic .sk-msg-body {
+  padding: 0 !important;
+}
+/* Тонкая разделительная линия между ответами для читаемости */
+.doma-topic .sk-msg + .sk-msg,
+.doma-topic .sakh-comments-container > div > div + div {
+  border-top: 1px dashed #e1e8ee !important;
+  padding-top: 6px !important;
+  margin-top: 2px !important;
+}
 @media (max-width: 480px) {
   .doma-topic .sk-msg-head {
-    background: #d3e2f2 !important;
-    border-bottom: 1px solid #b9cde2 !important;
-    padding: 3px 8px !important;
-    min-height: 20px !important;
+    background: transparent !important;
+    border-bottom: 0 !important;
+    padding: 2px 0 !important;
+    min-height: 0 !important;
   }
 }
