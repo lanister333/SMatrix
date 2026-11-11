@@ -363,6 +363,9 @@ function HousePageInner() {
               <div className="t-meta">
                 Автор: <b style={{ color: "#1E3A5F" }}>{tp.authorNick}</b> · создана {new Date(tp.createdAt).toLocaleString("ru-RU")}
               </div>
+              {tp.body && (
+                <div style={{ fontSize: "15px", color: "#2A3B50", lineHeight: 1.6, padding: "8px 0", whiteSpace: "pre-wrap" }}>{tp.body}</div>
+              )}
             </div>
 
             {/* Админ-кнопки темы */}
