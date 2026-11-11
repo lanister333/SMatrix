@@ -35,7 +35,7 @@ interface HouseData {
   topics: Topic[];
   isModerator: boolean;
 }
-interface Msg { id: string; body: string; authorNick: string; createdAt: string; }
+interface Msg { id: string; body: string; authorNick: string; parentId: string; createdAt: string; }
 interface TopicDetail {
   topic: { id: string; title: string; body: string; authorNick: string; pinned: boolean; closed: boolean; createdAt: string; houseId: string; branchId: string; };
   messages: Msg[];
@@ -69,6 +69,7 @@ function HousePageInner() {
   const [reply, setReply] = useState("");
   const [replyBusy, setReplyBusy] = useState(false);
   const [replyError, setReplyError] = useState("");
+  const [replyTo, setReplyTo] = useState("");
   const [chatData, setChatData] = useState<ChatData | null>(null);
   const [chatMsg, setChatMsg] = useState("");
   const [chatBusy, setChatBusy] = useState(false);
@@ -170,11 +171,12 @@ function HousePageInner() {
     try {
       const r = await fetch(`/api/houses/topics/${topicId}`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: t, body: reply }),
+        body: JSON.stringify({ token: t, body: reply, parentId: replyTo }),
       });
       const d = await r.json();
       if (!r.ok) throw Error(d.error || "Ошибка");
       setReply("");
+      setReplyTo("");
       // Reload topic
       window.location.href = `/doma/${params.id}?topic=${topicId}`;
     } catch (e) { setReplyError(e instanceof Error ? e.message : "Ошибка"); }
@@ -281,24 +283,80 @@ function HousePageInner() {
               )}
             </div>
             {tp.body && (
-              <div style={{ background: "#fff", border: "1px solid #d0d9e6", borderRadius: "4px", padding: "14px 16px", marginBottom: "12px" }}>
-                <div style={{ fontSize: "15px", color: "#2A3B50", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{tp.body}</div>
+              <div className="sk-msg" style={{ background: "#fbfdff", border: "1px solid #1E3A5F", marginBottom: "8px" }}>
+                <div className="sk-msg-head" style={{ background: "#d3e2f2", borderBottom: "1px solid #b9cde2", padding: "3px 8px", display: "flex", alignItems: "center", gap: "8px" }}>
+                  <b style={{ color: "#1E3A5F", fontSize: "13px" }}>{tp.authorNick}</b>
+                  <span style={{ fontSize: "12px", color: "#56657a" }}>{new Date(tp.createdAt).toLocaleString("ru-RU")}</span>
+                </div>
+                <div style={{ whiteSpace: "pre-wrap", wordBreak: "break-word", padding: "6px 8px", fontSize: "14px", lineHeight: 1.5, color: "#2A3B50" }}>{tp.body}</div>
               </div>
             )}
-            {topicData.messages.map((m) => (
-              <div key={m.id} style={{ background: "#fff", border: "1px solid #d0d9e6", borderRadius: "4px", padding: "12px 16px", marginBottom: "8px" }}>
-                <div style={{ fontSize: "13px", color: "#56657a", marginBottom: "4px" }}>
-                  <b style={{ color: "#1E3A5F" }}>{m.authorNick}</b> · {new Date(m.createdAt).toLocaleString("ru-RU")}
-                </div>
-                <div style={{ fontSize: "15px", color: "#2A3B50", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{m.body}</div>
-              </div>
-            ))}
+            {/* Дерево сообщений — лесница как на форуме */}
+            <div className="sakh-comments-container" style={{ position: "relative" }}>
+              {(() => {
+                const TEAL = "#249790";
+                const PAD = 30;
+                const childrenMap = new Map<string, Msg[]>();
+                for (const m of topicData.messages) {
+                  const key = m.parentId || "";
+                  if (!childrenMap.has(key)) childrenMap.set(key, []);
+                  childrenMap.get(key)!.push(m);
+                }
+                const roots = childrenMap.get("") || [];
+                function renderNode(msg: Msg, level: number): React.ReactNode {
+                  const children = childrenMap.get(msg.id) || [];
+                  return (
+                    <div key={msg.id} style={{ position: "relative", marginBottom: "8px" }}>
+                      <div className="sk-msg" style={{ position: "relative", zIndex: 1, background: "#fbfdff", border: "1px solid #1E3A5F" }}>
+                        <div className="sk-msg-head" style={{ background: "#d3e2f2", borderBottom: "1px solid #b9cde2", padding: "3px 8px", display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                          <b style={{ color: "#1E3A5F", fontSize: "13px" }}>{msg.authorNick}</b>
+                          <span style={{ fontSize: "12px", color: "#56657a" }}>{new Date(msg.createdAt).toLocaleString("ru-RU")}</span>
+                          <span style={{ flex: 1 }} />
+                          <button onClick={() => setReplyTo(msg.id)} style={{ fontSize: "11px", color: "#0a5caa", background: "none", border: "1px solid #c9daec", borderRadius: "2px", cursor: "pointer", padding: "1px 6px", fontFamily: "inherit" }}>Ответить</button>
+                          {topicData.isModerator && (
+                            <button onClick={async () => {
+                              if (!confirm("Удалить сообщение?")) return;
+                              const t = getToken();
+                              await fetch(`/api/houses/topics/${topicId}`, { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: t, msgId: msg.id }) });
+                              window.location.href = `/doma/${params.id}?topic=${topicId}`;
+                            }} style={{ fontSize: "11px", color: "#c40000", background: "none", border: "1px solid #c4000044", borderRadius: "3px", cursor: "pointer", padding: "1px 6px", fontFamily: "inherit" }}>Удалить</button>
+                          )}
+                        </div>
+                        <div style={{ whiteSpace: "pre-wrap", wordBreak: "break-word", padding: "6px 8px", fontSize: "14px", lineHeight: 1.5, color: "#2A3B50" }}>{msg.body}</div>
+                      </div>
+                      {children.length > 0 && (
+                        <div style={{ position: "relative", marginTop: "4px" }}>
+                          {children.map((child, idx) => {
+                            const isLast = idx === children.length - 1;
+                            return (
+                              <div key={child.id} style={{ position: "relative", paddingLeft: PAD + "px", marginBottom: "4px" }}>
+                                <div style={{ position: "absolute", left: "12px", top: "-16px", height: isLast ? "28px" : "calc(100% + 20px)", width: "2px", background: TEAL, zIndex: 0 }} />
+                                <div style={{ position: "absolute", left: "12px", top: "10px", width: "20px", height: "2px", background: TEAL, zIndex: 0 }} />
+                                {renderNode(child, Math.min(level + 1, 4))}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+                if (roots.length === 0) return <div style={{ padding: "20px", textAlign: "center", color: "#56657a", fontSize: "14px" }}>Нет ответов. Напишите первым!</div>;
+                return roots.map(root => renderNode(root, 0));
+              })()}
+            </div>
             {!tp.closed ? (
               <form onSubmit={handleReply} style={{ marginTop: "16px" }}>
-                <textarea value={reply} onChange={(e) => setReply(e.target.value)} placeholder="Ваш ответ…" rows={3} style={{ width: "100%", padding: "10px 12px", border: "1px solid #4A688C", borderRadius: "4px", fontSize: "15px", fontFamily: "inherit", boxSizing: "border-box", resize: "vertical" }} />
+                {replyTo && (
+                  <div style={{ marginBottom: "6px", fontSize: "13px", color: "#0a5caa", display: "flex", alignItems: "center", gap: "6px" }}>
+                    Ответ на сообщение
+                    <button type="button" onClick={() => setReplyTo("")} style={{ color: "#c40000", background: "none", border: "none", cursor: "pointer", fontSize: "13px", fontFamily: "inherit" }}>✕ Отмена</button>
+                  </div>
+                )}
+                <textarea value={reply} onChange={(e) => setReply(e.target.value)} placeholder={replyTo ? "Ваш ответ соседу…" : "Написать сообщение…"} rows={3} style={{ width: "100%", padding: "10px 12px", border: "1px solid #4A688C", borderRadius: "4px", fontSize: "15px", fontFamily: "inherit", boxSizing: "border-box", resize: "vertical" }} />
                 {replyError && <div style={{ color: "#c40000", fontSize: "13px", marginTop: "6px" }}>{replyError}</div>}
                 <button type="submit" disabled={replyBusy} style={{ marginTop: "8px", padding: "10px 20px", background: "#0a7d75", color: "#fff", border: "none", borderRadius: "4px", fontSize: "15px", fontWeight: 700, fontFamily: "inherit", cursor: replyBusy ? "wait" : "pointer" }}>
-                  {replyBusy ? "Отправка…" : "Ответить"}
+                  {replyBusy ? "Отправка…" : "Отправить"}
                 </button>
               </form>
             ) : (

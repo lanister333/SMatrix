@@ -1332,6 +1332,7 @@ model HouseMessage {
   authorId    String
   authorNick  String
   body        String
+  parentId    String   @default("")
   createdAt   DateTime @default(now())
 
   @@index([topicId, createdAt])

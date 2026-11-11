@@ -45,6 +45,7 @@ export async function GET(
         id: m.id,
         body: m.body,
         authorNick: m.authorNick,
+        parentId: m.parentId,
         createdAt: m.createdAt,
       })),
       isModerator: isMod,
@@ -82,6 +83,7 @@ export async function POST(
         authorId: user.id,
         authorNick: user.nickname,
         body: text,
+        parentId: String(body.parentId || ""),
       },
     });
 
@@ -130,8 +132,8 @@ export async function PATCH(
 }
 
 /**
- * DELETE /api/houses/topics/[topicId]?token=...
- * — Удалить тему (модератор).
+ * DELETE /api/houses/topics/[topicId]?token=... — Удалить тему (модератор).
+ * DELETE с body { token, msgId } — Удалить одно сообщение (модератор).
  */
 export async function DELETE(
   req: NextRequest,
@@ -140,7 +142,18 @@ export async function DELETE(
   try {
     const { topicId } = await params;
     const token = req.nextUrl.searchParams.get("token");
-    const user = token ? await userByToken(token) : null;
+    let user = token ? await userByToken(token) : null;
+
+    // Если тело есть — это удаление одного сообщения
+    let msgId = "";
+    try {
+      const body = await req.json();
+      if (body.msgId) {
+        msgId = String(body.msgId);
+        if (!user && body.token) user = await userByToken(body.token);
+      }
+    } catch {}
+
     if (!user) return NextResponse.json({ error: "Нужно войти" }, { status: 401 });
 
     const topic = await db.houseTopic.findUnique({ where: { id: topicId } });
@@ -153,6 +166,13 @@ export async function DELETE(
       return NextResponse.json({ error: "Нет прав на удаление" }, { status: 403 });
     }
 
+    if (msgId) {
+      // Удалить одно сообщение (+ его дочерние)
+      await db.houseMessage.deleteMany({ where: { topicId, OR: [{ id: msgId }, { parentId: msgId }] } });
+      return NextResponse.json({ ok: true });
+    }
+
+    // Удалить всю тему
     await db.houseMessage.deleteMany({ where: { topicId } });
     await db.houseTopic.delete({ where: { id: topicId } });
     return NextResponse.json({ ok: true });
