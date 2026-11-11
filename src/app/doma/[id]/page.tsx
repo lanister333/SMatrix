@@ -480,6 +480,9 @@ function HousePageInner() {
 
   // === FREE CHAT VIEW (?branch=freeChatBranchId) ===
   if (chatData && branchId) {
+    const chatTotal = chatData.messages.length;
+    const chatFirst = chatTotal ? 1 : 0;
+    const chatLast = chatTotal;
     return (
       <div className="sm-page flex min-h-screen flex-col">
         <Masthead settings={settings} />
@@ -488,6 +491,11 @@ function HousePageInner() {
           <div style={{ width: "100%", maxWidth: 900, margin: "0 auto", padding: "16px", boxSizing: "border-box" }}>
             <button onClick={() => window.location.href = `/doma/${params.id}`} style={{ color: "#0a5caa", textDecoration: "underline", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: "15px", marginBottom: "12px" }}>← Все ветки дома</button>
             <h1 style={{ fontSize: "20px", fontWeight: 700, color: "#1E3A5F", margin: "0 0 16px" }}>💬 Свободный чат жителей</h1>
+
+            {/* Бирюзовая полоса с количеством сообщений — как .sk-pager на форуме */}
+            <div className="sk-pager">
+              <span>Сообщения {chatFirst} - {chatLast} из <b>{chatTotal}</b></span>
+            </div>
 
             {/* Лента сообщений */}
             <div style={{ marginBottom: "20px" }}>
@@ -509,6 +517,11 @@ function HousePageInner() {
                   ))}
                 </div>
               )}
+            </div>
+
+            {/* Вторая бирюзовая полоса снизу — как на форуме */}
+            <div className="sk-pager">
+              <span>Сообщения {chatFirst} - {chatLast} из <b>{chatTotal}</b></span>
             </div>
 
             {/* Форма отправки */}
@@ -578,6 +591,10 @@ function HousePageInner() {
             <h2 style={{ fontSize: "17px", fontWeight: 700, color: "#1E3A5F", marginBottom: "10px" }}>
               {activeBranch ? `Темы в ветке «${activeBranch.title}»` : "Последние обсуждения в доме"}
             </h2>
+            {/* Бирюзовая полоса с количеством тем — как .sk-pager на форуме */}
+            <div className="sk-pager">
+              <span>Темы {data.topics.length ? 1 : 0} - {data.topics.length} из <b>{data.topics.length}</b></span>
+            </div>
             {data.topics.length === 0 ? (
               <div style={{ padding: "20px", textAlign: "center", color: "#56657a", fontSize: "14px", background: "#f8fafc", borderRadius: "4px" }}>Пока нет ни одной темы. Создайте первую — форму ниже.</div>
             ) : (
@@ -612,6 +629,10 @@ function HousePageInner() {
                 })}
               </div>
             )}
+            {/* Вторая бирюзовая полоса снизу — как на форуме */}
+            <div className="sk-pager">
+              <span>Темы {data.topics.length ? 1 : 0} - {data.topics.length} из <b>{data.topics.length}</b></span>
+            </div>
           </div>
 
           {/* Форма создания темы — только внутри ветки (не на главной) и не в свободном чате */}

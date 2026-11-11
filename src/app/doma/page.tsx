@@ -282,6 +282,10 @@ export default function DomaPage() {
                   boxSizing: "border-box",
                 }}
               />
+              {/* Бирюзовая полоса с количеством домов — как .sk-pager на форуме */}
+              <div className="sk-pager">
+                <span>Дома {filtered.length ? 1 : 0} - {filtered.length} из <b>{houses.length}</b>{searchQ ? ` · найдено ${filtered.length}` : ""}</span>
+              </div>
               {filtered.length === 0 ? (
                 <div style={{ padding: "24px", textAlign: "center", color: "#56657a", fontSize: "14px" }}>
                   {houses.length === 0 ? "Пока ни один дом не создан. Будьте первым!" : "Ничего не найдено."}
@@ -320,6 +324,10 @@ export default function DomaPage() {
                   ))}
                 </div>
               )}
+              {/* Вторая бирюзовая полоса снизу — как на форуме */}
+              <div className="sk-pager">
+                <span>Дома {filtered.length ? 1 : 0} - {filtered.length} из <b>{houses.length}</b>{searchQ ? ` · найдено ${filtered.length}` : ""}</span>
+              </div>
             </div>
           </div>
         </div>
