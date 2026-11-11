@@ -41,7 +41,7 @@ interface TopicDetail {
   messages: Msg[];
   isModerator: boolean;
 }
-interface ChatMsg { id: string; body: string; authorNick: string; authorId: string; createdAt: string; }
+interface ChatMsg { id: string; body: string; authorNick: string; authorId: string; parentId?: string; createdAt: string; }
 interface ChatData { messages: ChatMsg[]; isModerator: boolean; }
 
 function getToken(): string {
@@ -85,6 +85,11 @@ function HousePageInner() {
   const [chatError, setChatError] = useState("");
   // Поле «перейти к №» в бирюзовой полосе под темой (как на форуме)
   const [gotoNum, setGotoNum] = useState("");
+  // Ответ на конкретное сообщение в свободном чате
+  const [chatReplyTo, setChatReplyTo] = useState<{ id: string; nick: string } | null>(null);
+  const [chatReplyText, setChatReplyText] = useState("");
+  const [chatReplyBusy, setChatReplyBusy] = useState(false);
+  const [chatReplyError, setChatReplyError] = useState("");
 
   useEffect(() => {
     fetch("/api/bootstrap").then((r) => r.json()).then((r) => { if (r.settings) setSettings({ ...DEFAULT_SETTINGS, ...r.settings }); }).catch(() => {});
@@ -250,6 +255,31 @@ function HousePageInner() {
     const cr = await fetch(`/api/houses/${params.id}/chat?token=${encodeURIComponent(t)}`);
     const cd = await cr.json();
     setChatData(cd);
+  };
+
+  // Ответ на конкретное сообщение в свободном чате (с parentId)
+  const handleChatReply = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setChatReplyError("");
+    const t = getToken();
+    if (!t) { setChatReplyError("Войдите на форум, чтобы писать."); return; }
+    if (!chatReplyText.trim() || !chatReplyTo) return;
+    setChatReplyBusy(true);
+    try {
+      const r = await fetch(`/api/houses/${params.id}/chat`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: t, body: chatReplyText, parentId: chatReplyTo.id }),
+      });
+      const d = await r.json();
+      if (!r.ok) throw Error(d.error || "Ошибка");
+      setChatReplyText("");
+      setChatReplyTo(null);
+      // Reload chat
+      const cr = await fetch(`/api/houses/${params.id}/chat?token=${encodeURIComponent(t)}`);
+      const cd = await cr.json();
+      setChatData(cd);
+    } catch (e) { setChatReplyError(e instanceof Error ? e.message : "Ошибка"); }
+    finally { setChatReplyBusy(false); }
   };
 
   // === LOADING ===
@@ -503,18 +533,67 @@ function HousePageInner() {
                 <div style={{ padding: "24px", textAlign: "center", color: "#56657a", fontSize: "14px", background: "#f8fafc", borderRadius: "4px" }}>Пока нет сообщений. Напишите первое!</div>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  {chatData.messages.map((m) => (
-                    <div key={m.id} style={{ background: "#fff", border: "1px solid #d0d9e6", borderRadius: "4px", padding: "12px 16px" }}>
-                      <div style={{ fontSize: "13px", color: "#56657a", marginBottom: "4px", display: "flex", alignItems: "center", gap: "8px" }}>
-                        <b style={{ color: "#1E3A5F" }}>{m.authorNick}</b>
-                        <span>{new Date(m.createdAt).toLocaleString("ru-RU")}</span>
-                        {chatData.isModerator && (
-                          <button onClick={() => handleChatDelete(m.id)} style={{ marginLeft: "auto", fontSize: "11px", color: "#c40000", background: "none", border: "1px solid #c4000044", borderRadius: "3px", cursor: "pointer", padding: "1px 6px", fontFamily: "inherit" }}>Удалить</button>
-                        )}
-                      </div>
-                      <div style={{ fontSize: "15px", color: "#2A3B50", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{m.body}</div>
-                    </div>
-                  ))}
+                  {/* Карта ID → ник для пометки «ответ на @Ник» */}
+                  {(() => {
+                    const nickById = new Map(chatData.messages.map((m) => [m.id, m.authorNick]));
+                    return chatData.messages.map((m) => {
+                      const parentNick = m.parentId ? nickById.get(m.parentId) : null;
+                      const isReplyTarget = chatReplyTo?.id === m.id;
+                      return (
+                        <div key={m.id} style={{
+                          background: isReplyTarget ? "#fff7d6" : "#fff",
+                          border: isReplyTarget ? "2px solid #b45309" : "1px solid #d0d9e6",
+                          borderRadius: "4px", padding: "12px 16px",
+                        }}>
+                          <div style={{ fontSize: "13px", color: "#56657a", marginBottom: "4px", display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                            <b style={{ color: "#1E3A5F" }}>{m.authorNick}</b>
+                            <span>{new Date(m.createdAt).toLocaleString("ru-RU")}</span>
+                            {/* Пометка «↪ ответ на @Ник» */}
+                            {parentNick && (
+                              <span style={{ color: "#0a7d75", fontSize: "12px", fontWeight: 600 }}>
+                                ↪ ответ на @{parentNick}
+                              </span>
+                            )}
+                            {/* Кнопки */}
+                            <span style={{ display: "flex", gap: "6px", marginLeft: "auto", flexShrink: 0 }}>
+                              <button
+                                onClick={() => { setChatReplyTo({ id: m.id, nick: m.authorNick }); setChatReplyText(""); setChatReplyError(""); }}
+                                style={{ fontSize: "11px", color: "#0a5caa", background: "none", border: "1px solid #0a5caa44", borderRadius: "3px", cursor: "pointer", padding: "1px 8px", fontFamily: "inherit" }}
+                              >Ответить</button>
+                              {chatData.isModerator && (
+                                <button onClick={() => handleChatDelete(m.id)} style={{ fontSize: "11px", color: "#c40000", background: "none", border: "1px solid #c4000044", borderRadius: "3px", cursor: "pointer", padding: "1px 6px", fontFamily: "inherit" }}>Удалить</button>
+                              )}
+                            </span>
+                          </div>
+                          <div style={{ fontSize: "15px", color: "#2A3B50", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{m.body}</div>
+                          {/* Inline-форма ответа — открывается под сообщением */}
+                          {isReplyTarget && (
+                            <form onSubmit={handleChatReply} style={{ marginTop: "10px", paddingTop: "10px", borderTop: "1px dashed #c0cad8" }}>
+                              <div style={{ fontSize: "12px", color: "#56657a", marginBottom: "6px" }}>
+                                Ответ на сообщение от <b style={{ color: "#1E3A5F" }}>{m.authorNick}</b>
+                                <button type="button" onClick={() => { setChatReplyTo(null); setChatReplyText(""); setChatReplyError(""); }} style={{ marginLeft: "8px", fontSize: "11px", color: "#c40000", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0 }}>отменить ×</button>
+                              </div>
+                              <textarea
+                                value={chatReplyText}
+                                onChange={(e) => setChatReplyText(e.target.value)}
+                                placeholder={`Ответ @${m.authorNick}…`}
+                                rows={2}
+                                autoFocus
+                                maxLength={5000}
+                                style={{ width: "100%", padding: "8px 12px", border: "1px solid #4A688C", borderRadius: "4px", fontSize: "14px", fontFamily: "inherit", boxSizing: "border-box", resize: "vertical" }}
+                              />
+                              {chatReplyError && <div style={{ color: "#c40000", fontSize: "12px", marginTop: "4px" }}>{chatReplyError}</div>}
+                              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "6px" }}>
+                                <button type="submit" disabled={chatReplyBusy || !chatReplyText.trim()} style={{ padding: "6px 16px", background: "#0a7d75", color: "#fff", border: "none", borderRadius: "4px", fontSize: "14px", fontWeight: 700, fontFamily: "inherit", cursor: chatReplyBusy || !chatReplyText.trim() ? "wait" : "pointer" }}>
+                                  {chatReplyBusy ? "…" : "Отправить ответ"}
+                                </button>
+                              </div>
+                            </form>
+                          )}
+                        </div>
+                      );
+                    });
+                  })()}
                 </div>
               )}
             </div>

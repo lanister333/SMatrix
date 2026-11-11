@@ -38,6 +38,7 @@ export async function GET(
         body: m.body,
         authorNick: m.authorNick,
         authorId: m.authorId,
+        parentId: m.parentId || "",
         createdAt: m.createdAt,
       })),
       isModerator: isMod,
@@ -49,8 +50,9 @@ export async function GET(
 
 /**
  * POST /api/houses/[id]/chat
- * Body: { token, body }
+ * Body: { token, body, parentId? }
  * — Отправить сообщение в прямой чат (без темы).
+ * — parentId (опц.) — ID сообщения, на которое отвечают.
  */
 export async function POST(
   req: NextRequest,
@@ -68,6 +70,17 @@ export async function POST(
     const text = String(body.body || "").trim().slice(0, 5000);
     if (!text) return NextResponse.json({ error: "Пустое сообщение" }, { status: 400 });
 
+    // Если указан parentId — проверим что родитель существует и принадлежит этому чату
+    const parentId = String(body.parentId || "").trim();
+    if (parentId) {
+      const parent = await db.houseMessage.findFirst({
+        where: { id: parentId, houseId: id, topicId: "" },
+      });
+      if (!parent) {
+        return NextResponse.json({ error: "Родительское сообщение не найдено" }, { status: 400 });
+      }
+    }
+
     const msg = await db.houseMessage.create({
       data: {
         topicId: "",  // пустой topicId = прямой чат, без темы
@@ -75,6 +88,7 @@ export async function POST(
         authorId: user.id,
         authorNick: user.nickname,
         body: text,
+        parentId,
       },
     });
 
