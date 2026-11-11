@@ -33,21 +33,18 @@ export default function RootLayout({
     <html lang="ru" suppressHydrationWarning>
       <head>
         {/* Исправление «мигания логотипа»: preload самозагруженного шрифта
-            Anton — браузер начинает качать woff2 одновременно с HTML, ещё до
-            разбора globals.css; вместе с font-display:block (globals.css)
+            Anton Latin — браузер начинает качать woff2 одновременно с HTML,
+            ещё до разбора globals.css; вместе с font-display:block (globals.css)
             логотип больше не рисуется фолбэк-шрифтом (Arial Narrow/Impact),
             который выглядел как «другой логотип» перед нормальным.
-            crossOrigin обязателен для preload шрифтов по спецификации. */}
+            crossOrigin обязателен для preload шрифтов по спецификации.
+            2026-11-11: preload только latin (основной) — latin-ext не нужен,
+            на сайте нет расширенной латиницы (ā, ē и т.п.); сам файл
+            остаётся доступным, просто не preload-ится, экономит приоритет
+            критичных ресурсов. */}
         <link
           rel="preload"
           href="/fonts/anton-latin.woff2"
-          as="font"
-          type="font/woff2"
-          crossOrigin="anonymous"
-        />
-        <link
-          rel="preload"
-          href="/fonts/anton-latin-ext.woff2"
           as="font"
           type="font/woff2"
           crossOrigin="anonymous"

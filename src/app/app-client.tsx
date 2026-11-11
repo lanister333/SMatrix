@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type React from "react";
+import dynamic from "next/dynamic";
 import { FolderOpen, MessageSquare } from "lucide-react";
 import {
   FAV_KEY,
@@ -21,7 +22,15 @@ import { AdminPanel, type AdminSection } from "@/components/forum/admin";
 import { DEFAULT_SETTINGS, isStaffRole, MainNav, Masthead, SiteFooter, useAuth, type SiteSettings } from "@/components/site/chrome";
 // ШАГ 27 (макет главной): центральный и правый столбцы главной по согласованному макету
 import HomeCenter from "@/components/site/home-center";
-import HomeRight from "@/components/site/home-right";
+// 2026-11-11: lazy-load правой колонки главной — большой блок с виджетами
+// (Погода, Курсы валют, Отключения, Пробки, Службы спасения) не нужен для
+// первого рендера; грузится после гидратации через динамический import.
+const HomeRightLazy = dynamic(() => import("@/components/site/home-right"), {
+  ssr: false,
+  loading: () => (
+    <aside className="sk-col-right right-column" style={{ minHeight: 200 }} />
+  ),
+});
 import SakhDatetimeBlock from "@/components/site/sakh-datetime-block";
 import { ManifestTrust } from "@/components/site/manifest-trust";
 // ЗАДАЧА 14 (Шаг №4): иконки скоупов и рубрик — единый источник с левой
@@ -933,7 +942,7 @@ export default function App({ initialSearchParams = {} }: { initialSearchParams?
               {isHome ? <HomeCenter onOpenTopic={openTopic} onOpenProfile={openProfile} onOpenRegister={openRegister} /> : mainView}
             </div>
             {isHome ? (
-              <HomeRight />
+              <HomeRightLazy />
             ) : (
               <aside className="sk-col-right right-column">
               {/* Часы на ВСЕХ страницах (не только на Главной): первым блоком
