@@ -83,6 +83,8 @@ function HousePageInner() {
   const [chatMsg, setChatMsg] = useState("");
   const [chatBusy, setChatBusy] = useState(false);
   const [chatError, setChatError] = useState("");
+  // Поле «перейти к №» в бирюзовой полосе под темой (как на форуме)
+  const [gotoNum, setGotoNum] = useState("");
 
   useEffect(() => {
     fetch("/api/bootstrap").then((r) => r.json()).then((r) => { if (r.settings) setSettings({ ...DEFAULT_SETTINGS, ...r.settings }); }).catch(() => {});
@@ -202,6 +204,21 @@ function HousePageInner() {
     window.location.href = `/doma/${params.id}?topic=${topicId}`;
   };
 
+  // === GOTO MESSAGE BY NUMBER (бирюзовая полоса «перейти к №» как на форуме) ===
+  const handleGotoMsg = (n: number) => {
+    if (!n || n < 1) return;
+    const el = document.querySelector(`.sk-msg[data-msgnum="${n}"]`) as HTMLElement | null;
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      // Краткая подсветка целевого сообщения
+      const prevBg = el.style.background;
+      el.style.transition = "background 0.3s ease";
+      el.style.background = "#fff7d6";
+      setTimeout(() => { el.style.background = prevBg; }, 1200);
+    }
+    setGotoNum("");
+  };
+
   // === CHAT HANDLERS ===
   const handleChatSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -284,6 +301,10 @@ function HousePageInner() {
     // Нумерация #1, #2, #3...
     const sortedMsgs = [...topicData.messages].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
     const numById = new Map(sortedMsgs.map((m, i) => [m.id, i + 1]));
+    // Границы видимых номеров для подписи в бирюзовой полосе «Ответы 1 - N из N»
+    const totalMsgs = sortedMsgs.length;
+    const firstNum = totalMsgs ? 1 : 0;
+    const lastNum = totalMsgs;
 
     function renderMsg(msg: Msg, level: number): React.ReactNode {
       const children = childrenMap.get(msg.id) || [];
@@ -380,6 +401,26 @@ function HousePageInner() {
               </div>
             )}
 
+            {/* Бирюзовая полоса с количеством ответов — как .sk-pager на форуме */}
+            <div className="sk-pager">
+              <span>Ответы {firstNum} - {lastNum} из <b>{totalMsgs}</b></span>
+              <span className="pg-goto">
+                <span>перейти к №</span>
+                <input
+                  value={gotoNum}
+                  onChange={(e) => setGotoNum(e.target.value.replace(/[^0-9]/g, ""))}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && gotoNum) handleGotoMsg(parseInt(gotoNum));
+                  }}
+                  aria-label="Перейти к сообщению по номеру"
+                />
+                <a
+                  onClick={() => { if (gotoNum) handleGotoMsg(parseInt(gotoNum)); }}
+                  title="Перейти к сообщению"
+                >»</a>
+              </span>
+            </div>
+
             {/* Дерево ответов — лесница с бирюзовыми линиями */}
             <div className="sakh-comments-container cc-container" style={{ position: "relative" }}>
               {(() => {
@@ -387,6 +428,26 @@ function HousePageInner() {
                 if (roots.length === 0) return <div style={{ padding: "20px", textAlign: "center", color: "#56657a", fontSize: "14px" }}>Нет ответов. Напишите первым!</div>;
                 return roots.map(root => renderMsg(root, 0));
               })()}
+            </div>
+
+            {/* Вторая бирюзовая полоса снизу — как на форуме (для симметрии) */}
+            <div className="sk-pager">
+              <span>Ответы {firstNum} - {lastNum} из <b>{totalMsgs}</b></span>
+              <span className="pg-goto">
+                <span>перейти к №</span>
+                <input
+                  value={gotoNum}
+                  onChange={(e) => setGotoNum(e.target.value.replace(/[^0-9]/g, ""))}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && gotoNum) handleGotoMsg(parseInt(gotoNum));
+                  }}
+                  aria-label="Перейти к сообщению по номеру"
+                />
+                <a
+                  onClick={() => { if (gotoNum) handleGotoMsg(parseInt(gotoNum)); }}
+                  title="Перейти к сообщению"
+                >»</a>
+              </span>
             </div>
 
             {/* Форма быстрого ответа — как .sk-qr на форуме */}
