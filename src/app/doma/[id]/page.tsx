@@ -49,6 +49,15 @@ function getToken(): string {
   return "";
 }
 
+/** Правильное склонение: 0 тем, 1 тема, 2 темы, 5 тем */
+function pluralTopics(n: number): string {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return `${n} тема`;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return `${n} темы`;
+  return `${n} тем`;
+}
+
 function HousePageInner() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
@@ -457,7 +466,7 @@ function HousePageInner() {
                     style={{ display: "flex", alignItems: "center", gap: "14px", padding: "16px 18px", background: "#fff", border: `1px solid ${colors[i % 3]}33`, borderLeft: `4px solid ${colors[i % 3]}`, borderRadius: "4px", cursor: "pointer", fontSize: "16px", fontFamily: "inherit", textAlign: "left", width: "100%", boxSizing: "border-box" }}>
                     <span style={{ fontSize: "28px" }}>{icons[i % 3]}</span>
                     <span style={{ flex: 1, fontWeight: 600, color: "#1E3A5F" }}>{b.title}</span>
-                    <span style={{ fontSize: "13px", color: "#56657a", flexShrink: 0 }}>{bc?.topicsCount ?? 0} тем</span>
+                    <span style={{ fontSize: "13px", color: "#56657a", flexShrink: 0 }}>{pluralTopics(bc?.topicsCount ?? 0)}</span>
                   </button>
                 );
               })}
@@ -505,24 +514,7 @@ function HousePageInner() {
             )}
           </div>
 
-          {/* Быстрое создание темы */}
-          <div style={{ background: "#f8fafc", border: "1px solid #d0d9e6", borderRadius: "6px", padding: "16px 20px" }}>
-            <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#1E3A5F", margin: "0 0 12px" }}>Создать тему</h3>
-            <form onSubmit={handleQuickSubmit} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              {!activeBranch && (
-                <select value={qfBranch} onChange={(e) => setQfBranch(e.target.value)} style={{ width: "100%", padding: "8px 12px", border: "1px solid #4A688C", borderRadius: "4px", fontSize: "14px", fontFamily: "inherit", boxSizing: "border-box" }}>
-                  {data.branches.map((b) => <option key={b.id} value={b.id}>{b.title}</option>)}
-                </select>
-              )}
-              <input type="text" value={qfTitle} onChange={(e) => setQfTitle(e.target.value)} placeholder="Заголовок темы" style={{ width: "100%", padding: "8px 12px", border: "1px solid #4A688C", borderRadius: "4px", fontSize: "14px", fontFamily: "inherit", boxSizing: "border-box" }} />
-              <textarea value={qfBody} onChange={(e) => setQfBody(e.target.value)} placeholder="Текст сообщения (необязательно)" rows={3} style={{ width: "100%", padding: "8px 12px", border: "1px solid #4A688C", borderRadius: "4px", fontSize: "14px", fontFamily: "inherit", boxSizing: "border-box", resize: "vertical" }} />
-              {qfError && <div style={{ color: "#c40000", fontSize: "13px", fontWeight: 600 }}>{qfError}</div>}
-              <button type="submit" disabled={qfBusy} style={{ padding: "10px 20px", background: "#0a7d75", color: "#fff", border: "none", borderRadius: "4px", fontSize: "15px", fontWeight: 700, fontFamily: "inherit", cursor: qfBusy ? "wait" : "pointer", width: "100%", boxSizing: "border-box" }}>
-                {qfBusy ? "Отправка…" : "Создать тему"}
-              </button>
-            </form>
-          </div>
-
+          {/* Кнопка возврата */}
           <div style={{ marginTop: "20px" }}>
             <button onClick={() => router.push("/doma")} style={{ color: "#0a5caa", textDecoration: "underline", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: "15px" }}>← К списку домов</button>
           </div>
