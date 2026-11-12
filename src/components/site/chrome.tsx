@@ -51,7 +51,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   siteSlogan: "Спроси у города — город ответит.",
   siteSubtitle: "Сахалинская матрица взаимопомощи",
   siteDescription:
-    "Независимый форум-портал для жителей острова: советы, рекомендации мастеров, дороги, рыбалка и жизнь Сахалина. Спроси — и город ответит.",
+    "Открытый форум Сахалина,\nгде каждый становится частью живого сообщества.\nДавайте сделаем жизнь на острове лучше вместе.",
   footerNote: "Спроси у города — город ответит.",
   urgentBannerEnabled: "0",
   urgentBannerText: "",
@@ -226,30 +226,63 @@ export function Masthead(props: { settings: SiteSettings }) {
             {props.settings?.siteSubtitle ?? DEFAULT_SETTINGS.siteSubtitle}
           </div>
           {/* 2026-10-12: слово «форум» в описании — кликабельная ссылка на /?view=forum.
-              Используем indexOf (не regex с \b — word boundary не работает для кириллицы). */}
+              Используем indexOf (не regex с \b — word boundary не работает для кириллицы).
+              2026-11-11: по требованию владельца убрано подчёркивание у слова «форум»
+              (textDecoration: none). Текст описания разбит на 3 строки через <br/>. */}
           <p className="mt-0.5 text-[11.5px] font-medium leading-snug text-white md:mt-0.5 md:text-[12.5px] max-[640px]:hidden">
             {(() => {
               const desc = props.settings?.siteDescription ?? DEFAULT_SETTINGS.siteDescription;
-              const lower = desc.toLowerCase();
-              const idx = lower.indexOf("форум");
-              if (idx < 0) return desc;
-              const before = desc.substring(0, idx);
-              const word = desc.substring(idx, idx + 5);  // exact case as in source
-              const after = desc.substring(idx + 5);
-              return (
-                <>
-                  {before}
-                  <a
-                    href="/?view=forum"
-                    className="text-white"
-                    style={{ fontWeight: 700, textDecoration: "underline", textDecorationColor: "rgba(255,255,255,0.85)", textDecorationThickness: "2px", textUnderlineOffset: "2px" }}
-                    title="Перейти на главную страницу форума"
-                  >
-                    {word}
-                  </a>
-                  {after}
-                </>
-              );
+              // Разбиваем на строки по \n; если их нет — выводим как есть
+              const lines = desc.split("\n");
+              if (lines.length <= 1) {
+                // Старый формат без переносов — обрабатываем «форум» как ссылку
+                const lower = desc.toLowerCase();
+                const idx = lower.indexOf("форум");
+                if (idx < 0) return desc;
+                const before = desc.substring(0, idx);
+                const word = desc.substring(idx, idx + 5);
+                const after = desc.substring(idx + 5);
+                return (
+                  <>
+                    {before}
+                    <a
+                      href="/?view=forum"
+                      className="text-white"
+                      style={{ fontWeight: 700, textDecoration: "none" }}
+                      title="Перейти на главную страницу форума"
+                    >
+                      {word}
+                    </a>
+                    {after}
+                  </>
+                );
+              }
+              // Многострочный формат: для каждой строки рендерим отдельно, между строками <br/>
+              return lines.map((line, i) => {
+                const lower = line.toLowerCase();
+                const idx = lower.indexOf("форум");
+                if (idx < 0) {
+                  return <span key={i}>{i > 0 && <br />}{line}</span>;
+                }
+                const before = line.substring(0, idx);
+                const word = line.substring(idx, idx + 5);
+                const after = line.substring(idx + 5);
+                return (
+                  <span key={i}>
+                    {i > 0 && <br />}
+                    {before}
+                    <a
+                      href="/?view=forum"
+                      className="text-white"
+                      style={{ fontWeight: 700, textDecoration: "none" }}
+                      title="Перейти на главную страницу форума"
+                    >
+                      {word}
+                    </a>
+                    {after}
+                  </span>
+                );
+              });
             })()}
           </p>
         </div>

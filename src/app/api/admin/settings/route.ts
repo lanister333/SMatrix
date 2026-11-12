@@ -33,7 +33,7 @@ const EDITABLE_KEYS = [
 const DEFAULTS: Record<string, string> = {
   siteSlogan: "Спроси у города — город ответит.",
   siteSubtitle: "Сахалинская матрица взаимопомощи",
-  siteDescription: "",
+  siteDescription: "Открытый форум Сахалина,\nгде каждый становится частью живого сообщества.\nДавайте сделаем жизнь на острове лучше вместе.",
   footerNote: "",
   registrationEnabled: "1",
   newTopicsEnabled: "1",
