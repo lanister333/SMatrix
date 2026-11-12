@@ -228,8 +228,10 @@ export function Masthead(props: { settings: SiteSettings }) {
           {/* 2026-10-12: слово «форум» в описании — кликабельная ссылка на /?view=forum.
               Используем indexOf (не regex с \b — word boundary не работает для кириллицы).
               2026-11-11: по требованию владельца убрано подчёркивание у слова «форум»
-              (textDecoration: none). Текст описания разбит на 3 строки через <br/>. */}
-          <p className="mt-0.5 text-[11.5px] font-medium leading-snug text-white md:mt-0.5 md:text-[12.5px] max-[640px]:hidden">
+              (textDecoration: none). Текст описания разбит на 3 строки через <br/>.
+              2026-11-12: межстрочный интервал уплотнён (leading-tight вместо leading-snug),
+              чтобы трёхстрочное описание занимало столько же места, сколько однострочное. */}
+          <p className="mt-0.5 text-[11.5px] font-medium leading-tight text-white md:mt-0.5 md:text-[12.5px] max-[640px]:hidden">
             {(() => {
               const desc = props.settings?.siteDescription ?? DEFAULT_SETTINGS.siteDescription;
               // Разбиваем на строки по \n; если их нет — выводим как есть
