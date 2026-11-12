@@ -221,7 +221,10 @@ export function Masthead(props: { settings: SiteSettings }) {
             {props.settings?.siteSlogan ?? DEFAULT_SETTINGS.siteSlogan}
           </p>
         </div>
-        <div className="sm-mh-side header-appeal shrink-0 text-left md:max-w-[380px] md:text-right">
+        {/* 2026-11-12: по требованию владельца текст описания выровнен
+            по ЛЕВОЙ границе (было md:text-right — прижимало к правому
+            краю правой колонки шапки). */}
+        <div className="sm-mh-side header-appeal shrink-0 text-left md:max-w-[380px] md:text-left">
           <div className="text-[12px] font-bold uppercase leading-tight tracking-wide text-white md:text-[13.5px] xl:text-[15px]">
             {props.settings?.siteSubtitle ?? DEFAULT_SETTINGS.siteSubtitle}
           </div>
