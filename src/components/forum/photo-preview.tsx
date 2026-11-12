@@ -5,6 +5,12 @@ interface PhotoItem {
   alt: string;
 }
 
+/** Расширение PhotoItem с типом медиа — image или video.
+ * 2026-11-12: добавлено для поддержки видео в домовых чатах. */
+interface MediaItem extends PhotoItem {
+  kind: "image" | "video";
+}
+
 interface Props {
   photos: PhotoItem[];
   onRemove: (url: string) => void;
@@ -82,13 +88,28 @@ export function photosToMarkdown(photos: PhotoItem[]): string {
   return photos.map((p) => `![${p.alt}](${p.url})`).join("\n");
 }
 
-/** Распарсить markdown-фото из текста (для инициализации при редактировании) */
+/** Распарсить markdown-медиа (фото+видео) из текста.
+ * 2026-11-12: добавлена поддержка видео — определяется по расширению URL
+ * (.mp4, .webm → kind:"video", остальное → "image"). */
 export function markdownToPhotos(text: string): PhotoItem[] {
   const re = /!\[([^\]]*)\]\(([^)]+)\)/g;
   const result: PhotoItem[] = [];
   let m: RegExpExecArray | null;
   while ((m = re.exec(text)) !== null) {
     result.push({ alt: m[1] || "фото", url: m[2] });
+  }
+  return result;
+}
+
+/** Расширенная версия: возвращает тип медиа (image/video) по URL. */
+export function markdownToMedia(text: string): MediaItem[] {
+  const re = /!\[([^\]]*)\]\(([^)]+)\)/g;
+  const result: MediaItem[] = [];
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text)) !== null) {
+    const url = m[2];
+    const isVideo = /\.(mp4|webm)$/i.test(url);
+    result.push({ alt: m[1] || (isVideo ? "видео" : "фото"), url, kind: isVideo ? "video" : "image" });
   }
   return result;
 }

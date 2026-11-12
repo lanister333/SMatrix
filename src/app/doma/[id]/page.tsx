@@ -12,6 +12,9 @@ import {
   type SiteSettings,
 } from "@/components/site/chrome";
 import { AUTH_KEY } from "@/lib/ui";
+import { UploadMediaButton } from "@/components/forum/upload-media-button";
+import { PhotoPreview } from "@/components/forum/photo-preview";
+import { TextWithPhotos } from "@/components/site/text-with-photos";
 
 const NAV_ROUTES: Record<string, string> = {
   home: "/", forum: "/?view=forum", ads: "/obyavleniya",
@@ -90,6 +93,10 @@ function HousePageInner() {
   const [chatReplyText, setChatReplyText] = useState("");
   const [chatReplyBusy, setChatReplyBusy] = useState(false);
   const [chatReplyError, setChatReplyError] = useState("");
+  // Медиа (фото/видео) для прикрепления к сообщениям
+  const [replyPhotos, setReplyPhotos] = useState<{ url: string; alt: string }[]>([]);
+  const [chatPhotos, setChatPhotos] = useState<{ url: string; alt: string }[]>([]);
+  const [chatReplyPhotos, setChatReplyPhotos] = useState<{ url: string; alt: string }[]>([]);
 
   useEffect(() => {
     fetch("/api/bootstrap").then((r) => r.json()).then((r) => { if (r.settings) setSettings({ ...DEFAULT_SETTINGS, ...r.settings }); }).catch(() => {});
@@ -182,17 +189,21 @@ function HousePageInner() {
     setReplyError("");
     const t = getToken();
     if (!t) { setReplyError("Войдите на форум, чтобы писать."); return; }
-    if (!reply.trim()) return;
+    if (!reply.trim() && replyPhotos.length === 0) return;
     setReplyBusy(true);
     try {
+      // Собираем body: текст + markdown-медиа в конце
+      const photosMd = replyPhotos.map((p) => `\n![${p.alt}](${p.url})`).join("");
+      const body = (reply.trim() || "") + photosMd;
       const r = await fetch(`/api/houses/topics/${topicId}`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: t, body: reply, parentId: replyTo }),
+        body: JSON.stringify({ token: t, body, parentId: replyTo }),
       });
       const d = await r.json();
       if (!r.ok) throw Error(d.error || "Ошибка");
       setReply("");
       setReplyTo("");
+      setReplyPhotos([]);
       // Reload topic
       window.location.href = `/doma/${params.id}?topic=${topicId}`;
     } catch (e) { setReplyError(e instanceof Error ? e.message : "Ошибка"); }
@@ -230,16 +241,19 @@ function HousePageInner() {
     setChatError("");
     const t = getToken();
     if (!t) { setChatError("Войдите на форум, чтобы писать."); return; }
-    if (!chatMsg.trim()) return;
+    if (!chatMsg.trim() && chatPhotos.length === 0) return;
     setChatBusy(true);
     try {
+      const photosMd = chatPhotos.map((p) => `\n![${p.alt}](${p.url})`).join("");
+      const body = (chatMsg.trim() || "") + photosMd;
       const r = await fetch(`/api/houses/${params.id}/chat`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: t, body: chatMsg }),
+        body: JSON.stringify({ token: t, body }),
       });
       const d = await r.json();
       if (!r.ok) throw Error(d.error || "Ошибка");
       setChatMsg("");
+      setChatPhotos([]);
       // Reload chat
       const cr = await fetch(`/api/houses/${params.id}/chat?token=${encodeURIComponent(t)}`);
       const cd = await cr.json();
@@ -263,16 +277,20 @@ function HousePageInner() {
     setChatReplyError("");
     const t = getToken();
     if (!t) { setChatReplyError("Войдите на форум, чтобы писать."); return; }
-    if (!chatReplyText.trim() || !chatReplyTo) return;
+    if (!chatReplyText.trim() && chatReplyPhotos.length === 0) return;
+    if (!chatReplyTo) return;
     setChatReplyBusy(true);
     try {
+      const photosMd = chatReplyPhotos.map((p) => `\n![${p.alt}](${p.url})`).join("");
+      const body = (chatReplyText.trim() || "") + photosMd;
       const r = await fetch(`/api/houses/${params.id}/chat`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: t, body: chatReplyText, parentId: chatReplyTo.id }),
+        body: JSON.stringify({ token: t, body, parentId: chatReplyTo.id }),
       });
       const d = await r.json();
       if (!r.ok) throw Error(d.error || "Ошибка");
       setChatReplyText("");
+      setChatReplyPhotos([]);
       setChatReplyTo(null);
       // Reload chat
       const cr = await fetch(`/api/houses/${params.id}/chat?token=${encodeURIComponent(t)}`);
@@ -371,7 +389,7 @@ function HousePageInner() {
                   └ ответ на тему
                 </span>
               )}
-              {msg.body}
+              <TextWithPhotos text={msg.body} />
             </div>
           </div>
           {children.length > 0 && (
@@ -491,9 +509,17 @@ function HousePageInner() {
                       <button onClick={() => setReplyTo("")}>отменить ×</button>
                     </div>
                   )}
+                  {replyPhotos.length > 0 && (
+                    <PhotoPreview photos={replyPhotos} onRemove={(url) => setReplyPhotos((p) => p.filter((x) => x.url !== url))} />
+                  )}
                   <textarea value={reply} onChange={(e) => setReply(e.target.value)} placeholder="Напишите ваше мнение…" maxLength={10000} />
                   <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-                    <button className="sk-btn-classic" disabled={replyBusy || !reply.trim()} onClick={handleReply as any}>{replyBusy ? "Проверка…" : "Отправить мнение"}</button>
+                    <UploadMediaButton
+                      token={getToken()}
+                      onUploaded={(url, alt) => setReplyPhotos((p) => [...p, { url, alt }])}
+                      notify={(m) => setReplyError(m)}
+                    />
+                    <button className="sk-btn-classic" disabled={replyBusy || (!reply.trim() && replyPhotos.length === 0)} onClick={handleReply as any}>{replyBusy ? "Проверка…" : "Отправить мнение"}</button>
                   </div>
                   {replyError && <div style={{ color: "#c40000", fontSize: "13px", marginTop: "6px" }}>{replyError}</div>}
                 </>
@@ -565,14 +591,19 @@ function HousePageInner() {
                               )}
                             </span>
                           </div>
-                          <div style={{ fontSize: "15px", color: "#2A3B50", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{m.body}</div>
+                          <div style={{ fontSize: "15px", color: "#2A3B50", lineHeight: 1.6 }}>
+                            <TextWithPhotos text={m.body} />
+                          </div>
                           {/* Inline-форма ответа — открывается под сообщением */}
                           {isReplyTarget && (
                             <form onSubmit={handleChatReply} style={{ marginTop: "10px", paddingTop: "10px", borderTop: "1px dashed #c0cad8" }}>
                               <div style={{ fontSize: "12px", color: "#56657a", marginBottom: "6px" }}>
                                 Ответ на сообщение от <b style={{ color: "#1E3A5F" }}>{m.authorNick}</b>
-                                <button type="button" onClick={() => { setChatReplyTo(null); setChatReplyText(""); setChatReplyError(""); }} style={{ marginLeft: "8px", fontSize: "11px", color: "#c40000", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0 }}>отменить ×</button>
+                                <button type="button" onClick={() => { setChatReplyTo(null); setChatReplyText(""); setChatReplyPhotos([]); setChatReplyError(""); }} style={{ marginLeft: "8px", fontSize: "11px", color: "#c40000", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0 }}>отменить ×</button>
                               </div>
+                              {chatReplyPhotos.length > 0 && (
+                                <PhotoPreview photos={chatReplyPhotos} onRemove={(url) => setChatReplyPhotos((p) => p.filter((x) => x.url !== url))} />
+                              )}
                               <textarea
                                 value={chatReplyText}
                                 onChange={(e) => setChatReplyText(e.target.value)}
@@ -583,8 +614,13 @@ function HousePageInner() {
                                 style={{ width: "100%", padding: "8px 12px", border: "1px solid #4A688C", borderRadius: "4px", fontSize: "14px", fontFamily: "inherit", boxSizing: "border-box", resize: "vertical" }}
                               />
                               {chatReplyError && <div style={{ color: "#c40000", fontSize: "12px", marginTop: "4px" }}>{chatReplyError}</div>}
-                              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "6px" }}>
-                                <button type="submit" disabled={chatReplyBusy || !chatReplyText.trim()} style={{ padding: "6px 16px", background: "#0a7d75", color: "#fff", border: "none", borderRadius: "4px", fontSize: "14px", fontWeight: 700, fontFamily: "inherit", cursor: chatReplyBusy || !chatReplyText.trim() ? "wait" : "pointer" }}>
+                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "6px", gap: "8px", flexWrap: "wrap" }}>
+                                <UploadMediaButton
+                                  token={getToken()}
+                                  onUploaded={(url, alt) => setChatReplyPhotos((p) => [...p, { url, alt }])}
+                                  notify={(m) => setChatReplyError(m)}
+                                />
+                                <button type="submit" disabled={chatReplyBusy || (!chatReplyText.trim() && chatReplyPhotos.length === 0)} style={{ padding: "6px 16px", background: "#0a7d75", color: "#fff", border: "none", borderRadius: "4px", fontSize: "14px", fontWeight: 700, fontFamily: "inherit", cursor: chatReplyBusy || (!chatReplyText.trim() && chatReplyPhotos.length === 0) ? "wait" : "pointer" }}>
                                   {chatReplyBusy ? "…" : "Отправить ответ"}
                                 </button>
                               </div>
@@ -605,9 +641,17 @@ function HousePageInner() {
 
             {/* Форма отправки */}
             <form onSubmit={handleChatSend} style={{ position: "sticky", bottom: "0", background: "#fff", padding: "12px 0", borderTop: "2px solid #eef2f6" }}>
-              <div style={{ display: "flex", gap: "8px" }}>
+              {chatPhotos.length > 0 && (
+                <PhotoPreview photos={chatPhotos} onRemove={(url) => setChatPhotos((p) => p.filter((x) => x.url !== url))} />
+              )}
+              <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                <UploadMediaButton
+                  token={getToken()}
+                  onUploaded={(url, alt) => setChatPhotos((p) => [...p, { url, alt }])}
+                  notify={(m) => setChatError(m)}
+                />
                 <input type="text" value={chatMsg} onChange={(e) => setChatMsg(e.target.value)} placeholder="Написать сообщение…" style={{ flex: 1, padding: "10px 14px", border: "1px solid #4A688C", borderRadius: "4px", fontSize: "15px", fontFamily: "inherit" }} />
-                <button type="submit" disabled={chatBusy} style={{ padding: "10px 20px", background: "#0a7d75", color: "#fff", border: "none", borderRadius: "4px", fontSize: "15px", fontWeight: 700, fontFamily: "inherit", cursor: chatBusy ? "wait" : "pointer", flexShrink: 0 }}>
+                <button type="submit" disabled={chatBusy || (!chatMsg.trim() && chatPhotos.length === 0)} style={{ padding: "10px 20px", background: "#0a7d75", color: "#fff", border: "none", borderRadius: "4px", fontSize: "15px", fontWeight: 700, fontFamily: "inherit", cursor: (chatBusy || (!chatMsg.trim() && chatPhotos.length === 0)) ? "wait" : "pointer", flexShrink: 0 }}>
                   {chatBusy ? "…" : "Отправить"}
                 </button>
               </div>

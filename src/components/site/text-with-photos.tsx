@@ -1,6 +1,6 @@
 "use client";
 
-import { markdownToPhotos, stripPhotoMarkdown } from "@/components/forum/photo-preview";
+import { markdownToPhotos, markdownToMedia, stripPhotoMarkdown } from "@/components/forum/photo-preview";
 import { TwemojiText } from "@/components/forum/twemoji-text";
 
 interface Props {
@@ -12,19 +12,20 @@ interface Props {
 }
 
 /**
- * TextWithPhotos — рендерит текст с встроенными markdown-фото.
+ * TextWithPhotos — рендерит текст с встроенными markdown-фото и видео.
  *
  * Парсит markdown-синтаксис ![alt](url) из текста, разделяет на:
  *   - обычный текст (показывается как <p>)
- *   - фото (показываются как <img> галерея под текстом)
+ *   - медиа (фото как <img>, видео как <video>) галерея под текстом
  *
- * Используется во всех спецразделах (Рекомендую, Где купить, ЖКХ и т.д.),
- * чтобы фотографии загруженные через /api/upload отображались в публикациях.
+ * 2026-11-12: добавлена поддержка видео (mp4, webm) — определяется
+ * по расширению URL. Видео показывается через <video controls>.
  *
- * Создан 2026-11-03.
+ * Используется во всех спецразделах (Рекомендую, Где купить, ЖКХ и т.д.)
+ * и в домовых чатах.
  */
 export function TextWithPhotos({ text, maxWidth, onImageClick }: Props) {
-  const photos = markdownToPhotos(text);
+  const media = markdownToMedia(text);
   const textWithoutPhotos = stripPhotoMarkdown(text);
 
   return (
@@ -34,7 +35,7 @@ export function TextWithPhotos({ text, maxWidth, onImageClick }: Props) {
           <TwemojiText text={textWithoutPhotos} size={20} />
         </p>
       )}
-      {photos.length > 0 && (
+      {media.length > 0 && (
         <div
           className="text-photos-gallery"
           style={{
@@ -44,26 +45,42 @@ export function TextWithPhotos({ text, maxWidth, onImageClick }: Props) {
             marginTop: 8,
           }}
         >
-          {photos.map((img, i) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              key={i}
-              src={img.url}
-              alt={img.alt}
-              onClick={() => onImageClick?.(img.url, img.alt)}
-              style={{
-                maxWidth: maxWidth ?? 220,
-                maxHeight: 220,
-                width: "auto",
-                height: "auto",
-                objectFit: "cover",
-                borderRadius: 6,
-                border: "1px solid #e2e8f0",
-                cursor: onImageClick ? "pointer" : "default",
-                display: "block",
-              }}
-            />
-          ))}
+          {media.map((item, i) =>
+            item.kind === "video" ? (
+              <video
+                key={i}
+                src={item.url}
+                controls
+                style={{
+                  maxWidth: maxWidth ?? 320,
+                  maxHeight: 320,
+                  width: "100%",
+                  borderRadius: 6,
+                  border: "1px solid #e2e8f0",
+                  display: "block",
+                }}
+              />
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={i}
+                src={item.url}
+                alt={item.alt}
+                onClick={() => onImageClick?.(item.url, item.alt)}
+                style={{
+                  maxWidth: maxWidth ?? 220,
+                  maxHeight: 220,
+                  width: "auto",
+                  height: "auto",
+                  objectFit: "cover",
+                  borderRadius: 6,
+                  border: "1px solid #e2e8f0",
+                  cursor: onImageClick ? "pointer" : "default",
+                  display: "block",
+                }}
+              />
+            )
+          )}
         </div>
       )}
     </>
